@@ -13,13 +13,13 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import com.android.bookswap.resources.C
-import com.android.bookswap.ui.theme.SampleAppTheme
+import com.android.bookswap.ui.theme.BookSwapAppTheme
 
 class MainActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setContent {
-      SampleAppTheme {
+      BookSwapAppTheme {
         // A surface container using the 'background' color from the theme
         Surface(
             modifier = Modifier.fillMaxSize().semantics { testTag = C.Tag.main_screen_container },
@@ -39,5 +39,5 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
 @Preview(showBackground = true)
 @Composable
 fun GreetingPreview() {
-  SampleAppTheme { Greeting("Android") }
+  BookSwapAppTheme { Greeting("Android") }
 }
