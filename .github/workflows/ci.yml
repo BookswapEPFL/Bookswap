@@ -113,3 +113,12 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: ./gradlew sonar --parallel --build-cache
+
+      # Load google-services.json and local.properties from the secrets
+      - name: Decode secrets
+        env:
+          GOOGLE_SERVICES: ${{ secrets.GOOGLE_SERVICES }}
+          LOCAL_PROPERTIES: ${{ secrets.LOCAL_PROPERTIES }}
+        run: |
+          echo "$GOOGLE_SERVICES" | base64 --decode > ./app/google-services.json
+          echo "$LOCAL_PROPERTIES" | base64 --decode > ./local.properties
