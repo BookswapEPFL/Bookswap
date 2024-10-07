@@ -131,6 +131,10 @@ dependencies {
     globalTestImplementation(libs.androidx.junit)
     globalTestImplementation(libs.androidx.espresso.core)
 
+    // Google Service and Maps
+    implementation(libs.play.services.maps)
+    implementation(libs.play.services.auth)
+
     // ------------- Jetpack Compose ------------------
     val composeBom = platform(libs.compose.bom)
     implementation(composeBom)
