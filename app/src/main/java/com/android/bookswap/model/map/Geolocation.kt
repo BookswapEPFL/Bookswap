@@ -1,4 +1,4 @@
-package com.android.sample.model.map
+package com.android.bookswap.model.map
 
 import android.Manifest
 import android.annotation.SuppressLint
