@@ -75,10 +75,9 @@ class BooksFirestorerRepository(private val db: FirebaseFirestore) : Booksreposi
       val description = document.getString("Description") ?: return null
       val rating = document.getString("Rating") ?: return null
       val photo = document.getString("Photo") ?: return null
-      val language = document.getString("Language") ?: return null
       val isbn = document.getString("ISBN") ?: return null
-      val languageBook = Languages.valueOf(language)
-      DataBook(title, author, description, 0, photo, languageBook, isbn)
+      val languageBook = Languages.valueOf(document.getString("Language") ?: return null)
+      DataBook(title, author, description, rating.toInt(), photo, languageBook, isbn)
     } catch (e: Exception) {
       null // Return null in case of any exception during the conversion
     }

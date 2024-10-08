@@ -4,9 +4,7 @@ import androidx.test.core.app.ApplicationProvider
 import com.android.bookswap.model.BooksFirestorerRepository
 import com.android.bookswap.model.DataBook
 import com.android.bookswap.model.Languages
-import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.Tasks
-import com.google.firebase.Firebase
 import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.*
 import com.google.firebase.firestore.*
@@ -14,13 +12,11 @@ import com.google.firebase.firestore.util.Assert.fail
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers
 import org.mockito.Mock
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.`when`
 import org.mockito.MockitoAnnotations
-import org.mockito.junit.MockitoJUnitRunner
 import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.verify
 import org.robolectric.RobolectricTestRunner
@@ -58,11 +54,10 @@ class BooksFirestorerRepositoryTest {
     booksFirestorerRepository = BooksFirestorerRepository(mockFirestore)
 
     `when`(mockFirestore.collection(ArgumentMatchers.any())).thenReturn(mockCollectionReference)
-    `when`(mockCollectionReference.document(ArgumentMatchers.any())).thenReturn(mockDocumentReference)
+    `when`(mockCollectionReference.document(ArgumentMatchers.any()))
+        .thenReturn(mockDocumentReference)
     `when`(mockCollectionReference.get()).thenReturn(Tasks.forResult(mockQuerySnapshot))
   }
-
-
 
   @Test
   fun getbook_callsFirestoreGet() {
@@ -101,94 +96,113 @@ class BooksFirestorerRepositoryTest {
     verify(mockDocumentReference).delete()
   }
 
-    @Test
-    fun addBooks_callsFirestoreSet_andOnSuccess() {
-        // Arrange
-        doAnswer { Tasks.forResult(null) }.`when`(mockDocumentReference).set(testBook)
+  @Test
+  fun addBooks_callsFirestoreSet_andOnSuccess() {
+    // Arrange
+    doAnswer { Tasks.forResult(null) }.`when`(mockDocumentReference).set(testBook)
 
-        // Act
-        booksFirestorerRepository.addBooks(testBook, {
-            // Assert success callback
-            assert(true)
-        }, {
-            fail("Should not fail")
-        })
+    // Act
+    booksFirestorerRepository.addBooks(
+        testBook,
+        {
+          // Assert success callback
+          assert(true)
+        },
+        { fail("Should not fail") })
 
-        // Verify Firestore set operation
-        verify(mockDocumentReference).set(testBook)
-    }
-    @Test
-    fun updatebook_callsFirestoreSet_andOnSuccess() {
-        // Arrange
-        doAnswer { Tasks.forResult(null) }.`when`(mockDocumentReference).set(testBook)
+    // Verify Firestore set operation
+    verify(mockDocumentReference).set(testBook)
+  }
 
-        // Act
-        booksFirestorerRepository.updatebook(testBook, {
-            // Assert success callback
-            assert(true)
-        }, {
-            fail("Should not fail")
-        })
+  @Test
+  fun updatebook_callsFirestoreSet_andOnSuccess() {
+    // Arrange
+    doAnswer { Tasks.forResult(null) }.`when`(mockDocumentReference).set(testBook)
 
-        // Verify Firestore update operation
-        verify(mockDocumentReference).set(testBook)
-    }
-    @Test
-    fun documenttoBooks_returnsDataBook_whenDocumentIsValid() {
-        // Arrange
-        `when`(mockDocumentSnapshot.getString("Title")).thenReturn(testBook.Title)
-        `when`(mockDocumentSnapshot.getString("Author")).thenReturn(testBook.Author)
-        `when`(mockDocumentSnapshot.getString("Description")).thenReturn(testBook.Description)
-        `when`(mockDocumentSnapshot.getString("Rating")).thenReturn(testBook.Rating.toString())
-        `when`(mockDocumentSnapshot.getString("Photo")).thenReturn(testBook.photo)
-        `when`(mockDocumentSnapshot.getString("Language")).thenReturn(testBook.Language.name)
-        `when`(mockDocumentSnapshot.getString("ISBN")).thenReturn(testBook.ISBN)
+    // Act
+    booksFirestorerRepository.updatebook(
+        testBook,
+        {
+          // Assert success callback
+          assert(true)
+        },
+        { fail("Should not fail") })
 
-        // Act
-        val result = booksFirestorerRepository.documenttoBooks(mockDocumentSnapshot)
+    // Verify Firestore update operation
+    verify(mockDocumentReference).set(testBook)
+  }
 
-        // Assert
-        assert(result != null)
-        assert(result?.Title == testBook.Title)
-        assert(result?.Author == testBook.Author)
-    }
+  @Test
+  fun documenttoBooks_returnsDataBook_whenDocumentIsValid() {
+    // Arrange
+    `when`(mockDocumentSnapshot.getString("Title")).thenReturn(testBook.Title)
+    `when`(mockDocumentSnapshot.getString("Author")).thenReturn(testBook.Author)
+    `when`(mockDocumentSnapshot.getString("Description")).thenReturn(testBook.Description)
+    `when`(mockDocumentSnapshot.getString("Rating")).thenReturn(testBook.Rating.toString())
+    `when`(mockDocumentSnapshot.getString("Photo")).thenReturn(testBook.photo)
+    `when`(mockDocumentSnapshot.getString("Language")).thenReturn(testBook.Language.name)
+    `when`(mockDocumentSnapshot.getString("ISBN")).thenReturn(testBook.ISBN)
 
-    @Test
-    fun documenttoBooks_returnsNull_whenRequiredFieldIsMissing() {
-        // Arrange - Missing "Title"
-        `when`(mockDocumentSnapshot.getString("Title")).thenReturn(null)
-        `when`(mockDocumentSnapshot.getString("Author")).thenReturn(testBook.Author)
-        `when`(mockDocumentSnapshot.getString("Description")).thenReturn(testBook.Description)
-        `when`(mockDocumentSnapshot.getString("Rating")).thenReturn(testBook.Rating.toString())
-        `when`(mockDocumentSnapshot.getString("Photo")).thenReturn(testBook.photo)
-        `when`(mockDocumentSnapshot.getString("Language")).thenReturn(testBook.Language.name)
-        `when`(mockDocumentSnapshot.getString("ISBN")).thenReturn(testBook.ISBN)
+    // Act
+    val result = booksFirestorerRepository.documenttoBooks(mockDocumentSnapshot)
 
-        // Act
-        val result = booksFirestorerRepository.documenttoBooks(mockDocumentSnapshot)
+    // Assert
+    assert(result != null)
+    assert(result?.Title == testBook.Title)
+    assert(result?.Author == testBook.Author)
+  }
 
-        // Assert
-        assert(result == null)
-    }
+  @Test
+  fun documenttoBooks_returnsNull_whenRequiredFieldIsMissing() {
+    // Arrange - Missing "Title"
+    `when`(mockDocumentSnapshot.getString("Title")).thenReturn(null)
+    `when`(mockDocumentSnapshot.getString("Author")).thenReturn(testBook.Author)
+    `when`(mockDocumentSnapshot.getString("Description")).thenReturn(testBook.Description)
+    `when`(mockDocumentSnapshot.getString("Rating")).thenReturn(testBook.Rating.toString())
+    `when`(mockDocumentSnapshot.getString("Photo")).thenReturn(testBook.photo)
+    `when`(mockDocumentSnapshot.getString("Language")).thenReturn(testBook.Language.name)
+    `when`(mockDocumentSnapshot.getString("ISBN")).thenReturn(testBook.ISBN)
 
-    @Test
-    fun documenttoBooks_returnsNull_whenLanguageIsInvalid() {
-        // Arrange - Invalid language value
-        `when`(mockDocumentSnapshot.getString("Title")).thenReturn(testBook.Title)
-        `when`(mockDocumentSnapshot.getString("Author")).thenReturn(testBook.Author)
-        `when`(mockDocumentSnapshot.getString("Description")).thenReturn(testBook.Description)
-        `when`(mockDocumentSnapshot.getString("Rating")).thenReturn(testBook.Rating.toString())
-        `when`(mockDocumentSnapshot.getString("Photo")).thenReturn(testBook.photo)
-        `when`(mockDocumentSnapshot.getString("Language")).thenReturn("INVALID_LANGUAGE")
-        `when`(mockDocumentSnapshot.getString("ISBN")).thenReturn(testBook.ISBN)
+    // Act
+    val result = booksFirestorerRepository.documenttoBooks(mockDocumentSnapshot)
 
-        // Act
-        val result = booksFirestorerRepository.documenttoBooks(mockDocumentSnapshot)
+    // Assert
+    assert(result == null)
+  }
 
-        // Assert
-        assert(result == null) // Should return null due to invalid language
-    }
+  @Test
+  fun documenttoBooks_returnsNull_whenLanguageIsInvalid() {
+    // Arrange - Invalid language value
+    `when`(mockDocumentSnapshot.getString("Title")).thenReturn(testBook.Title)
+    `when`(mockDocumentSnapshot.getString("Author")).thenReturn(testBook.Author)
+    `when`(mockDocumentSnapshot.getString("Description")).thenReturn(testBook.Description)
+    `when`(mockDocumentSnapshot.getString("Rating")).thenReturn(testBook.Rating.toString())
+    `when`(mockDocumentSnapshot.getString("Photo")).thenReturn(testBook.photo)
+    `when`(mockDocumentSnapshot.getString("Language")).thenReturn("INVALID_LANGUAGE")
+    `when`(mockDocumentSnapshot.getString("ISBN")).thenReturn(testBook.ISBN)
 
+    // Act
+    val result = booksFirestorerRepository.documenttoBooks(mockDocumentSnapshot)
 
+    // Assert
+    assert(result == null) // Should return null due to invalid language
+  }
 
+  @Test
+  fun getNewUid_returnsUniqueDocumentId() {
+    // Arrange
+    val collectionBooks = "Books"
+    val mockDocumentReference = mock(DocumentReference::class.java)
+    val expectedUid = "unique-document-id"
+
+    // Mock Firestore to return a document with the desired ID
+    `when`(mockFirestore.collection(collectionBooks).document()).thenReturn(mockDocumentReference)
+    `when`(mockDocumentReference.id).thenReturn(expectedUid)
+
+    // Act
+    val uid = booksFirestorerRepository.getNewUid()
+
+    // Assert
+    assert(uid == expectedUid) // Ensure the ID matches the expected value
+  }
 }
