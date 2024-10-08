@@ -1,4 +1,4 @@
-package com.android.sample.models.chat
+package com.android.bookswap.models.chat
 
 data class MessageBox(
     val contactName: String,

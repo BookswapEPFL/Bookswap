@@ -1,4 +1,4 @@
-package com.android.sample.ui.chat
+package com.android.bookswap.ui.chat
 
 
 import androidx.compose.foundation.background
@@ -42,11 +42,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.android.sample.models.chat.MessageBox
-import com.android.sample.ui.theme.Accent
-import com.android.sample.ui.theme.AccentSecondary
-import com.android.sample.ui.theme.Primary
-import com.android.sample.ui.theme.BackGround
+import com.android.bookswap.models.chat.MessageBox
+import com.android.bookswap.ui.theme.Accent
+import com.android.bookswap.ui.theme.AccentSecondary
+import com.android.bookswap.ui.theme.Primary
+import com.android.bookswap.ui.theme.BackGround
 
 
 
