@@ -137,6 +137,11 @@ dependencies {
     implementation(libs.play.services.maps)
     implementation(libs.play.services.auth)
 
+    // Google Service and Maps
+    implementation(libs.play.services.maps)
+    implementation(libs.maps.compose)
+    implementation(libs.maps.compose.utils)
+
     // ------------- Jetpack Compose ------------------
     val composeBom = platform(libs.compose.bom)
     implementation(composeBom)
