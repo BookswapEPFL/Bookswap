@@ -45,16 +45,7 @@ import com.android.bookswap.ui.theme.Primary
 /** This is the main screen for the chat feature. It displays the list of messages */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ListChatScreen() {
-  // This is should be replaced with the actual data from the database in a VM
-  val placeHolderData =
-      List(12) {
-        MessageBox(
-            "Contact ${it + 1}",
-            "Test message $it test for the feature of ellipsis in the message",
-            "01.01.24")
-      }
-
+fun ListChatScreen(placeHolderData: List<MessageBox> = emptyList()) {
   Scaffold(
       topBar = {
         TopAppBar(
@@ -64,7 +55,7 @@ fun ListChatScreen() {
                 ),
             title = {
               Box(
-                  modifier = Modifier.fillMaxSize().testTag("messageScreenTitle"),
+                  modifier = Modifier.fillMaxSize().testTag("chat_messageScreenTitle"),
                   contentAlignment = Alignment.Center) {
                     Text(
                         text = "Messages",
@@ -84,13 +75,13 @@ fun ListChatScreen() {
         LazyColumn(
             contentPadding = pv,
             modifier =
-                Modifier.fillMaxSize().background(color = BackGround).testTag("messageList")) {
+                Modifier.fillMaxSize().background(color = BackGround).testTag("chat_messageList")) {
               item { MessageDivider() }
               if (placeHolderData.isEmpty()) {
                 item {
                   Text(
                       text = "No messages yet",
-                      modifier = Modifier.fillMaxWidth().padding(16.dp).testTag("noMessages"),
+                      modifier = Modifier.fillMaxWidth().padding(16.dp),
                       color = Primary,
                       fontSize = 20.sp,
                       fontWeight = FontWeight.Bold,
@@ -119,7 +110,7 @@ fun MessageBoxDisplay(message: MessageBox, onClick: () -> Unit = {}) {
           .height(55.dp)
           .background(color = BackGround)
           .clickable(onClick = onClick)
-          .testTag("messageBox"),
+          .testTag("chat_messageBox"),
   ) {
     Icon(
         imageVector = Icons.Filled.Person,

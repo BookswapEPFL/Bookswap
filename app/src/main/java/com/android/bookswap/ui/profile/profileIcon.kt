@@ -14,11 +14,11 @@ import com.android.bookswap.ui.theme.Accent
 /** Profile Icon for the top app bar */
 @Composable
 fun ProfileIcon() {
-  IconButton(onClick = { /*TODO*/}, modifier = Modifier.testTag("profileIcon")) {
+  IconButton(onClick = { /*TODO*/}, modifier = Modifier.testTag("profileIconButton")) {
     Icon(
         Icons.Filled.AccountCircle,
         contentDescription = "Profile Icon",
         tint = Accent,
-        modifier = Modifier.size(32.dp))
+        modifier = Modifier.size(32.dp).testTag("profileIcon"))
   }
 }
