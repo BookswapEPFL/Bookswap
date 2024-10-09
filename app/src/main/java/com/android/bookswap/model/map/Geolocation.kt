@@ -12,6 +12,17 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.core.app.ActivityCompat
 import com.google.android.gms.location.*
 
+/**
+ * Geolocation class manages the geolocation functionality and handles the required permissions for
+ * accessing location data.
+ * - To start receiving location updates, call startLocationUpdates().
+ * - To stop receiving updates, call stopLocationUpdates().
+ * - The current user's location can be checked using the latitude and longitude variables.
+ * - The current state of location updates can be checked using the isRunning variable.
+ *
+ * This class requires appropriate location permissions to function, including both foreground and
+ * optionally background location access.
+ */
 class Geolocation(private val activity: Activity) {
 
   private val REQUEST_LOCATION_PERMISSION = 1
