@@ -42,9 +42,7 @@ import com.android.bookswap.ui.theme.AccentSecondary
 import com.android.bookswap.ui.theme.BackGround
 import com.android.bookswap.ui.theme.Primary
 
-/**
- * This is the main screen for the chat feature. It displays the list of messages
- */
+/** This is the main screen for the chat feature. It displays the list of messages */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ListChatScreen() {

@@ -11,9 +11,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.android.bookswap.ui.theme.Accent
 
-/**
- * Profile Icon for the top app bar
- */
+/** Profile Icon for the top app bar */
 @Composable
 fun ProfileIcon() {
   IconButton(onClick = { /*TODO*/}, modifier = Modifier.testTag("profileIcon")) {
