@@ -30,8 +30,8 @@ class Geolocation(private val activity: Activity) {
   private val fusedLocationClient: FusedLocationProviderClient =
       LocationServices.getFusedLocationProviderClient(activity)
   val isRunning = mutableStateOf(false)
-  val latitude = mutableDoubleStateOf(Double.NaN) // Change to MutableState
-  val longitude = mutableDoubleStateOf(Double.NaN)
+  val latitude = mutableStateOf(Double.NaN) // Change to MutableState
+  val longitude = mutableStateOf(Double.NaN)
 
   // Location request settings
   private val locationRequest: LocationRequest =
@@ -46,8 +46,8 @@ class Geolocation(private val activity: Activity) {
         override fun onLocationResult(p0: LocationResult) {
           p0.lastLocation?.let { location ->
             // Handle the updated location here
-            latitude.doubleValue = location.latitude
-            longitude.doubleValue = location.longitude
+            latitude.value = location.latitude
+            longitude.value = location.longitude
             // You can save this location or notify other parts of your app
           }
         }

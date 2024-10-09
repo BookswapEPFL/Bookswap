@@ -140,8 +140,8 @@ class GeolocationTest {
 
   @Test
   fun `latitude and longitude should initially be NaN`() {
-    assertEquals(Double.NaN, geolocation.latitude.doubleValue, 0.0)
-    assertEquals(Double.NaN, geolocation.longitude.doubleValue, 0.0)
+    assertEquals(Double.NaN, geolocation.latitude.value, 0.0)
+    assertEquals(Double.NaN, geolocation.longitude.value, 0.0)
   }
 
   @Test
@@ -166,7 +166,7 @@ class GeolocationTest {
     locationCallbackSlot.captured.onLocationResult(mockLocationResult)
 
     // Verify that the latitude and longitude states are updated correctly
-    assertEquals(37.7749, geolocation.latitude.doubleValue, 0.0)
-    assertEquals(-122.4194, geolocation.longitude.doubleValue, 0.0)
+    assertEquals(37.7749, geolocation.latitude.value, 0.0)
+    assertEquals(-122.4194, geolocation.longitude.value, 0.0)
   }
 }
