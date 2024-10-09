@@ -1,33 +1,3 @@
-/*package com.android.sample.model.map
-
-import android.app.Activity
-import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationServices
-import io.mockk.every
-import io.mockk.mockk
-import io.mockk.mockkStatic
-import org.junit.Before
-import org.mockito.Mockito.*
-
-class GeolocationTest {
-
-    private lateinit var mockActivity: Activity
-    private lateinit var mockFusedLocationClient: FusedLocationProviderClient
-    private lateinit var geolocation: Geolocation
-
-    @Before
-    fun setup() {
-        mockFusedLocationClient = mockk()
-        mockActivity = mock(Activity::class.java)
-
-        mockkStatic(LocationServices::class)
-        every { LocationServices.getFusedLocationProviderClient(mockActivity) } returns mockFusedLocationClient
-
-
-        // Create an instance of the class under test
-        geolocation = Geolocation(mockActivity)
-    }
-}*/
 package com.android.bookswap.model.map
 
 import android.Manifest
@@ -50,8 +20,12 @@ import io.mockk.verify
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
 import org.mockito.Mockito.*
+import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
 
+@RunWith(RobolectricTestRunner::class)
 class GeolocationTest {
 
   private lateinit var mockActivity: Activity
@@ -86,11 +60,16 @@ class GeolocationTest {
             eq(Looper.getMainLooper()))
   }
 
+  @Config(sdk = [30])
   @Test
   fun `startLocationUpdates should request permissions if not granted`() {
     `when`(
             ActivityCompat.checkSelfPermission(
                 mockActivity, Manifest.permission.ACCESS_FINE_LOCATION))
+        .thenReturn(PackageManager.PERMISSION_DENIED)
+    `when`(
+            ActivityCompat.checkSelfPermission(
+                mockActivity, Manifest.permission.ACCESS_BACKGROUND_LOCATION))
         .thenReturn(PackageManager.PERMISSION_DENIED)
 
     // Mock ActivityCompat.requestPermissions (static method)
@@ -101,14 +80,54 @@ class GeolocationTest {
     geolocation.startLocationUpdates()
 
     // Define the expected permissions array
-    val expectedPermissions =
+    val expectedLocationPermissions =
         arrayOf(
-            Manifest.permission.ACCESS_FINE_LOCATION,
-            Manifest.permission.ACCESS_COARSE_LOCATION,
-            Manifest.permission.ACCESS_BACKGROUND_LOCATION)
+            Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION)
+
+    val expectedBackgroundPermissions = arrayOf(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
 
     // Verify that ActivityCompat.requestPermissions is called with the correct arguments
-    verify { ActivityCompat.requestPermissions(eq(mockActivity), eq(expectedPermissions), eq(1)) }
+    verify {
+      ActivityCompat.requestPermissions(eq(mockActivity), eq(expectedLocationPermissions), eq(1))
+    }
+    verify {
+      ActivityCompat.requestPermissions(eq(mockActivity), eq(expectedBackgroundPermissions), eq(2))
+    }
+  }
+
+  @Config(sdk = [28])
+  @Test
+  fun `startLocationUpdates should request permissions If not granted API 28`() {
+    `when`(
+            ActivityCompat.checkSelfPermission(
+                mockActivity, Manifest.permission.ACCESS_FINE_LOCATION))
+        .thenReturn(PackageManager.PERMISSION_DENIED)
+    `when`(
+            ActivityCompat.checkSelfPermission(
+                mockActivity, Manifest.permission.ACCESS_BACKGROUND_LOCATION))
+        .thenReturn(PackageManager.PERMISSION_DENIED)
+
+    // Mock ActivityCompat.requestPermissions (static method)
+    mockkStatic(ActivityCompat::class)
+
+    every { ActivityCompat.requestPermissions(any(), any(), any()) } just Runs
+
+    geolocation.startLocationUpdates()
+
+    // Define the expected permissions array
+    val expectedLocationPermissions =
+        arrayOf(
+            Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION)
+
+    val expectedBackgroundPermissions = arrayOf(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
+
+    // Verify that ActivityCompat.requestPermissions is called with the correct arguments
+    verify {
+      ActivityCompat.requestPermissions(eq(mockActivity), eq(expectedLocationPermissions), eq(1))
+    }
+    verify(exactly = 0) {
+      ActivityCompat.requestPermissions(any(), eq(expectedBackgroundPermissions), any())
+    }
   }
 
   @Test

@@ -4,15 +4,21 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Looper
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.mutableDoubleStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.core.app.ActivityCompat
 import com.google.android.gms.location.*
 
 class Geolocation(private val activity: Activity) {
 
   private val REQUEST_LOCATION_PERMISSION = 1
-  private lateinit var fusedLocationClient: FusedLocationProviderClient
+  private val BACKGROUND_LOCATION_PERMISSION_REQUEST_CODE = 2
+  private val fusedLocationClient: FusedLocationProviderClient =
+      LocationServices.getFusedLocationProviderClient(activity)
+  val isRunning = mutableStateOf(false)
   val latitude = mutableDoubleStateOf(Double.NaN) // Change to MutableState
   val longitude = mutableDoubleStateOf(Double.NaN)
 
@@ -36,23 +42,33 @@ class Geolocation(private val activity: Activity) {
         }
       }
 
-  init {
-    fusedLocationClient = LocationServices.getFusedLocationProviderClient(activity)
-  }
-
   // Request location permissions
   private fun requestLocationPermissions() {
     val permissions =
         arrayOf(
-            Manifest.permission.ACCESS_FINE_LOCATION,
-            Manifest.permission.ACCESS_COARSE_LOCATION,
-            Manifest.permission.ACCESS_BACKGROUND_LOCATION)
+            Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION)
     ActivityCompat.requestPermissions(activity, permissions, REQUEST_LOCATION_PERMISSION)
   }
 
   // Check if permissions are granted
   private fun hasLocationPermissions(): Boolean {
     return ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_FINE_LOCATION) ==
+        PackageManager.PERMISSION_GRANTED &&
+        ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_COARSE_LOCATION) ==
+            PackageManager.PERMISSION_GRANTED
+  }
+
+  @RequiresApi(Build.VERSION_CODES.Q)
+  private fun requestBackgroundPermissions() {
+    val permissions = arrayOf(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
+    ActivityCompat.requestPermissions(
+        activity, permissions, BACKGROUND_LOCATION_PERMISSION_REQUEST_CODE)
+  }
+
+  @RequiresApi(Build.VERSION_CODES.Q)
+  private fun hasBackgroundPermissions(): Boolean {
+    return ActivityCompat.checkSelfPermission(
+        activity, Manifest.permission.ACCESS_BACKGROUND_LOCATION) ==
         PackageManager.PERMISSION_GRANTED
   }
 
@@ -60,15 +76,29 @@ class Geolocation(private val activity: Activity) {
   @SuppressLint("MissingPermission")
   fun startLocationUpdates() {
     if (hasLocationPermissions()) {
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && !hasBackgroundPermissions()) {
+        requestBackgroundPermissions()
+      }
+      // can run without ACCESS_BACKGROUND_LOCATION but it is better if we have the permission
       fusedLocationClient.requestLocationUpdates(
           locationRequest, locationCallback, Looper.getMainLooper())
+      isRunning.value = true
     } else {
       requestLocationPermissions()
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && !hasBackgroundPermissions()) {
+        requestBackgroundPermissions()
+      }
+      if (hasLocationPermissions()) {
+        fusedLocationClient.requestLocationUpdates(
+            locationRequest, locationCallback, Looper.getMainLooper())
+        isRunning.value = true
+      }
     }
   }
 
   // Stop location updates
   fun stopLocationUpdates() {
     fusedLocationClient.removeLocationUpdates(locationCallback)
+    isRunning.value = false
   }
 }
