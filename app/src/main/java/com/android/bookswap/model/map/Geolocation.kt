@@ -27,7 +27,7 @@ class Geolocation(private val activity: Activity) {
   private val locationCallback =
       object : LocationCallback() {
         override fun onLocationResult(p0: LocationResult) {
-          p0.lastLocation.let { location ->
+          p0.lastLocation?.let { location ->
             // Handle the updated location here
             latitude.doubleValue = location.latitude
             longitude.doubleValue = location.longitude
