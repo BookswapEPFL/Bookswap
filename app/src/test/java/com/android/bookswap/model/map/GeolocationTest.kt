@@ -58,6 +58,7 @@ class GeolocationTest {
             any(LocationRequest::class.java),
             any(LocationCallback::class.java),
             eq(Looper.getMainLooper()))
+      assertEquals(true, geolocation.isRunning.value)
   }
 
   @Config(sdk = [30])
@@ -93,6 +94,7 @@ class GeolocationTest {
     verify {
       ActivityCompat.requestPermissions(eq(mockActivity), eq(expectedBackgroundPermissions), eq(2))
     }
+    assertEquals(false, geolocation.isRunning.value)
   }
 
   @Config(sdk = [28])
@@ -128,14 +130,17 @@ class GeolocationTest {
     verify(exactly = 0) {
       ActivityCompat.requestPermissions(any(), eq(expectedBackgroundPermissions), any())
     }
+      assertEquals(false, geolocation.isRunning.value)
   }
 
   @Test
   fun `stopLocationUpdates should remove location updates`() {
+      geolocation.startLocationUpdates()
     geolocation.stopLocationUpdates()
 
     // Verify that removeLocationUpdates was called with the correct callback
     verify(mockFusedLocationClient).removeLocationUpdates(any(LocationCallback::class.java))
+      assertEquals(false, geolocation.isRunning.value)
   }
 
   @Test
@@ -168,5 +173,6 @@ class GeolocationTest {
     // Verify that the latitude and longitude states are updated correctly
     assertEquals(37.7749, geolocation.latitude.value, 0.0)
     assertEquals(-122.4194, geolocation.longitude.value, 0.0)
+      assertEquals(true, geolocation.isRunning.value)
   }
 }
