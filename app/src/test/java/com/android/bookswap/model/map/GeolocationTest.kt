@@ -85,16 +85,35 @@ class GeolocationTest {
         arrayOf(
             Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION)
 
-    val expectedBackgroundPermissions = arrayOf(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
-
     // Verify that ActivityCompat.requestPermissions is called with the correct arguments
     verify {
       ActivityCompat.requestPermissions(eq(mockActivity), eq(expectedLocationPermissions), eq(1))
     }
+    assertEquals(false, geolocation.isRunning.value)
+  }
+
+  @Config(sdk = [30])
+  @Test
+  fun `startLocationUpdates should request background permissions if not granted`() {
+    `when`(
+            ActivityCompat.checkSelfPermission(
+                mockActivity, Manifest.permission.ACCESS_BACKGROUND_LOCATION))
+        .thenReturn(PackageManager.PERMISSION_DENIED)
+
+    // Mock ActivityCompat.requestPermissions (static method)
+    mockkStatic(ActivityCompat::class)
+
+    every { ActivityCompat.requestPermissions(any(), any(), any()) } just Runs
+
+    geolocation.startLocationUpdates()
+
+    val expectedBackgroundPermissions = arrayOf(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
+
+    // Verify that ActivityCompat.requestPermissions is called with the correct arguments
     verify {
       ActivityCompat.requestPermissions(eq(mockActivity), eq(expectedBackgroundPermissions), eq(2))
     }
-    assertEquals(false, geolocation.isRunning.value)
+    assertEquals(true, geolocation.isRunning.value)
   }
 
   @Config(sdk = [28])

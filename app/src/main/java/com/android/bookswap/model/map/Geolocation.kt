@@ -85,23 +85,22 @@ class Geolocation(private val activity: Activity) {
   // Start location updates
   @SuppressLint("MissingPermission")
   fun startLocationUpdates() {
-    if (hasLocationPermissions()) {
-      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && !hasBackgroundPermissions()) {
-        requestBackgroundPermissions()
-      }
-      // can run without ACCESS_BACKGROUND_LOCATION but it is better if we have the permission
-      fusedLocationClient.requestLocationUpdates(
-          locationRequest, locationCallback, Looper.getMainLooper())
-      isRunning.value = true
-    } else {
-      requestLocationPermissions()
-      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && !hasBackgroundPermissions()) {
-        requestBackgroundPermissions()
-      }
+    if (!isRunning.value) {
       if (hasLocationPermissions()) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && !hasBackgroundPermissions()) {
+          requestBackgroundPermissions()
+        }
+        // can run without ACCESS_BACKGROUND_LOCATION but it is better if we have the permission
         fusedLocationClient.requestLocationUpdates(
             locationRequest, locationCallback, Looper.getMainLooper())
         isRunning.value = true
+      } else {
+        requestLocationPermissions()
+        // need to check here for the permission, as otherwise the startLocationUpdates would just
+        // loop indefinitely if the user refuse to give the permission
+        if (hasLocationPermissions()) {
+          startLocationUpdates()
+        }
       }
     }
   }
