@@ -100,6 +100,7 @@ fun ListChatScreen(placeHolderData: List<MessageBox> = emptyList()) {
         BottomAppBar(modifier = Modifier.background(color = BackGround)) {}
       })
 }
+
 /*
 This function is used to display the message box
  */
