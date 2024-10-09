@@ -10,8 +10,12 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performTextInput
 import com.android.bookswap.model.Booksrepository
 import com.android.bookswap.model.DataBook
+import com.android.bookswap.model.Languages
 import com.android.bookswap.ui.Addbook.AddToBook
+import com.android.bookswap.ui.Addbook.createDataBook
 import com.android.bookswap.ui.Addbook.listToBooksView
+import junit.framework.TestCase.assertEquals
+import junit.framework.TestCase.assertNull
 import org.junit.Rule
 import org.junit.Test
 
@@ -68,6 +72,74 @@ class AddToBookTest {
     composeTestRule.onNodeWithTag("inputBookISBN").assertIsDisplayed()
     composeTestRule.onNodeWithTag("inputBookPhoto").assertIsDisplayed()
     composeTestRule.onNodeWithTag("inputBookLanguage").assertIsDisplayed()
+  }
+
+  @Test
+  fun testCreateDataBook_ValidData() {
+    // Test with valid data
+    val book =
+        createDataBook(
+            title = "My Book",
+            author = "Author Name",
+            description = "This is a description",
+            ratingStr = "4",
+            photo = "https://example.com/photo.jpg",
+            languageStr = "ENGLISH",
+            isbn = "1234567890")
+
+    // Assert the book is created correctly
+    assertEquals("My Book", book?.Title)
+    assertEquals("Author Name", book?.Author)
+    assertEquals("This is a description", book?.Description)
+    assertEquals(4, book?.Rating)
+    assertEquals("https://example.com/photo.jpg", book?.photo)
+    assertEquals(Languages.ENGLISH, book?.Language)
+    assertEquals("1234567890", book?.ISBN)
+  }
+
+  @Test
+  fun testCreateDataBook_InvalidData() {
+    // Test with invalid data (empty title)
+    var book =
+        createDataBook(
+            title = "",
+            author = "Author Name",
+            description = "This is a description",
+            ratingStr = "4",
+            photo = "https://example.com/photo.jpg",
+            languageStr = "ENGLISH",
+            isbn = "1234567890")
+
+    // Assert that the book is null due to invalid title
+    assertNull(book)
+
+    // Test with invalid rating
+    book =
+        createDataBook(
+            title = "My Book",
+            author = "Author Name",
+            description = "This is a description",
+            ratingStr = "invalid_rating",
+            photo = "https://example.com/photo.jpg",
+            languageStr = "ENGLISH",
+            isbn = "1234567890")
+
+    // Assert that the book is null due to invalid rating
+    assertNull(book)
+
+    // Test with invalid language
+    book =
+        createDataBook(
+            title = "My Book",
+            author = "Author Name",
+            description = "This is a description",
+            ratingStr = "4",
+            photo = "https://example.com/photo.jpg",
+            languageStr = "INVALID_LANGUAGE",
+            isbn = "1234567890")
+
+    // Assert that the book is null due to invalid language
+    assertNull(book)
   }
 }
 
