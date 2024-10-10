@@ -6,8 +6,11 @@ import com.android.bookswap.data.DataBook
 import com.android.bookswap.model.BooksFirestorerRepository
 import com.google.android.gms.tasks.Tasks
 import com.google.firebase.FirebaseApp
-import com.google.firebase.auth.*
-import com.google.firebase.firestore.*
+import com.google.firebase.firestore.CollectionReference
+import com.google.firebase.firestore.DocumentReference
+import com.google.firebase.firestore.DocumentSnapshot
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.firestore.util.Assert.fail
 import org.junit.Before
 import org.junit.Test
@@ -90,7 +93,7 @@ class BooksFirestorerRepositoryTest {
     doAnswer { Tasks.forResult(null) }.`when`(mockDocumentReference).delete()
 
     // Act
-    booksFirestorerRepository.deletebooks(testBook.isbn, testBook, {}, {})
+    booksFirestorerRepository.deletebooks(testBook.isbn!!, testBook, {}, {})
 
     // Assert
     verify(mockDocumentReference).delete()

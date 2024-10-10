@@ -66,7 +66,7 @@ class BooksFirestorerRepository(private val db: FirebaseFirestore) : Booksreposi
       onFailure: (Exception) -> Unit
   ) {
     performFirestoreOperation(
-        db.collection(collectionBooks).document(dataBook.isbn).delete(), OnSucess, onFailure)
+        db.collection(collectionBooks).document(dataBook.isbn!!).delete(), OnSucess, onFailure)
   }
   // Maps a Firestore document to a DataBook object
   // If any required field is missing, returns null to avoid incomplete objects
