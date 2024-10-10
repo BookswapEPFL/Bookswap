@@ -28,7 +28,7 @@ jobs:
 
       # This step removes the current gradle cache to avoid any caching issues
       - name: Remove current gradle cache
-        run: rm -rf ~/.gradle
+        run: gradle clean build
 
       # Kernel-based Virtual Machine (KVM) is an open source virtualization technology built into Linux. Enabling it allows the Android emulator to run faster.
       - name: Enable KVM group perms
