@@ -143,6 +143,7 @@ dependencies {
     implementation(libs.play.services.auth)
 
     // ------------- Jetpack Compose ------------------
+    implementation("androidx.compose.material:material:1.8.0-alpha01")
     val composeBom = platform(libs.compose.bom)
     implementation(composeBom)
     globalTestImplementation(composeBom)
