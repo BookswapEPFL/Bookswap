@@ -47,7 +47,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
 @Composable
-fun SignInScreen() { // navigationActions: NavigationActions) { //Add this when navigation is implemented
+fun SignInScreen() { // navigationActions: NavigationActions) { //Add this when navigation is
+  // implemented
   val context = LocalContext.current
 
   val launcher =
@@ -55,7 +56,8 @@ fun SignInScreen() { // navigationActions: NavigationActions) { //Add this when 
           onAuthComplete = { result ->
             Log.d("SignInScreen", "User signed in: ${result.user?.displayName}")
             Toast.makeText(context, "Login successful!", Toast.LENGTH_LONG).show()
-            // navigationActions.navigateTo(TopLevelDestinations.OVERVIEW) //TO DO: implement navigation and make navigateTo(TopLevelDestinations.MAP)
+            // navigationActions.navigateTo(TopLevelDestinations.OVERVIEW) //TO DO: implement
+            // navigation and make navigateTo(TopLevelDestinations.MAP)
           },
           onAuthError = {
             Log.e("SignInScreen", "Failed to sign in: ${it.statusCode}")
@@ -65,7 +67,7 @@ fun SignInScreen() { // navigationActions: NavigationActions) { //Add this when 
 
   Scaffold(
       modifier = Modifier.fillMaxSize(),
-      containerColor = BackGround,// Set the background color
+      containerColor = BackGround, // Set the background color
       content = { padding ->
         Column(
             modifier = Modifier.fillMaxSize().padding(padding),
@@ -74,13 +76,13 @@ fun SignInScreen() { // navigationActions: NavigationActions) { //Add this when 
         ) {
           // App Logo Image
           Image(
-              painter = painterResource(id = R.drawable.logo5), //Bookswap logo
+              painter = painterResource(id = R.drawable.logo5), // Bookswap logo
               contentDescription = "App Logo",
               modifier = Modifier.size(250.dp))
 
           Spacer(modifier = Modifier.height(50.dp))
 
-          //First part of the title:
+          // First part of the title:
           Text(
               modifier = Modifier.testTag("login_loginTitle1"),
               text = "Welcome to",
@@ -96,7 +98,7 @@ fun SignInScreen() { // navigationActions: NavigationActions) { //Add this when 
 
           Spacer(modifier = Modifier.height(5.dp))
 
-          //Second part of the logo:
+          // Second part of the logo:
           Text(
               modifier = Modifier.testTag("login_loginTitle2"),
               text = "BookSwap",
@@ -131,11 +133,9 @@ fun SignInScreen() { // navigationActions: NavigationActions) { //Add this when 
 fun GoogleSignInButton(onSignInClick: () -> Unit) {
   Button(
       onClick = onSignInClick,
-      colors =
-          ButtonDefaults.buttonColors(
-              containerColor = Secondary), // Button color
+      colors = ButtonDefaults.buttonColors(containerColor = Secondary), // Button color
       shape = RoundedCornerShape(50), // Circular edges for the button
-      border = BorderStroke(1.dp, Primary),// Button's border color
+      border = BorderStroke(1.dp, Primary), // Button's border color
       modifier =
           Modifier.padding(8.dp)
               .height(48.dp) // Adjust height as needed
@@ -146,17 +146,16 @@ fun GoogleSignInButton(onSignInClick: () -> Unit) {
             modifier = Modifier.fillMaxWidth()) {
               // Google logo
               Image(
-                  painter =
-                      painterResource(id = R.drawable.google_logo), //Google logo
+                  painter = painterResource(id = R.drawable.google_logo), // Google logo
                   contentDescription = "Google Logo",
                   modifier =
-                      Modifier.size(30.dp) //Size of the Google logo
+                      Modifier.size(30.dp) // Size of the Google logo
                           .padding(end = 8.dp))
 
               // Text for the button
               Text(
                   text = "Sign in with Google",
-                  color = Accent,// Text color
+                  color = Accent, // Text color
                   fontSize = 16.sp, // Font size
                   fontWeight = FontWeight.Medium)
             }
