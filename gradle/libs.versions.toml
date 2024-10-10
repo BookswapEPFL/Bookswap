@@ -35,8 +35,8 @@ firebaseUiAuth = "8.0.0"
 playServicesAuth = "21.2.0"
 playServicesMaps = "19.0.0"
 
-# HTTP request
-volley = "1.2.1"
+volley = "1.2.1" # HTTP request
+json = "20240303" #Json parsing
 
 [libraries]
 google-play-services-location = { group = "com.google.android.gms", name = "play-services-location", version = "19.0.1" }
@@ -79,6 +79,7 @@ play-services-maps = { module = "com.google.android.gms:play-services-maps", ver
 
 robolectric = { module = "org.robolectric:robolectric", version.ref = "robolectric" }
 volley = { module = "com.android.volley:volley", version.ref = "volley" }
+json = { module = "org.json:json", version.ref = "json" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
