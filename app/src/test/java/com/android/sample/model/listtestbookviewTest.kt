@@ -1,7 +1,8 @@
+import com.android.bookswap.data.BookLanguages
+import com.android.bookswap.data.DataBook
 import com.android.bookswap.model.Booksrepository
-import com.android.bookswap.model.DataBook
-import com.android.bookswap.model.Languages
 import com.android.bookswap.ui.Addbook.listToBooksView
+import java.util.UUID
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -31,13 +32,14 @@ class ListToBooksViewTest {
   // Updated test book to match the DataBook properties
   private val testBook =
       DataBook(
-          Title = "Test Book",
-          Author = "Test Author",
-          Description = "This is a test description",
-          Rating = 5,
+          uuid = UUID.randomUUID(),
+          title = "Test Book",
+          author = "Test Author",
+          description = "This is a test description",
+          rating = 5,
           photo = "test_photo_url",
-          Language = Languages.ENGLISH,
-          ISBN = "123-4567891234")
+          language = BookLanguages.ENGLISH,
+          isbn = "123-4567891234")
 
   @Before
   fun setUp() {

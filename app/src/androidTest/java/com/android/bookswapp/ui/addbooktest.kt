@@ -8,9 +8,9 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performTextInput
+import com.android.bookswap.data.BookLanguages
+import com.android.bookswap.data.DataBook
 import com.android.bookswap.model.Booksrepository
-import com.android.bookswap.model.DataBook
-import com.android.bookswap.model.Languages
 import com.android.bookswap.ui.Addbook.AddToBook
 import com.android.bookswap.ui.Addbook.createDataBook
 import com.android.bookswap.ui.Addbook.listToBooksView
@@ -84,17 +84,17 @@ class AddToBookTest {
             description = "This is a description",
             ratingStr = "4",
             photo = "https://example.com/photo.jpg",
-            languageStr = "ENGLISH",
-            isbn = "1234567890")
+            Book_languageStr = "ENGLISH",
+            Isbn = "1234567890")
 
     // Assert the book is created correctly
-    assertEquals("My Book", book?.Title)
-    assertEquals("Author Name", book?.Author)
-    assertEquals("This is a description", book?.Description)
-    assertEquals(4, book?.Rating)
+    assertEquals("My Book", book?.title)
+    assertEquals("Author Name", book?.author)
+    assertEquals("This is a description", book?.description)
+    assertEquals(4, book?.rating)
     assertEquals("https://example.com/photo.jpg", book?.photo)
-    assertEquals(Languages.ENGLISH, book?.Language)
-    assertEquals("1234567890", book?.ISBN)
+    assertEquals(BookLanguages.ENGLISH, book?.language)
+    assertEquals("1234567890", book?.isbn)
   }
 
   @Test
@@ -107,8 +107,8 @@ class AddToBookTest {
             description = "This is a description",
             ratingStr = "4",
             photo = "https://example.com/photo.jpg",
-            languageStr = "ENGLISH",
-            isbn = "1234567890")
+            Book_languageStr = "ENGLISH",
+            Isbn = "1234567890")
 
     // Assert that the book is null due to invalid title
     assertNull(book)
@@ -121,8 +121,8 @@ class AddToBookTest {
             description = "This is a description",
             ratingStr = "invalid_rating",
             photo = "https://example.com/photo.jpg",
-            languageStr = "ENGLISH",
-            isbn = "1234567890")
+            Book_languageStr = "ENGLISH",
+            Isbn = "1234567890")
 
     // Assert that the book is null due to invalid rating
     assertNull(book)
@@ -135,8 +135,8 @@ class AddToBookTest {
             description = "This is a description",
             ratingStr = "4",
             photo = "https://example.com/photo.jpg",
-            languageStr = "INVALID_LANGUAGE",
-            isbn = "1234567890")
+            Book_languageStr = "INVALID_LANGUAGE",
+            Isbn = "1234567890")
 
     // Assert that the book is null due to invalid language
     assertNull(book)

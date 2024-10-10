@@ -24,12 +24,13 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.android.bookswap.model.DataBook
-import com.android.bookswap.model.Languages
+import com.android.bookswap.data.BookLanguages
+import com.android.bookswap.data.DataBook
 import com.android.bookswap.ui.theme.Accent
 import com.android.bookswap.ui.theme.BackGround
 import com.android.bookswap.ui.theme.Primary
 import com.android.bookswap.ui.theme.Secondary
+import java.util.UUID
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -229,8 +230,8 @@ fun createDataBook(
     description: String,
     ratingStr: String,
     photo: String,
-    languageStr: String,
-    isbn: String
+    Book_languageStr: String,
+    Isbn: String
 ): DataBook? {
   // Validate Title
   if (title.isBlank()) {
@@ -264,26 +265,27 @@ fun createDataBook(
   }
 
   // Validate Language
-  val language: Languages =
+  val languages: BookLanguages =
       try {
-        Languages.valueOf(languageStr.uppercase())
+        BookLanguages.valueOf(Book_languageStr.uppercase())
       } catch (e: IllegalArgumentException) {
-        println("Invalid language: $languageStr. Please use one of the supported languages.")
+        println("Invalid language: $Book_languageStr. Please use one of the supported languages.")
         return null
       }
 
   // Validate ISBN
-  if (isbn.isBlank()) {
+  if (Isbn.isBlank()) {
     println("ISBN cannot be empty.")
     return null
   }
   // If all validations pass, return a new DataBook instance
   return DataBook(
-      Title = title,
-      Author = author,
-      Description = description,
-      Rating = rating,
+      uuid = UUID.randomUUID(),
+      title = title,
+      author = author,
+      description = description,
+      rating = rating,
       photo = photo,
-      Language = language,
-      ISBN = isbn)
+      language = languages,
+      isbn = Isbn)
 }
