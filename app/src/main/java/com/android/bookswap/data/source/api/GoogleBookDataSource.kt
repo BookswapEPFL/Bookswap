@@ -45,7 +45,7 @@ class GoogleBookDataSource(context: Context) {
     queue.add(stringRequest)
   }
 
-  @VisibleForTesting
+  @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
   fun parseISBNResponse(response: String): Result<DataBook> {
     try {
       val json = JSONObject(response)
