@@ -33,19 +33,19 @@ class MessageRepositoryFirestore(private val db: FirebaseFirestore) : MessageRep
   }
 
   override fun sendMessage(
-      message: Message,
-      onSuccess: () -> Unit,
-      onFailure: (Exception) -> Unit
+    message: Message,
+    onSuccess: () -> Unit,
+    onFailure: (Exception) -> Unit
   ) {
-    val messageMap =
-        mapOf(
-            "id" to message.id,
-            "text" to message.text,
-            "senderId" to message.senderId,
-            "timestamp" to message.timestamp)
+    val messageMap = mapOf(
+      "id" to message.id,
+      "text" to message.text,
+      "senderId" to message.senderId,
+      "receiverId" to message.receiverId,
+      "timestamp" to message.timestamp
+    )
 
-    db.collection(collectionPath).document(message.id).set(messageMap).addOnCompleteListener {
-        result ->
+    db.collection(collectionPath).document(message.id).set(messageMap).addOnCompleteListener { result ->
       if (result.isSuccessful) {
         onSuccess()
       } else {
@@ -53,8 +53,16 @@ class MessageRepositoryFirestore(private val db: FirebaseFirestore) : MessageRep
       }
     }
   }
-  fun addMessagesListener(onSuccess: (List<Message>) -> Unit, onFailure: (Exception) -> Unit): ListenerRegistration {
+  fun addMessagesListener(
+    otherUserId: String,
+    currentUserId: String,
+    onSuccess: (List<Message>) -> Unit,
+    onFailure: (Exception) -> Unit
+  ): ListenerRegistration {
     return db.collection("messages")
+      .whereIn("senderId", listOf(currentUserId, otherUserId))
+      .whereIn("receiverId", listOf(currentUserId, otherUserId))
+      .whereNotEqualTo("senderId", "receiverId")
       .addSnapshotListener { snapshot, e ->
         if (e != null) {
           onFailure(e)
@@ -83,8 +91,9 @@ fun toMessage(document: DocumentSnapshot): Message? {
     val id = document.getString("id") ?: return null
     val text = document.getString("text") ?: return null
     val senderId = document.getString("senderId") ?: return null
+    val receiverId = document.getString("receiverId") ?: return null
     val timestamp = document.getLong("timestamp") ?: return null
-    Message(id, text, senderId, timestamp)
+    Message(id, text, senderId, receiverId, timestamp)
   } catch (e: Exception) {
     Log.e("MessageRepository", "Error converting document to Message: ${e.message}")
     null

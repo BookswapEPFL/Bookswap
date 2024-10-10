@@ -1,4 +1,4 @@
-package com.android.bookswap.ui
+package com.android.bookswap.ui.chat
 
 import android.util.Log
 import androidx.compose.foundation.background
@@ -23,14 +23,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
@@ -48,20 +46,17 @@ import java.util.Locale
 @Composable
 fun MessageView(
     messageRepository: MessageRepositoryFirestore,
-    currentUserId: String // To identify the current user for aligning messages
+    currentUserId: String, // To identify the current user for aligning messages
+    otherUserId: String
 ) {
   var messages by remember { mutableStateOf(emptyList<Message>()) }
   var newMessageText by remember { mutableStateOf(TextFieldValue("")) }
 
-  // Fetch messages from Firestore
-  //LaunchedEffect(Unit) {
-  //  messageRepository.getMessages(
-  //      onSuccess = { fetchedMessages -> messages = fetchedMessages },
-  //      onFailure = { e -> Log.e("MessageView", "Failed to fetch messages: ${e.message}") })
-  //}
 
     DisposableEffect(Unit) {
         val listenerRegistration = messageRepository.addMessagesListener(
+            otherUserId = otherUserId,
+            currentUserId = currentUserId,
             onSuccess = { fetchedMessages ->
                 messages = fetchedMessages
             },
@@ -107,13 +102,13 @@ fun MessageView(
               Button(
                   onClick = {
                       val messageId = messageRepository.getNewUid()
-                      val newMessage =
-                          Message(
-                              id = messageId,
-                              text = newMessageText.text,
-                              senderId = currentUserId,
-                              timestamp = System.currentTimeMillis()
-                          )
+                      val newMessage = Message(
+                          id = messageId,
+                          text = newMessageText.text,
+                          senderId = currentUserId,
+                          receiverId = otherUserId, // Ensure receiverId is set here
+                          timestamp = System.currentTimeMillis()
+                      )
                       // Send the message
                       messageRepository.sendMessage(
                           message = newMessage,
@@ -121,7 +116,7 @@ fun MessageView(
                               newMessageText = TextFieldValue("") // Clear input field
                           },
                           onFailure = { e ->
-                              Log.e("MessageView", "Failed to fetch messages: ${e.message}")
+                              Log.e("MessageView", "Failed to send message: ${e.message}")
                           })
                   },
                   colors = ButtonColors(Secondary, Accent, Secondary, Accent),
