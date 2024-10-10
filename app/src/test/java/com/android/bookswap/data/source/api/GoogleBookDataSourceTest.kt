@@ -81,7 +81,7 @@ class GoogleBookDataSourceTest {
             rating = null,
             photo = "image2",
             language = BookLanguages.ENGLISH,
-            isbn = "9780435123432")
+            isbn = "9780435123437")
 
     val mockGoogleBookDataSource = mock(GoogleBookDataSource::class.java)
     `when`(mockGoogleBookDataSource.parseISBNResponse(jsonBook)).thenCallRealMethod()
@@ -207,7 +207,7 @@ class GoogleBookDataSourceTest {
             rating = null,
             photo = null,
             language = BookLanguages.OTHER,
-            isbn = "9780435123432")
+            isbn = "9780435123437")
 
     val mockGoogleBookDataSource = mock(GoogleBookDataSource::class.java)
     `when`(mockGoogleBookDataSource.parseISBNResponse(anyString())).thenCallRealMethod()

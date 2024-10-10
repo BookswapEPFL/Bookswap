@@ -15,7 +15,6 @@ import java.util.UUID
 import org.json.JSONObject
 
 const val GOOGLE_BOOK_API = "https://www.googleapis.com/books/v1/volumes?q="
-const val ISBN13_PREFIX = "978"
 
 /**
  * Source to request data from GoogleBook
@@ -59,11 +58,15 @@ class GoogleBookDataSource(context: Context) {
             is String -> BookLanguages.values().first { it.languageCode == languageCode }
             else -> null
           }
-      var identifier =
-          item.getJSONArray("industryIdentifiers").getJSONObject(0).getString("identifier")
-      if (identifier.length == 10) {
-        identifier = "$ISBN13_PREFIX$identifier"
-      }
+
+      // We do not know where the ISBN_13 is, so we need to filter for it
+      val industryIdentifiers = item.getJSONArray("industryIdentifiers")
+      val identifier =
+          (0 until industryIdentifiers.length())
+              .map { industryIdentifiers.getJSONObject(it) }
+              .first { it.getString("type") == "ISBN_13" }
+              .getString("identifier")
+
       return Result.success(
           DataBook(
               UUID.randomUUID(),
