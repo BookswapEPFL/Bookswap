@@ -11,10 +11,11 @@ import com.android.volley.Request
 import com.android.volley.VolleyError
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
-import org.json.JSONObject
 import java.util.UUID
+import org.json.JSONObject
 
 const val GOOGLE_BOOK_API = "https://www.googleapis.com/books/v1/volumes?q="
+const val ISBN13_PREFIX = "978"
 
 /**
  * Source to request data from GoogleBook
@@ -58,6 +59,11 @@ class GoogleBookDataSource(context: Context) {
             is String -> BookLanguages.values().first { it.languageCode == languageCode }
             else -> null
           }
+      var identifier =
+          item.getJSONArray("industryIdentifiers").getJSONObject(0).getString("identifier")
+      if (identifier.length == 10) {
+        identifier = "$ISBN13_PREFIX$identifier"
+      }
       return Result.success(
           DataBook(
               UUID.randomUUID(),
@@ -67,7 +73,7 @@ class GoogleBookDataSource(context: Context) {
               null,
               item.getJSONObjectOrNull("imageLinks")?.getStringOrNull("thumbnail"),
               language ?: BookLanguages.OTHER,
-              item.getJSONArray("industryIdentifiers").getJSONObject(0).getString("identifier")))
+              identifier))
     } catch (exception: Exception) {
       return Result.failure(exception)
     }
