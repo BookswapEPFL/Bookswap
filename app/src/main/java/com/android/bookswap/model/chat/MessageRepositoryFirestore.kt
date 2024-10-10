@@ -3,6 +3,7 @@ package com.android.bookswap.model.chat
 import android.util.Log
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ListenerRegistration
 
 class MessageRepositoryFirestore(private val db: FirebaseFirestore) : MessageRepository {
   private val collectionPath = "messages"
@@ -51,6 +52,29 @@ class MessageRepositoryFirestore(private val db: FirebaseFirestore) : MessageRep
         onFailure(result.exception ?: Exception("Unknown error sending message"))
       }
     }
+  }
+  fun addMessagesListener(onSuccess: (List<Message>) -> Unit, onFailure: (Exception) -> Unit): ListenerRegistration {
+    return db.collection("messages")
+      .addSnapshotListener { snapshot, e ->
+        if (e != null) {
+          onFailure(e)
+          return@addSnapshotListener
+        }
+
+        if (snapshot != null && !snapshot.isEmpty) {
+          val messages = snapshot.documents.mapNotNull { document ->
+            try {
+              document.toObject(Message::class.java)
+            } catch (ex: Exception) {
+              Log.e("MessageRepository", "Error converting document to Message: ${ex.message}")
+              null
+            }
+          }.sortedBy { it.timestamp } // Sort messages by timestamp
+          onSuccess(messages)
+        } else {
+          onSuccess(emptyList())
+        }
+      }
   }
 }
 
