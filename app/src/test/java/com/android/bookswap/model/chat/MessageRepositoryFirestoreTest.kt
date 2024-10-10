@@ -74,7 +74,7 @@ class MessageRepositoryFirestoreTest {
   }
 
   @Test
-  fun getMessages_callsFirestoreGet() {
+  fun `get messages calls firestore get`() {
     // Arrange
     `when`(mockQuerySnapshot.documents).thenReturn(listOf(mockDocumentSnapshot))
     `when`(mockDocumentSnapshot.getString("id")).thenReturn(testMessage.id)
@@ -96,7 +96,7 @@ class MessageRepositoryFirestoreTest {
   }
 
   @Test
-  fun sendMessage_callsFirestoreSet_andOnSuccess() {
+  fun `send message calls firestore set and calls OnSuccess`() {
     // Arrange
     val messageMap =
         mapOf(
