@@ -26,12 +26,12 @@ data class DataBook(
 )
 
 /** All supported book language type */
-enum class BookLanguages {
-  FRENCH, // French language
-  GERMAN, // German language
-  ENGLISH, // English language
-  SPANISH, // Spanish language
-  ITALIAN, // Italian language
-  ROMANSH, // Romansh, a language spoken in Switzerland
-  OTHER // All languages that are not yet implemented
+enum class BookLanguages(val languageCode: String) {
+  FRENCH("FR"), // French language
+  GERMAN("DE"), // German language
+  ENGLISH("EN"), // English language
+  SPANISH("ES"), // Spanish language
+  ITALIAN("IT"), // Italian language
+  ROMANSH("RM"), // Romansh, a language spoken in Switzerland
+  OTHER("OTHER") // All languages that are not yet implemented
 }
