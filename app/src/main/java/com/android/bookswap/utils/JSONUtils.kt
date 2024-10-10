@@ -15,14 +15,6 @@ fun JSONObject.getStringOrNull(name: String): String? {
   return if (this.has(name)) this.getString(name) else null
 }
 
-fun JSONArray.getJSONObjectOrNull(index: Int): JSONObject? {
-  return if (!this.isNull(index)) this.getJSONObject(index) else null
-}
-
-fun JSONArray.getJSONArrayOrNull(index: Int): JSONArray? {
-  return if (!this.isNull(index)) this.getJSONArray(index) else null
-}
-
 fun JSONArray.getStringOrNull(index: Int): String? {
   return if (!this.isNull(index)) this.getString(index) else null
 }

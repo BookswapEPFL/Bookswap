@@ -118,4 +118,48 @@ class GoogleBookDataSourceTest {
 
     assertTrue(mockGoogleBookDataSource.parseISBNResponse(missingTitleJson).isFailure)
   }
+
+  @Test
+  fun `parseISBNResponse valid when partially empty`() {
+    val jsonBook =
+        """
+      {
+        "kind": "books#volumes",
+        "totalItems": 1,
+        "items": [
+          {
+            "id": "JLunPwAACAAJ",
+            "volumeInfo": {
+              "title": "Flowers for Algernon",
+              "industryIdentifiers": [
+                {
+                  "type": "ISBN_10",
+                  "identifier": "0435123432"
+                },
+                {
+                  "type": "ISBN_13",
+                  "identifier": "9780435123437"
+                }
+              ]
+            }
+          }
+        ]
+      }
+    """
+            .trimIndent()
+    val dataBook =
+        DataBook(
+            Title = "Flowers for Algernon",
+            Author = "unknown",
+            Description = "unknown",
+            Rating = 0,
+            photo = "",
+            Language = Languages.SWISS_GERMAN,
+            ISBN = "0435123432")
+
+    val mockGoogleBookDataSource = mock(GoogleBookDataSource::class.java)
+    `when`(mockGoogleBookDataSource.parseISBNResponse(jsonBook)).thenCallRealMethod()
+
+    assertEquals(dataBook, mockGoogleBookDataSource.parseISBNResponse(jsonBook).getOrNull())
+  }
 }
