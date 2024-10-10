@@ -37,8 +37,8 @@ playServicesAuth = "21.2.0"
 playServicesMaps = "19.0.0"
 navigationCompose = "2.8.2"
 
-# HTTP request
-volley = "1.2.1"
+volley = "1.2.1" # HTTP request
+json = "20240303" #Json parsing
 
 [libraries]
 google-play-services-location = { group = "com.google.android.gms", name = "play-services-location", version = "19.0.1" }
@@ -83,6 +83,7 @@ firebase-firestore-ktx = { group = "com.google.firebase", name = "firebase-fires
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
 
 volley = { module = "com.android.volley:volley", version.ref = "volley" }
+json = { module = "org.json:json", version.ref = "json" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

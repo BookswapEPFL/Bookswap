@@ -174,7 +174,7 @@ dependencies {
     testImplementation(libs.robolectric)
 
     implementation(libs.volley) //HTTP request
-    implementation("org.json:json:20240303") //JSON parser
+    implementation(libs.json) //JSON parser
 }
 
 tasks.withType<Test> {
