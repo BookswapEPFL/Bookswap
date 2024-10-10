@@ -12,12 +12,12 @@ data class DataBook(
 )
 
 // Enum class representing the available languages for a book
-enum class Languages {
-  FRENCH, // French language
-  GERMAN, // German language
-  ENGLISH, // English language
-  SPANISH, // Spanish language
-  ITALIEN, // Italian language
-  ROMANCH, // Romansh, a language spoken in Switzerland
-  SWISS_GERMAN // Swiss German dialect
+enum class Languages(val languageCode: String) {
+  FRENCH("FR"), // French language
+  GERMAN("DE"), // German language
+  ENGLISH("EN"), // English language
+  SPANISH("ES"), // Spanish language
+  ITALIEN("IT"), // Italian language
+  ROMANCH("RM"), // Romansh, a language spoken in Switzerland
+  SWISS_GERMAN("E") // Swiss German dialect
 }
