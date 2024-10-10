@@ -88,6 +88,10 @@ class NavigationActionsTest {
 
   @Test
   fun list_Navigation_Bar_DestinationsCorrectOrder() {
-    assertThat(List_Navigation_Bar_Destinations, `is`(listOf(TopLevelDestinations.CHAT, TopLevelDestinations.NEWBOOK, TopLevelDestinations.MAP)))
+    assertThat(
+        List_Navigation_Bar_Destinations,
+        `is`(
+            listOf(
+                TopLevelDestinations.CHAT, TopLevelDestinations.NEWBOOK, TopLevelDestinations.MAP)))
   }
 }
