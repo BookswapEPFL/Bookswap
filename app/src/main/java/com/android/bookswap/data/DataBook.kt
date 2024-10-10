@@ -28,7 +28,6 @@ enum class BookLanguages {
   ENGLISH, // English language
   SPANISH, // Spanish language
   ITALIAN, // Italian language
-  ROMANCH, // Romansh, a language spoken in Switzerland
-  SWISS_GERMAN, // Swiss German dialect
+  ROMANSH, // Romansh, a language spoken in Switzerland
   OTHER // All languages that are not yet implemented
 }
