@@ -1,5 +1,7 @@
 package com.android.bookswap.model
 
+import com.android.bookswap.data.BookLanguages
+import com.android.bookswap.data.DataBook
 import com.google.android.gms.tasks.Task
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
@@ -43,7 +45,7 @@ class BooksFirestorerRepository(private val db: FirebaseFirestore) : Booksreposi
   // Calls OnSuccess if the operation is successful, otherwise onFailure with the exception
   override fun addBooks(dataBook: DataBook, OnSucess: () -> Unit, onFailure: (Exception) -> Unit) {
     performFirestoreOperation(
-        db.collection(collectionBooks).document(dataBook.Title).set(dataBook), OnSucess, onFailure)
+        db.collection(collectionBooks).document(dataBook.title).set(dataBook), OnSucess, onFailure)
   }
   // Updates an existing book in Firestore by replacing the document with the same title
   // Uses performFirestoreOperation to handle success and failure
@@ -53,7 +55,7 @@ class BooksFirestorerRepository(private val db: FirebaseFirestore) : Booksreposi
       onFailure: (Exception) -> Unit
   ) {
     performFirestoreOperation(
-        db.collection(collectionBooks).document(dataBook.Title).set(dataBook), OnSucess, onFailure)
+        db.collection(collectionBooks).document(dataBook.title).set(dataBook), OnSucess, onFailure)
   }
   // Deletes a book from Firestore by its title
   // Uses performFirestoreOperation to handle success and failure
@@ -64,7 +66,7 @@ class BooksFirestorerRepository(private val db: FirebaseFirestore) : Booksreposi
       onFailure: (Exception) -> Unit
   ) {
     performFirestoreOperation(
-        db.collection(collectionBooks).document(dataBook.ISBN).delete(), OnSucess, onFailure)
+        db.collection(collectionBooks).document(dataBook.isbn).delete(), OnSucess, onFailure)
   }
   // Maps a Firestore document to a DataBook object
   // If any required field is missing, returns null to avoid incomplete objects
@@ -76,7 +78,7 @@ class BooksFirestorerRepository(private val db: FirebaseFirestore) : Booksreposi
       val rating = document.getString("Rating") ?: return null
       val photo = document.getString("Photo") ?: return null
       val isbn = document.getString("ISBN") ?: return null
-      val languageBook = Languages.valueOf(document.getString("Language") ?: return null)
+      val languageBook = BookLanguages.valueOf(document.getString("Language") ?: return null)
       DataBook(title, author, description, rating.toInt(), photo, languageBook, isbn)
     } catch (e: Exception) {
       null // Return null in case of any exception during the conversion
