@@ -172,6 +172,9 @@ dependencies {
     testImplementation(libs.mockito.kotlin)
     // ----------       Robolectric     ------------
     testImplementation(libs.robolectric)
+
+    implementation(libs.volley) //HTTP request
+    implementation("org.json:json:20240303") //JSON parser
 }
 
 tasks.withType<Test> {
