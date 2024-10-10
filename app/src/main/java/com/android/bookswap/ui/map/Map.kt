@@ -3,7 +3,6 @@ package com.android.bookswap.ui.map
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,14 +14,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.shape.CutCornerShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
@@ -66,53 +62,52 @@ fun MapScreen(listUser: List<TempUser>) {
     }
 
     Scaffold(
+        modifier = Modifier.testTag("mapScreen"),
         bottomBar = {
             //To add a bottom navigation bar when it will be created
         },
         content = { pd ->
-            Box(Modifier.fillMaxSize()) {
-                GoogleMap(
-                    onMapClick = {
-                        selectedUser = null
-                    },
-                    modifier = Modifier.fillMaxSize().padding(pd).testTag("mapScreen"),
-                    cameraPositionState = cameraPositionState,
-                ) {
-                    listUser
-                        .filter { !it.longitude.isNaN() && !it.latitude.isNaN() && it.listBook.isNotEmpty() }
-                        .forEach { item ->
-                            val markerState = MarkerState(position = LatLng(item.latitude, item.longitude))
+            GoogleMap(
+                onMapClick = {
+                    selectedUser = null
+                },
+                modifier = Modifier.fillMaxSize().padding(pd).testTag("mapGoogleMap"),
+                cameraPositionState = cameraPositionState,
+            ) {
+                listUser
+                    .filter { !it.longitude.isNaN() && !it.latitude.isNaN() && it.listBook.isNotEmpty() }
+                    .forEach { item ->
+                        val markerState = MarkerState(position = LatLng(item.latitude, item.longitude))
 
-                            Marker(
-                                state = markerState,
-                                onClick = {
-                                    selectedUser = item
-                                    coroutineScope.launch {
-                                        // Calculate the screen position when marker is clicked
-                                        val projection = cameraPositionState.projection
-                                        projection?.let {
-                                            val screenPosition = it.toScreenLocation(markerState.position)
-                                            markerScreenPosition = Offset(screenPosition.x.toFloat(), screenPosition.y.toFloat())
-                                        }
+                        Marker(
+                            state = markerState,
+                            onClick = {
+                                selectedUser = item
+                                coroutineScope.launch {
+                                    // Calculate the screen position when marker is clicked
+                                    val projection = cameraPositionState.projection
+                                    projection?.let {
+                                        val screenPosition = it.toScreenLocation(markerState.position)
+                                        markerScreenPosition = Offset(screenPosition.x.toFloat(), screenPosition.y.toFloat())
                                     }
-                                    false
                                 }
-                            )
-                        }
-                }
-
-                // Custom info window linked to the marker
-                markerScreenPosition?.let { screenPos ->
-                    selectedUser?.let { user ->
-                        CustomInfoWindow(
-                            modifier = Modifier
-                                .offset { IntOffset(screenPos.x.roundToInt(), screenPos.y.roundToInt()) }
-                                .background(Color.Transparent),
-                            user = user
+                                false
+                            }
                         )
                     }
+            }
+
+            // Custom info window linked to the marker
+            markerScreenPosition?.let { screenPos ->
+                selectedUser?.let { user ->
+                    CustomInfoWindow(
+                        modifier = Modifier
+                            .offset { IntOffset(screenPos.x.roundToInt(), screenPos.y.roundToInt()) },
+                        user = user
+                    )
                 }
             }
+
         }
     )
 }
@@ -128,34 +123,40 @@ fun CustomInfoWindow(modifier: Modifier = Modifier, user: TempUser) {
                     color = Color.hsl(23f, 0.17f, 0.36f, 1f)),
                 shape = RoundedCornerShape(0.dp, 10.dp, 10.dp, 10.dp)
             )
-            .heightIn(max = 400.dp),
+            .heightIn(max = 400.dp)
+            .testTag("mapBoxMarker")
+            .background(Color.Transparent),
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
         colors = CardDefaults.cardColors(containerColor = Color.hsl(70f, 0.47f, 0.81f, 1f)),
         shape = RoundedCornerShape(0.dp,10.dp,10.dp,10.dp)
     ) {
         Spacer(modifier.height(10.dp))
         LazyColumn (
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth().testTag("mapBoxMarkerList")
         ) {
             itemsIndexed(user.listBook) { index, book ->
                 Column(
-                    modifier = Modifier.padding(horizontal = 8.dp)
+                    modifier = Modifier.padding(horizontal = 8.dp).testTag("mapBoxMarkerListBox")
                 ) {
                     Text(
                         text = book.Title,
                         color = Color.hsl(23f, 0.17f, 0.36f, 1f),
-                        fontSize = 20.sp
+                        fontSize = 20.sp,
+                        modifier = Modifier.testTag("mapBoxMarkerListBoxTitle")
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
                         text = book.Author,
                         color = Color.hsl(26f, 0.28f, 0.53f, 1f),
-                        fontSize = 16.sp
+                        fontSize = 16.sp,
+                        modifier = Modifier.testTag("mapBoxMarkerListBoxTitle")
                     )
                 }
                 if(index < user.listBook.size - 1)
                 HorizontalDivider(
-                    modifier = Modifier.fillMaxWidth().height(5.dp), // Optional padding around divider
+                    modifier = Modifier.fillMaxWidth()
+                        .height(5.dp)
+                        .testTag("mapBoxMarkerListSpacer"),
                     thickness = 1.dp,
                     color = Color.hsl(23f, 0.17f, 0.36f, 1f)
                 )
