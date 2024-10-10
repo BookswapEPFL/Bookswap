@@ -19,7 +19,7 @@ object Route {
 
 object Screen {
     const val AUTH = "Auth Screen"
-    const val CHATLSIT = "ChatList Screen"
+    const val CHATLIST = "ChatList Screen"
     const val CHAT = "Chat Screen"
     const val MAP = "Map Screen"
     const val NEWBOOK = "NewBook Screen"
