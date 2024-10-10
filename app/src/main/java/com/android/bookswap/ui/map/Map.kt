@@ -37,6 +37,17 @@ import com.google.maps.android.compose.GoogleMap
 import kotlin.math.roundToInt
 import kotlinx.coroutines.launch
 
+/**
+ * Composable function to display a map with user locations and associated book information.
+ *
+ * This screen renders a GoogleMap that shows books locations as markers. Upon clicking a marker, it
+ * displays a custom info window with the list of books at this location.
+ *
+ * @param listUser List of users (`TempUser`) to display on the map, each containing their location
+ *   (latitude, longitude) and a list of books they own (`listBook`).
+ * @param selectedUser An optional user (`TempUser`) to be initially selected and focused on the
+ *   map. This user’s info window will be shown if not null.
+ */
 @Composable
 fun MapScreen(listUser: List<TempUser>, selectedUser: TempUser? = null) {
 
@@ -116,6 +127,18 @@ fun MapScreen(listUser: List<TempUser>, selectedUser: TempUser? = null) {
       })
 }
 
+/**
+ * Composable function to display a custom info window for a selected book's list marker on the map.
+ *
+ * This function creates a card that shows detailed information about a user's list of books when
+ * the corresponding map marker is clicked.
+ *
+ * @param modifier A `Modifier` to apply to the card containing the custom info window. It can be
+ *   used to modify the position, size, and appearance of the info window, but is mainly intended to
+ *   give the position of the CustomInfoWindow. Default is `Modifier`.
+ * @param user The `TempUser` object containing the list of books (`listBook`) to be displayed
+ *   inside the info window.
+ */
 @Composable
 fun CustomInfoWindow(modifier: Modifier = Modifier, user: TempUser) {
   Card(
@@ -160,4 +183,5 @@ fun CustomInfoWindow(modifier: Modifier = Modifier, user: TempUser) {
       }
 }
 
+// need to be removed when user dataclass will be created
 data class TempUser(val latitude: Double, val longitude: Double, val listBook: List<DataBook>)
