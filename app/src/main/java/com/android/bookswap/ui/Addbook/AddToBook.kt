@@ -5,11 +5,13 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -19,9 +21,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.android.bookswap.model.DataBook
 import com.android.bookswap.model.Languages
+import com.android.bookswap.ui.theme.Accent
+import com.android.bookswap.ui.theme.BackGround
+import com.android.bookswap.ui.theme.Primary
+import com.android.bookswap.ui.theme.Secondary
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -43,7 +51,14 @@ fun AddToBook(listToBooksView: listToBooksView) {
       topBar = {
         TopAppBar(
             // Title of the screen
-            title = { Text("Add Your Book", modifier = Modifier.testTag("addBookTitle")) },
+            title = {
+              Text(
+                  text = "Add Your Book",
+                  fontSize = 24.sp,
+                  fontWeight = FontWeight.Bold,
+                  color = Accent,
+                  modifier = Modifier.testTag("addBookTitle"))
+            },
             // Icon button for navigation (currently no action defined)
             navigationIcon = {
               IconButton(onClick = {}) {
@@ -62,7 +77,17 @@ fun AddToBook(listToBooksView: listToBooksView) {
               placeholder = { Text("Enter the book title") },
               modifier =
                   Modifier.padding(paddingValues)
-                      .testTag("inputBookTitle") // Adding padding to the input field
+                      .testTag("inputBookTitle"), // Light background color inside the ,
+              colors =
+                  TextFieldDefaults.outlinedTextFieldColors(
+                      focusedBorderColor = Secondary, // Custom green for focused border
+                      unfocusedBorderColor = Secondary, // Lighter green for unfocused border
+                      // textColor = AccentSecondary, // Text color
+                      cursorColor = Secondary, // Custom green for the cursor
+                      focusedLabelColor = Secondary, // Custom green for focused label
+                      unfocusedLabelColor = Secondary, // Lighter color for unfocused label
+                      // backgroundColor = Secondary
+                  ) // Adding padding to the input field
               )
 
           // Author Input Field
@@ -71,49 +96,107 @@ fun AddToBook(listToBooksView: listToBooksView) {
               onValueChange = { author = it },
               label = { Text("Author") },
               placeholder = { Text("Enter the author's name") },
-              modifier = Modifier.padding(paddingValues).testTag("inputBookAuthor"))
-
+              modifier = Modifier.padding(paddingValues).testTag("inputBookAuthor"),
+              colors =
+                  TextFieldDefaults.outlinedTextFieldColors(
+                      focusedBorderColor = Secondary, // Custom green for focused border
+                      unfocusedBorderColor = Secondary, // Lighter green for unfocused border
+                      // textColor = AccentSecondary, // Text color
+                      cursorColor = Secondary, // Custom green for the cursor
+                      focusedLabelColor = Secondary, // Custom green for focused label
+                      unfocusedLabelColor = Secondary, // Lighter color for unfocused label
+                      // backgroundColor = Secondary
+                  ) // Adding padding to the input field
+              )
           // Description Input Field
           OutlinedTextField(
               value = description,
               onValueChange = { description = it },
               label = { Text("Description") },
               placeholder = { Text("Provide a description of the book") },
-              modifier = Modifier.testTag("inputBookDescription"))
-
+              modifier = Modifier.testTag("inputBookDescription"),
+              colors =
+                  TextFieldDefaults.outlinedTextFieldColors(
+                      focusedBorderColor = Secondary, // Custom green for focused border
+                      unfocusedBorderColor = Secondary, // Lighter green for unfocused border
+                      // textColor = AccentSecondary, // Text color
+                      cursorColor = Secondary, // Custom green for the cursor
+                      focusedLabelColor = Secondary, // Custom green for focused label
+                      unfocusedLabelColor = Secondary, // Lighter color for unfocused label
+                      // backgroundColor = Secondary
+                  ) // Adding padding to the input field
+              )
           // Rating Input Field
           OutlinedTextField(
               value = rating,
               onValueChange = { rating = it },
               label = { Text("Rating") },
               placeholder = { Text("Rate the book (e.g. 4.5)") },
-              modifier = Modifier.testTag("inputBookRating"))
-
+              modifier = Modifier.testTag("inputBookRating"),
+              colors =
+                  TextFieldDefaults.outlinedTextFieldColors(
+                      focusedBorderColor = Secondary, // Custom green for focused border
+                      unfocusedBorderColor = Secondary, // Lighter green for unfocused border
+                      cursorColor = Secondary, // Custom green for the cursor
+                      focusedLabelColor = Secondary, // Custom green for focused label
+                      unfocusedLabelColor = Secondary, // Lighter color for unfocused label
+                      // backgroundColor = Secondary
+                  ) // Adding padding to the input field
+              )
           // ISBN Input Field
           OutlinedTextField(
               value = isbn,
               onValueChange = { isbn = it },
               label = { Text("ISBN") },
               placeholder = { Text("Enter the ISBN") },
-              modifier = Modifier.testTag("inputBookISBN"))
-
+              modifier = Modifier.testTag("inputBookISBN"),
+              colors =
+                  TextFieldDefaults.outlinedTextFieldColors(
+                      focusedBorderColor = Secondary, // Custom green for focused border
+                      unfocusedBorderColor = Secondary, // Lighter green for unfocused border
+                      cursorColor = Secondary, // Custom green for the cursor
+                      focusedLabelColor = Secondary, // Custom green for focused label
+                      unfocusedLabelColor = Secondary, // Lighter color for unfocused label
+                  ) // Adding padding to the input field
+              )
           // Photo  Input Field
           OutlinedTextField(
               value = photo,
               onValueChange = { photo = it },
               label = { Text("Photo ") },
               placeholder = { Text("Enter a photo of the books") },
-              modifier = Modifier.testTag("inputBookPhoto"))
-
+              modifier = Modifier.testTag("inputBookPhoto"),
+              colors =
+                  TextFieldDefaults.outlinedTextFieldColors(
+                      focusedBorderColor = Secondary, // Custom green for focused border
+                      unfocusedBorderColor = Secondary, // Lighter green for unfocused border
+                      cursorColor = Secondary, // Custom green for the cursor
+                      focusedLabelColor = Secondary, // Custom green for focused label
+                      unfocusedLabelColor = Secondary, // Lighter color for unfocused label
+                  ) // Adding padding to the input field
+              )
           // Language Input Field
           OutlinedTextField(
               value = language,
               onValueChange = { language = it },
               label = { Text("Language ") },
               placeholder = { Text("In which language are the book") },
-              modifier = Modifier.testTag("inputBookLanguage"))
+              modifier = Modifier.testTag("inputBookLanguage"),
+              colors =
+                  TextFieldDefaults.outlinedTextFieldColors(
+                      focusedBorderColor = Secondary, // Custom green for focused border
+                      unfocusedBorderColor = Secondary, // Lighter green for unfocused border
+                      cursorColor = Secondary, // Custom green for the cursor
+                      focusedLabelColor = Secondary, // Custom green for focused label
+                      unfocusedLabelColor = Secondary, // Lighter color for unfocused label
+                  ) // Adding padding to the input field
+              )
           // Save Button
           Button(
+              colors =
+                  ButtonDefaults.buttonColors(
+                      containerColor = Primary, // Light green
+                      contentColor = BackGround),
               onClick = {
                 // Check if title and ISBN are not blank and if photo is blank (required fields)
                 if (title.isNotBlank() && isbn.isNotBlank() && photo.isBlank()) {
