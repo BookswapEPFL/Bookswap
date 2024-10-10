@@ -13,6 +13,10 @@ import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTag
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navigation
 import com.android.bookswap.resources.C
 import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.navigation.Route
@@ -50,10 +54,10 @@ class MainActivity : ComponentActivity() {
                 composable(Screen.AUTH) {/*Todo*/ }
             }
             navigation(
-                startDestination = Screen.CHATLSIT,
+                startDestination = Screen.CHATLIST,
                 route = Route.CHAT
             ) {
-                composable(Screen.CHATLSIT) {/*Todo*/ }
+                composable(Screen.CHATLIST) {/*Todo*/ }
                 composable(Screen.CHAT) {/*Todo*/ }
             }
             navigation(
