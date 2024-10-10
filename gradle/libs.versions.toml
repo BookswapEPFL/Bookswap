@@ -27,6 +27,7 @@ gms = "4.4.2"
 # Firebase Libraries
 firebaseAuth = "23.0.0"
 firebaseAuthKtx = "23.0.0"
+
 firebaseDatabaseKtx = "21.0.0"
 firebaseFirestore = "25.1.0"
 firebaseUiAuth = "8.0.0"
@@ -38,7 +39,6 @@ playServicesMaps = "19.0.0"
 [libraries]
 google-play-services-location = { group = "com.google.android.gms", name = "play-services-location", version = "19.0.1" }
 # Firebase Libraries
-firebase-firestore-ktx = { group = "com.google.firebase", name = "firebase-firestore-ktx", version.ref = "firebaseFirestoreKtx" }
 firebase-auth-ktx = { group = "com.google.firebase", name = "firebase-auth-ktx", version.ref = "firebaseAuthKtx" }
 firebase-auth = { module = "com.google.firebase:firebase-auth", version.ref = "firebaseAuth" }
 firebase-database-ktx = { module = "com.google.firebase:firebase-database-ktx", version.ref = "firebaseDatabaseKtx" }
@@ -75,6 +75,8 @@ play-services-auth = { module = "com.google.android.gms:play-services-auth", ver
 play-services-maps = { module = "com.google.android.gms:play-services-maps", version.ref = "playServicesMaps" }
 
 robolectric = { module = "org.robolectric:robolectric", version.ref = "robolectric" }
+firebase-firestore-ktx = { group = "com.google.firebase", name = "firebase-firestore-ktx", version.ref = "firebaseFirestoreKtx" }
+
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
