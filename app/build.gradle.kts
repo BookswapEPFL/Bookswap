@@ -130,8 +130,6 @@ dependencies {
     implementation(platform(libs.compose.bom))
     implementation(libs.firebase.firestore.ktx)
     implementation(libs.firebase.auth.ktx)
-    implementation(libs.androidx.navigation.common)
-    implementation(libs.androidx.navigation.runtime)
     implementation(libs.androidx.navigation.compose)
     testImplementation(libs.junit)
     testImplementation(libs.mockito.core)
