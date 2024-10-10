@@ -7,6 +7,7 @@ import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
+import java.util.UUID
 
 // A class that implements the Booksrepository interface using Firebase Firestore as the data source
 class BooksFirestorerRepository(private val db: FirebaseFirestore) : Booksrepository {
@@ -79,7 +80,8 @@ class BooksFirestorerRepository(private val db: FirebaseFirestore) : Booksreposi
       val photo = document.getString("Photo") ?: return null
       val isbn = document.getString("ISBN") ?: return null
       val languageBook = BookLanguages.valueOf(document.getString("Language") ?: return null)
-      DataBook(title, author, description, rating.toInt(), photo, languageBook, isbn)
+      DataBook(
+          UUID.randomUUID(), title, author, description, rating.toInt(), photo, languageBook, isbn)
     } catch (e: Exception) {
       null // Return null in case of any exception during the conversion
     }

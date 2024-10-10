@@ -12,6 +12,7 @@ import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.firestore.util.Assert.fail
+import java.util.UUID
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -37,6 +38,7 @@ class BooksFirestorerRepositoryTest {
 
   private val testBook =
       DataBook(
+          uuid = UUID.randomUUID(),
           title = "Test Book",
           author = "Test Author",
           description = "Test Description",
