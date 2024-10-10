@@ -78,11 +78,20 @@ jobs:
         run: |
           ./gradlew ktfmtCheck
 
+      # Load google-services.json and local.properties from the secrets
+      - name: Decode secrets
+        env:
+          GOOGLE_SERVICES: ${{ secrets.GOOGLE_SERVICES }}
+          LOCAL_PROPERTIES: ${{ secrets.LOCAL_PROPERTIES }}
+        run: |
+          echo "$GOOGLE_SERVICES" | base64 --decode > ./app/google-services.json
+          echo "$LOCAL_PROPERTIES" | base64 --decode > ./local.properties
+
       # This step runs gradle commands to build the application
       - name: Assemble
         run: |
           # To run the CI with debug information, add --info
-          ./gradlew assemble lint --parallel --build-cache
+          ./gradlew assembleDebug lint --parallel --build-cache
 
       # Run Unit tests
       - name: Run tests

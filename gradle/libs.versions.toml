@@ -13,16 +13,48 @@ composeActivity = "1.8.2"
 composeViewModel = "2.7.0"
 lifecycleRuntimeKtx = "2.7.0"
 kaspresso = "1.5.5"
+mockitoCore = "3.12.4"
+mockitoInline = "3.12.4"
+mockitoKotlin = "5.4.0"
 robolectric = "4.11.1"
 sonar = "4.4.1.3373"
+mockk = "1.12.0"
+firebaseFirestoreKtx = "25.1.0"
+
+# gradle/libs.versions.toml
+gms = "4.4.2"
+
+# Firebase Libraries
+firebaseAuth = "23.0.0"
+firebaseAuthKtx = "23.0.0"
+firebaseDatabaseKtx = "21.0.0"
+firebaseFirestore = "25.1.0"
+firebaseUiAuth = "8.0.0"
+
+# Google Service and Maps
+playServicesAuth = "21.2.0"
+playServicesMaps = "19.0.0"
 
 [libraries]
+google-play-services-location = { group = "com.google.android.gms", name = "play-services-location", version = "19.0.1" }
+# Firebase Libraries
+firebase-firestore-ktx = { group = "com.google.firebase", name = "firebase-firestore-ktx", version.ref = "firebaseFirestoreKtx" }
+firebase-auth-ktx = { group = "com.google.firebase", name = "firebase-auth-ktx", version.ref = "firebaseAuthKtx" }
+firebase-auth = { module = "com.google.firebase:firebase-auth", version.ref = "firebaseAuth" }
+firebase-database-ktx = { module = "com.google.firebase:firebase-database-ktx", version.ref = "firebaseDatabaseKtx" }
+firebase-firestore = { module = "com.google.firebase:firebase-firestore", version.ref = "firebaseFirestore" }
+firebase-ui-auth = { module = "com.firebaseui:firebase-ui-auth", version.ref = "firebaseUiAuth" }
+
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
+mockk = { group = "io.mockk", name = "mockk", version.ref = "mockk" }
+mockito-core = { module = "org.mockito:mockito-core", version.ref = "mockitoCore" }
+mockito-inline = { module = "org.mockito:mockito-inline", version.ref = "mockitoInline" }
+mockito-kotlin = { module = "org.mockito.kotlin:mockito-kotlin" , version.ref="mockitoKotlin"}
 androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtx" }
 
 compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
@@ -39,6 +71,9 @@ compose-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifes
 kaspresso = { group = "com.kaspersky.android-components", name = "kaspresso", version.ref = "kaspresso" }
 kaspresso-compose = { group = "com.kaspersky.android-components", name = "kaspresso-compose-support", version.ref = "kaspresso" }
 
+play-services-auth = { module = "com.google.android.gms:play-services-auth", version.ref = "playServicesAuth" }
+play-services-maps = { module = "com.google.android.gms:play-services-maps", version.ref = "playServicesMaps" }
+
 robolectric = { module = "org.robolectric:robolectric", version.ref = "robolectric" }
 
 [plugins]
@@ -46,3 +81,4 @@ androidApplication = { id = "com.android.application", version.ref = "agp" }
 jetbrainsKotlinAndroid = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 ktfmt = { id = "com.ncorti.ktfmt.gradle", version.ref = "ktfmt" }
 sonar = { id = "org.sonarqube", version.ref = "sonar" }
+gms = { id = "com.google.gms.google-services", version.ref = "gms" }
