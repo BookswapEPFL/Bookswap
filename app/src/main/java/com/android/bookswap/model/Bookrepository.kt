@@ -1,5 +1,7 @@
 package com.android.bookswap.model
 
+import com.android.bookswap.data.DataBook
+
 // Interface defining a contract for managing book-related operations in a repository.
 interface Booksrepository {
 
