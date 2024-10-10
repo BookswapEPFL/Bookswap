@@ -1,6 +1,7 @@
 package com.android.bookswap.data
 
 import android.location.Address
+import io.mockk.InternalPlatformDsl.toStr
 import java.util.Locale
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
@@ -17,7 +18,7 @@ class UserTest {
     assertEquals(u1.phoneNumber, "")
     assertEquals(u1.profilePictureUrl, "")
     assertEquals(u1.userId, "")
-    assertEquals(u1.address, Address(Locale.getDefault()))
+    assertEquals(u1.address.toStr(), Address(Locale.getDefault()).toString())
   }
 
   @Test
@@ -41,20 +42,20 @@ class UserTest {
     assertEquals(u1.greeting, "M.")
     assertEquals(u1.firstName, "John")
     assertEquals(u1.lastName, "Doe")
-    assertEquals(u1.email, "Hohn.Doe@example.com")
+    assertEquals(u1.email, "John.Doe@example.com")
     assertEquals(u1.phoneNumber, "+41223456789")
     assertEquals(u1.profilePictureUrl, "dummyPic.png")
     assertEquals(u1.userId, "dummyUUID0000")
-    assertEquals(u1.address, address)
+    assertEquals(u1.address.toString(), address.toString())
     u1.greeting = "Mr."
     assertNotEquals(u1.greeting, "M.")
     assertEquals(u1.greeting, "Mr.")
     assertEquals(u1.firstName, "John")
     assertEquals(u1.lastName, "Doe")
-    assertEquals(u1.email, "Hohn.Doe@example.com")
+    assertEquals(u1.email, "John.Doe@example.com")
     assertEquals(u1.phoneNumber, "+41223456789")
     assertEquals(u1.profilePictureUrl, "dummyPic.png")
     assertEquals(u1.userId, "dummyUUID0000")
-    assertEquals(u1.address, address)
+    assertEquals(u1.address.toString(), address.toString())
   }
 }
