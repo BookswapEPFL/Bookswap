@@ -1,7 +1,8 @@
 package com.android.bookswap.data.source.api
 
-import com.android.bookswap.model.DataBook
-import com.android.bookswap.model.Languages
+import com.android.bookswap.data.BookLanguages
+import com.android.bookswap.data.DataBook
+import java.util.UUID
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertThrows
 import org.junit.Assert.assertTrue
@@ -73,18 +74,19 @@ class GoogleBookDataSourceTest {
             .trimIndent()
     val dataBook =
         DataBook(
-            Title = "Flowers for Algernon",
-            Author = "Daniel Keyes",
-            Description = "Example desc",
-            Rating = 0,
+            uuid = UUID.randomUUID(),
+            title = "Flowers for Algernon",
+            author = "Daniel Keyes",
+            description = "Example desc",
+            rating = 0,
             photo = "image2",
-            Language = Languages.ENGLISH,
-            ISBN = "0435123432")
+            language = BookLanguages.ENGLISH,
+            isbn = "0435123432")
 
     val mockGoogleBookDataSource = mock(GoogleBookDataSource::class.java)
     `when`(mockGoogleBookDataSource.parseISBNResponse(jsonBook)).thenCallRealMethod()
 
-    assertEquals(dataBook, mockGoogleBookDataSource.parseISBNResponse(jsonBook).getOrNull())
+    assertDataBookEqual(dataBook, mockGoogleBookDataSource.parseISBNResponse(jsonBook).getOrNull())
   }
 
   @Test
@@ -102,7 +104,7 @@ class GoogleBookDataSourceTest {
     val missingTitleJson =
         """
       {
-        "kind": "books#volumes",
+        "kind": assertEquals"books#volumes",
         "totalItems": 1,
         "items": [
           {
@@ -198,18 +200,30 @@ class GoogleBookDataSourceTest {
             .trimIndent()
     val dataBook =
         DataBook(
-            Title = "Flowers for Algernon",
-            Author = "unknown",
-            Description = "unknown",
-            Rating = 0,
+            uuid = UUID.randomUUID(),
+            title = "Flowers for Algernon",
+            author = "unknown",
+            description = "unknown",
+            rating = 0,
             photo = "",
-            Language = Languages.SWISS_GERMAN,
-            ISBN = "0435123432")
+            language = BookLanguages.OTHER,
+            isbn = "0435123432")
 
     val mockGoogleBookDataSource = mock(GoogleBookDataSource::class.java)
     `when`(mockGoogleBookDataSource.parseISBNResponse(anyString())).thenCallRealMethod()
 
-    assertEquals(dataBook, mockGoogleBookDataSource.parseISBNResponse(fieldsEmpty).getOrNull())
-    assertEquals(dataBook, mockGoogleBookDataSource.parseISBNResponse(listEmpty).getOrNull())
+    assertDataBookEqual(
+        dataBook, mockGoogleBookDataSource.parseISBNResponse(fieldsEmpty).getOrNull())
+    assertDataBookEqual(dataBook, mockGoogleBookDataSource.parseISBNResponse(listEmpty).getOrNull())
+  }
+
+  /**
+   * Assert that two books are equal without comparing the uuid.
+   *
+   * @param expected the expected book
+   * @param result the received book, with it's uuid replaced to be the same as expected uuid
+   */
+  private fun assertDataBookEqual(expected: DataBook, result: DataBook?) {
+    assertEquals(expected, result?.copy(uuid = expected.uuid))
   }
 }

@@ -2,8 +2,8 @@ package com.android.bookswap.data.source.api
 
 import android.content.Context
 import androidx.annotation.VisibleForTesting
-import com.android.bookswap.model.DataBook
-import com.android.bookswap.model.Languages
+import com.android.bookswap.data.BookLanguages
+import com.android.bookswap.data.DataBook
 import com.android.bookswap.utils.getJSONArrayOrNull
 import com.android.bookswap.utils.getJSONObjectOrNull
 import com.android.bookswap.utils.getStringOrNull
@@ -11,6 +11,7 @@ import com.android.volley.Request
 import com.android.volley.VolleyError
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
+import java.util.UUID
 import org.json.JSONObject
 
 const val GOOGLE_BOOK_API = "https://www.googleapis.com/books/v1/volumes?q="
@@ -54,17 +55,18 @@ class GoogleBookDataSource(context: Context) {
 
       val language =
           when (val languageCode = item.getStringOrNull("language")?.uppercase()) {
-            is String -> Languages.values().first { it.languageCode == languageCode }
+            is String -> BookLanguages.values().first { it.languageCode == languageCode }
             else -> null
           }
       return Result.success(
           DataBook(
+              UUID.randomUUID(),
               item.getString("title"),
               item.getJSONArrayOrNull("authors")?.getStringOrNull(0) ?: "unknown",
               item.getStringOrNull("description") ?: "unknown",
               0,
               item.getJSONObjectOrNull("imageLinks")?.getStringOrNull("thumbnail") ?: "",
-              language ?: Languages.SWISS_GERMAN,
+              language ?: BookLanguages.OTHER,
               item.getJSONArray("industryIdentifiers").getJSONObject(0).getString("identifier")))
     } catch (exception: Exception) {
       return Result.failure(exception)
