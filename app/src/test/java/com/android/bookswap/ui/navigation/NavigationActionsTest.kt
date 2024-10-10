@@ -18,7 +18,7 @@ import org.mockito.Mockito.`when`
 import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
 
-public class NavigationActionsTest {
+class NavigationActionsTest {
   private lateinit var navigationDestination: NavDestination
   private lateinit var navHostController: NavHostController
   private lateinit var navigationActions: NavigationActions
@@ -84,5 +84,10 @@ public class NavigationActionsTest {
     assertThat(TopLevelDestinations.MAP.icon, `is`(Icons.Outlined.Place))
     assertThat(TopLevelDestinations.NEWBOOK.icon, `is`(Icons.Outlined.AddCircle))
     assertThat(TopLevelDestinations.PROFIL.icon, `is`(Icons.Outlined.AccountCircle))
+  }
+
+  @Test
+  fun list_Navigation_Bar_DestinationsCorrectOrder() {
+    assertThat(List_Navigation_Bar_Destinations, `is`(listOf(TopLevelDestinations.CHAT, TopLevelDestinations.NEWBOOK, TopLevelDestinations.MAP)))
   }
 }
