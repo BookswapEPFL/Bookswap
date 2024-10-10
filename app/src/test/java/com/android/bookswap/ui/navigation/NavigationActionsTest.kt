@@ -1,5 +1,10 @@
 package com.android.bookswap.ui.navigation
 
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.MailOutline
+import androidx.compose.material.icons.outlined.AccountCircle
+import androidx.compose.material.icons.outlined.AddCircle
+import androidx.compose.material.icons.outlined.Place
 import androidx.navigation.NavDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.NavOptionsBuilder
@@ -72,8 +77,14 @@ public class NavigationActionsTest {
     fun goBackCallPopBackStack(){
         navigationActions.goBack()
         verify(navHostController).popBackStack()
+    }
 
-
+    @Test
+    fun topLevelDestinationsHaveCorrectIcon(){
+        assertThat(TopLevelDestinations.CHAT.icon, `is`(Icons.Filled.MailOutline))
+        assertThat(TopLevelDestinations.MAP.icon, `is`(Icons.Outlined.Place))
+        assertThat(TopLevelDestinations.NEWBOOK.icon, `is`(Icons.Outlined.AddCircle))
+        assertThat(TopLevelDestinations.PROFIL.icon, `is`(Icons.Outlined.AccountCircle))
     }
 
 }
