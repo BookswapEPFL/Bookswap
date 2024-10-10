@@ -29,7 +29,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.android.bookswap.model.DataBook
+import com.android.bookswap.data.DataBook
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.*
@@ -47,27 +47,30 @@ fun MapScreen(listUser: List<TempUser>, selectedUser: TempUser? = null) {
   var mutableStateSelectedUser by remember { mutableStateOf(selectedUser) }
   var markerScreenPosition by remember { mutableStateOf<Offset?>(null) }
 
-    //compute the position of the marker on the screen given the camera position and the marker's position on the map
-    fun computePositionOfMarker(cameraPositionState: CameraPositionState, markerLatLng : LatLng){
-        val projection = cameraPositionState.projection
-        projection?.let {
-            val screenPosition = it.toScreenLocation(markerLatLng)
-            markerScreenPosition = Offset(screenPosition.x.toFloat(), screenPosition.y.toFloat())
-        }
+  // compute the position of the marker on the screen given the camera position and the marker's
+  // position on the map
+  fun computePositionOfMarker(cameraPositionState: CameraPositionState, markerLatLng: LatLng) {
+    val projection = cameraPositionState.projection
+    projection?.let {
+      val screenPosition = it.toScreenLocation(markerLatLng)
+      markerScreenPosition = Offset(screenPosition.x.toFloat(), screenPosition.y.toFloat())
     }
-
-  if (mutableStateSelectedUser != null) {
-      computePositionOfMarker(cameraPositionState, LatLng(mutableStateSelectedUser!!.latitude, mutableStateSelectedUser!!.longitude))
   }
 
-
+  if (mutableStateSelectedUser != null) {
+    computePositionOfMarker(
+        cameraPositionState,
+        LatLng(mutableStateSelectedUser!!.latitude, mutableStateSelectedUser!!.longitude))
+  }
 
   val coroutineScope = rememberCoroutineScope()
 
   // Recalculate marker screen position during camera movement
   LaunchedEffect(cameraPositionState.position) {
     if (mutableStateSelectedUser != null) {
-        computePositionOfMarker(cameraPositionState, LatLng(mutableStateSelectedUser!!.latitude, mutableStateSelectedUser!!.longitude))
+      computePositionOfMarker(
+          cameraPositionState,
+          LatLng(mutableStateSelectedUser!!.latitude, mutableStateSelectedUser!!.longitude))
     }
   }
 
@@ -92,7 +95,7 @@ fun MapScreen(listUser: List<TempUser>, selectedUser: TempUser? = null) {
                     onClick = {
                       mutableStateSelectedUser = item
                       coroutineScope.launch {
-                          computePositionOfMarker(cameraPositionState, markerState.position)
+                        computePositionOfMarker(cameraPositionState, markerState.position)
                       }
                       false
                     })
@@ -134,13 +137,13 @@ fun CustomInfoWindow(modifier: Modifier = Modifier, user: TempUser) {
           itemsIndexed(user.listBook) { index, book ->
             Column(modifier = Modifier.padding(horizontal = 8.dp).testTag("mapBoxMarkerListBox")) {
               Text(
-                  text = book.Title,
+                  text = book.title,
                   color = Color.hsl(23f, 0.17f, 0.36f, 1f),
                   fontSize = 20.sp,
                   modifier = Modifier.testTag("mapBoxMarkerListBoxTitle"))
               Spacer(modifier = Modifier.height(4.dp))
               Text(
-                  text = book.Author,
+                  text = book.author ?: "",
                   color = Color.hsl(26f, 0.28f, 0.53f, 1f),
                   fontSize = 16.sp,
                   modifier = Modifier.testTag("mapBoxMarkerListBoxAuthor"))
