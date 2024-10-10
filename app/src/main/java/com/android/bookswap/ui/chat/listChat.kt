@@ -128,8 +128,13 @@ fun MessageBoxDisplay(message: MessageBox, onClick: () -> Unit = {}) {
                     text = message.contactName,
                     fontWeight = FontWeight.Medium,
                     fontSize = 18.sp,
-                    color = Accent)
-                Text(text = message.date, fontSize = 14.sp, color = AccentSecondary)
+                    color = Accent,
+                    modifier = Modifier.testTag("chat_messageContactName"))
+                Text(
+                    text = message.date,
+                    fontSize = 14.sp,
+                    color = AccentSecondary,
+                    modifier = Modifier.testTag("chat_messageDate"))
               }
 
           Text(
@@ -137,7 +142,8 @@ fun MessageBoxDisplay(message: MessageBox, onClick: () -> Unit = {}) {
               fontSize = 14.sp,
               color = AccentSecondary,
               maxLines = 1,
-              overflow = TextOverflow.Ellipsis)
+              overflow = TextOverflow.Ellipsis,
+              modifier = Modifier.testTag("chat_messageContent"))
         }
   }
 }
