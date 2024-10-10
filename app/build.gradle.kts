@@ -52,12 +52,12 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
 
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "11"
     }
 
     packaging {
@@ -121,6 +121,7 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.firebase.database.ktx)
+    implementation(libs.firebase.firestore)
     implementation(libs.firebase.ui.auth)
     implementation(libs.firebase.auth.ktx)
     implementation(libs.firebase.auth)
@@ -129,6 +130,8 @@ dependencies {
     implementation(platform(libs.compose.bom))
     implementation(libs.androidx.espresso.intents)
     implementation(libs.firebase.firestore.ktx)
+    implementation(libs.firebase.auth.ktx)
+    implementation(libs.androidx.navigation.compose)
     testImplementation(libs.junit)
     testImplementation(libs.mockito.core)
     testImplementation(libs.mockito.kotlin)
