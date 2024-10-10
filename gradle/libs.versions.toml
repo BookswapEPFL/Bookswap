@@ -27,7 +27,6 @@ gms = "4.4.2"
 # Firebase Libraries
 firebaseAuth = "23.0.0"
 firebaseAuthKtx = "23.0.0"
-
 firebaseDatabaseKtx = "21.0.0"
 firebaseFirestore = "25.1.0"
 firebaseUiAuth = "8.0.0"
@@ -35,6 +34,7 @@ firebaseUiAuth = "8.0.0"
 # Google Service and Maps
 playServicesAuth = "21.2.0"
 playServicesMaps = "19.0.0"
+espressoIntents = "3.6.1"
 navigationCompose = "2.8.2"
 
 [libraries]
@@ -79,6 +79,7 @@ robolectric = { module = "org.robolectric:robolectric", version.ref = "robolectr
 firebase-firestore-ktx = { group = "com.google.firebase", name = "firebase-firestore-ktx", version.ref = "firebaseFirestoreKtx" }
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
 
+androidx-espresso-intents = { group = "androidx.test.espresso", name = "espresso-intents", version.ref = "espressoIntents" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
