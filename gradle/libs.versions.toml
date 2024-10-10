@@ -29,6 +29,7 @@ firebaseUiAuth = "8.0.0"
 # Google Service and Maps
 playServicesAuth = "21.2.0"
 playServicesMaps = "19.0.0"
+espressoIntents = "3.6.1"
 
 [libraries]
 # Firebase Libraries
@@ -64,6 +65,7 @@ play-services-auth = { module = "com.google.android.gms:play-services-auth", ver
 play-services-maps = { module = "com.google.android.gms:play-services-maps", version.ref = "playServicesMaps" }
 
 robolectric = { module = "org.robolectric:robolectric", version.ref = "robolectric" }
+androidx-espresso-intents = { group = "androidx.test.espresso", name = "espresso-intents", version.ref = "espressoIntents" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
