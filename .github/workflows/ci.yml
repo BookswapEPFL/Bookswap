@@ -56,6 +56,16 @@ jobs:
             ~/.android/avd/*
             ~/.android/adb*
           key: avd-34
+      # Install Android SDK
+      - name: Install Android SDK
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y android-sdk
+          echo "export ANDROID_HOME=$HOME/Android/Sdk" >> $GITHUB_ENV
+          echo "export PATH=$PATH:$HOME/Android/Sdk/platform-tools" >> $GITHUB_ENV
+          echo "export PATH=$PATH:$HOME/Android/Sdk/tools" >> $GITHUB_ENV
+          echo "export PATH=$PATH:$HOME/Android/Sdk/tools/bin" >> $GITHUB_ENV
+        shell: bash
 
       - name: create AVD and generate snapshot for caching
         if: steps.avd-cache.outputs.cache-hit != 'true'
