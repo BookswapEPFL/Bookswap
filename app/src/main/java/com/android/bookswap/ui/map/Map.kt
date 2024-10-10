@@ -46,28 +46,28 @@ fun MapScreen(listUser: List<TempUser>, selectedUser: TempUser? = null) {
 
   var mutableStateSelectedUser by remember { mutableStateOf(selectedUser) }
   var markerScreenPosition by remember { mutableStateOf<Offset?>(null) }
-  if (mutableStateSelectedUser != null) {
-    val projection = cameraPositionState.projection
-    projection?.let {
-      val markerLatLng =
-          LatLng(mutableStateSelectedUser!!.latitude, mutableStateSelectedUser!!.longitude)
-      val screenPosition = it.toScreenLocation(markerLatLng)
-      markerScreenPosition = Offset(screenPosition.x.toFloat(), screenPosition.y.toFloat())
+
+    //compute the position of the marker on the screen given the camera position and the marker's position on the map
+    fun computePositionOfMarker(cameraPositionState: CameraPositionState, markerLatLng : LatLng){
+        val projection = cameraPositionState.projection
+        projection?.let {
+            val screenPosition = it.toScreenLocation(markerLatLng)
+            markerScreenPosition = Offset(screenPosition.x.toFloat(), screenPosition.y.toFloat())
+        }
     }
+
+  if (mutableStateSelectedUser != null) {
+      computePositionOfMarker(cameraPositionState, LatLng(mutableStateSelectedUser!!.latitude, mutableStateSelectedUser!!.longitude))
   }
+
+
 
   val coroutineScope = rememberCoroutineScope()
 
   // Recalculate marker screen position during camera movement
   LaunchedEffect(cameraPositionState.position) {
     if (mutableStateSelectedUser != null) {
-      val projection = cameraPositionState.projection
-      projection?.let {
-        val markerLatLng =
-            LatLng(mutableStateSelectedUser!!.latitude, mutableStateSelectedUser!!.longitude)
-        val screenPosition = it.toScreenLocation(markerLatLng)
-        markerScreenPosition = Offset(screenPosition.x.toFloat(), screenPosition.y.toFloat())
-      }
+        computePositionOfMarker(cameraPositionState, LatLng(mutableStateSelectedUser!!.latitude, mutableStateSelectedUser!!.longitude))
     }
   }
 
@@ -92,13 +92,7 @@ fun MapScreen(listUser: List<TempUser>, selectedUser: TempUser? = null) {
                     onClick = {
                       mutableStateSelectedUser = item
                       coroutineScope.launch {
-                        // Calculate the screen position when marker is clicked
-                        val projection = cameraPositionState.projection
-                        projection?.let {
-                          val screenPosition = it.toScreenLocation(markerState.position)
-                          markerScreenPosition =
-                              Offset(screenPosition.x.toFloat(), screenPosition.y.toFloat())
-                        }
+                          computePositionOfMarker(cameraPositionState, markerState.position)
                       }
                       false
                     })
