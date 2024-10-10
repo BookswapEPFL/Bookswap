@@ -78,10 +78,10 @@ class GoogleBookDataSourceTest {
             title = "Flowers for Algernon",
             author = "Daniel Keyes",
             description = "Example desc",
-            rating = 0,
+            rating = null,
             photo = "image2",
             language = BookLanguages.ENGLISH,
-            isbn = "0435123432")
+            isbn = "9780435123432")
 
     val mockGoogleBookDataSource = mock(GoogleBookDataSource::class.java)
     `when`(mockGoogleBookDataSource.parseISBNResponse(jsonBook)).thenCallRealMethod()
@@ -202,12 +202,12 @@ class GoogleBookDataSourceTest {
         DataBook(
             uuid = UUID.randomUUID(),
             title = "Flowers for Algernon",
-            author = "unknown",
-            description = "unknown",
-            rating = 0,
-            photo = "",
+            author = null,
+            description = null,
+            rating = null,
+            photo = null,
             language = BookLanguages.OTHER,
-            isbn = "0435123432")
+            isbn = "9780435123432")
 
     val mockGoogleBookDataSource = mock(GoogleBookDataSource::class.java)
     `when`(mockGoogleBookDataSource.parseISBNResponse(anyString())).thenCallRealMethod()

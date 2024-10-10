@@ -15,7 +15,7 @@ import java.util.UUID
 import org.json.JSONObject
 
 const val GOOGLE_BOOK_API = "https://www.googleapis.com/books/v1/volumes?q="
-
+const val ISBN_13_PREFIX = "978"
 /**
  * Source to request data from GoogleBook
  *
@@ -58,16 +58,22 @@ class GoogleBookDataSource(context: Context) {
             is String -> BookLanguages.values().first { it.languageCode == languageCode }
             else -> null
           }
+
+      var identifier =
+          item.getJSONArray("industryIdentifiers").getJSONObject(0).getString("identifier")
+      if (identifier.length == 10) {
+        identifier = "$ISBN_13_PREFIX$identifier"
+      }
       return Result.success(
           DataBook(
               UUID.randomUUID(),
               item.getString("title"),
-              item.getJSONArrayOrNull("authors")?.getStringOrNull(0) ?: "unknown",
-              item.getStringOrNull("description") ?: "unknown",
-              0,
-              item.getJSONObjectOrNull("imageLinks")?.getStringOrNull("thumbnail") ?: "",
+              item.getJSONArrayOrNull("authors")?.getStringOrNull(0),
+              item.getStringOrNull("description"),
+              null,
+              item.getJSONObjectOrNull("imageLinks")?.getStringOrNull("thumbnail"),
               language ?: BookLanguages.OTHER,
-              item.getJSONArray("industryIdentifiers").getJSONObject(0).getString("identifier")))
+              identifier))
     } catch (exception: Exception) {
       return Result.failure(exception)
     }
