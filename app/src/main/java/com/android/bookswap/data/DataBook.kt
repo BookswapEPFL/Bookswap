@@ -13,12 +13,12 @@ package com.android.bookswap.data
  */
 data class DataBook(
     val title: String,
-    val author: String,
-    val description: String,
+    val author: String?,
+    val description: String?,
     val rating: Int?,
-    val photo: String,
+    val photo: String?,
     val language: BookLanguages,
-    val isbn: String
+    val isbn: String?
 )
 
 /** All supported book language type */
