@@ -7,9 +7,13 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Looper
 import androidx.annotation.RequiresApi
+import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.core.app.ActivityCompat
 import com.google.android.gms.location.*
+
+const val REQUEST_LOCATION_PERMISSION = 1
+const val BACKGROUND_LOCATION_PERMISSION_REQUEST_CODE = 2
 
 /**
  * Geolocation class manages the geolocation functionality and handles the required permissions for
@@ -23,14 +27,11 @@ import com.google.android.gms.location.*
  * optionally background location access.
  */
 class Geolocation(private val activity: Activity) {
-
-  private val REQUEST_LOCATION_PERMISSION = 1
-  private val BACKGROUND_LOCATION_PERMISSION_REQUEST_CODE = 2
   private val fusedLocationClient: FusedLocationProviderClient =
       LocationServices.getFusedLocationProviderClient(activity)
   val isRunning = mutableStateOf(false)
-  val latitude = mutableStateOf(Double.NaN) // Change to MutableState
-  val longitude = mutableStateOf(Double.NaN)
+  val latitude = mutableDoubleStateOf(Double.NaN)
+  val longitude = mutableDoubleStateOf(Double.NaN)
 
   // Location request settings
   private val locationRequest: LocationRequest =
@@ -43,10 +44,10 @@ class Geolocation(private val activity: Activity) {
   private val locationCallback =
       object : LocationCallback() {
         override fun onLocationResult(p0: LocationResult) {
-          p0.lastLocation?.let { location ->
+          p0.lastLocation.let { location ->
             // Handle the updated location here
-            latitude.value = location.latitude
-            longitude.value = location.longitude
+            latitude.doubleValue = location.latitude
+            longitude.doubleValue = location.longitude
             // You can save this location or notify other parts of your app
           }
         }

@@ -38,10 +38,10 @@ class NavigationActionsTest {
     navigationActions.navigateTo(TopLevelDestinations.MAP)
     verify(navHostController).navigate(eq(Route.MAP), any<(NavOptionsBuilder) -> Unit>())
 
-    navigationActions.navigateTo(TopLevelDestinations.PROFIL)
+    navigationActions.navigateTo(TopLevelDestinations.PROFILE)
     verify(navHostController).navigate(eq(Route.PROFIL), any<(NavOptionsBuilder) -> Unit>())
 
-    navigationActions.navigateTo(TopLevelDestinations.NEWBOOK)
+    navigationActions.navigateTo(TopLevelDestinations.NEW_BOOK)
     verify(navHostController).navigate(eq(Route.NEWBOOK), any<(NavOptionsBuilder) -> Unit>())
   }
 
@@ -68,7 +68,7 @@ class NavigationActionsTest {
     `when`(navHostController.currentDestination).thenReturn(navigationDestination)
     `when`(navigationDestination.route).thenReturn(Route.NEWBOOK)
 
-    navigationActions.navigateTo(TopLevelDestinations.NEWBOOK)
+    navigationActions.navigateTo(TopLevelDestinations.NEW_BOOK)
     assertThat(navigationActions.currentRoute(), `is`(Route.NEWBOOK))
   }
 
@@ -82,8 +82,8 @@ class NavigationActionsTest {
   fun topLevelDestinationsHaveCorrectIcon() {
     assertThat(TopLevelDestinations.CHAT.icon, `is`(Icons.Filled.MailOutline))
     assertThat(TopLevelDestinations.MAP.icon, `is`(Icons.Outlined.Place))
-    assertThat(TopLevelDestinations.NEWBOOK.icon, `is`(Icons.Outlined.AddCircle))
-    assertThat(TopLevelDestinations.PROFIL.icon, `is`(Icons.Outlined.AccountCircle))
+    assertThat(TopLevelDestinations.NEW_BOOK.icon, `is`(Icons.Outlined.AddCircle))
+    assertThat(TopLevelDestinations.PROFILE.icon, `is`(Icons.Outlined.AccountCircle))
   }
 
   @Test
@@ -92,6 +92,8 @@ class NavigationActionsTest {
         List_Navigation_Bar_Destinations,
         `is`(
             listOf(
-                TopLevelDestinations.CHAT, TopLevelDestinations.NEWBOOK, TopLevelDestinations.MAP)))
+                TopLevelDestinations.CHAT,
+                TopLevelDestinations.NEW_BOOK,
+                TopLevelDestinations.MAP)))
   }
 }

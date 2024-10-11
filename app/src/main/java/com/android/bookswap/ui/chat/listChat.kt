@@ -35,7 +35,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.android.bookswap.models.chat.MessageBox
+import com.android.bookswap.model.chat.MessageBox
 import com.android.bookswap.ui.profile.ProfileIcon
 import com.android.bookswap.ui.theme.Accent
 import com.android.bookswap.ui.theme.AccentSecondary
@@ -148,9 +148,7 @@ fun MessageBoxDisplay(message: MessageBox, onClick: () -> Unit = {}) {
   }
 }
 
-/*
-This function is used to display a divider between the messages
- */
+/** This function is used to display a divider between the messages */
 @Composable
 fun MessageDivider() {
   HorizontalDivider(
