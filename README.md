@@ -20,4 +20,7 @@ Lastly, there is a method of connecting with other people to propose the book ex
 - It will use geolocation for the recommendation and camera for easier creation of book entries
 - The scans of the books and entry creation and managing will be offline and doable without connectivity, it will also store a state so you can see your directory as it was the last time the android was connected.It will update the cloud upon reconnecting.
 
+## Links
 [Figma link](https://www.figma.com/design/uyHS0PV5RBnmToK2JuTb4h/Untitled?node-id=0-1&m=dev&t=VdHNM8v7U5bhvsW7-1)
+[Team review sheet](https://docs.google.com/spreadsheets/d/1hyi3ISzlwAXZ63ztd7Q84RkBFf24cPgatv3uUx4Y4hc/edit?usp=sharing)
+[Team minutes](https://docs.google.com/spreadsheets/d/1YF34CWge25Y1hSQsP5UWHCDoyYNJaxIPasSb13gWYao/edit?usp=sharing)
