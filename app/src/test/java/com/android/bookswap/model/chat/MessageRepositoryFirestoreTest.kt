@@ -33,6 +33,7 @@ class MessageRepositoryFirestoreTest {
           id = "message-id",
           text = "Hello, World!",
           senderId = "user-id",
+          receiverId = "receiver-id",
           timestamp = System.currentTimeMillis())
 
   private lateinit var messageRepository: MessageRepositoryFirestore
@@ -81,6 +82,7 @@ class MessageRepositoryFirestoreTest {
     `when`(mockDocumentSnapshot.getString("id")).thenReturn(testMessage.id)
     `when`(mockDocumentSnapshot.getString("text")).thenReturn(testMessage.text)
     `when`(mockDocumentSnapshot.getString("senderId")).thenReturn(testMessage.senderId)
+    `when`(mockDocumentSnapshot.getString("receiverId")).thenReturn(testMessage.receiverId)
     `when`(mockDocumentSnapshot.getLong("timestamp")).thenReturn(testMessage.timestamp)
 
     // Act
@@ -104,6 +106,7 @@ class MessageRepositoryFirestoreTest {
             "id" to testMessage.id,
             "text" to testMessage.text,
             "senderId" to testMessage.senderId,
+            "receiverId" to testMessage.receiverId,
             "timestamp" to testMessage.timestamp)
 
     doAnswer { Tasks.forResult(null) }.`when`(mockDocumentReference).set(messageMap)
