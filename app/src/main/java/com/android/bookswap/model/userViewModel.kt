@@ -101,12 +101,13 @@ open class UserViewModel(var email: String) : ViewModel() {
       address: Address = user.address,
       picURL: String = user.profilePictureUrl
   ) {
-    this.user = User(greeting, firstName, lastName, email, phone, address, picURL)
+    this.user = User(greeting, firstName, lastName, email, phone, address, picURL, uid)
     // firebaseConnection.storeData("users", uid, this.user)
   }
 
   fun updateUser(newUser: User = user) {
     this.user = newUser
+    this.uid = newUser.userId
     // firebaseConnection.storeData("users", uid, this.user)
   }
 
@@ -170,6 +171,10 @@ open class UserViewModel(var email: String) : ViewModel() {
   }
 
   fun updateAddress(newAddress: Address, onComplete: () -> Unit) {
-    var address = newAddress
+    this.user.address.countryCode = newAddress.countryCode
+    this.user.address.postalCode = newAddress.postalCode
+    this.user.address.locality = newAddress.locality
+    this.user.address.countryName = newAddress.countryName
+    this.user.address.setAddressLine(0, newAddress.getAddressLine(0))
   }
 }
