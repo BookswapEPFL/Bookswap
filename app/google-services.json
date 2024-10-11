@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "53350524991",
+    "firebase_url": "https://bookswap-f1ffa-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "bookswap-f1ffa",
+    "storage_bucket": "bookswap-f1ffa.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:53350524991:android:508855d80381972d23708a",
+        "android_client_info": {
+          "package_name": "com.android.bookswap"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "53350524991-f9ivn26uja9jpum9jsctco0ql90qhd2v.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.android.bookswap",
+            "certificate_hash": "9512d1e17de86a5fb79bd6b37918b7ef455250a6"
+          }
+        },
+        {
+          "client_id": "53350524991-rim3tpfdgv2ghibl586ku7fvq6ngcddn.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDLHkIvLf6wRY-0B3pMFnMNmPqWAqXdrlw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "53350524991-rim3tpfdgv2ghibl586ku7fvq6ngcddn.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
