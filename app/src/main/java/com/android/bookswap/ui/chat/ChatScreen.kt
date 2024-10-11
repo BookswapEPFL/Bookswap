@@ -44,7 +44,7 @@ import java.util.Date
 import java.util.Locale
 
 @Composable
-fun MessageView(
+fun ChatScreen(
     messageRepository: MessageRepositoryFirestore,
     currentUserId: String, // To identify the current user for aligning messages
     otherUserId: String
@@ -52,80 +52,65 @@ fun MessageView(
   var messages by remember { mutableStateOf(emptyList<Message>()) }
   var newMessageText by remember { mutableStateOf(TextFieldValue("")) }
 
-
-    DisposableEffect(Unit) {
-        val listenerRegistration = messageRepository.addMessagesListener(
+  DisposableEffect(Unit) {
+    val listenerRegistration =
+        messageRepository.addMessagesListener(
             otherUserId = otherUserId,
             currentUserId = currentUserId,
-            onSuccess = { fetchedMessages ->
-                messages = fetchedMessages
-            },
-            onFailure = { e ->
-                Log.e("MessageView", "Failed to fetch messages: ${e.message}")
-            }
-        )
+            onSuccess = { fetchedMessages -> messages = fetchedMessages },
+            onFailure = { e -> Log.e("MessageView", "Failed to fetch messages: ${e.message}") })
 
-        onDispose {
-            listenerRegistration.remove()
-        }
-    }
-    Box(modifier = Modifier.fillMaxSize().background(BackGround)) {
-      Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.SpaceBetween) {
-          // Message list
-          LazyColumn(
-              modifier = Modifier.weight(1f).padding(8.dp),
-              verticalArrangement = Arrangement.Bottom
-          ) {
-              items(messages) { message ->
-                  MessageItem(
-                      message = message,
-                      currentUserId = currentUserId
-                  )
-              }
+    onDispose { listenerRegistration.remove() }
+  }
+  Box(modifier = Modifier.fillMaxSize().background(BackGround)) {
+    Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.SpaceBetween) {
+      // Message list
+      LazyColumn(
+          modifier = Modifier.weight(1f).padding(8.dp), verticalArrangement = Arrangement.Bottom) {
+            items(messages) { message ->
+              MessageItem(message = message, currentUserId = currentUserId)
+            }
           }
 
-          // Message input field and send button
-          Row(
-              modifier = Modifier.fillMaxWidth().padding(top = 8.dp).background(Primary),
-              verticalAlignment = Alignment.CenterVertically
-          ) {
-              BasicTextField(
-                  value = newMessageText,
-                  onValueChange = { newMessageText = it },
-                  modifier =
-                  Modifier.weight(1f)
-                      .padding(8.dp)
-                      .background(Secondary, MaterialTheme.shapes.small)
-                      .border(1.dp, Accent, MaterialTheme.shapes.small)
-                      .padding(8.dp)
-              )
-              Button(
-                  onClick = {
-                      val messageId = messageRepository.getNewUid()
-                      val newMessage = Message(
+      // Message input field and send button
+      Row(
+          modifier = Modifier.fillMaxWidth().padding(top = 8.dp).background(Primary),
+          verticalAlignment = Alignment.CenterVertically) {
+            BasicTextField(
+                value = newMessageText,
+                onValueChange = { newMessageText = it },
+                modifier =
+                    Modifier.weight(1f)
+                        .padding(8.dp)
+                        .background(Secondary, MaterialTheme.shapes.small)
+                        .border(1.dp, Accent, MaterialTheme.shapes.small)
+                        .padding(8.dp))
+            Button(
+                onClick = {
+                  val messageId = messageRepository.getNewUid()
+                  val newMessage =
+                      Message(
                           id = messageId,
                           text = newMessageText.text,
                           senderId = currentUserId,
                           receiverId = otherUserId, // Ensure receiverId is set here
-                          timestamp = System.currentTimeMillis()
-                      )
-                      // Send the message
-                      messageRepository.sendMessage(
-                          message = newMessage,
-                          onSuccess = {
-                              newMessageText = TextFieldValue("") // Clear input field
-                          },
-                          onFailure = { e ->
-                              Log.e("MessageView", "Failed to send message: ${e.message}")
-                          })
-                  },
-                  colors = ButtonColors(Secondary, Accent, Secondary, Accent),
-                  modifier = Modifier.padding(horizontal = 8.dp)
-              ) {
+                          timestamp = System.currentTimeMillis())
+                  // Send the message
+                  messageRepository.sendMessage(
+                      message = newMessage,
+                      onSuccess = {
+                        newMessageText = TextFieldValue("") // Clear input field
+                      },
+                      onFailure = { e ->
+                        Log.e("MessageView", "Failed to send message: ${e.message}")
+                      })
+                },
+                colors = ButtonColors(Secondary, Accent, Secondary, Accent),
+                modifier = Modifier.padding(horizontal = 8.dp)) {
                   Text("Send")
-              }
+                }
           }
-  }
+    }
   }
 }
 
@@ -133,54 +118,57 @@ fun MessageView(
 fun MessageItem(message: Message, currentUserId: String) {
   val isCurrentUser = message.senderId == currentUserId
   val cornerRadius = 25.dp
-  val shape = if (isCurrentUser) {
-      RoundedCornerShape(topStart = cornerRadius, topEnd = cornerRadius, bottomStart = cornerRadius, bottomEnd = 5.dp)
-  } else {
-      RoundedCornerShape(topStart = cornerRadius, topEnd = cornerRadius, bottomStart = 5.dp, bottomEnd = cornerRadius)
-  }
+  val shape =
+      if (isCurrentUser) {
+        RoundedCornerShape(
+            topStart = cornerRadius,
+            topEnd = cornerRadius,
+            bottomStart = cornerRadius,
+            bottomEnd = 5.dp)
+      } else {
+        RoundedCornerShape(
+            topStart = cornerRadius,
+            topEnd = cornerRadius,
+            bottomStart = 5.dp,
+            bottomEnd = cornerRadius)
+      }
   Row(
       modifier = Modifier.fillMaxWidth(),
       horizontalArrangement = if (isCurrentUser) Arrangement.End else Arrangement.Start) {
-      Card(
-          colors =
-          if (isCurrentUser) {
-              CardColors(Primary, Accent, Primary, Accent)
-          } else {
-              CardColors(Secondary, Accent, Secondary, Accent)
-          },
-          shape = shape,
-          modifier = Modifier
-              .padding(8.dp)
-              .widthIn(max = (LocalConfiguration.current.screenWidthDp.dp * 2 / 3))
-              .border(1.dp, Accent, shape)
-      ) {
-          Column(modifier = Modifier.padding(16.dp)) {
-              Text(
-                  text = message.text,
-                  color = Accent
-              )
-              Text(
-                  text = formatTimestamp(message.timestamp),
-                  color = AccentSecondary,
-                  style = MaterialTheme.typography.bodySmall,
-                  modifier = Modifier.align(Alignment.End)
-              )
-          }
+        Card(
+            colors =
+                if (isCurrentUser) {
+                  CardColors(Primary, Accent, Primary, Accent)
+                } else {
+                  CardColors(Secondary, Accent, Secondary, Accent)
+                },
+            shape = shape,
+            modifier =
+                Modifier.padding(8.dp)
+                    .widthIn(max = (LocalConfiguration.current.screenWidthDp.dp * 2 / 3))
+                    .border(1.dp, Accent, shape)) {
+              Column(modifier = Modifier.padding(16.dp)) {
+                Text(text = message.text, color = Accent)
+                Text(
+                    text = formatTimestamp(message.timestamp),
+                    color = AccentSecondary,
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.align(Alignment.End))
+              }
+            }
       }
-
-
-  }}
+}
 
 fun formatTimestamp(timestamp: Long): String {
-    val messageDate = Date(timestamp)
-    val currentDate = Date()
-    val dateFormat = SimpleDateFormat("yyyyMMdd", Locale.getDefault())
-    val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
-    val dateTimeFormat = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
+  val messageDate = Date(timestamp)
+  val currentDate = Date()
+  val dateFormat = SimpleDateFormat("yyyyMMdd", Locale.getDefault())
+  val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
+  val dateTimeFormat = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
 
-    return if (dateFormat.format(messageDate) == dateFormat.format(currentDate)) {
-        timeFormat.format(messageDate)
-    } else {
-        dateTimeFormat.format(messageDate)
-    }
+  return if (dateFormat.format(messageDate) == dateFormat.format(currentDate)) {
+    timeFormat.format(messageDate)
+  } else {
+    dateTimeFormat.format(messageDate)
+  }
 }
