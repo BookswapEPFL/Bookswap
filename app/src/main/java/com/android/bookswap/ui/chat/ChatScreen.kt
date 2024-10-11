@@ -32,8 +32,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
-import com.android.bookswap.model.chat.Message
-import com.android.bookswap.model.chat.MessageRepositoryFirestore
+import com.android.bookswap.data.chat.Message
+import com.android.bookswap.data.chat.MessageRepositoryFirestore
 import com.android.bookswap.ui.theme.Accent
 import com.android.bookswap.ui.theme.AccentSecondary
 import com.android.bookswap.ui.theme.BackGround
