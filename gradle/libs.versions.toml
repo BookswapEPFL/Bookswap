@@ -36,10 +36,13 @@ playServicesAuth = "21.2.0"
 playServicesMaps = "19.0.0"
 espressoIntents = "3.6.1"
 navigationCompose = "2.8.2"
+volley = "1.2.1" # HTTP request
+json = "20240303" #Json parsing
 
 [libraries]
 google-play-services-location = { group = "com.google.android.gms", name = "play-services-location", version = "19.0.1" }
 # Firebase Libraries
+firebase-firestore-ktx = { group = "com.google.firebase", name = "firebase-firestore-ktx", version.ref = "firebaseFirestoreKtx" }
 firebase-auth-ktx = { group = "com.google.firebase", name = "firebase-auth-ktx", version.ref = "firebaseAuthKtx" }
 firebase-auth = { module = "com.google.firebase:firebase-auth", version.ref = "firebaseAuth" }
 firebase-database-ktx = { module = "com.google.firebase:firebase-database-ktx", version.ref = "firebaseDatabaseKtx" }
@@ -76,10 +79,11 @@ play-services-auth = { module = "com.google.android.gms:play-services-auth", ver
 play-services-maps = { module = "com.google.android.gms:play-services-maps", version.ref = "playServicesMaps" }
 
 robolectric = { module = "org.robolectric:robolectric", version.ref = "robolectric" }
-firebase-firestore-ktx = { group = "com.google.firebase", name = "firebase-firestore-ktx", version.ref = "firebaseFirestoreKtx" }
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
 
 androidx-espresso-intents = { group = "androidx.test.espresso", name = "espresso-intents", version.ref = "espressoIntents" }
+volley = { module = "com.android.volley:volley", version.ref = "volley" }
+json = { module = "org.json:json", version.ref = "json" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
