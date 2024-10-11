@@ -37,10 +37,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.bookswap.model.chat.MessageBox
 import com.android.bookswap.ui.profile.ProfileIcon
-import com.android.bookswap.ui.theme.Accent
-import com.android.bookswap.ui.theme.AccentSecondary
-import com.android.bookswap.ui.theme.BackGround
-import com.android.bookswap.ui.theme.Primary
+import com.android.bookswap.ui.theme.ColorVariable
 
 /** This is the main screen for the chat feature. It displays the list of messages */
 @OptIn(ExperimentalMaterial3Api::class)
@@ -51,7 +48,7 @@ fun ListChatScreen(placeHolderData: List<MessageBox> = emptyList()) {
         TopAppBar(
             colors =
                 TopAppBarDefaults.smallTopAppBarColors(
-                    containerColor = BackGround,
+                    containerColor = ColorVariable.BackGround,
                 ),
             title = {
               Box(
@@ -64,7 +61,7 @@ fun ListChatScreen(placeHolderData: List<MessageBox> = emptyList()) {
                                 fontSize = 30.sp,
                                 lineHeight = 20.sp,
                                 fontWeight = FontWeight(700),
-                                color = Accent,
+                                color = ColorVariable.Accent,
                                 letterSpacing = 0.3.sp,
                             ))
                   }
@@ -75,14 +72,16 @@ fun ListChatScreen(placeHolderData: List<MessageBox> = emptyList()) {
         LazyColumn(
             contentPadding = pv,
             modifier =
-                Modifier.fillMaxSize().background(color = BackGround).testTag("chat_messageList")) {
+                Modifier.fillMaxSize()
+                    .background(color = ColorVariable.BackGround)
+                    .testTag("chat_messageList")) {
               item { MessageDivider() }
               if (placeHolderData.isEmpty()) {
                 item {
                   Text(
                       text = "No messages yet",
                       modifier = Modifier.fillMaxWidth().padding(16.dp),
-                      color = Primary,
+                      color = ColorVariable.Primary,
                       fontSize = 20.sp,
                       fontWeight = FontWeight.Bold,
                       textAlign = TextAlign.Center)
@@ -97,7 +96,7 @@ fun ListChatScreen(placeHolderData: List<MessageBox> = emptyList()) {
       },
       bottomBar = {
         // To Modify with the navbar
-        BottomAppBar(modifier = Modifier.background(color = BackGround)) {}
+        BottomAppBar(modifier = Modifier.background(color = ColorVariable.BackGround)) {}
       })
 }
 
@@ -109,7 +108,7 @@ fun MessageBoxDisplay(message: MessageBox, onClick: () -> Unit = {}) {
   Row(
       Modifier.fillMaxWidth()
           .height(55.dp)
-          .background(color = BackGround)
+          .background(color = ColorVariable.BackGround)
           .clickable(onClick = onClick)
           .testTag("chat_messageBox"),
   ) {
@@ -128,19 +127,19 @@ fun MessageBoxDisplay(message: MessageBox, onClick: () -> Unit = {}) {
                     text = message.contactName,
                     fontWeight = FontWeight.Medium,
                     fontSize = 18.sp,
-                    color = Accent,
+                    color = ColorVariable.Accent,
                     modifier = Modifier.testTag("chat_messageContactName"))
                 Text(
                     text = message.date,
                     fontSize = 14.sp,
-                    color = AccentSecondary,
+                    color = ColorVariable.AccentSecondary,
                     modifier = Modifier.testTag("chat_messageDate"))
               }
 
           Text(
               text = message.message,
               fontSize = 14.sp,
-              color = AccentSecondary,
+              color = ColorVariable.AccentSecondary,
               maxLines = 1,
               overflow = TextOverflow.Ellipsis,
               modifier = Modifier.testTag("chat_messageContent"))
