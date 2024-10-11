@@ -9,14 +9,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
-import com.android.bookswap.ui.theme.Accent
+import com.android.bookswap.ui.theme.ColorVariable
 
 @Composable
 fun BackButton(navController: NavigationActions) {
   IconButton(onClick = { navController.goBack() }, modifier = Modifier.testTag("backButton")) {
     Icon(
         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-        tint = Accent,
+        tint = ColorVariable.Accent,
         contentDescription = "Back",
         modifier = Modifier.testTag("backIcon").size(32.dp))
   }
