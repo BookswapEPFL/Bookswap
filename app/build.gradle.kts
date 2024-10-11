@@ -1,5 +1,3 @@
-
-
 plugins {
     jacoco
     alias(libs.plugins.androidApplication)
@@ -8,6 +6,7 @@ plugins {
     alias(libs.plugins.sonar)
     id("com.google.gms.google-services")
 }
+
 android {
     namespace = "com.android.bookswap"
     compileSdk = 34
@@ -24,6 +23,7 @@ android {
             useSupportLibrary = true
         }
     }
+
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -32,12 +32,13 @@ android {
                 "proguard-rules.pro"
             )
         }
+
         debug {
             enableUnitTestCoverage = true
             enableAndroidTestCoverage = true
         }
-
     }
+
     testCoverage {
         jacocoVersion = "0.8.8"
     }
@@ -49,6 +50,7 @@ android {
     composeOptions {
         kotlinCompilerExtensionVersion = "1.4.2"
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
@@ -61,16 +63,9 @@ android {
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
-
         }
     }
-    dexOptions {
-        preDexLibraries = false
-    }
 
-    packagingOptions {
-        excludes += "META-INF/versions/9/OSGI-INF/MANIFEST.MF"
-    }
     testOptions {
         unitTests {
             isIncludeAndroidResources = true
@@ -136,15 +131,11 @@ dependencies {
     implementation(libs.firebase.firestore.ktx)
     implementation(libs.firebase.auth.ktx)
     implementation(libs.androidx.navigation.compose)
-    implementation(libs.firebase.crashlytics.buildtools)
-    implementation(libs.identity.jvm)
-
     testImplementation(libs.junit)
     testImplementation(libs.mockito.core)
     testImplementation(libs.mockito.kotlin)
     testImplementation(libs.mockk)
     testImplementation(libs.mockito.inline)
-    implementation("org.bouncycastle:bcprov-jdk18on:1.78.1")
     globalTestImplementation(libs.androidx.junit)
     globalTestImplementation(libs.androidx.espresso.core)
 
@@ -181,6 +172,9 @@ dependencies {
     testImplementation(libs.mockito.kotlin)
     // ----------       Robolectric     ------------
     testImplementation(libs.robolectric)
+
+    //implementation(libs.volley) //HTTP request
+    //implementation(libs.json) //JSON parser
 }
 
 tasks.withType<Test> {

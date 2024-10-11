@@ -27,7 +27,6 @@ class AddToBookTest {
     composeTestRule.setContent {
       AddToBook(listToBooksView = MockListToBooksView(MockBooksRepository()))
     }
-
     // Check if the Save button is initially disabled
     composeTestRule.onNodeWithText("Save").assertIsNotEnabled()
   }
@@ -37,11 +36,9 @@ class AddToBookTest {
     composeTestRule.setContent {
       AddToBook(listToBooksView = MockListToBooksView(MockBooksRepository()))
     }
-
     // Fill in the Title and ISBN fields
     composeTestRule.onNodeWithText("Title").performTextInput("My Book Title")
     composeTestRule.onNodeWithText("ISBN").performTextInput("1234567890")
-
     // Check if the Save button is now enabled
     composeTestRule.onNodeWithText("Save").assertIsEnabled()
   }
@@ -52,7 +49,6 @@ class AddToBookTest {
     composeTestRule.setContent {
       AddToBook(listToBooksView = MockListToBooksView(MockBooksRepository()))
     }
-
     // Assert that all components are displayed and their contents are correct
     composeTestRule
         .onNodeWithTag("addBookScreen")
@@ -140,6 +136,37 @@ class AddToBookTest {
 
     // Assert that the book is null due to invalid language
     assertNull(book)
+  }
+
+  @Test
+  fun testSaveButtonDisabledWhenTitleIsEmpty() {
+    composeTestRule.setContent {
+      AddToBook(listToBooksView = MockListToBooksView(MockBooksRepository()))
+    }
+    // Fill in the ISBN field but leave the Title field empty
+    composeTestRule.onNodeWithText("ISBN").performTextInput("1234567890")
+
+    // Check if the Save button is still disabled
+    composeTestRule.onNodeWithText("Save").assertIsNotEnabled()
+  }
+
+  @Test
+  fun testSaveButtonDisabledWhenLanguageIsInvalid() {
+    composeTestRule.setContent {
+      AddToBook(listToBooksView = MockListToBooksView(MockBooksRepository()))
+    }
+
+    // Fill in all the required fields except language with invalid data
+    composeTestRule.onNodeWithText("Title").performTextInput("My Book Title")
+    composeTestRule.onNodeWithText("Author").performTextInput("Author Name")
+    composeTestRule.onNodeWithText("Description").performTextInput("This is a description")
+    composeTestRule.onNodeWithText("Rating").performTextInput("4")
+    composeTestRule.onNodeWithText("ISBN").performTextInput("1234567890")
+    composeTestRule.onNodeWithText("Photo").performTextInput("https://example.com/photo.jpg")
+    composeTestRule.onNodeWithText("Language").performTextInput("INVALID_LANGUAGE")
+
+    // Check if the Save button is still disabled
+    composeTestRule.onNodeWithText("Save").assertIsNotEnabled()
   }
 }
 
