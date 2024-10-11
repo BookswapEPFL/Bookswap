@@ -1,7 +1,6 @@
-package com.android.bookswap
+package com.android.bookswap.ui
 
 import android.location.Address
-import androidx.activity.compose.setContent
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.android.bookswap.data.User
@@ -53,7 +52,7 @@ class UserProfileScreenTest : TestCase() {
   fun testDisplay() =
       run(testName = "assertContent") {
         step("Start User Profile Screen") {
-          ComposeScreen.onComposeScreen<UserProfileScreen>(composeTestRule) {
+          ComposeScreen.onComposeScreen<com.android.bookswap.screen.UserProfileScreen>(composeTestRule) {
             titleTxt {
               assertIsDisplayed()
               assertTextEquals("Your Profile")
@@ -86,7 +85,7 @@ class UserProfileScreenTest : TestCase() {
   fun testEdit() =
       run(testName = "assertEditAction") {
         step("Start User Profile Screen") {
-          ComposeScreen.onComposeScreen<UserProfileScreen>(composeTestRule) {
+          ComposeScreen.onComposeScreen<com.android.bookswap.screen.UserProfileScreen>(composeTestRule) {
             titleTxt {
               assertIsDisplayed()
               assertTextEquals("Your Profile")
