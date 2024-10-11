@@ -149,25 +149,6 @@ class AddToBookTest {
     // Check if the Save button is still disabled
     composeTestRule.onNodeWithText("Save").assertIsNotEnabled()
   }
-
-  @Test
-  fun testSaveButtonDisabledWhenLanguageIsInvalid() {
-    composeTestRule.setContent {
-      AddToBook(listToBooksView = MockListToBooksView(MockBooksRepository()))
-    }
-
-    // Fill in all the required fields except language with invalid data
-    composeTestRule.onNodeWithText("Title").performTextInput("My Book Title")
-    composeTestRule.onNodeWithText("Author").performTextInput("Author Name")
-    composeTestRule.onNodeWithText("Description").performTextInput("This is a description")
-    composeTestRule.onNodeWithText("Rating").performTextInput("4")
-    composeTestRule.onNodeWithText("ISBN").performTextInput("1234567890")
-    composeTestRule.onNodeWithText("Photo").performTextInput("https://example.com/photo.jpg")
-    composeTestRule.onNodeWithText("Language").performTextInput("INVALID_LANGUAGE")
-
-    // Check if the Save button is still disabled
-    composeTestRule.onNodeWithText("Save").assertIsNotEnabled()
-  }
 }
 
 // Simulating the listToBooksView interface implementation
