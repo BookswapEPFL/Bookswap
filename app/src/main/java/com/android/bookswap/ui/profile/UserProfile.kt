@@ -14,12 +14,21 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.sharp.ArrowBack
+import androidx.compose.material.icons.outlined.Edit
+import androidx.compose.material.icons.rounded.AccountCircle
+import androidx.compose.material.icons.twotone.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.android.bookswap.data.User
@@ -34,7 +43,7 @@ fun UserProfile(userVM: UserViewModel, modifier: Modifier = Modifier) {
   var showEditProfile by remember { mutableStateOf(false) }
 
   var needRecompose by remember { mutableStateOf(false) }
-  var mod = modifier.padding(0.dp)
+  var mod = modifier
 
   if (showEditProfile) {
     EditProfileDialog(
@@ -62,73 +71,96 @@ fun UserProfile(userVM: UserViewModel, modifier: Modifier = Modifier) {
   }
 
   BookSwapAppTheme() {
+
     // Scaffold to provide basic UI structure with a top app bar
     Scaffold(
-        modifier = mod.testTag("profileScreenContainer").padding(0.dp),
+        modifier = mod.testTag("profileScreenContainer"),
         topBar = {
           TopAppBar(
-              modifier = mod,
+              modifier = mod.testTag("profileTopAppBar"),
               // Title of the screen
               title = { Text("Your Profile", modifier = mod.testTag("profileTitleTxt")) },
               // Icon button for navigation (currently no action defined)
               navigationIcon = {
                 IconButton(modifier = mod.size(50.dp), onClick = {}) {
-                  Column(
-                      modifier = mod.fillMaxSize(),
-                      Arrangement.Center,
-                      Alignment.CenterHorizontally) {
-                        Text(text = "", modifier = mod.fillMaxWidth(), textAlign = TextAlign.Center)
-                        // You can add an icon here for the button
-                      }
+                  Icon(
+                      imageVector = Icons.AutoMirrored.Sharp.ArrowBack,
+                      contentDescription = "",
+                      modifier = mod.size(30.dp))
                 }
               })
         },
         content = { paddingValues ->
           // Column layout to stack input fields vertically with spacing
-          Row(modifier = mod.padding(paddingValues).consumeWindowInsets(paddingValues)) {
-            Column(modifier = mod.fillMaxWidth(0.25f)) {
-              Box(modifier = mod.aspectRatio(1f), contentAlignment = Alignment.Center) {}
-            }
-            Column(
-                verticalArrangement = Arrangement.spacedBy(8.dp), modifier = mod.fillMaxHeight()) {
-                  // Title Input Field
-                  Text(
-                      text = "${user.greeting} ${user.firstName} ${user.lastName}",
-                      modifier = mod.testTag("fullNameTxt"))
-
-                  // Author Input Field
-                  Text(text = user.email, modifier = mod.testTag("emailTxt"))
-
-                  // Description Input Field
-                  Text(text = user.phoneNumber, modifier = mod.testTag("phoneNumberTxt"))
-
-                  // User address
-                  Text(
-                      text =
-                          "${user.address.getAddressLine(0)}," +
-                              " ${user.address.postalCode} ${user.address.locality} " +
-                              "${user.address.countryCode}, ${user.address.countryName}",
-                      modifier = mod.testTag("addressTxt"))
-
-                  // Save Button
-                  Button(
-                      onClick = { showEditProfile = true },
-                      // Enable the button only if title and ISBN are filled and photo is blank
-                      enabled = true,
-                      modifier = mod.testTag("editProfileBtn")) {
-                        // Text displayed on the button
-                        Text("Edit Profile")
-                      }
+          Row(
+              modifier = mod.padding(paddingValues).consumeWindowInsets(paddingValues),
+              horizontalArrangement = Arrangement.spacedBy(5f.dp)) {
+                Column(modifier = mod.fillMaxWidth(0.25f)) {
+                  Box {
+                    IconButton(onClick = { /*TODO*/}, modifier = mod.aspectRatio(1f)) {
+                      Box(
+                          modifier =
+                              mod.padding(2.5f.dp)
+                                  .border(3.5f.dp, Color(0xFFA98467), CircleShape)) {
+                            Image(
+                                imageVector = Icons.Rounded.AccountCircle,
+                                contentDescription = "",
+                                modifier = mod.fillMaxSize().scale(1.2f).clipToBounds(),
+                                colorFilter = ColorFilter.tint(Color(0xFF6C584C)))
+                          }
+                      Box(
+                          modifier = mod.fillMaxSize().padding(0f.dp),
+                          contentAlignment = Alignment.TopEnd) {
+                            IconButton(onClick = { /*TODO*/}, modifier = mod) {
+                              Image(
+                                  imageVector = Icons.Outlined.Edit,
+                                  contentDescription = "",
+                                  colorFilter = ColorFilter.tint(Color(0xFFAAAAAA)))
+                            }
+                          }
+                    }
+                  }
                 }
-          }
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = mod.fillMaxHeight()) {
+                      // Title Input Field
+                      Text(
+                          text = "${user.greeting} ${user.firstName} ${user.lastName}",
+                          modifier = mod.testTag("fullNameTxt"))
+
+                      // Author Input Field
+                      Text(text = user.email, modifier = mod.testTag("emailTxt"))
+
+                      // Description Input Field
+                      Text(text = user.phoneNumber, modifier = mod.testTag("phoneNumberTxt"))
+
+                      // User address
+                      Text(
+                          text =
+                              "${user.address.getAddressLine(0)}," +
+                                  " ${user.address.postalCode} ${user.address.locality} " +
+                                  "${user.address.countryCode}, ${user.address.countryName}",
+                          modifier = mod.testTag("addressTxt"))
+
+                      // Save Button
+                      Button(
+                          onClick = { showEditProfile = true },
+                          border = BorderStroke(1f.dp, Color(0xFFA98467)),
+                          modifier = mod.testTag("editProfileBtn")) {
+                            // Text displayed on the button
+                            Text("Edit Profile")
+                          }
+                    }
+              }
         })
   }
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, backgroundColor = 0xFFF0EAD2)
 @Composable
 fun UserProfilePreview() {
-  var address = Address(Locale.getDefault())
+  val address = Address(Locale.getDefault())
   address.countryCode = "CH"
   address.locality = "Lausanne"
   address.postalCode = "1000"
@@ -145,5 +177,6 @@ fun UserProfilePreview() {
           address,
           "dummyPic.png",
           "dummyUUID0000"))
+
   UserProfile(userVM)
 }
