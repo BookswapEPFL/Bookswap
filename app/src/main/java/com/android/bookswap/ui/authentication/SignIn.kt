@@ -32,6 +32,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.bookswap.R
+import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.theme.Accent
 import com.android.bookswap.ui.theme.BackGround
 import com.android.bookswap.ui.theme.Primary
@@ -47,7 +48,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
 @Composable
-fun SignInScreen() { // navigationActions: NavigationActions) { //Add this when navigation is
+fun SignInScreen(navigationActions: NavigationActions) { // Add this when navigation is
   // implemented
   val context = LocalContext.current
 
