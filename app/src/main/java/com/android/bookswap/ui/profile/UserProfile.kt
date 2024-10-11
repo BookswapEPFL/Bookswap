@@ -69,7 +69,7 @@ fun UserProfile(userVM: UserViewModel, modifier: Modifier = Modifier) {
           TopAppBar(
               modifier = mod,
               // Title of the screen
-              title = { Text("Your Profile", modifier = mod.testTag("profileTitleText")) },
+              title = { Text("Your Profile", modifier = mod.testTag("profileTitleTxt")) },
               // Icon button for navigation (currently no action defined)
               navigationIcon = {
                 IconButton(modifier = mod.size(50.dp), onClick = {}) {
@@ -94,13 +94,13 @@ fun UserProfile(userVM: UserViewModel, modifier: Modifier = Modifier) {
                   // Title Input Field
                   Text(
                       text = "${user.greeting} ${user.firstName} ${user.lastName}",
-                      modifier = mod.testTag("fullNameText"))
+                      modifier = mod.testTag("fullNameTxt"))
 
                   // Author Input Field
-                  Text(text = user.email, modifier = mod.testTag("emailText"))
+                  Text(text = user.email, modifier = mod.testTag("emailTxt"))
 
                   // Description Input Field
-                  Text(text = user.phoneNumber, modifier = mod.testTag("phoneNumberText"))
+                  Text(text = user.phoneNumber, modifier = mod.testTag("phoneNumberTxt"))
 
                   // User address
                   Text(
@@ -108,16 +108,16 @@ fun UserProfile(userVM: UserViewModel, modifier: Modifier = Modifier) {
                           "${user.address.getAddressLine(0)}," +
                               " ${user.address.postalCode} ${user.address.locality} " +
                               "${user.address.countryCode}, ${user.address.countryName}",
-                      modifier = mod.testTag("addressText"))
+                      modifier = mod.testTag("addressTxt"))
 
                   // Save Button
                   Button(
-                      onClick = {},
+                      onClick = { showEditProfile = true },
                       // Enable the button only if title and ISBN are filled and photo is blank
                       enabled = true,
                       modifier = mod.testTag("editProfileBtn")) {
                         // Text displayed on the button
-                        Text("Edit Profile", modifier = mod.testTag("editProfileBtnTxt"))
+                        Text("Edit Profile")
                       }
                 }
           }

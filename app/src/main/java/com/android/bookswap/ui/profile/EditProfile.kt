@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.android.bookswap.data.User
 
@@ -22,6 +23,7 @@ fun EditProfileDialog(onDismiss: () -> Unit, onSave: (User) -> Unit, user: User)
   var _lastName = remember { mutableStateOf<String>(user.lastName) }
 
   AlertDialog(
+          modifier = Modifier.testTag("editProfileAlert"),
           onDismissRequest = onDismiss,
           title = { Text("Edit Profile") },
           text = {
@@ -30,28 +32,31 @@ fun EditProfileDialog(onDismiss: () -> Unit, onSave: (User) -> Unit, user: User)
                   value = _greeting.value,
                   onValueChange = { _greeting.value = it },
                   label = { Text("greeting") },
-                  modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp))
+                  modifier =
+                      Modifier.fillMaxWidth().padding(vertical = 4.dp).testTag("greetingTbx"))
               OutlinedTextField(
                   value = _firstName.value,
                   onValueChange = { _firstName.value = it },
                   label = { Text("firstname") },
-                  modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp))
+                  modifier =
+                      Modifier.fillMaxWidth().padding(vertical = 4.dp).testTag("firstNameTbx"))
               OutlinedTextField(
                   value = _lastName.value,
                   onValueChange = { _lastName.value = it },
                   label = { Text("lastname") },
-                  modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp))
+                  modifier =
+                      Modifier.fillMaxWidth().padding(vertical = 4.dp).testTag("lastNameTbx"))
               OutlinedTextField(
                   readOnly = true, // {TODO: fix database UUID }
                   value = _email.value,
                   onValueChange = {},
                   label = { Text("Email") },
-                  modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp))
+                  modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp).testTag("emailTbx"))
               OutlinedTextField(
                   value = _phone.value,
                   onValueChange = { _phone.value = it },
                   label = { Text("Phone") },
-                  modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp))
+                  modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp).testTag("phoneTbx"))
             }
           },
           confirmButton = {
@@ -72,12 +77,16 @@ fun EditProfileDialog(onDismiss: () -> Unit, onSave: (User) -> Unit, user: User)
                           user.address,
                           user.profilePictureUrl,
                           user.userId))
-                }) {
+                },
+                modifier = Modifier.testTag("confirmBtn")) {
                   Text("Save")
                 }
           },
           dismissButton = {
-            androidx.compose.material3.Button(onClick = onDismiss) { Text("Cancel") }
+            androidx.compose.material3.Button(
+                onClick = onDismiss, modifier = Modifier.testTag("dismissBtn")) {
+                  Text("Cancel")
+                }
           })
       .also { Log.d("EditProfile", "Alert.also()") }
 }
