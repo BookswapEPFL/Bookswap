@@ -173,8 +173,6 @@ dependencies {
     // ----------       Robolectric     ------------
     testImplementation(libs.robolectric)
 
-    //implementation(libs.volley) //HTTP request
-    //implementation(libs.json) //JSON parser
 }
 
 tasks.withType<Test> {
