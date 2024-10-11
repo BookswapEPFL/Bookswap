@@ -44,9 +44,8 @@ import kotlinx.coroutines.launch
  * displays a custom info window with the list of books at this location.
  *
  * @param listUser List of users (`TempUser`) to display on the map, each containing their location
- *   (latitude, longitude) and a list of books they own (`listBook`).
- *   This argument will later be deleted as the code should in the future use a class to get
- *   the user from the database.
+ *   (latitude, longitude) and a list of books they own (`listBook`). This argument will later be
+ *   deleted as the code should in the future use a class to get the user from the database.
  * @param selectedUser An optional user (`TempUser`) to be initially selected and focused on the
  *   map. This user’s info window will be shown if not null.
  */
