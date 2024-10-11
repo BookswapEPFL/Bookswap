@@ -52,32 +52,33 @@ class UserProfileScreenTest : TestCase() {
   fun testDisplay() =
       run(testName = "assertContent") {
         step("Start User Profile Screen") {
-          ComposeScreen.onComposeScreen<com.android.bookswap.screen.UserProfileScreen>(composeTestRule) {
-            titleTxt {
-              assertIsDisplayed()
-              assertTextEquals("Your Profile")
-            }
-            fullNameTxt {
-              assertIsDisplayed()
-              assertTextEquals("M. John Doe")
-            }
-            emailTxt {
-              assertIsDisplayed()
-              assertTextEquals("John.Doe@example.com")
-            }
-            phoneNumberTxt {
-              assertIsDisplayed()
-              assertTextEquals("+41223456789")
-            }
-            addressTxt {
-              assertIsDisplayed()
-              assertTextEquals("Rue de la Gare 1, 1000 Lausanne CH, Switzerland")
-            }
-            editProfileBtn {
-              assertIsDisplayed()
-              assertIsEnabled()
-            }
-          }
+          ComposeScreen.onComposeScreen<com.android.bookswap.screen.UserProfileScreen>(
+              composeTestRule) {
+                titleTxt {
+                  assertIsDisplayed()
+                  assertTextEquals("Your Profile")
+                }
+                fullNameTxt {
+                  assertIsDisplayed()
+                  assertTextEquals("M. John Doe")
+                }
+                emailTxt {
+                  assertIsDisplayed()
+                  assertTextEquals("John.Doe@example.com")
+                }
+                phoneNumberTxt {
+                  assertIsDisplayed()
+                  assertTextEquals("+41223456789")
+                }
+                addressTxt {
+                  assertIsDisplayed()
+                  assertTextEquals("Rue de la Gare 1, 1000 Lausanne CH, Switzerland")
+                }
+                editProfileBtn {
+                  assertIsDisplayed()
+                  assertIsEnabled()
+                }
+              }
         }
       }
 
@@ -85,34 +86,35 @@ class UserProfileScreenTest : TestCase() {
   fun testEdit() =
       run(testName = "assertEditAction") {
         step("Start User Profile Screen") {
-          ComposeScreen.onComposeScreen<com.android.bookswap.screen.UserProfileScreen>(composeTestRule) {
-            titleTxt {
-              assertIsDisplayed()
-              assertTextEquals("Your Profile")
-            }
-            fullNameTxt {
-              assertIsDisplayed()
-              assertTextEquals("M. John Doe")
-            }
-            emailTxt {
-              assertIsDisplayed()
-              assertTextEquals("John.Doe@example.com")
-            }
-            phoneNumberTxt {
-              assertIsDisplayed()
-              assertTextEquals("+41223456789")
-            }
-            addressTxt {
-              assertIsDisplayed()
-              assertTextEquals("Rue de la Gare 1, 1000 Lausanne CH, Switzerland")
-            }
-            editProfileBtn {
-              assertIsDisplayed()
-              assertIsEnabled()
-              assertHasClickAction()
-              performClick()
-            }
-          }
+          ComposeScreen.onComposeScreen<com.android.bookswap.screen.UserProfileScreen>(
+              composeTestRule) {
+                titleTxt {
+                  assertIsDisplayed()
+                  assertTextEquals("Your Profile")
+                }
+                fullNameTxt {
+                  assertIsDisplayed()
+                  assertTextEquals("M. John Doe")
+                }
+                emailTxt {
+                  assertIsDisplayed()
+                  assertTextEquals("John.Doe@example.com")
+                }
+                phoneNumberTxt {
+                  assertIsDisplayed()
+                  assertTextEquals("+41223456789")
+                }
+                addressTxt {
+                  assertIsDisplayed()
+                  assertTextEquals("Rue de la Gare 1, 1000 Lausanne CH, Switzerland")
+                }
+                editProfileBtn {
+                  assertIsDisplayed()
+                  assertIsEnabled()
+                  assertHasClickAction()
+                  performClick()
+                }
+              }
         }
       }
 }
