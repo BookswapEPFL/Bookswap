@@ -23,13 +23,14 @@ class UserTest {
 
   @Test
   fun checkAssign() {
-    val address = Address(Locale.getDefault())
+    val userVM = com.android.bookswap.model.UserViewModel("")
+    val address: Address = Address(Locale.getDefault())
     address.countryCode = "CH"
     address.locality = "Lausanne"
     address.postalCode = "1000"
     address.countryName = "Switzerland"
     address.setAddressLine(0, "Rue de la Gare 1")
-    val u1 =
+    userVM.updateUser(
         User(
             "M.",
             "John",
@@ -38,7 +39,8 @@ class UserTest {
             "+41223456789",
             address,
             "dummyPic.png",
-            "dummyUUID0000")
+            "dummyUUID0000"))
+    var u1 = userVM.getUser()
     assertEquals(u1.greeting, "M.")
     assertEquals(u1.firstName, "John")
     assertEquals(u1.lastName, "Doe")
@@ -47,7 +49,11 @@ class UserTest {
     assertEquals(u1.profilePictureUrl, "dummyPic.png")
     assertEquals(u1.userId, "dummyUUID0000")
     assertEquals(u1.address.toString(), address.toString())
-    u1.greeting = "Mr."
+    userVM.updateUser(greeting = "Mr.")
+    val address2: Address = address
+    address2.postalCode = "1001"
+    userVM.updateAddress(address2, {})
+    u1 = userVM.getUser()
     assertNotEquals(u1.greeting, "M.")
     assertEquals(u1.greeting, "Mr.")
     assertEquals(u1.firstName, "John")
@@ -56,6 +62,7 @@ class UserTest {
     assertEquals(u1.phoneNumber, "+41223456789")
     assertEquals(u1.profilePictureUrl, "dummyPic.png")
     assertEquals(u1.userId, "dummyUUID0000")
-    assertEquals(u1.address.toString(), address.toString())
+    assertNotEquals(u1.address.toString(), address.toString())
+    assertEquals(u1.address.postalCode, "1001")
   }
 }
