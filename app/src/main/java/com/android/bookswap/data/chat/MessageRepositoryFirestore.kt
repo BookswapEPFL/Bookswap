@@ -1,4 +1,4 @@
-package com.android.bookswap.model.chat
+package com.android.bookswap.data.chat
 
 import android.util.Log
 import com.google.firebase.firestore.DocumentSnapshot
@@ -33,19 +33,20 @@ class MessageRepositoryFirestore(private val db: FirebaseFirestore) : MessageRep
   }
 
   override fun sendMessage(
-    message: Message,
-    onSuccess: () -> Unit,
-    onFailure: (Exception) -> Unit
+      message: Message,
+      onSuccess: () -> Unit,
+      onFailure: (Exception) -> Unit
   ) {
-    val messageMap = mapOf(
-      "id" to message.id,
-      "text" to message.text,
-      "senderId" to message.senderId,
-      "receiverId" to message.receiverId,
-      "timestamp" to message.timestamp
-    )
+    val messageMap =
+        mapOf(
+            "id" to message.id,
+            "text" to message.text,
+            "senderId" to message.senderId,
+            "receiverId" to message.receiverId,
+            "timestamp" to message.timestamp)
 
-    db.collection(collectionPath).document(message.id).set(messageMap).addOnCompleteListener { result ->
+    db.collection(collectionPath).document(message.id).set(messageMap).addOnCompleteListener {
+        result ->
       if (result.isSuccessful) {
         onSuccess()
       } else {
@@ -53,36 +54,42 @@ class MessageRepositoryFirestore(private val db: FirebaseFirestore) : MessageRep
       }
     }
   }
+
   fun addMessagesListener(
-    otherUserId: String,
-    currentUserId: String,
-    onSuccess: (List<Message>) -> Unit,
-    onFailure: (Exception) -> Unit
+      otherUserId: String,
+      currentUserId: String,
+      onSuccess: (List<Message>) -> Unit,
+      onFailure: (Exception) -> Unit
   ): ListenerRegistration {
     return db.collection("messages")
-      .whereIn("senderId", listOf(currentUserId, otherUserId))
-      .whereIn("receiverId", listOf(currentUserId, otherUserId))
-      .whereNotEqualTo("senderId", "receiverId")
-      .addSnapshotListener { snapshot, e ->
-        if (e != null) {
-          onFailure(e)
-          return@addSnapshotListener
-        }
+        .whereIn("senderId", listOf(currentUserId, otherUserId))
+        .whereIn("receiverId", listOf(currentUserId, otherUserId))
+        .whereNotEqualTo("senderId", "receiverId")
+        .addSnapshotListener { snapshot, e ->
+          if (e != null) {
+            onFailure(e)
+            return@addSnapshotListener
+          }
 
-        if (snapshot != null && !snapshot.isEmpty) {
-          val messages = snapshot.documents.mapNotNull { document ->
-            try {
-              document.toObject(Message::class.java)
-            } catch (ex: Exception) {
-              Log.e("MessageRepository", "Error converting document to Message: ${ex.message}")
-              null
-            }
-          }.sortedBy { it.timestamp } // Sort messages by timestamp
-          onSuccess(messages)
-        } else {
-          onSuccess(emptyList())
+          if (snapshot != null && !snapshot.isEmpty) {
+            val messages =
+                snapshot.documents
+                    .mapNotNull { document ->
+                      try {
+                        document.toObject(Message::class.java)
+                      } catch (ex: Exception) {
+                        Log.e(
+                            "MessageRepository",
+                            "Error converting document to Message: ${ex.message}")
+                        null
+                      }
+                    }
+                    .sortedBy { it.timestamp } // Sort messages by timestamp
+            onSuccess(messages)
+          } else {
+            onSuccess(emptyList())
+          }
         }
-      }
   }
 }
 

@@ -1,4 +1,4 @@
-package com.android.bookswap.model.chat
+package com.android.bookswap.data.chat
 
 data class Message(
     val id: String = "",

@@ -1,9 +1,10 @@
 package com.android.bookswap.model.chat
 
 import androidx.test.core.app.ApplicationProvider
+import com.android.bookswap.data.chat.Message
+import com.android.bookswap.data.chat.MessageRepositoryFirestore
 import com.google.android.gms.tasks.Tasks
 import com.google.firebase.FirebaseApp
-import com.google.firebase.auth.*
 import com.google.firebase.firestore.*
 import com.google.firebase.firestore.util.Assert.fail
 import org.junit.Before
