@@ -20,7 +20,7 @@ robolectric = "4.11.1"
 sonar = "4.4.1.3373"
 mockk = "1.12.0"
 firebaseFirestoreKtx = "25.1.0"
-
+json = "20210307"
 # gradle/libs.versions.toml
 gms = "4.4.2"
 
@@ -76,7 +76,7 @@ kaspresso-compose = { group = "com.kaspersky.android-components", name = "kaspre
 
 play-services-auth = { module = "com.google.android.gms:play-services-auth", version.ref = "playServicesAuth" }
 play-services-maps = { module = "com.google.android.gms:play-services-maps", version.ref = "playServicesMaps" }
-
+json = { group = "org.json", name = "json", version.ref = "json" }
 robolectric = { module = "org.robolectric:robolectric", version.ref = "robolectric" }
 firebase-firestore-ktx = { group = "com.google.firebase", name = "firebase-firestore-ktx", version.ref = "firebaseFirestoreKtx" }
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
