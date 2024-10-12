@@ -1,5 +1,6 @@
 [versions]
 agp = "8.3.0"
+firebaseBom = "33.4.0"
 kotlin = "1.8.10"
 coreKtx = "1.12.0"
 ktfmt = "0.17.0"
@@ -25,6 +26,7 @@ json = "20210307"
 gms = "4.4.2"
 
 # Firebase Libraries
+firebaseAnalytics = "21.0.0"
 firebaseAuth = "23.0.0"
 firebaseAuthKtx = "23.0.0"
 
@@ -43,6 +45,7 @@ volley = "1.2.1"
 [libraries]
 google-play-services-location = { group = "com.google.android.gms", name = "play-services-location", version = "19.0.1" }
 # Firebase Libraries
+
 firebase-auth-ktx = { group = "com.google.firebase", name = "firebase-auth-ktx", version.ref = "firebaseAuthKtx" }
 firebase-auth = { module = "com.google.firebase:firebase-auth", version.ref = "firebaseAuth" }
 firebase-database-ktx = { module = "com.google.firebase:firebase-database-ktx", version.ref = "firebaseDatabaseKtx" }
@@ -50,6 +53,7 @@ firebase-firestore = { module = "com.google.firebase:firebase-firestore", versio
 firebase-ui-auth = { module = "com.firebaseui:firebase-ui-auth", version.ref = "firebaseUiAuth" }
 
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+google-firebase-auth = { module = "com.google.firebase:firebase-auth" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
