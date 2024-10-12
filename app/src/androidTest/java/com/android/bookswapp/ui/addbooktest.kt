@@ -39,34 +39,7 @@ class AddToBookTest {
     // Check if the Save button is now enabled
     composeTestRule.onNodeWithText("Save").assertIsEnabled()
   }
-  /*
-    @Test
-    fun displayAllComponents() {
-      // Set the content for the Compose UI to be tested
-      composeTestRule.setContent {
-        AddToBook(listToBooksView = MockListToBooksView(MockBooksRepository()))
-      }
-      // Assert that all components are displayed and their contents are correct
-      composeTestRule
-          .onNodeWithTag("addBookScreen")
-          .assertIsDisplayed() // Ensure to add a test tag to your screen
-      composeTestRule.onNodeWithTag("addBookTitle").assertIsDisplayed()
-      composeTestRule
-          .onNodeWithTag("addBookTitle")
-          .assertTextEquals("Add Your Book") // Update this based on your screen title
-      composeTestRule.onNodeWithTag("bookSave").assertIsDisplayed()
-      composeTestRule.onNodeWithTag("bookSave").assertTextEquals("Save")
 
-      // Check that all input fields are displayed
-      composeTestRule.onNodeWithTag("inputBookTitle").assertIsDisplayed()
-      composeTestRule.onNodeWithTag("inputBookAuthor").assertIsDisplayed()
-      composeTestRule.onNodeWithTag("inputBookDescription").assertIsDisplayed()
-      composeTestRule.onNodeWithTag("inputBookRating").assertIsDisplayed()
-      composeTestRule.onNodeWithTag("inputBookISBN").assertIsDisplayed()
-      composeTestRule.onNodeWithTag("inputBookPhoto").assertIsDisplayed()
-      composeTestRule.onNodeWithTag("inputBookLanguage").assertIsDisplayed()
-    }
-  */
   @Test
   fun testCreateDataBook_ValidData() {
     // Test with valid data
