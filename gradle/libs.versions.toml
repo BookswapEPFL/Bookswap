@@ -39,7 +39,8 @@ playServicesMaps = "19.0.0"
 
 navigationCompose = "2.8.2"
 volley = "1.2.1" # HTTP request
-json = "20240303" #Json parsing
+json = "20240303"
+firebaseMessagingKtx = "24.0.2" #Json parsing
 
 [libraries]
 google-play-services-location = { group = "com.google.android.gms", name = "play-services-location", version = "19.0.1" }
@@ -91,6 +92,7 @@ androidx-navigation-compose = { group = "androidx.navigation", name = "navigatio
 
 volley = { module = "com.android.volley:volley", version.ref = "volley" }
 json = { module = "org.json:json", version.ref = "json" }
+firebase-messaging-ktx = { group = "com.google.firebase", name = "firebase-messaging-ktx", version.ref = "firebaseMessagingKtx" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
