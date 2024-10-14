@@ -19,6 +19,9 @@ import com.google.android.gms.location.LocationServices
 const val REQUEST_LOCATION_PERMISSION = 1
 const val BACKGROUND_LOCATION_PERMISSION_REQUEST_CODE = 2
 
+const val REQUEST_LOCATION_PERMISSION = 1
+const val BACKGROUND_LOCATION_PERMISSION_REQUEST_CODE = 2
+
 /**
  * Geolocation class manages the geolocation functionality and handles the required permissions for
  * accessing location data.
