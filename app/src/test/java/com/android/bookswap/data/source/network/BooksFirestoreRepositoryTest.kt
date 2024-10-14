@@ -106,7 +106,7 @@ class BookFirestoreSourceTest {
     doAnswer { Tasks.forResult(null) }.`when`(mockDocumentReference).set(testBook)
 
     // Act
-    bookFirestoreSource.addBooks(testBook) { assertTrue(it.isSuccess) }
+    bookFirestoreSource.addBook(testBook) { assertTrue(it.isSuccess) }
 
     // Verify Firestore set operation
     verify(mockDocumentReference).set(testBook)
@@ -136,7 +136,7 @@ class BookFirestoreSourceTest {
     `when`(mockDocumentSnapshot.getString("ISBN")).thenReturn(testBook.isbn)
 
     // Act
-    val result = bookFirestoreSource.documentToBooks(mockDocumentSnapshot)
+    val result = bookFirestoreSource.documentToBook(mockDocumentSnapshot)
 
     // Assert
     assertNotNull(result)
@@ -145,7 +145,7 @@ class BookFirestoreSourceTest {
   }
 
   @Test
-  fun documentToBooks_returnsNull_whenRequiredFieldIsMissing() {
+  fun documentToBook_returnsNull_whenRequiredFieldIsMissing() {
     // Arrange - Missing "Title"
     `when`(mockDocumentSnapshot.getString("Title")).thenReturn(null)
     `when`(mockDocumentSnapshot.getString("Author")).thenReturn(testBook.author)
@@ -156,14 +156,14 @@ class BookFirestoreSourceTest {
     `when`(mockDocumentSnapshot.getString("ISBN")).thenReturn(testBook.isbn)
 
     // Act
-    val result = bookFirestoreSource.documentToBooks(mockDocumentSnapshot)
+    val result = bookFirestoreSource.documentToBook(mockDocumentSnapshot)
 
     // Assert
     assertTrue(result.isFailure)
   }
 
   @Test
-  fun documentToBooks_returnsNull_whenLanguageIsInvalid() {
+  fun documentToBook_returnsNull_whenLanguageIsInvalid() {
     // Arrange - Invalid language value
     `when`(mockDocumentSnapshot.getString("Title")).thenReturn(testBook.title)
     `when`(mockDocumentSnapshot.getString("Author")).thenReturn(testBook.author)
@@ -174,7 +174,7 @@ class BookFirestoreSourceTest {
     `when`(mockDocumentSnapshot.getString("ISBN")).thenReturn(testBook.isbn)
 
     // Act
-    val result = bookFirestoreSource.documentToBooks(mockDocumentSnapshot)
+    val result = bookFirestoreSource.documentToBook(mockDocumentSnapshot)
 
     // Assert
     assertTrue(result.isFailure) // Should return null due to invalid language
