@@ -22,5 +22,7 @@ Lastly, there is a method of connecting with other people to propose the book ex
 
 ## Links
 [Figma link](https://www.figma.com/design/uyHS0PV5RBnmToK2JuTb4h/Untitled?node-id=0-1&m=dev&t=VdHNM8v7U5bhvsW7-1)
+
 [Team review sheet](https://docs.google.com/spreadsheets/d/1hyi3ISzlwAXZ63ztd7Q84RkBFf24cPgatv3uUx4Y4hc/edit?usp=sharing)
+
 [Team minutes](https://docs.google.com/spreadsheets/d/1YF34CWge25Y1hSQsP5UWHCDoyYNJaxIPasSb13gWYao/edit?usp=sharing)
