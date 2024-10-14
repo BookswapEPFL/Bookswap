@@ -1,5 +1,6 @@
 package com.android.bookswap.data.source.network
 
+import android.util.Log
 import com.android.bookswap.data.BookLanguages
 import com.android.bookswap.data.DataBook
 import com.android.bookswap.data.repository.BooksRepository
@@ -44,7 +45,6 @@ class BookFirestoreSource(private val db: FirebaseFirestore) : BooksRepository {
         val books =
             task.result?.mapNotNull { document ->
               val result = documentToBook(document)
-              result.exceptionOrNull()?.printStackTrace() // Print exception if there is one
               result.getOrNull()
             } ?: emptyList()
         callback(Result.success(books))
@@ -105,6 +105,7 @@ class BookFirestoreSource(private val db: FirebaseFirestore) : BooksRepository {
               languageBook,
               isbn))
     } catch (e: Exception) {
+      Log.e("FirestoreSource", "Error converting document to Book: ${e.message}")
       Result.failure(e)
     }
   }

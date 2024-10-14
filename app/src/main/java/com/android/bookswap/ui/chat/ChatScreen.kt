@@ -33,7 +33,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import com.android.bookswap.data.DataMessage
-import com.android.bookswap.data.source.network.MessageRepositoryFirestore
+import com.android.bookswap.data.source.network.MessageFirestoreSource
 import com.android.bookswap.ui.theme.ColorVariable
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -41,7 +41,7 @@ import java.util.Locale
 
 @Composable
 fun ChatScreen(
-    messageRepository: MessageRepositoryFirestore,
+    messageRepository: MessageFirestoreSource,
     currentUserId: String, // To identify the current user for aligning messages
     otherUserId: String
 ) {
@@ -51,11 +51,14 @@ fun ChatScreen(
   DisposableEffect(Unit) {
     val listenerRegistration =
         messageRepository.addMessagesListener(
-            otherUserId = otherUserId,
-            currentUserId = currentUserId,
-            onSuccess = { fetchedMessages -> messages = fetchedMessages },
-            onFailure = { e -> Log.e("MessageView", "Failed to fetch messages: ${e.message}") })
-
+            otherUserId = otherUserId, currentUserId = currentUserId) { result ->
+              if (result.isSuccess) {
+                messages = result.getOrThrow()
+              } else {
+                Log.e(
+                    "MessageView", "Failed to fetch messages: ${result.exceptionOrNull()?.message}")
+              }
+            }
     onDispose { listenerRegistration.remove() }
   }
   Box(modifier = Modifier.fillMaxSize().background(ColorVariable.BackGround)) {
@@ -94,12 +97,15 @@ fun ChatScreen(
                   // Send the message
                   messageRepository.sendMessage(
                       message = newMessage,
-                      onSuccess = {
-                        newMessageText = TextFieldValue("") // Clear input field
-                      },
-                      onFailure = { e ->
-                        Log.e("MessageView", "Failed to send message: ${e.message}")
-                      })
+                  ) { result ->
+                    if (result.isSuccess) {
+                      newMessageText = TextFieldValue("")
+                    } else {
+                      Log.e(
+                          "MessageView",
+                          "Failed to send message: ${result.exceptionOrNull()?.message}")
+                    }
+                  }
                 },
                 colors =
                     ButtonColors(
