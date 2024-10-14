@@ -36,7 +36,7 @@ interface BooksRepository {
    * @param callback callback function that receives Result.success() when operation succeed of
    *   Result.failure(exception) if error
    */
-  fun addBooks(dataBook: DataBook, callback: (Result<Unit>) -> Unit)
+  fun addBook(dataBook: DataBook, callback: (Result<Unit>) -> Unit)
 
   /**
    * Function to update an existing book in the repository.

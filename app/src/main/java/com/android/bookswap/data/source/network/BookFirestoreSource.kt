@@ -43,7 +43,7 @@ class BookFirestoreSource(private val db: FirebaseFirestore) : BooksRepository {
         // Maps Firestore documents to DataBook objects or returns an empty list
         val books =
             task.result?.mapNotNull { document ->
-              val result = documentToBooks(document)
+              val result = documentToBook(document)
               result.exceptionOrNull()?.printStackTrace() // Print exception if there is one
               result.getOrNull()
             } ?: emptyList()
@@ -55,7 +55,7 @@ class BookFirestoreSource(private val db: FirebaseFirestore) : BooksRepository {
   }
 
   /** Adds a new book to the Firestore collection */
-  override fun addBooks(dataBook: DataBook, callback: (Result<Unit>) -> Unit) {
+  override fun addBook(dataBook: DataBook, callback: (Result<Unit>) -> Unit) {
     performFirestoreOperation(
         db.collection(COLLECTION_NAME).document(dataBook.title).set(dataBook),
         callback,
@@ -84,7 +84,7 @@ class BookFirestoreSource(private val db: FirebaseFirestore) : BooksRepository {
    *
    * @return DataBook on success, otherwise error
    */
-  fun documentToBooks(document: DocumentSnapshot): Result<DataBook> {
+  fun documentToBook(document: DocumentSnapshot): Result<DataBook> {
 
     return try {
       val title = document.getString("Title")!!
