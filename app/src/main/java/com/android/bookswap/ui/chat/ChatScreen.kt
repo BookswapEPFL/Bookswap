@@ -32,13 +32,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
-import com.android.bookswap.data.chat.Message
-import com.android.bookswap.data.chat.MessageRepositoryFirestore
-import com.android.bookswap.ui.theme.Accent
-import com.android.bookswap.ui.theme.AccentSecondary
-import com.android.bookswap.ui.theme.BackGround
-import com.android.bookswap.ui.theme.Primary
-import com.android.bookswap.ui.theme.Secondary
+import com.android.bookswap.data.DataMessage
+import com.android.bookswap.data.source.network.MessageRepositoryFirestore
+import com.android.bookswap.ui.theme.ColorVariable
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -49,7 +45,7 @@ fun ChatScreen(
     currentUserId: String, // To identify the current user for aligning messages
     otherUserId: String
 ) {
-  var messages by remember { mutableStateOf(emptyList<Message>()) }
+  var messages by remember { mutableStateOf(emptyList<DataMessage>()) }
   var newMessageText by remember { mutableStateOf(TextFieldValue("")) }
 
   DisposableEffect(Unit) {
@@ -62,7 +58,7 @@ fun ChatScreen(
 
     onDispose { listenerRegistration.remove() }
   }
-  Box(modifier = Modifier.fillMaxSize().background(BackGround)) {
+  Box(modifier = Modifier.fillMaxSize().background(ColorVariable.BackGround)) {
     Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.SpaceBetween) {
       // Message list
       LazyColumn(
@@ -74,7 +70,7 @@ fun ChatScreen(
 
       // Message input field and send button
       Row(
-          modifier = Modifier.fillMaxWidth().padding(top = 8.dp).background(Primary),
+          modifier = Modifier.fillMaxWidth().padding(top = 8.dp).background(ColorVariable.Primary),
           verticalAlignment = Alignment.CenterVertically) {
             BasicTextField(
                 value = newMessageText,
@@ -82,14 +78,14 @@ fun ChatScreen(
                 modifier =
                     Modifier.weight(1f)
                         .padding(8.dp)
-                        .background(Secondary, MaterialTheme.shapes.small)
-                        .border(1.dp, Accent, MaterialTheme.shapes.small)
+                        .background(ColorVariable.Secondary, MaterialTheme.shapes.small)
+                        .border(1.dp, ColorVariable.Accent, MaterialTheme.shapes.small)
                         .padding(8.dp))
             Button(
                 onClick = {
                   val messageId = messageRepository.getNewUid()
                   val newMessage =
-                      Message(
+                      DataMessage(
                           id = messageId,
                           text = newMessageText.text,
                           senderId = currentUserId,
@@ -105,7 +101,12 @@ fun ChatScreen(
                         Log.e("MessageView", "Failed to send message: ${e.message}")
                       })
                 },
-                colors = ButtonColors(Secondary, Accent, Secondary, Accent),
+                colors =
+                    ButtonColors(
+                        ColorVariable.Secondary,
+                        ColorVariable.Accent,
+                        ColorVariable.Secondary,
+                        ColorVariable.Accent),
                 modifier = Modifier.padding(horizontal = 8.dp)) {
                   Text("Send")
                 }
@@ -115,7 +116,7 @@ fun ChatScreen(
 }
 
 @Composable
-fun MessageItem(message: Message, currentUserId: String) {
+fun MessageItem(message: DataMessage, currentUserId: String) {
   val isCurrentUser = message.senderId == currentUserId
   val cornerRadius = 25.dp
   val shape =
@@ -138,20 +139,28 @@ fun MessageItem(message: Message, currentUserId: String) {
         Card(
             colors =
                 if (isCurrentUser) {
-                  CardColors(Primary, Accent, Primary, Accent)
+                  CardColors(
+                      ColorVariable.Primary,
+                      ColorVariable.Accent,
+                      ColorVariable.Primary,
+                      ColorVariable.Accent)
                 } else {
-                  CardColors(Secondary, Accent, Secondary, Accent)
+                  CardColors(
+                      ColorVariable.Secondary,
+                      ColorVariable.Accent,
+                      ColorVariable.Secondary,
+                      ColorVariable.Accent)
                 },
             shape = shape,
             modifier =
                 Modifier.padding(8.dp)
                     .widthIn(max = (LocalConfiguration.current.screenWidthDp.dp * 2 / 3))
-                    .border(1.dp, Accent, shape)) {
+                    .border(1.dp, ColorVariable.Accent, shape)) {
               Column(modifier = Modifier.padding(16.dp)) {
-                Text(text = message.text, color = Accent)
+                Text(text = message.text, color = ColorVariable.Accent)
                 Text(
                     text = formatTimestamp(message.timestamp),
-                    color = AccentSecondary,
+                    color = ColorVariable.AccentSecondary,
                     style = MaterialTheme.typography.bodySmall,
                     modifier = Modifier.align(Alignment.End))
               }
