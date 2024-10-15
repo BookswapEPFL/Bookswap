@@ -104,7 +104,7 @@ open class UserViewModel(var email: String) : ViewModel() {
       picURL: String = user.profilePictureUrl
   ) {
     updateUser(User(greeting, firstName, lastName, email, phone, address, picURL, uid))
-      updateAddress(address,{})
+    updateAddress(address, {})
     // firebaseConnection.storeData("users", uid, this.user)
   }
 
@@ -175,90 +175,142 @@ open class UserViewModel(var email: String) : ViewModel() {
   }
 
   fun updateAddress(newAddress: Address, onComplete: () -> Unit) {
-      fun createAddress(
-          locale: Locale = Locale.getDefault(),
-          featureName: String? = "",
-          addressLines: HashMap<Int, String> = HashMap<Int, String>(),
-          adminArea: String? = "",
-          subAdminArea: String? = "",
-          locality: String? = "",
-          subLocality: String? = "",
-          thoroughfare: String? = "",
-          subThoroughfare: String? = "",
-          premises: String? = "",
-          postalCode: String? = "",
-          countryCode: String? = "",
-          countryName: String? = "",
-          latitude: Double = 0.0,
-          longitude: Double = 0.0,
-          hasLat: Boolean = false,
-          hasLon: Boolean = false,
-          phone: String? = "",
-          url: String? = ""
-      ): Address {
-          var addr = Address(locale)
-          addr.setFeatureName(featureName)
-          print("f|${featureName.orEmpty()}| ")
-          addr.setAdminArea(adminArea)
-          print("aa|${adminArea.orEmpty()}| ")
-          addr.setSubAdminArea(subAdminArea)
-          print("sa|${subAdminArea.orEmpty()}| ")
-          addr.setLocality(locality)
-          print("lo|${locality.orEmpty()}| ")
-          addr.setSubLocality(subLocality)
-          print("sl|${subLocality.orEmpty()}| ")
-          addr.setThoroughfare(thoroughfare)
-          print("tf|${thoroughfare.orEmpty()}| ")
-          addr.setSubThoroughfare(subThoroughfare)
-          print("st|${subThoroughfare.orEmpty()}| ")
-          addr.setPremises(premises)
-          print("pr|${premises.orEmpty()}| ")
-          addr.setPostalCode(postalCode)
-          print("pc|${postalCode.orEmpty()}| ")
-          addr.setCountryCode(countryCode)
-          print("cc|${countryCode.orEmpty()}| ")
-          addr.setCountryName(countryName)
-          print("cn|${countryName.orEmpty()}| ")
-          if(hasLat) addr.latitude  = latitude
-          if(hasLon) addr.longitude = longitude
-          addr.setPhone(phone)
-          print("ph|${phone.orEmpty()}| ")
-          addr.setUrl(url)
-          print("url|${url.orEmpty()}|")
-          if(addressLines.isNotEmpty())for (line in addressLines)
-              addr.setAddressLine(line.key, line.value)
-          println(" - ${addr.toString()} - ")
-          return addr
-      }
-      var loc = newAddress.locale
-      if(loc == null) loc = Locale.getDefault()
+    fun createAddress(
+        locale: Locale = Locale.getDefault(),
+        featureName: String? = "",
+        addressLines: HashMap<Int, String> = HashMap<Int, String>(),
+        adminArea: String? = "",
+        subAdminArea: String? = "",
+        locality: String? = "",
+        subLocality: String? = "",
+        thoroughfare: String? = "",
+        subThoroughfare: String? = "",
+        premises: String? = "",
+        postalCode: String? = "",
+        countryCode: String? = "",
+        countryName: String? = "",
+        latitude: Double = 0.0,
+        longitude: Double = 0.0,
+        hasLat: Boolean = false,
+        hasLon: Boolean = false,
+        phone: String? = "",
+        url: String? = ""
+    ): Address {
+      var addr = Address(locale)
+      addr.setFeatureName(featureName)
+      print("f|${featureName.orEmpty()}| ")
+      addr.setAdminArea(adminArea)
+      print("aa|${adminArea.orEmpty()}| ")
+      addr.setSubAdminArea(subAdminArea)
+      print("sa|${subAdminArea.orEmpty()}| ")
+      addr.setLocality(locality)
+      print("lo|${locality.orEmpty()}| ")
+      addr.setSubLocality(subLocality)
+      print("sl|${subLocality.orEmpty()}| ")
+      addr.setThoroughfare(thoroughfare)
+      print("tf|${thoroughfare.orEmpty()}| ")
+      addr.setSubThoroughfare(subThoroughfare)
+      print("st|${subThoroughfare.orEmpty()}| ")
+      addr.setPremises(premises)
+      print("pr|${premises.orEmpty()}| ")
+      addr.setPostalCode(postalCode)
+      print("pc|${postalCode.orEmpty()}| ")
+      addr.setCountryCode(countryCode)
+      print("cc|${countryCode.orEmpty()}| ")
+      addr.setCountryName(countryName)
+      print("cn|${countryName.orEmpty()}| ")
+      if (hasLat) addr.latitude = latitude
+      if (hasLon) addr.longitude = longitude
+      addr.setPhone(phone)
+      print("ph|${phone.orEmpty()}| ")
+      addr.setUrl(url)
+      print("url|${url.orEmpty()}|")
+      if (addressLines.isNotEmpty())
+          for (line in addressLines) addr.setAddressLine(line.key, line.value)
+      println(" - ${addr.toString()} - ")
+      return addr
+    }
+    var loc = newAddress.locale
+    if (loc == null) loc = Locale.getDefault()
 
-      var addrLines = HashMap<Int, String>()
-      if(newAddress.maxAddressLineIndex>-1)for(i in 0..newAddress.maxAddressLineIndex)
-          addrLines.put(i,newAddress.getAddressLine(i))
+    var addrLines = HashMap<Int, String>()
+    if (newAddress.maxAddressLineIndex > -1)
+        for (i in 0..newAddress.maxAddressLineIndex) addrLines.put(i, newAddress.getAddressLine(i))
 
-      this.user.address = createAddress(
-        loc,
-        if(newAddress.featureName.isNullOrEmpty()){""}else{newAddress.featureName},
-        addrLines,
-        if(newAddress.adminArea.isNullOrEmpty()){""}else{newAddress.adminArea},
-        if(newAddress.subAdminArea.isNullOrEmpty()){""}else{newAddress.subAdminArea},
-        if(newAddress.locality.isNullOrEmpty()){""}else{newAddress.locality},
-        if(newAddress.subLocality.isNullOrEmpty()){""}else{newAddress.subLocality},
-        if(newAddress.thoroughfare.isNullOrEmpty()){""}else{newAddress.thoroughfare},
-        if(newAddress.subThoroughfare.isNullOrEmpty()){""}else{newAddress.subThoroughfare},
-        if(newAddress.premises.isNullOrEmpty()){""}else{newAddress.premises},
-        if(newAddress.postalCode.isNullOrEmpty()){""}else{newAddress.postalCode},
-        if(newAddress.countryCode.isNullOrEmpty()){""}else{newAddress.countryCode},
-        if(newAddress.countryName.isNullOrEmpty()){""}else{newAddress.countryName},
-        newAddress.latitude,
-        newAddress.longitude,
-        newAddress.hasLatitude(),
-        newAddress.hasLongitude(),
-        if(newAddress.phone.isNullOrEmpty()){""}else{newAddress.phone},
-        if(newAddress.url.isNullOrEmpty()){""}else{newAddress.url}
-      )
-      println(this.user.address.toString())
-      Log.d("userVM", "updateAddress: ${this.user.address}")
+    this.user.address =
+        createAddress(
+            loc,
+            if (newAddress.featureName.isNullOrEmpty()) {
+              ""
+            } else {
+              newAddress.featureName
+            },
+            addrLines,
+            if (newAddress.adminArea.isNullOrEmpty()) {
+              ""
+            } else {
+              newAddress.adminArea
+            },
+            if (newAddress.subAdminArea.isNullOrEmpty()) {
+              ""
+            } else {
+              newAddress.subAdminArea
+            },
+            if (newAddress.locality.isNullOrEmpty()) {
+              ""
+            } else {
+              newAddress.locality
+            },
+            if (newAddress.subLocality.isNullOrEmpty()) {
+              ""
+            } else {
+              newAddress.subLocality
+            },
+            if (newAddress.thoroughfare.isNullOrEmpty()) {
+              ""
+            } else {
+              newAddress.thoroughfare
+            },
+            if (newAddress.subThoroughfare.isNullOrEmpty()) {
+              ""
+            } else {
+              newAddress.subThoroughfare
+            },
+            if (newAddress.premises.isNullOrEmpty()) {
+              ""
+            } else {
+              newAddress.premises
+            },
+            if (newAddress.postalCode.isNullOrEmpty()) {
+              ""
+            } else {
+              newAddress.postalCode
+            },
+            if (newAddress.countryCode.isNullOrEmpty()) {
+              ""
+            } else {
+              newAddress.countryCode
+            },
+            if (newAddress.countryName.isNullOrEmpty()) {
+              ""
+            } else {
+              newAddress.countryName
+            },
+            newAddress.latitude,
+            newAddress.longitude,
+            newAddress.hasLatitude(),
+            newAddress.hasLongitude(),
+            if (newAddress.phone.isNullOrEmpty()) {
+              ""
+            } else {
+              newAddress.phone
+            },
+            if (newAddress.url.isNullOrEmpty()) {
+              ""
+            } else {
+              newAddress.url
+            })
+    println(this.user.address.toString())
+    Log.d("userVM", "updateAddress: ${this.user.address}")
   }
 }

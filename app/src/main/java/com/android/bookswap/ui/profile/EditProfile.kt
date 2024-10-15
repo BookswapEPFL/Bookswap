@@ -37,59 +37,44 @@ fun EditProfileDialog(onDismiss: () -> Unit, onSave: (User) -> Unit, user: User)
                     value = _greeting.value,
                     onValueChange = { _greeting.value = it },
                     label = { Text("Greeting") },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .testTag("greetingTbx"),
+                    modifier = Modifier.fillMaxWidth().testTag("greetingTbx"),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                     singleLine = true,
-                    placeholder = { Text(text = "Ex. \"M.\"") }
-                )
+                    placeholder = { Text(text = "Ex. \"M.\"") })
 
                 OutlinedTextField(
                     value = _firstName.value,
                     onValueChange = { _firstName.value = it },
                     label = { Text("Firstname") },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .testTag("firstnameTbx"),
+                    modifier = Modifier.fillMaxWidth().testTag("firstnameTbx"),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                     singleLine = true,
-                    placeholder = { Text(text = "Ex. \"John\"") }
-                )
+                    placeholder = { Text(text = "Ex. \"John\"") })
                 OutlinedTextField(
                     value = _lastName.value,
                     onValueChange = { _lastName.value = it },
                     label = { Text("Lastname") },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .testTag("lastnameTbx"),
+                    modifier = Modifier.fillMaxWidth().testTag("lastnameTbx"),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                     singleLine = true,
-                    placeholder = { Text(text = "Ex. \"Doe\"") }
-                )
+                    placeholder = { Text(text = "Ex. \"Doe\"") })
                 OutlinedTextField(
                     readOnly = false,
                     value = _email.value,
                     onValueChange = { _email.value = it },
                     label = { Text("Email") },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .testTag("emailTbx"),
+                    modifier = Modifier.fillMaxWidth().testTag("emailTbx"),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                     singleLine = true,
-                    placeholder = { Text(text = "Ex. \"John.Doe@example.com\"") }
-                )
+                    placeholder = { Text(text = "Ex. \"John.Doe@example.com\"") })
                 OutlinedTextField(
                     value = _phone.value,
                     onValueChange = { _phone.value = it },
                     label = { Text("Phone") },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .testTag("phoneTbx"),
+                    modifier = Modifier.fillMaxWidth().testTag("phoneTbx"),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
                     singleLine = true,
-                    placeholder = { Text(text = "Ex. \"+41223456789\"") }
-                )
+                    placeholder = { Text(text = "Ex. \"+41223456789\"") })
               }
             },
             confirmButton = {

@@ -6,7 +6,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.android.bookswap.data.User
 import com.android.bookswap.model.UserViewModel
 import com.android.bookswap.screen.UserProfileScreen
-import com.android.bookswap.ui.profile.UserProfile
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
 import io.github.kakaocup.compose.node.element.ComposeScreen
 import java.util.Locale
