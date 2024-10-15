@@ -3,12 +3,14 @@ package com.android.bookswap.ui.profile
 import android.location.Address
 import android.util.Log
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import com.android.bookswap.data.User
 import com.android.bookswap.model.UserViewModel
@@ -28,37 +30,66 @@ fun EditProfileDialog(onDismiss: () -> Unit, onSave: (User) -> Unit, user: User)
         AlertDialog(
             modifier = Modifier.testTag("editProfileAlert"),
             onDismissRequest = onDismiss,
-            title = { Text("Edit Profile") },
+            title = { Text("Edit Profile", Modifier.testTag("editProfileTitleTxt")) },
             text = {
               Column() {
                 OutlinedTextField(
                     value = _greeting.value,
                     onValueChange = { _greeting.value = it },
-                    label = { Text("greeting") },
-                    modifier = Modifier.fillMaxWidth().testTag("greetingTbx"),
+                    label = { Text("Greeting") },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag("greetingTbx"),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                    singleLine = true,
+                    placeholder = { Text(text = "Ex. \"M.\"") }
                 )
 
                 OutlinedTextField(
                     value = _firstName.value,
                     onValueChange = { _firstName.value = it },
-                    label = { Text("firstname") },
-                    modifier = Modifier.fillMaxWidth().testTag("firstNameTbx"))
+                    label = { Text("Firstname") },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag("firstnameTbx"),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                    singleLine = true,
+                    placeholder = { Text(text = "Ex. \"John\"") }
+                )
                 OutlinedTextField(
                     value = _lastName.value,
                     onValueChange = { _lastName.value = it },
-                    label = { Text("lastname") },
-                    modifier = Modifier.fillMaxWidth().testTag("lastNameTbx"))
+                    label = { Text("Lastname") },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag("lastnameTbx"),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                    singleLine = true,
+                    placeholder = { Text(text = "Ex. \"Doe\"") }
+                )
                 OutlinedTextField(
-                    readOnly = true, // {TODO: fix database UUID }
+                    readOnly = false,
                     value = _email.value,
-                    onValueChange = {},
+                    onValueChange = { _email.value = it },
                     label = { Text("Email") },
-                    modifier = Modifier.fillMaxWidth().testTag("emailTbx"))
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag("emailTbx"),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                    singleLine = true,
+                    placeholder = { Text(text = "Ex. \"John.Doe@example.com\"") }
+                )
                 OutlinedTextField(
                     value = _phone.value,
                     onValueChange = { _phone.value = it },
                     label = { Text("Phone") },
-                    modifier = Modifier.fillMaxWidth().testTag("phoneTbx"))
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag("phoneTbx"),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
+                    singleLine = true,
+                    placeholder = { Text(text = "Ex. \"+41223456789\"") }
+                )
               }
             },
             confirmButton = {

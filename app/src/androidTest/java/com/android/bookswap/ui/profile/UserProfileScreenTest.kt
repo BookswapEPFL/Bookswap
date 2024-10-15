@@ -1,4 +1,4 @@
-package com.android.bookswap.ui
+package com.android.bookswap.ui.profile
 
 import android.location.Address
 import androidx.compose.ui.test.junit4.createComposeRule
