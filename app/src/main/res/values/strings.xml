@@ -1,6 +1,5 @@
 <resources>
     <string name="app_name">BookSwapApp</string>
     <string name="title_activity_main">MainActivity</string>
-    <string name="title_activity_second">SecondActivity</string>
     <string name="default_web_client_id">53350524991-rim3tpfdgv2ghibl586ku7fvq6ngcddn.apps.googleusercontent.com</string>
 </resources>

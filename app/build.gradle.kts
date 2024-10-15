@@ -1,3 +1,6 @@
+import java.io.FileInputStream
+import java.util.Properties
+
 plugins {
     jacoco
     alias(libs.plugins.androidApplication)
@@ -11,6 +14,15 @@ android {
     namespace = "com.android.bookswap"
     compileSdk = 34
 
+    // Load the API key from local.properties
+    val localProperties = Properties()
+    val localPropertiesFile = rootProject.file("local.properties")
+    if (localPropertiesFile.exists()) {
+        localProperties.load(FileInputStream(localPropertiesFile))
+    }
+
+    val mapsApiKey: String = localProperties.getProperty("MAPS_API_KEY") ?: ""
+
     defaultConfig {
         applicationId = "com.android.bookswap"
         minSdk = 28
@@ -22,6 +34,7 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+        manifestPlaceholders["MAPS_API_KEY"] = mapsApiKey
     }
 
     buildTypes {
@@ -144,6 +157,11 @@ dependencies {
     implementation(libs.play.services.maps)
     implementation(libs.play.services.auth)
 
+    // Google Service and Maps
+    implementation(libs.play.services.maps)
+    implementation(libs.maps.compose)
+    implementation(libs.maps.compose.utils)
+
     // ------------- Jetpack Compose ------------------
     val composeBom = platform(libs.compose.bom)
     implementation(composeBom)
@@ -167,6 +185,7 @@ dependencies {
     // --------- Kaspresso test framework ----------
     globalTestImplementation(libs.kaspresso)
     globalTestImplementation(libs.kaspresso.compose)
+
 
     testImplementation(libs.mockito.core)
     testImplementation(libs.mockito.inline)
