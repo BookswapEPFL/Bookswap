@@ -1,6 +1,5 @@
 package com.android.bookswap.ui.profile
 
-import android.location.Address
 import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
@@ -11,11 +10,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.tooling.preview.Preview
 import com.android.bookswap.data.User
-import com.android.bookswap.model.UserViewModel
 import com.android.bookswap.ui.theme.BookSwapAppTheme
-import java.util.Locale
 
 @Composable
 fun EditProfileDialog(
@@ -115,6 +111,7 @@ fun EditProfileDialog(
       .also { Log.d("EditProfile", "Alert.also()") }
 }
 
+/*
 @Preview
 @Composable
 fun EditProfileDialoguePreview() {
@@ -137,3 +134,4 @@ fun EditProfileDialoguePreview() {
           "dummyUUID0000"))
   EditProfileDialog(onDismiss = { /*TODO*/}, onSave = { /*TODO*/}, user = userVM.getUser())
 }
+*/

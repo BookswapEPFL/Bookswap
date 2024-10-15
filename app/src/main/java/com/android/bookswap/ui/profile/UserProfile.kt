@@ -1,6 +1,5 @@
 package com.android.bookswap.ui.profile
 
-import android.location.Address
 import android.util.Log
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.Arrangement
@@ -29,12 +28,9 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.android.bookswap.data.User
 import com.android.bookswap.model.UserViewModel
 import com.android.bookswap.ui.theme.*
-import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -161,6 +157,7 @@ fun UserProfile(userVM: UserViewModel, modifier: Modifier = Modifier) {
   }
 }
 
+/*
 @Preview(showBackground = true, backgroundColor = 0xFFF0EAD2)
 @Composable
 fun UserProfilePreview() {
@@ -184,3 +181,4 @@ fun UserProfilePreview() {
 
   UserProfile(userVM)
 }
+*/
