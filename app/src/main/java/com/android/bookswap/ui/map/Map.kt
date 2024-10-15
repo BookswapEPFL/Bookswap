@@ -30,6 +30,9 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.bookswap.data.DataBook
+import com.android.bookswap.ui.theme.Accent
+import com.android.bookswap.ui.theme.AccentSecondary
+import com.android.bookswap.ui.theme.Secondary
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.*
@@ -148,13 +151,13 @@ fun CustomInfoWindow(modifier: Modifier = Modifier, user: TempUser) {
               .wrapContentSize()
               .width(200.dp)
               .border(
-                  BorderStroke(width = 1.dp, color = Color.hsl(23f, 0.17f, 0.36f, 1f)),
+                  BorderStroke(width = 1.dp, color = Accent),
                   shape = RoundedCornerShape(0.dp, 10.dp, 10.dp, 10.dp))
               .heightIn(max = 400.dp)
               .testTag("mapBoxMarker")
               .background(Color.Transparent),
       elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
-      colors = CardDefaults.cardColors(containerColor = Color.hsl(70f, 0.47f, 0.81f, 1f)),
+      colors = CardDefaults.cardColors(containerColor = Secondary),
       shape = RoundedCornerShape(0.dp, 10.dp, 10.dp, 10.dp)) {
         Spacer(modifier.height(10.dp))
         LazyColumn(modifier = Modifier.fillMaxWidth().testTag("mapBoxMarkerList")) {
@@ -162,13 +165,13 @@ fun CustomInfoWindow(modifier: Modifier = Modifier, user: TempUser) {
             Column(modifier = Modifier.padding(horizontal = 8.dp).testTag("mapBoxMarkerListBox")) {
               Text(
                   text = book.title,
-                  color = Color.hsl(23f, 0.17f, 0.36f, 1f),
+                  color = Accent,
                   fontSize = 20.sp,
                   modifier = Modifier.testTag("mapBoxMarkerListBoxTitle"))
               Spacer(modifier = Modifier.height(4.dp))
               Text(
                   text = book.author ?: "",
-                  color = Color.hsl(26f, 0.28f, 0.53f, 1f),
+                  color = AccentSecondary,
                   fontSize = 16.sp,
                   modifier = Modifier.testTag("mapBoxMarkerListBoxAuthor"))
             }
@@ -177,7 +180,7 @@ fun CustomInfoWindow(modifier: Modifier = Modifier, user: TempUser) {
                     modifier =
                         Modifier.fillMaxWidth().height(5.dp).testTag("mapBoxMarkerListDivider"),
                     thickness = 1.dp,
-                    color = Color.hsl(23f, 0.17f, 0.36f, 1f))
+                    color = Accent)
           }
         }
         Spacer(modifier.height(4.dp))
