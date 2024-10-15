@@ -41,6 +41,10 @@ navigationCompose = "2.8.2"
 firebaseCrashlyticsBuildtools = "3.0.2"
 identityJvm = "202408.1"
 volley = "1.2.1"
+volley = "1.2.1" # HTTP request
+json = "20240303" #Json parsing
+mapsCompose = "4.3.3"
+mapsComposeUtils = "4.3.0"
 
 [libraries]
 google-play-services-location = { group = "com.google.android.gms", name = "play-services-location", version = "19.0.1" }
@@ -89,6 +93,9 @@ firebase-crashlytics-buildtools = { group = "com.google.firebase", name = "fireb
 identity-jvm = { group = "com.android.identity", name = "identity-jvm", version.ref = "identityJvm" }
 volley = { group = "com.android.volley", name = "volley", version.ref = "volley" }
 
+
+maps-compose = { module = "com.google.maps.android:maps-compose", version.ref = "mapsCompose" }
+maps-compose-utils = { module = "com.google.maps.android:maps-compose-utils", version.ref = "mapsComposeUtils" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
