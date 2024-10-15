@@ -33,10 +33,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.bookswap.R
 import com.android.bookswap.ui.navigation.NavigationActions
-import com.android.bookswap.ui.theme.Accent
-import com.android.bookswap.ui.theme.BackGround
-import com.android.bookswap.ui.theme.Primary
-import com.android.bookswap.ui.theme.Secondary
+import com.android.bookswap.ui.theme.ColorVariable
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
@@ -68,7 +65,7 @@ fun SignInScreen(navigationActions: NavigationActions) { // Add this when naviga
 
   Scaffold(
       modifier = Modifier.fillMaxSize(),
-      containerColor = BackGround, // Set the background color
+      containerColor = ColorVariable.BackGround, // Set the background color
       content = { padding ->
         Column(
             modifier = Modifier.fillMaxSize().padding(padding),
@@ -134,9 +131,9 @@ fun SignInScreen(navigationActions: NavigationActions) { // Add this when naviga
 fun GoogleSignInButton(onSignInClick: () -> Unit) {
   Button(
       onClick = onSignInClick,
-      colors = ButtonDefaults.buttonColors(containerColor = Secondary), // Button color
+      colors = ButtonDefaults.buttonColors(containerColor = ColorVariable.Secondary), // Button color
       shape = RoundedCornerShape(50), // Circular edges for the button
-      border = BorderStroke(1.dp, Primary), // Button's border color
+      border = BorderStroke(1.dp, ColorVariable.Primary), // Button's border color
       modifier =
           Modifier.padding(8.dp)
               .height(48.dp) // Adjust height as needed
@@ -156,7 +153,7 @@ fun GoogleSignInButton(onSignInClick: () -> Unit) {
               // Text for the button
               Text(
                   text = "Sign in with Google",
-                  color = Accent, // Text color
+                  color = ColorVariable.Accent, // Text color
                   fontSize = 16.sp, // Font size
                   fontWeight = FontWeight.Medium)
             }
