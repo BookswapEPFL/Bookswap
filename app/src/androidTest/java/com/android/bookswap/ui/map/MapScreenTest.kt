@@ -9,12 +9,11 @@ import androidx.compose.ui.test.onNodeWithTag
 import com.android.bookswap.data.BookLanguages
 import com.android.bookswap.data.DataBook
 import java.util.UUID
-import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
 class MapScreenTest {
-  val user =
+    private val user =
       listOf(
           TempUser(
               latitude = 0.0,
@@ -49,10 +48,8 @@ class MapScreenTest {
                           language = BookLanguages.GERMAN,
                           isbn = "345-678-901"))))
 
-  val userWithoutBooks = listOf(TempUser(latitude = 1.0, longitude = 1.0, listBook = emptyList()))
+  private val userWithoutBooks = listOf(TempUser(latitude = 1.0, longitude = 1.0, listBook = emptyList()))
   @get:Rule val composeTestRule = createComposeRule()
-
-  @Before fun setUp() {}
 
   @Test
   fun displayAllComponents() {
