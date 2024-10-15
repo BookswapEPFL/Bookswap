@@ -35,3 +35,59 @@ enum class BookLanguages(val languageCode: String) {
   ROMANSH("RM"), // Romansh, a language spoken in Switzerland
   OTHER("OTHER") // All languages that are not yet implemented
 }
+
+/** List of all supported book languages */
+val LIST_BOOK_LANGUAGES =
+  listOf(
+      BookLanguages.FRENCH,
+      BookLanguages.GERMAN,
+      BookLanguages.ENGLISH,
+      BookLanguages.SPANISH,
+      BookLanguages.ITALIAN,
+      BookLanguages.ROMANSH,
+      BookLanguages.OTHER
+  )
+/** Genre of a book */
+enum class Genre {
+    Fiction,
+    NonFiction,
+    Fantasy,
+    ScienceFiction,
+    Mystery,
+    Thriller,
+    Romance,
+    Horror,
+    Historical,
+    Western,
+    Dystopian,
+    Memoir,
+    Biography,
+    Autobiography,
+    SelfHelp,
+    Health,
+    Travel,
+    Guide
+}
+
+/** List of all supported book genres */
+val LIST_BOOK_GENRES =
+    listOf(
+        Genre.Fiction,
+        Genre.NonFiction,
+        Genre.Fantasy,
+        Genre.ScienceFiction,
+        Genre.Mystery,
+        Genre.Thriller,
+        Genre.Romance,
+        Genre.Horror,
+        Genre.Historical,
+        Genre.Western,
+        Genre.Dystopian,
+        Genre.Memoir,
+        Genre.Biography,
+        Genre.Autobiography,
+        Genre.SelfHelp,
+        Genre.Health,
+        Genre.Travel,
+        Genre.Guide,
+    )
