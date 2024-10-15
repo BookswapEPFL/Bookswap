@@ -61,7 +61,8 @@ fun UserProfile(userVM: UserViewModel, modifier: Modifier = Modifier) {
           showEditProfile = false
           needRecompose = true
         },
-        user)
+        user = user,
+        modifier = Modifier.testTag("editProfileDialogue"))
   }
 
   LaunchedEffect(userVM.uid, needRecompose) {
@@ -145,7 +146,10 @@ fun UserProfile(userVM: UserViewModel, modifier: Modifier = Modifier) {
 
                       // Save Button
                       Button(
-                          onClick = { showEditProfile = true },
+                          onClick = {
+                            showEditProfile = true
+                            Log.d("click", "UserProfile: edit")
+                          },
                           border = BorderStroke(1f.dp, Color(0xFFA98467)),
                           modifier = mod.testTag("editProfileBtn")) {
                             // Text displayed on the button

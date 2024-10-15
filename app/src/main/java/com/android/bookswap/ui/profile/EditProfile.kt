@@ -18,7 +18,12 @@ import com.android.bookswap.ui.theme.BookSwapAppTheme
 import java.util.Locale
 
 @Composable
-fun EditProfileDialog(onDismiss: () -> Unit, onSave: (User) -> Unit, user: User) {
+fun EditProfileDialog(
+    onDismiss: () -> Unit,
+    onSave: (User) -> Unit,
+    user: User,
+    modifier: Modifier = Modifier
+) {
 
   var _email = remember { mutableStateOf<String>(user.email) }
   var _phone = remember { mutableStateOf<String>(user.phoneNumber) }
