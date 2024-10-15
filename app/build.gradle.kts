@@ -94,9 +94,9 @@ android {
 
 sonar {
     properties {
-        property("sonar.projectKey", "gf_android-bookswap")
-        property("sonar.projectName", "Android-BookSwap")
-        property("sonar.organization", "gabrielfleischer")
+        property("sonar.projectKey", "BookswapEPFL_Bookswap")
+        property("sonar.projectName", "BookSwapApp")
+        property("sonar.organization", "bookswapepfl")
         property("sonar.host.url", "https://sonarcloud.io")
         // Comma-separated paths to the various directories containing the *.xml JUnit report files. Each path may be absolute or relative to the project base directory.
         property("sonar.junit.reportPaths", "${project.layout.buildDirectory.get()}/test-results/testDebugunitTest/")
