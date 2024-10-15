@@ -13,7 +13,7 @@ import org.junit.Rule
 import org.junit.Test
 
 class MapScreenTest {
-    private val user =
+  private val user =
       listOf(
           TempUser(
               latitude = 0.0,
@@ -48,7 +48,8 @@ class MapScreenTest {
                           language = BookLanguages.GERMAN,
                           isbn = "345-678-901"))))
 
-  private val userWithoutBooks = listOf(TempUser(latitude = 1.0, longitude = 1.0, listBook = emptyList()))
+  private val userWithoutBooks =
+      listOf(TempUser(latitude = 1.0, longitude = 1.0, listBook = emptyList()))
   @get:Rule val composeTestRule = createComposeRule()
 
   @Test
