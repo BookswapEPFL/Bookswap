@@ -50,9 +50,10 @@ fun ChatScreen(
   var messages by remember { mutableStateOf(emptyList<DataMessage>()) }
   var newMessageText by remember { mutableStateOf(TextFieldValue("")) }
 
-  var listenerRegistration: ListenerRegistration? = null
+  var listenerRegistration: ListenerRegistration?
   DisposableEffect(Unit) {
-    listenerRegistration = messageRepository.addMessagesListener(
+    listenerRegistration =
+        messageRepository.addMessagesListener(
             otherUserId = otherUserId, currentUserId = currentUserId) { result ->
               if (result.isSuccess) {
                 messages = result.getOrThrow()
