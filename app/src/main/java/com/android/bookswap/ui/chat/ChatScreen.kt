@@ -30,11 +30,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import com.android.bookswap.data.DataMessage
 import com.android.bookswap.data.source.network.MessageFirestoreSource
 import com.android.bookswap.ui.theme.ColorVariable
+import com.google.firebase.firestore.ListenerRegistration
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -48,9 +50,9 @@ fun ChatScreen(
   var messages by remember { mutableStateOf(emptyList<DataMessage>()) }
   var newMessageText by remember { mutableStateOf(TextFieldValue("")) }
 
+  var listenerRegistration: ListenerRegistration? = null
   DisposableEffect(Unit) {
-    val listenerRegistration =
-        messageRepository.addMessagesListener(
+    listenerRegistration = messageRepository.addMessagesListener(
             otherUserId = otherUserId, currentUserId = currentUserId) { result ->
               if (result.isSuccess) {
                 messages = result.getOrThrow()
@@ -59,7 +61,7 @@ fun ChatScreen(
                     "MessageView", "Failed to fetch messages: ${result.exceptionOrNull()?.message}")
               }
             }
-    onDispose { listenerRegistration.remove() }
+    onDispose { listenerRegistration?.remove() }
   }
   Box(modifier = Modifier.fillMaxSize().background(ColorVariable.BackGround)) {
     Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.SpaceBetween) {
@@ -83,7 +85,9 @@ fun ChatScreen(
                         .padding(8.dp)
                         .background(ColorVariable.Secondary, MaterialTheme.shapes.small)
                         .border(1.dp, ColorVariable.Accent, MaterialTheme.shapes.small)
-                        .padding(8.dp))
+                        .padding(8.dp)
+                        .testTag("message_input_field"),
+            )
             Button(
                 onClick = {
                   val messageId = messageRepository.getNewUid()
@@ -113,7 +117,7 @@ fun ChatScreen(
                         ColorVariable.Accent,
                         ColorVariable.Secondary,
                         ColorVariable.Accent),
-                modifier = Modifier.padding(horizontal = 8.dp)) {
+                modifier = Modifier.padding(horizontal = 8.dp).testTag("send_button")) {
                   Text("Send")
                 }
           }
@@ -161,14 +165,19 @@ fun MessageItem(message: DataMessage, currentUserId: String) {
             modifier =
                 Modifier.padding(8.dp)
                     .widthIn(max = (LocalConfiguration.current.screenWidthDp.dp * 2 / 3))
-                    .border(1.dp, ColorVariable.Accent, shape)) {
+                    .border(1.dp, ColorVariable.Accent, shape)
+                    .testTag("message_item ${message.id}")) {
               Column(modifier = Modifier.padding(16.dp)) {
-                Text(text = message.text, color = ColorVariable.Accent)
+                Text(
+                    text = message.text,
+                    modifier = Modifier.testTag("message_text ${message.id}"),
+                    color = ColorVariable.Accent)
                 Text(
                     text = formatTimestamp(message.timestamp),
                     color = ColorVariable.AccentSecondary,
                     style = MaterialTheme.typography.bodySmall,
-                    modifier = Modifier.align(Alignment.End))
+                    modifier =
+                        Modifier.align(Alignment.End).testTag("message_timestamp ${message.id}"))
               }
             }
       }
