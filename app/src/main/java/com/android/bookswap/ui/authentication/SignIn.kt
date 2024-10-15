@@ -131,7 +131,8 @@ fun SignInScreen(navigationActions: NavigationActions) { // Add this when naviga
 fun GoogleSignInButton(onSignInClick: () -> Unit) {
   Button(
       onClick = onSignInClick,
-      colors = ButtonDefaults.buttonColors(containerColor = ColorVariable.Secondary), // Button color
+      colors =
+          ButtonDefaults.buttonColors(containerColor = ColorVariable.Secondary), // Button color
       shape = RoundedCornerShape(50), // Circular edges for the button
       border = BorderStroke(1.dp, ColorVariable.Primary), // Button's border color
       modifier =
