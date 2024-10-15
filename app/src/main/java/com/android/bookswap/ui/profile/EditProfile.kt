@@ -40,8 +40,7 @@ fun EditProfileDialog(
                     label = { Text("Greeting") },
                     modifier = Modifier.fillMaxWidth().testTag("greetingTbx"),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-                    singleLine = true,
-                    placeholder = { Text(text = "Ex. \"M.\"") })
+                    singleLine = true)
 
                 OutlinedTextField(
                     value = _firstName.value,
@@ -49,16 +48,14 @@ fun EditProfileDialog(
                     label = { Text("Firstname") },
                     modifier = Modifier.fillMaxWidth().testTag("firstnameTbx"),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-                    singleLine = true,
-                    placeholder = { Text(text = "Ex. \"John\"") })
+                    singleLine = true)
                 OutlinedTextField(
                     value = _lastName.value,
                     onValueChange = { _lastName.value = it },
                     label = { Text("Lastname") },
                     modifier = Modifier.fillMaxWidth().testTag("lastnameTbx"),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-                    singleLine = true,
-                    placeholder = { Text(text = "Ex. \"Doe\"") })
+                    singleLine = true)
                 OutlinedTextField(
                     readOnly = false,
                     value = _email.value,
@@ -66,20 +63,18 @@ fun EditProfileDialog(
                     label = { Text("Email") },
                     modifier = Modifier.fillMaxWidth().testTag("emailTbx"),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-                    singleLine = true,
-                    placeholder = { Text(text = "Ex. \"John.Doe@example.com\"") })
+                    singleLine = true)
                 OutlinedTextField(
                     value = _phone.value,
                     onValueChange = { _phone.value = it },
                     label = { Text("Phone") },
                     modifier = Modifier.fillMaxWidth().testTag("phoneTbx"),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
-                    singleLine = true,
-                    placeholder = { Text(text = "Ex. \"+41223456789\"") })
+                    singleLine = true)
               }
             },
             confirmButton = {
-              androidx.compose.material3.Button(
+              Button(
                   onClick = {
                     val greeting = _greeting.value
                     val firstName = _firstName.value

@@ -167,6 +167,7 @@ class EditProfileScreenTest : TestCase() {
               assertIsEnabled()
               performClick()
               performTextClearance()
+              assertTextEquals("Greeting","")
               performTextInput("Mr.")
             }
             firstnameTbx {
@@ -174,6 +175,7 @@ class EditProfileScreenTest : TestCase() {
               assertIsEnabled()
               performClick()
               performTextClearance()
+              assertTextEquals("Firstname","")
               performTextInput("Jones")
             }
             lastnameTbx {
@@ -181,6 +183,7 @@ class EditProfileScreenTest : TestCase() {
               assertIsEnabled()
               performClick()
               performTextClearance()
+              assertTextEquals("Lastname","")
               performTextInput("Douses")
             }
             emailTbx {
@@ -188,6 +191,7 @@ class EditProfileScreenTest : TestCase() {
               assertIsEnabled()
               performClick()
               performTextClearance()
+              assertTextEquals("Email","")
               performTextInput("Jones.Douses@example.com")
             }
             phoneNumberTbx {
@@ -195,6 +199,7 @@ class EditProfileScreenTest : TestCase() {
               assertIsEnabled()
               performClick()
               performTextClearance()
+              assertTextEquals("Phone","")
               performTextInput("+41234567890")
             }
             confirmBtn {
