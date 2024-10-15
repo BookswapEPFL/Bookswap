@@ -10,7 +10,7 @@ import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onChild
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
-import com.android.bookswap.models.chat.MessageBox
+import com.android.bookswap.model.chat.MessageBox
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
