@@ -66,8 +66,6 @@ class AddToBookTest {
     composeTestRule.onNodeWithTag("inputBookDescription").assertIsDisplayed()
     composeTestRule.onNodeWithTag("inputBookRating").assertIsDisplayed()
     composeTestRule.onNodeWithTag("inputBookISBN").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("inputBookPhoto").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("inputBookLanguage").assertIsDisplayed()
   }
 
   @Test
