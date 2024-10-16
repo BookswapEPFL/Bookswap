@@ -365,39 +365,7 @@ private fun DraggableMenu(listAllBooks: List<DataBook>) {
                                           .height(STAR_HEIGHT_DP.dp)
                                           .testTag("mapDraggableMenuBookBoxRating")) {
                                     // leave all stars empty if no rating
-                                    val rating = book.rating ?: 0
-                                    for (i in 1..rating) {
-                                      Icon(
-                                          imageVector =
-                                              Icons.Filled.Star, // Use the filled star icon
-                                          contentDescription = "Star Icon",
-                                          tint = Color.Black,
-                                          modifier =
-                                              Modifier.size(STAR_SIZE_DP.dp)
-                                                  .testTag("mapDraggableMenuBookBoxStar"))
-                                    }
-                                    for (i in rating + 1..MAX_RATING) {
-                                      // Hollow star
-                                      // Icons.Outlined.Star doesn't work, it displays the
-                                      // Icons.Filled.Star
-                                      Box(
-                                          modifier =
-                                              Modifier.width(STAR_SIZE_DP.dp)
-                                                  .testTag("mapDraggableMenuBookBoxEmptyStar")) {
-                                            Icon(
-                                                imageVector = Icons.Filled.Star,
-                                                contentDescription = "Star Icon",
-                                                tint = Color.Black,
-                                                modifier = Modifier.size(STAR_SIZE_DP.dp))
-                                            Icon(
-                                                imageVector = Icons.Filled.Star,
-                                                contentDescription = "Star Icon",
-                                                tint = ColorVariable.BackGround,
-                                                modifier =
-                                                    Modifier.size(STAR_INNER_SIZE_DP.dp)
-                                                        .align(Alignment.Center))
-                                          }
-                                    }
+                                    DisplayStarReview(book.rating ?: 0)
                                   }
                               // text for the tags of the book, will be added at a later date
                               // It isn't decided how we will handle the tag for the books
@@ -419,6 +387,40 @@ private fun DraggableMenu(listAllBooks: List<DataBook>) {
               }
             }
       }
+}
+
+/**
+ * Composable function that displays a row of 5 stars, the n first are filled then the rest are
+ * empty stars.
+ *
+ * @param rating A [Int] from 1 to 5, used to know how many filled star should be displayed
+ */
+@Composable
+private fun DisplayStarReview(rating: Int) {
+  for (i in 1..rating) {
+    Icon(
+        imageVector = Icons.Filled.Star,
+        contentDescription = "Star Icon",
+        tint = Color.Black,
+        modifier = Modifier.size(STAR_SIZE_DP.dp).testTag("mapDraggableMenuBookBoxStar"))
+  }
+  for (i in rating + 1..MAX_RATING) {
+    // Hollow star
+    // Icons.Outlined.Star doesn't work, it displays the
+    // Icons.Filled.Star
+    Box(modifier = Modifier.width(STAR_SIZE_DP.dp).testTag("mapDraggableMenuBookBoxEmptyStar")) {
+      Icon(
+          imageVector = Icons.Filled.Star,
+          contentDescription = "Star Icon",
+          tint = Color.Black,
+          modifier = Modifier.size(STAR_SIZE_DP.dp))
+      Icon(
+          imageVector = Icons.Filled.Star,
+          contentDescription = "Star Icon",
+          tint = ColorVariable.BackGround,
+          modifier = Modifier.size(STAR_INNER_SIZE_DP.dp).align(Alignment.Center))
+    }
+  }
 }
 
 // need to be removed when user dataclass will be created
