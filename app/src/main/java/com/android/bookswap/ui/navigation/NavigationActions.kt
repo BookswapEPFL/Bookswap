@@ -27,6 +27,7 @@ object Screen {
   const val ADD_BOOK_SCAN = "AddBookScan Screen"
   const val ADD_BOOK_ISBN = "AddBookISBN Screen"
   const val SETTINGS = "Settings Screen"
+  const val FILTER = "Filter Screen"
 }
 
 data class TopLevelDestination(val route: String, val icon: ImageVector, val textId: String)
