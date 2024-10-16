@@ -47,10 +47,13 @@ class AddToBookTest {
     // Set the content for the Compose UI to be tested
     composeTestRule.setContent { AddToBook(BooksFirestoreRepository(Firebase.firestore)) }
     // Assert that all components are displayed and their contents are correct
+    Thread.sleep(2000)
     composeTestRule
         .onNodeWithTag("addBookScreen")
         .assertIsDisplayed() // Ensure to add a test tag to your screen
+
     composeTestRule.onNodeWithTag("addBookTitle").assertIsDisplayed()
+
     composeTestRule
         .onNodeWithTag("addBookTitle")
         .assertTextEquals("Add Your Book") // Update this based on your screen title
