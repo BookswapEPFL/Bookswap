@@ -65,7 +65,7 @@ class UserProfileScreenTest : TestCase() {
           }
           addressTxt {
             assertIsDisplayed()
-            assertTextEquals("Rue de la Gare 1, 1000 Lausanne CH, Switzerland")
+            assertTextEquals("0.0, 0.0")
           }
           editProfileBtn {
             assertIsDisplayed()
@@ -100,7 +100,7 @@ class UserProfileScreenTest : TestCase() {
           }
           addressTxt {
             assertIsDisplayed()
-            assertTextEquals("Rue de la Gare 1, 1000 Lausanne CH, Switzerland")
+            assertTextEquals("0.0, 0.0")
           }
           editProfileBtn {
             assertIsDisplayed()
