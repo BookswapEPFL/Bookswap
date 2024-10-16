@@ -36,18 +36,8 @@ enum class BookLanguages(val languageCode: String) {
   OTHER("OTHER") // All languages that are not yet implemented
 }
 
-/** List of all supported book languages */
-val LIST_BOOK_LANGUAGES =
-    listOf(
-        BookLanguages.FRENCH,
-        BookLanguages.GERMAN,
-        BookLanguages.ENGLISH,
-        BookLanguages.SPANISH,
-        BookLanguages.ITALIAN,
-        BookLanguages.ROMANSH,
-        BookLanguages.OTHER)
 /** Genre of a book */
-enum class Genre {
+enum class BookGenres {
   Fiction,
   NonFiction,
   Fantasy,
@@ -67,26 +57,3 @@ enum class Genre {
   Travel,
   Guide
 }
-
-/** List of all supported book genres */
-val LIST_BOOK_GENRES =
-    listOf(
-        Genre.Fiction,
-        Genre.NonFiction,
-        Genre.Fantasy,
-        Genre.ScienceFiction,
-        Genre.Mystery,
-        Genre.Thriller,
-        Genre.Romance,
-        Genre.Horror,
-        Genre.Historical,
-        Genre.Western,
-        Genre.Dystopian,
-        Genre.Memoir,
-        Genre.Biography,
-        Genre.Autobiography,
-        Genre.SelfHelp,
-        Genre.Health,
-        Genre.Travel,
-        Genre.Guide,
-    )
