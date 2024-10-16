@@ -68,7 +68,7 @@ fun FilterMapScreen(navigationActions: NavigationActions, selectedFilters: Mutab
                       TextStyle(
                           fontSize =
                               TOP_BAR_TITLE_FONT_SIZE, // Hard coded style that should be extracted
-                                                       // to a theme
+                          // to a theme
                           lineHeight = TOP_BAR_TITLE_LINE_HEIGHT,
                           fontWeight = TOP_BAR_TITLE_FONT_WEIGHT,
                           color = ColorVariable.Accent,
