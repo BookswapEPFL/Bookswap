@@ -10,10 +10,8 @@ import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QuerySnapshot
+import com.google.firebase.firestore.util.Assert.fail
 import java.util.UUID
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNotNull
-import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -27,7 +25,7 @@ import org.mockito.kotlin.verify
 import org.robolectric.RobolectricTestRunner
 
 @RunWith(RobolectricTestRunner::class)
-class BookFirestoreSourceTest {
+class BooksFirestoreRepositoryTest {
 
   @Mock private lateinit var mockFirestore: FirebaseFirestore
   @Mock private lateinit var mockCollectionReference: CollectionReference
@@ -35,18 +33,18 @@ class BookFirestoreSourceTest {
   @Mock private lateinit var mockDocumentSnapshot: DocumentSnapshot
   @Mock private lateinit var mockQuerySnapshot: QuerySnapshot
 
-  private lateinit var bookFirestoreSource: BookFirestoreSource
+  private lateinit var booksFirestorerRepository: BooksFirestoreRepository
 
   private val testBook =
-      DataBook(
-          uuid = UUID.randomUUID(),
-          title = "Test Book",
-          author = "Test Author",
-          description = "Test Description",
-          rating = 5,
-          photo = "http://example.com/photo.jpg",
-          language = BookLanguages.ENGLISH,
-          isbn = "1234567890")
+    DataBook(
+      uuid = UUID.randomUUID(),
+      title = "Test Book",
+      author = "Test Author",
+      description = "Test Description",
+      rating = 5,
+      photo = "http://example.com/photo.jpg",
+      language = BookLanguages.ENGLISH,
+      isbn = "1234567890")
 
   @Before
   fun setUp() {
@@ -57,11 +55,11 @@ class BookFirestoreSourceTest {
       FirebaseApp.initializeApp(ApplicationProvider.getApplicationContext())
     }
 
-    bookFirestoreSource = BookFirestoreSource(mockFirestore)
+    booksFirestorerRepository = BooksFirestoreRepository(mockFirestore)
 
     `when`(mockFirestore.collection(ArgumentMatchers.any())).thenReturn(mockCollectionReference)
     `when`(mockCollectionReference.document(ArgumentMatchers.any()))
-        .thenReturn(mockDocumentReference)
+      .thenReturn(mockDocumentReference)
     `when`(mockCollectionReference.get()).thenReturn(Tasks.forResult(mockQuerySnapshot))
   }
 
@@ -78,11 +76,13 @@ class BookFirestoreSourceTest {
     `when`(mockDocumentSnapshot.getString("ISBN")).thenReturn(testBook.isbn)
 
     // Act
-    bookFirestoreSource.getBook { result ->
-      assertTrue(result.isFailure)
-      assertTrue(result.getOrThrow().isNotEmpty())
-      assertEquals(testBook.title, result.getOrNull()?.first()?.title)
-    }
+    booksFirestorerRepository.getBook(
+      OnSucess = { books ->
+        // Assert that the fetched books match the expected values
+        assert(books.isNotEmpty())
+        assert(books.first().title == testBook.title)
+      },
+      onFailure = { fail("Should not fail") })
 
     // Verify that Firestore collection was called
     verify(mockCollectionReference).get()
@@ -94,7 +94,7 @@ class BookFirestoreSourceTest {
     doAnswer { Tasks.forResult(null) }.`when`(mockDocumentReference).delete()
 
     // Act
-    bookFirestoreSource.deleteBook(testBook.uuid) {}
+    booksFirestorerRepository.deleteBooks(testBook.isbn!!, testBook, {}, {})
 
     // Assert
     verify(mockDocumentReference).delete()
@@ -106,7 +106,13 @@ class BookFirestoreSourceTest {
     doAnswer { Tasks.forResult(null) }.`when`(mockDocumentReference).set(testBook)
 
     // Act
-    bookFirestoreSource.addBook(testBook) { assertTrue(it.isSuccess) }
+    booksFirestorerRepository.addBook(
+      testBook,
+      {
+        // Assert success callback
+        assert(true)
+      },
+      { fail("Should not fail") })
 
     // Verify Firestore set operation
     verify(mockDocumentReference).set(testBook)
@@ -118,14 +124,20 @@ class BookFirestoreSourceTest {
     doAnswer { Tasks.forResult(null) }.`when`(mockDocumentReference).set(testBook)
 
     // Act
-    bookFirestoreSource.updateBook(testBook) { assert(it.isSuccess) }
+    booksFirestorerRepository.updateBook(
+      testBook,
+      {
+        // Assert success callback
+        assert(true)
+      },
+      { fail("Should not fail") })
 
     // Verify Firestore update operation
     verify(mockDocumentReference).set(testBook)
   }
 
   @Test
-  fun documentToBooks_returnsDataBook_whenDocumentIsValid() {
+  fun documenttoBooks_returnsDataBook_whenDocumentIsValid() {
     // Arrange
     `when`(mockDocumentSnapshot.getString("Title")).thenReturn(testBook.title)
     `when`(mockDocumentSnapshot.getString("Author")).thenReturn(testBook.author)
@@ -136,16 +148,16 @@ class BookFirestoreSourceTest {
     `when`(mockDocumentSnapshot.getString("ISBN")).thenReturn(testBook.isbn)
 
     // Act
-    val result = bookFirestoreSource.documentToBook(mockDocumentSnapshot)
+    val result = booksFirestorerRepository.documentToBooks(mockDocumentSnapshot)
 
     // Assert
-    assertNotNull(result)
-    assertEquals(testBook.title, result.getOrNull()?.title)
-    assertEquals(testBook.author, result.getOrNull()?.author)
+    assert(result != null)
+    assert(result?.title == testBook.title)
+    assert(result?.author == testBook.author)
   }
 
   @Test
-  fun documentToBook_returnsNull_whenRequiredFieldIsMissing() {
+  fun documenttoBooks_returnsNull_whenRequiredFieldIsMissing() {
     // Arrange - Missing "Title"
     `when`(mockDocumentSnapshot.getString("Title")).thenReturn(null)
     `when`(mockDocumentSnapshot.getString("Author")).thenReturn(testBook.author)
@@ -156,14 +168,14 @@ class BookFirestoreSourceTest {
     `when`(mockDocumentSnapshot.getString("ISBN")).thenReturn(testBook.isbn)
 
     // Act
-    val result = bookFirestoreSource.documentToBook(mockDocumentSnapshot)
+    val result = booksFirestorerRepository.documentToBooks(mockDocumentSnapshot)
 
     // Assert
-    assertTrue(result.isFailure)
+    assert(result == null)
   }
 
   @Test
-  fun documentToBook_returnsNull_whenLanguageIsInvalid() {
+  fun documenttoBooks_returnsNull_whenLanguageIsInvalid() {
     // Arrange - Invalid language value
     `when`(mockDocumentSnapshot.getString("Title")).thenReturn(testBook.title)
     `when`(mockDocumentSnapshot.getString("Author")).thenReturn(testBook.author)
@@ -174,10 +186,10 @@ class BookFirestoreSourceTest {
     `when`(mockDocumentSnapshot.getString("ISBN")).thenReturn(testBook.isbn)
 
     // Act
-    val result = bookFirestoreSource.documentToBook(mockDocumentSnapshot)
+    val result = booksFirestorerRepository.documentToBooks(mockDocumentSnapshot)
 
     // Assert
-    assertTrue(result.isFailure) // Should return null due to invalid language
+    assert(result == null) // Should return null due to invalid language
   }
 
   @Test
@@ -185,16 +197,16 @@ class BookFirestoreSourceTest {
     // Arrange
     val collectionBooks = "Books"
     val mockDocumentReference = mock(DocumentReference::class.java)
-    val expectedUid = "unique-document-id"
+    val expectedUid = UUID.randomUUID().toString()
 
     // Mock Firestore to return a document with the desired ID
     `when`(mockFirestore.collection(collectionBooks).document()).thenReturn(mockDocumentReference)
     `when`(mockDocumentReference.id).thenReturn(expectedUid)
 
     // Act
-    val uid = bookFirestoreSource.getNewUid()
+    val uid = booksFirestorerRepository.getNewUid()
 
     // Assert
-    assert(uid == expectedUid) // Ensure the ID matches the expected value
+    assert(uid.toString() == expectedUid) // Ensure the ID matches the expected value
   }
 }

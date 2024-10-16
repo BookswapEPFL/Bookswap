@@ -1,6 +1,5 @@
 package com.android.bookswap.data.source.network
 
-import android.util.Log
 import com.android.bookswap.data.BookLanguages
 import com.android.bookswap.data.DataBook
 import com.android.bookswap.data.repository.BooksRepository
@@ -11,117 +10,95 @@ import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import java.util.UUID
 
-/** Name of the Firestore collection that stores books */
-const val COLLECTION_NAME = "Books"
+// A class that implements the BooksRepository interface using Firebase Firestore as the data source
+class BooksFirestoreRepository(private val db: FirebaseFirestore) : BooksRepository {
 
-/** Implement [BooksRepository] interface using Firebase's Firestore as the data source */
-class BookFirestoreSource(private val db: FirebaseFirestore) : BooksRepository {
+  // Name of the Firestore collection that stores books
+  private val collectionBooks = "Books"
 
-  /**
-   * Initializes the repository by adding an auth state listener to Firebase Authentication If the
-   * user is authenticated, it triggers the OnSuccess callback
-   */
-  override fun init(callback: (Result<Unit>) -> Unit) {
+  // Initializes the repository by adding an auth state listener to Firebase Authentication
+  // If the user is authenticated, it triggers the OnSuccess callback
+  override fun init(OnSucess: () -> Unit) {
     Firebase.auth.addAuthStateListener {
       if (it.currentUser != null) {
-        callback(Result.success(Unit))
+        OnSucess()
       }
-      callback(Result.failure(Exception("User is not logged in firestore")))
     }
   }
-  /** Generates and returns a new unique document ID for a book in Firestore */
-  override fun getNewUid(): String {
-    return db.collection(COLLECTION_NAME).document().id
+  // Generates and returns a new unique document ID for a book in Firestore
+  override fun getNewUid(): UUID {
+    return UUID.fromString(db.collection(collectionBooks).document().id)
   }
-  /**
-   * Fetches the list of books from the Firestore collection If the task is successful, maps the
-   * Firestore documents to DataBook objects Calls OnSuccess with the list of books, or onFailure if
-   * the task fails
-   */
-  override fun getBook(callback: (Result<List<DataBook>>) -> Unit) {
-    db.collection(COLLECTION_NAME).get().addOnCompleteListener { task ->
+  // Fetches the list of books from the Firestore collection
+  // If the task is successful, maps the Firestore documents to DataBook objects
+  // Calls OnSuccess with the list of books, or onFailure if the task fails
+  override fun getBook(OnSucess: (List<DataBook>) -> Unit, onFailure: (Exception) -> Unit) {
+    db.collection(collectionBooks).get().addOnCompleteListener { task ->
       if (task.isSuccessful) {
         // Maps Firestore documents to DataBook objects or returns an empty list
-        val books =
-            task.result?.mapNotNull { document ->
-              val result = documentToBook(document)
-              result.getOrNull()
-            } ?: emptyList()
-        callback(Result.success(books))
+        val books = task.result?.mapNotNull { document -> documentToBooks(document) } ?: emptyList()
+        OnSucess(books)
       } else {
-        callback(Result.failure(task.exception!!))
+        task.exception?.let { e -> onFailure(e) }
       }
     }
   }
-
-  /** Adds a new book to the Firestore collection */
-  override fun addBook(dataBook: DataBook, callback: (Result<Unit>) -> Unit) {
+  // Adds a new book to the Firestore collection
+  // Calls OnSuccess if the operation is successful, otherwise onFailure with the exception
+  override fun addBook(dataBook: DataBook, OnSucess: () -> Unit, onFailure: (Exception) -> Unit) {
     performFirestoreOperation(
-        db.collection(COLLECTION_NAME).document(dataBook.title).set(dataBook),
-        callback,
-    )
+      db.collection(collectionBooks).document(dataBook.title).set(dataBook), OnSucess, onFailure)
   }
-  /**
-   * Updates an existing book in Firestore by replacing the document with the same title Uses
-   * performFirestoreOperation to handle success and failure
-   */
-  override fun updateBook(dataBook: DataBook, callback: (Result<Unit>) -> Unit) {
+  // Updates an existing book in Firestore by replacing the document with the same title
+  // Uses performFirestoreOperation to handle success and failure
+  override fun updateBook(
+    dataBook: DataBook,
+    OnSucess: () -> Unit,
+    onFailure: (Exception) -> Unit
+  ) {
     performFirestoreOperation(
-        db.collection(COLLECTION_NAME).document(dataBook.title).set(dataBook), callback)
+      db.collection(collectionBooks).document(dataBook.title).set(dataBook), OnSucess, onFailure)
   }
-
-  /**
-   * Deletes a book from Firestore by its title Uses performFirestoreOperation to handle success and
-   * failure
-   */
-  override fun deleteBook(uuid: UUID, callback: (Result<Unit>) -> Unit) {
+  // Deletes a book from Firestore by its title
+  // Uses performFirestoreOperation to handle success and failure
+  override fun deleteBooks(
+    id: String,
+    dataBook: DataBook,
+    OnSucess: () -> Unit,
+    onFailure: (Exception) -> Unit
+  ) {
     performFirestoreOperation(
-        db.collection(COLLECTION_NAME).document(uuid.toString()).delete(), callback)
+      db.collection(collectionBooks).document(dataBook.isbn!!).delete(), OnSucess, onFailure)
   }
-  /**
-   * Maps a Firestore document to a DataBook object If any required field is missing, returns null
-   * to avoid incomplete objects
-   *
-   * @return DataBook on success, otherwise error
-   */
-  fun documentToBook(document: DocumentSnapshot): Result<DataBook> {
-
+  // Maps a Firestore document to a DataBook object
+  // If any required field is missing, returns null to avoid incomplete objects
+  fun documentToBooks(document: DocumentSnapshot): DataBook? {
     return try {
-      val title = document.getString("Title")!!
-      val author = document.getString("Author")!!
-      val description = document.getString("Description")!!
-      val rating = document.getString("Rating")!!
-      val photo = document.getString("Photo")!!
-      val isbn = document.getString("ISBN")!!
-      val languageBook = BookLanguages.valueOf(document.getString("Language")!!)
-      Result.success(
-          DataBook(
-              UUID.randomUUID(),
-              title,
-              author,
-              description,
-              rating.toInt(),
-              photo,
-              languageBook,
-              isbn))
+      val title = document.getString("Title") ?: return null
+      val author = document.getString("Author") ?: return null
+      val description = document.getString("Description") ?: return null
+      val rating = document.getString("Rating") ?: return null
+      val photo = document.getString("Photo") ?: return null
+      val isbn = document.getString("ISBN") ?: return null
+      val languageBook = BookLanguages.valueOf(document.getString("Language") ?: return null)
+      DataBook(
+        UUID.randomUUID(), title, author, description, rating.toInt(), photo, languageBook, isbn)
     } catch (e: Exception) {
-      Log.e("FirestoreSource", "Error converting document to Book: ${e.message}")
-      Result.failure(e)
+      null // Return null in case of any exception during the conversion
     }
   }
-  /**
-   * Helper function to perform Firestore operations (add, update, delete) Executes the provided
-   * Firestore task and triggers success or failure callbacks
-   *
-   * @param callback callback function that receives Result.success() when operation succeed of
-   *   Result.failure(exception) if error
-   */
-  private fun performFirestoreOperation(task: Task<Void>, callback: (Result<Unit>) -> Unit) {
+  // Helper function to perform Firestore operations (add, update, delete)
+  // Executes the provided Firestore task and triggers success or failure callbacks
+  private fun performFirestoreOperation(
+    task: Task<Void>,
+    OnSucess: () -> Unit,
+    OnFailure: (Exception) -> Unit
+  ) {
     task.addOnCompleteListener { result ->
       if (result.isSuccessful) {
-        callback(Result.success(Unit))
+        OnSucess()
       } else {
-        result.exception?.let { e -> callback(Result.failure(e)) }
+        result.exception?.let { e -> OnFailure(e) }
       }
     }
   }
