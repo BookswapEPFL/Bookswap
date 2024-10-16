@@ -18,7 +18,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.sharp.ArrowBack
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.rounded.AccountCircle
-import androidx.compose.material.icons.twotone.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -39,11 +38,12 @@ fun UserProfile(userVM: UserViewModel, modifier: Modifier = Modifier) {
   var showEditProfile by remember { mutableStateOf(false) }
 
   var needRecompose by remember { mutableStateOf(false) }
-  var mod = modifier
+  val mod = modifier
 
   if (showEditProfile) {
     EditProfileDialog(
         onDismiss = {
+          Log.d("EditProfile_Dismiss", "Edit profile alert dismissed")
           showEditProfile = false
           needRecompose = true
         },
@@ -53,16 +53,17 @@ fun UserProfile(userVM: UserViewModel, modifier: Modifier = Modifier) {
               firstName = it.firstName,
               lastName = it.lastName,
               email = it.email,
-              phone = it.phoneNumber)
+              phone = it.phoneNumber,
+              address = user.address,
+              picURL = user.profilePictureUrl)
           showEditProfile = false
           needRecompose = true
         },
-        user = user,
-        modifier = Modifier.testTag("editProfileDialogue"))
+        dataUser = user,
+        modifier = Modifier.testTag("editProfileAld"))
   }
 
   LaunchedEffect(userVM.uid, needRecompose) {
-    Log.d("LaunchedEffectTAG", "UserProfileScreen recomposed")
     user = userVM.getUser()
     needRecompose = false
   }
@@ -142,10 +143,7 @@ fun UserProfile(userVM: UserViewModel, modifier: Modifier = Modifier) {
 
                       // Save Button
                       Button(
-                          onClick = {
-                            showEditProfile = true
-                            Log.d("click", "UserProfile: edit")
-                          },
+                          onClick = { showEditProfile = true },
                           border = BorderStroke(1f.dp, Color(0xFFA98467)),
                           modifier = mod.testTag("editProfileBtn")) {
                             // Text displayed on the button

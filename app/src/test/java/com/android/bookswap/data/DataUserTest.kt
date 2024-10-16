@@ -7,10 +7,10 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
 import org.junit.Test
 
-class UserTest {
+class DataUserTest {
   @Test
   fun checkCreate() {
-    val u1 = User()
+    val u1 = DataUser()
     assertEquals(u1.greeting, "")
     assertEquals(u1.firstName, "")
     assertEquals(u1.lastName, "")
@@ -31,7 +31,7 @@ class UserTest {
     address.setCountryName("Switzerland")
     address.setAddressLine(0, "Rue de la Gare 1")
     userVM.updateUser(
-        User(
+        DataUser(
             "M.",
             "John",
             "Doe",
@@ -131,7 +131,7 @@ class UserTest {
             countryName = "Switzerland")
     address.setAddressLine(0, "Rue de la Gare 1")
     val usr =
-        User(
+        DataUser(
             "M.",
             "John",
             "Doe",
@@ -141,7 +141,7 @@ class UserTest {
             "dummyPic.png",
             "dummyUUID0000")
     userVM.updateUser(
-        User(
+        DataUser(
             "M.",
             "John",
             "Doe",

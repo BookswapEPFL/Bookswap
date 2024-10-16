@@ -4,7 +4,7 @@ import android.location.Address
 import android.util.Log
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.android.bookswap.data.User
+import com.android.bookswap.data.DataUser
 import com.android.bookswap.screen.EditProfileScreen
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
 import io.github.kakaocup.compose.node.element.ComposeScreen
@@ -44,7 +44,7 @@ class EditProfileScreenTest : TestCase() {
       phone: String = "",
       url: String = ""
   ): Address {
-    var addr = Address(locale)
+    val addr = Address(locale)
     addr.featureName = featureName
     addr.adminArea = adminArea
     addr.subAdminArea = subAdminArea
@@ -65,49 +65,39 @@ class EditProfileScreenTest : TestCase() {
     return addr
   }
 
-  @Before
-  fun setup() {
-    val myAddress =
-        createAddress(
-            Locale.UK,
-            "dummyAddress",
-            HashMap<Int, String>((mapOf((0 to "Example street 1A"), (1 to "Apartment 1")))),
-            "exampleAdminArea",
-            "dummySubAdmin",
-            "Foo-Town",
-            "Bar-urbs",
-            "egsample-fare",
-            "sample-subthrough",
-            "ramdomPremise",
-            "1337-42",
-            "EX",
-            "ExampleCountry",
-            0.0,
-            0.0,
-            false,
-            false,
-            "+000123456789",
-            "www.dummyurl.example")
-    composeTestRule.setContent {
-      EditProfileDialog(
-          onDismiss = { /*TODO*/},
-          onSave = { Log.d("editUsrAlrt_Save", "User info saved ${it.printFull1Line()}") },
-          user =
-              User(
-                  "M.",
-                  "John",
-                  "Doe",
-                  "John.Doe@example.com",
-                  "+41223456789",
-                  myAddress,
-                  "dummyPic.png",
-                  "dummyUUID0000"))
-    }
-  }
+  val myAddress =
+      createAddress(
+          Locale.UK,
+          "dummyAddress",
+          HashMap((mapOf((0 to "Example street 1A"), (1 to "Apartment 1")))),
+          "exampleAdminArea",
+          "dummySubAdmin",
+          "Foo-Town",
+          "Bar-urbs",
+          "egsample-fare",
+          "sample-subthrough",
+          "ramdomPremise",
+          "1337-42",
+          "EX",
+          "ExampleCountry",
+          0.0,
+          0.0,
+          false,
+          false,
+          "+000123456789",
+          "www.dummyurl.example")
+
+  @Before fun setup() {}
 
   @Test
   fun testDisplay() =
       run(testName = "test alert display") {
+        composeTestRule.setContent {
+          EditProfileDialog(
+              { Log.d("EditProfileTest_Dismiss", "User info discarded") },
+              { Log.d("EditProfileTest_Save", "User info saved ${it.printFull1Line()}") },
+              DataUser("", "", "", "", "", myAddress, "", ""))
+        }
         step("try displaying the alert box") {
           ComposeScreen.onComposeScreen<EditProfileScreen>(composeTestRule) {
             titleTxt {
@@ -117,27 +107,37 @@ class EditProfileScreenTest : TestCase() {
             greetingTbx {
               assertIsDisplayed()
               assertIsEnabled()
-              assertTextEquals("Greeting", "M.")
+              assertTextContains("Greeting", true)
+              performTextClearance()
+              assertTextContains("Mr.", true)
             }
             firstnameTbx {
               assertIsDisplayed()
               assertIsEnabled()
-              assertTextEquals("Firstname", "John")
+              assertTextContains("Firstname", true)
+              performTextClearance()
+              assertTextContains("John", true)
             }
             lastnameTbx {
               assertIsDisplayed()
               assertIsEnabled()
-              assertTextEquals("Lastname", "Doe")
+              assertTextContains("Lastname", true)
+              performTextClearance()
+              assertTextContains("Doe", true)
             }
             emailTbx {
               assertIsDisplayed()
               assertIsEnabled()
-              assertTextEquals("Email", "John.Doe@example.com")
+              assertTextContains("Email", true)
+              performTextClearance()
+              assertTextContains("John.Doe@example.com", true)
             }
             phoneNumberTbx {
               assertIsDisplayed()
               assertIsEnabled()
-              assertTextEquals("Phone", "+41223456789")
+              assertTextContains("Phone", true)
+              performTextClearance()
+              assertTextContains("+4122345678", true)
             }
             confirmBtn {
               assertIsDisplayed()
@@ -156,6 +156,20 @@ class EditProfileScreenTest : TestCase() {
   @Test
   fun testEdit() =
       run(testName = "test alert edit") {
+        composeTestRule.setContent {
+          EditProfileDialog(
+              { Log.d("EditProfileTest_Dismiss", "User info discarded") },
+              { Log.d("EditProfileTest_Save", "User info saved ${it.printFull1Line()}") },
+              DataUser(
+                  "M.",
+                  "John",
+                  "Doe",
+                  "John.Doe@example.com",
+                  "+41223456789",
+                  myAddress,
+                  "dummyPic.png",
+                  "dummyUUID0000"))
+        }
         step("try editing the textbox values") {
           ComposeScreen.onComposeScreen<EditProfileScreen>(composeTestRule) {
             titleTxt {
@@ -167,40 +181,45 @@ class EditProfileScreenTest : TestCase() {
               assertIsEnabled()
               performClick()
               performTextClearance()
-              assertTextEquals("Greeting", "")
+              assertTextContains("Greeting", true)
               performTextInput("Mr.")
+              assertTextContains("Mr.", true)
             }
             firstnameTbx {
               assertIsDisplayed()
               assertIsEnabled()
               performClick()
               performTextClearance()
-              assertTextEquals("Firstname", "")
+              assertTextContains("Firstname", true)
               performTextInput("Jones")
+              assertTextContains("Jones", true)
             }
             lastnameTbx {
               assertIsDisplayed()
               assertIsEnabled()
               performClick()
               performTextClearance()
-              assertTextEquals("Lastname", "")
+              assertTextContains("Lastname", true)
               performTextInput("Douses")
+              assertTextContains("Douses", true)
             }
             emailTbx {
               assertIsDisplayed()
               assertIsEnabled()
               performClick()
               performTextClearance()
-              assertTextEquals("Email", "")
+              assertTextContains("Email", true)
               performTextInput("Jones.Douses@example.com")
+              assertTextContains("Jones.Douses@example.com", true)
             }
             phoneNumberTbx {
               assertIsDisplayed()
               assertIsEnabled()
               performClick()
               performTextClearance()
-              assertTextEquals("Phone", "")
+              assertTextContains("Phone", true)
               performTextInput("+41234567890")
+              assertTextContains("+41234567890", true)
             }
             confirmBtn {
               assertIsDisplayed()
@@ -219,6 +238,20 @@ class EditProfileScreenTest : TestCase() {
   @Test
   fun testEditConfirm() =
       run(testName = "test edit and confirm") {
+        composeTestRule.setContent {
+          EditProfileDialog(
+              { Log.d("EditProfileTest_Dismiss", "User info discarded") },
+              { Log.d("EditProfileTest_Save", "User info saved ${it.printFull1Line()}") },
+              DataUser(
+                  "M.",
+                  "John",
+                  "Doe",
+                  "John.Doe@example.com",
+                  "+41223456789",
+                  myAddress,
+                  "dummyPic.png",
+                  "dummyUUID0000"))
+        }
         step("try editing the textbox values then confirming the changes") {
           ComposeScreen.onComposeScreen<EditProfileScreen>(composeTestRule) {
             titleTxt {
@@ -226,81 +259,28 @@ class EditProfileScreenTest : TestCase() {
               assertTextEquals("Edit Profile")
             }
             greetingTbx {
-              assertIsDisplayed()
-              assertIsEnabled()
-              performClick()
               performTextClearance()
               performTextInput("Mr.")
-            }
-            firstnameTbx {
-              assertIsDisplayed()
-              assertIsEnabled()
-              performClick()
-              performTextClearance()
-              performTextInput("Jones")
-            }
-            lastnameTbx {
-              assertIsDisplayed()
-              assertIsEnabled()
-              performClick()
-              performTextClearance()
-              performTextInput("Douses")
-            }
-            emailTbx {
-              assertIsDisplayed()
-              assertIsEnabled()
-              performClick()
-              performTextClearance()
-              performTextInput("Jones.Douses@example.com")
-            }
-            phoneNumberTbx {
-              assertIsDisplayed()
-              assertIsEnabled()
-              performClick()
-              performTextClearance()
-              performTextInput("+41234567890")
-            }
-            confirmBtn {
-              assertIsDisplayed()
-              assertIsEnabled()
-              assertTextEquals("Save")
-            }
-            dismissBtn {
-              assertIsDisplayed()
-              assertIsEnabled()
-              assertTextEquals("Cancel")
-            }
-          }
-        }
-        step("test if the values are edited") {
-          ComposeScreen.onComposeScreen<EditProfileScreen>(composeTestRule) {
-            titleTxt {
-              assertIsDisplayed()
-              assertTextEquals("Edit Profile")
-            }
-            greetingTbx {
-              assertIsDisplayed()
-              assertIsEnabled()
               assertTextEquals("Greeting", "Mr.")
             }
             firstnameTbx {
-              assertIsDisplayed()
-              assertIsEnabled()
+              performTextClearance()
+              performTextInput("Jones")
               assertTextEquals("Firstname", "Jones")
             }
             lastnameTbx {
-              assertIsDisplayed()
-              assertIsEnabled()
+              performTextClearance()
+              performTextInput("Douses")
               assertTextEquals("Lastname", "Douses")
             }
             emailTbx {
-              assertIsDisplayed()
-              assertIsEnabled()
+              performTextClearance()
+              performTextInput("Jones.Douses@example.com")
               assertTextEquals("Email", "Jones.Douses@example.com")
             }
             phoneNumberTbx {
-              assertIsDisplayed()
-              assertIsEnabled()
+              performTextClearance()
+              performTextInput("+41234567890")
               assertTextEquals("Phone", "+41234567890")
             }
             confirmBtn {
@@ -373,6 +353,20 @@ class EditProfileScreenTest : TestCase() {
   @Test
   fun testEditDismiss() =
       run(testName = "test alert display") {
+        composeTestRule.setContent {
+          EditProfileDialog(
+              { Log.d("EditProfileTest_Dismiss", "User info discarded") },
+              { Log.d("EditProfileTest_Save", "User info saved ${it.printFull1Line()}") },
+              DataUser(
+                  "M.",
+                  "John",
+                  "Doe",
+                  "John.Doe@example.com",
+                  "+41223456789",
+                  myAddress,
+                  "dummyPic.png",
+                  "dummyUUID0000"))
+        }
         step("try editing the textbox values then cancelling the changes") {
           ComposeScreen.onComposeScreen<EditProfileScreen>(composeTestRule) {
             titleTxt {

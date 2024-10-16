@@ -2,19 +2,19 @@ package com.android.bookswap.model
 
 import android.location.Address
 import androidx.lifecycle.ViewModel
-import com.android.bookswap.data.User
+import com.android.bookswap.data.DataUser
 
 open class UserViewModel(var email: String) : ViewModel() {
   var uid = "ERROR_UUID"
-  private var user = User(email = email)
+  private var dataUser = DataUser(email = email)
   private var isLoaded = false
   // private val firebaseConnection: FirebaseConnection = FirebaseConnection.getInstance()
 
-  open fun getUser(force: Boolean = false): User {
+  open fun getUser(force: Boolean = false): DataUser {
     if (!isLoaded || force) {
       fetchUser()
     }
-    return user
+    return dataUser
   }
 
   private fun fetchUser() {
@@ -93,23 +93,23 @@ open class UserViewModel(var email: String) : ViewModel() {
   }
 
   fun updateUser(
-      greeting: String = user.greeting,
-      firstName: String = user.firstName,
-      lastName: String = user.lastName,
-      email: String = user.email,
-      phone: String = user.phoneNumber,
-      address: Address = user.address,
-      picURL: String = user.profilePictureUrl
+      greeting: String = dataUser.greeting,
+      firstName: String = dataUser.firstName,
+      lastName: String = dataUser.lastName,
+      email: String = dataUser.email,
+      phone: String = dataUser.phoneNumber,
+      address: Address = dataUser.address,
+      picURL: String = dataUser.profilePictureUrl
   ) {
-    updateUser(User(greeting, firstName, lastName, email, phone, address, picURL, uid))
+    updateUser(DataUser(greeting, firstName, lastName, email, phone, address, picURL, uid))
     updateAddress(address, {})
     // firebaseConnection.storeData("users", uid, this.user)
   }
 
-  fun updateUser(newUser: User) {
-    this.user = newUser
-    updateAddress(newUser.address, {})
-    this.uid = newUser.userId
+  fun updateUser(newDataUser: DataUser) {
+    this.dataUser = newDataUser
+    updateAddress(newDataUser.address, {})
+    this.uid = newDataUser.userId
     // firebaseConnection.storeData("users", uid, this.user)
   }
 
@@ -173,6 +173,6 @@ open class UserViewModel(var email: String) : ViewModel() {
   }
 
   fun updateAddress(newAddress: Address, onComplete: () -> Unit) {
-    this.user.address = newAddress
+    this.dataUser.address = newAddress
   }
 }

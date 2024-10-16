@@ -3,7 +3,7 @@ package com.android.bookswap.data
 import android.location.Address
 import java.util.Locale
 
-data class User(
+data class DataUser(
     var greeting: String = "",
     var firstName: String = "",
     var lastName: String = "",

@@ -7,8 +7,7 @@ import io.github.kakaocup.compose.node.element.KNode
 class EditProfileScreen(semanticsProvider: SemanticsNodeInteractionsProvider) :
     ComposeScreen<EditProfileScreen>(
         semanticsProvider = semanticsProvider,
-        viewBuilderAction = { hasTestTag("editProfileAlert") }) {
-
+        viewBuilderAction = { hasTestTag("editProfileContainer") }) {
   val titleTxt: KNode = child { hasTestTag("editProfileTitleTxt") }
   val greetingTbx: KNode = child { hasTestTag("greetingTbx") }
   val firstnameTbx: KNode = child { hasTestTag("firstnameTbx") }
