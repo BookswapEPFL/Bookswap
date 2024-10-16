@@ -81,12 +81,12 @@ class GoogleBookDataSourceTest {
             rating = null,
             photo = "image2",
             language = BookLanguages.ENGLISH,
-            isbn = "9780435123432")
+            isbn = "9780435123437")
 
     val mockGoogleBookDataSource = mock(GoogleBookDataSource::class.java)
     `when`(mockGoogleBookDataSource.parseISBNResponse(jsonBook)).thenCallRealMethod()
 
-    assertDataBookEqual(dataBook, mockGoogleBookDataSource.parseISBNResponse(jsonBook).getOrNull())
+    assertBookEquals(dataBook, mockGoogleBookDataSource.parseISBNResponse(jsonBook).getOrNull())
   }
 
   @Test
@@ -104,7 +104,7 @@ class GoogleBookDataSourceTest {
     val missingTitleJson =
         """
       {
-        "kind": assertEquals"books#volumes",
+        "kind": "books#volumes",
         "totalItems": 1,
         "items": [
           {
@@ -207,23 +207,22 @@ class GoogleBookDataSourceTest {
             rating = null,
             photo = null,
             language = BookLanguages.OTHER,
-            isbn = "9780435123432")
+            isbn = "9780435123437")
 
     val mockGoogleBookDataSource = mock(GoogleBookDataSource::class.java)
     `when`(mockGoogleBookDataSource.parseISBNResponse(anyString())).thenCallRealMethod()
 
-    assertDataBookEqual(
-        dataBook, mockGoogleBookDataSource.parseISBNResponse(fieldsEmpty).getOrNull())
-    assertDataBookEqual(dataBook, mockGoogleBookDataSource.parseISBNResponse(listEmpty).getOrNull())
+    assertBookEquals(dataBook, mockGoogleBookDataSource.parseISBNResponse(fieldsEmpty).getOrNull())
+    assertBookEquals(dataBook, mockGoogleBookDataSource.parseISBNResponse(listEmpty).getOrNull())
   }
 
   /**
-   * Assert that two books are equal without comparing the uuid.
+   * Assert that two books are identical except for their UUID
    *
-   * @param expected the expected book
-   * @param result the received book, with it's uuid replaced to be the same as expected uuid
+   * @param expected the expected result
+   * @param result the result with it's UUID modified to match the UUID of expected
    */
-  private fun assertDataBookEqual(expected: DataBook, result: DataBook?) {
+  private fun assertBookEquals(expected: DataBook, result: DataBook?) {
     assertEquals(expected, result?.copy(uuid = expected.uuid))
   }
 }
