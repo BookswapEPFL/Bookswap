@@ -1,5 +1,6 @@
-package com.android.bookswap.ui.add
+package com.android.bookswap.ui.books.add
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -29,30 +30,30 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.android.bookswap.models.chat.MessageBox
+import com.android.bookswap.data.source.api.GoogleBookDataSource
 import com.android.bookswap.ui.components.ButtonComponent
 import com.android.bookswap.ui.components.FieldComponent
+import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.profile.ProfileIcon
-import com.android.bookswap.ui.theme.Accent
-import com.android.bookswap.ui.theme.BackGround
+import com.android.bookswap.ui.theme.ColorVariable
 
 /** This is the main screen for the chat feature. It displays the list of messages */
 @OptIn(ExperimentalMaterial3Api::class)
-@Preview
 @Composable
-fun AddISBNScreen(placeHolderData: List<MessageBox> = emptyList()) {
+fun AddISBNScreen(navigationActions: NavigationActions) {
+  val context = LocalContext.current
   Scaffold(
       topBar = {
         MediumTopAppBar(
             colors =
                 TopAppBarDefaults.topAppBarColors(
-                    containerColor = BackGround,
+                    containerColor = ColorVariable.BackGround,
                 ),
             title = {
               Box(modifier = Modifier) {
@@ -60,13 +61,13 @@ fun AddISBNScreen(placeHolderData: List<MessageBox> = emptyList()) {
                     horizontalArrangement = Arrangement.Center,
                     modifier = Modifier.fillMaxWidth(0.85f)) {
                       IconButton(
-                          onClick = { /*TODO*/},
+                          onClick = { /*TODO navigate back*/},
                           modifier = Modifier.testTag("go_back_button"),
                       ) {
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Back Icon",
-                            tint = Accent,
+                            tint = ColorVariable.Accent,
                             modifier = Modifier.size(64.dp),
                         )
                       }
@@ -77,7 +78,7 @@ fun AddISBNScreen(placeHolderData: List<MessageBox> = emptyList()) {
                                   fontSize = 30.sp,
                                   lineHeight = 20.sp,
                                   fontWeight = FontWeight(700),
-                                  color = Accent,
+                                  color = ColorVariable.Accent,
                                   letterSpacing = 0.3.sp,
                               ),
                           modifier = Modifier.padding(top = 4.dp))
@@ -89,34 +90,52 @@ fun AddISBNScreen(placeHolderData: List<MessageBox> = emptyList()) {
       content = { pv ->
         Box(
             modifier =
-                Modifier.fillMaxSize().padding(pv).padding().background(color = BackGround)) {
+                Modifier.fillMaxSize()
+                    .padding(pv)
+                    .padding()
+                    .background(color = ColorVariable.BackGround)) {
               var isbn by remember { mutableStateOf("") }
 
               Column(
-                  modifier = Modifier.fillMaxWidth().padding(top = 40.dp).testTag("isbn_fields"),
+                  modifier = Modifier.fillMaxWidth().padding(top = 40.dp),
                   horizontalAlignment = Alignment.CenterHorizontally,
                   verticalArrangement = Arrangement.spacedBy(45.dp)) {
-                    FieldComponent("ISBN*", value = isbn) {
-                      if (it.all { c -> c.isDigit() }) {
-                        isbn = it
-                      }
-                    }
-                    ButtonComponent({}) {
-                      Row(Modifier.fillMaxWidth()) {
-                        Text("Search", style = TextStyle(color = Color.White))
-                        Spacer(Modifier.weight(1f))
-                        Icon(
-                            Icons.Filled.Search,
-                            contentDescription = "Search icon",
-                            tint = Color.White,
-                        )
-                      }
-                    }
+                    FieldComponent(
+                        modifier = Modifier.testTag("isbn_field"),
+                        labelText = "ISBN*",
+                        value = isbn) {
+                          if (it.all { c -> c.isDigit() } && it.length <= 13) {
+                            isbn = it
+                          }
+                        }
+                    ButtonComponent(
+                        modifier = Modifier.testTag("isbn_searchButton"),
+                        onClick = {
+                          GoogleBookDataSource(context).getBookFromISBN(isbn) { result ->
+                            if (result.isFailure) {
+                              Log.e("AddBook", result.exceptionOrNull().toString())
+                            } else {
+                              /** TODO: Add book */
+                              // navigationActions.navigateTo() TODO: currently there is no top
+                              // level for the book list
+                            }
+                          }
+                        }) {
+                          Row(Modifier.fillMaxWidth()) {
+                            Text("Search", style = TextStyle(color = Color.White))
+                            Spacer(Modifier.weight(1f))
+                            Icon(
+                                Icons.Filled.Search,
+                                contentDescription = "Search icon",
+                                tint = Color.White,
+                            )
+                          }
+                        }
                   }
             }
       },
       bottomBar = {
         // TODO: Change to navbar
-        BottomAppBar(modifier = Modifier.background(color = BackGround)) {}
+        BottomAppBar(modifier = Modifier.background(color = ColorVariable.BackGround)) {}
       })
 }
