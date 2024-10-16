@@ -35,7 +35,6 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import com.android.bookswap.data.DataMessage
 import com.android.bookswap.data.repository.MessageRepository
-import com.android.bookswap.data.source.network.MessageFirestoreSource
 import com.android.bookswap.ui.theme.ColorVariable
 import com.google.firebase.firestore.ListenerRegistration
 import java.text.SimpleDateFormat

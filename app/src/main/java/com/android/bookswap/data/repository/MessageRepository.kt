@@ -34,7 +34,6 @@ interface MessageRepository {
    */
   fun sendMessage(message: DataMessage, callback: (Result<Unit>) -> Unit)
 
-
   /**
    * Add a listener to the repository to get messages in real-time
    *
@@ -46,5 +45,6 @@ interface MessageRepository {
   fun addMessagesListener(
       otherUserId: String,
       currentUserId: String,
-      callback: (Result<List<DataMessage>>) -> Unit): ListenerRegistration
+      callback: (Result<List<DataMessage>>) -> Unit
+  ): ListenerRegistration
 }

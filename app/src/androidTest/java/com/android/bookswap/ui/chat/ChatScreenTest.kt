@@ -1,6 +1,5 @@
 package com.android.bookswap.ui.chat
 
-import android.location.GnssAntennaInfo.Listener
 import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextEquals
@@ -19,6 +18,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mockito.mock
+
 class ChatScreenTest {
 
   @get:Rule val composeTestRule = createComposeRule()
@@ -38,9 +38,8 @@ class ChatScreenTest {
               text = "Test message $it",
               timestamp = System.currentTimeMillis())
         }
-      mockMessageRepository = MockMessageFirestoreSource().apply {
-          messages = placeHolderData.toMutableList()
-      }
+    mockMessageRepository =
+        MockMessageFirestoreSource().apply { messages = placeHolderData.toMutableList() }
   }
 
   private val palette =
@@ -73,17 +72,15 @@ class ChatScreenTest {
 
   @Test
   fun hasRequiredComponentsAndShowsMessages() {
-      val mockMessageRepository = MockMessageFirestoreSource().apply {
-          messages = placeHolderData.toMutableList()
-      }
+    val mockMessageRepository =
+        MockMessageFirestoreSource().apply { messages = placeHolderData.toMutableList() }
 
-      composeTestRule.setContent {
-          ChatScreen(
-              messageRepository = mockMessageRepository,
-              currentUserId = currentUserId,
-              otherUserId = otherUserId
-          )
-      }
+    composeTestRule.setContent {
+      ChatScreen(
+          messageRepository = mockMessageRepository,
+          currentUserId = currentUserId,
+          otherUserId = otherUserId)
+    }
     composeTestRule.onNodeWithTag("message_input_field").assertIsDisplayed()
     composeTestRule.onNodeWithTag("send_button").assertIsDisplayed()
     placeHolderData.forEach { message ->
@@ -121,33 +118,30 @@ class ChatScreenTest {
     composeTestRule.onNodeWithTag("message_input_field").assertTextEquals(testInput)
   }
 
-    @Test
-    fun testSendMessage() {
-        val testMessageId = "test-message-id"
-        val mockMessageRepository = MockMessageFirestoreSource().apply {
-            mockNewUid = testMessageId
-        }
+  @Test
+  fun testSendMessage() {
+    val testMessageId = "test-message-id"
+    val mockMessageRepository = MockMessageFirestoreSource().apply { mockNewUid = testMessageId }
 
-        composeTestRule.setContent {
-            ChatScreen(
-                messageRepository = mockMessageRepository,
-                currentUserId = currentUserId,
-                otherUserId = otherUserId
-            )
-        }
-
-        val testInput = "Hello, World!"
-
-        composeTestRule.onNodeWithTag("message_input_field").performTextInput(testInput)
-        composeTestRule.onNodeWithTag("send_button").performClick()
-
-        // Verify that the message was sent
-        val sentMessage = mockMessageRepository.messages.find { it.id == testMessageId }
-        assert(sentMessage != null) { "Message was not sent" }
-        assert(sentMessage?.text == testInput) { "Message text does not match" }
-        assert(sentMessage?.senderId == currentUserId) { "Sender ID does not match" }
-        assert(sentMessage?.receiverId == otherUserId) { "Receiver ID does not match" }
+    composeTestRule.setContent {
+      ChatScreen(
+          messageRepository = mockMessageRepository,
+          currentUserId = currentUserId,
+          otherUserId = otherUserId)
     }
+
+    val testInput = "Hello, World!"
+
+    composeTestRule.onNodeWithTag("message_input_field").performTextInput(testInput)
+    composeTestRule.onNodeWithTag("send_button").performClick()
+
+    // Verify that the message was sent
+    val sentMessage = mockMessageRepository.messages.find { it.id == testMessageId }
+    assert(sentMessage != null) { "Message was not sent" }
+    assert(sentMessage?.text == testInput) { "Message text does not match" }
+    assert(sentMessage?.senderId == currentUserId) { "Sender ID does not match" }
+    assert(sentMessage?.receiverId == otherUserId) { "Receiver ID does not match" }
+  }
 
   @Test
   fun testAllColorsBelongToPalette() {
@@ -171,40 +165,38 @@ class ChatScreenTest {
     }
   }
 
-    class MockMessageFirestoreSource : MessageRepository {
-        var mockNewUid: String = "mock-uid"
-        var messages: MutableList<DataMessage> = mutableListOf()
-        private var sendMessageResult: Result<Unit> = Result.success(Unit)
+  class MockMessageFirestoreSource : MessageRepository {
+    var mockNewUid: String = "mock-uid"
+    var messages: MutableList<DataMessage> = mutableListOf()
+    private var sendMessageResult: Result<Unit> = Result.success(Unit)
 
-        override fun init(callback: (Result<Unit>) -> Unit) {
-            callback(Result.success(Unit))
-        }
-
-        override fun getNewUid(): String {
-            return mockNewUid
-        }
-
-        override fun getMessages(callback: (Result<List<DataMessage>>) -> Unit) {
-            callback(Result.success(messages))
-        }
-
-        override fun sendMessage(message: DataMessage, callback: (Result<Unit>) -> Unit) {
-            messages.add(message)
-            callback(sendMessageResult)
-        }
-
-        override fun addMessagesListener(
-            otherUserId: String,
-            currentUserId: String,
-            callback: (Result<List<DataMessage>>) -> Unit
-        ): ListenerRegistration {
-            requireNotNull(otherUserId) { "otherUserId must not be null" }
-            requireNotNull(currentUserId) { "currentUserId must not be null" }
-
-            callback(Result.success(messages)) // Or whatever logic you'd like to simulate
-            return mock(ListenerRegistration::class.java)
-        }
+    override fun init(callback: (Result<Unit>) -> Unit) {
+      callback(Result.success(Unit))
     }
+
+    override fun getNewUid(): String {
+      return mockNewUid
+    }
+
+    override fun getMessages(callback: (Result<List<DataMessage>>) -> Unit) {
+      callback(Result.success(messages))
+    }
+
+    override fun sendMessage(message: DataMessage, callback: (Result<Unit>) -> Unit) {
+      messages.add(message)
+      callback(sendMessageResult)
+    }
+
+    override fun addMessagesListener(
+        otherUserId: String,
+        currentUserId: String,
+        callback: (Result<List<DataMessage>>) -> Unit
+    ): ListenerRegistration {
+      requireNotNull(otherUserId) { "otherUserId must not be null" }
+      requireNotNull(currentUserId) { "currentUserId must not be null" }
+
+      callback(Result.success(messages)) // Or whatever logic you'd like to simulate
+      return mock(ListenerRegistration::class.java)
+    }
+  }
 }
-
-
