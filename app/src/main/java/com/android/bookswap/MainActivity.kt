@@ -17,6 +17,7 @@ import androidx.navigation.navigation
 import com.android.bookswap.data.BookLanguages
 import com.android.bookswap.data.DataBook
 import com.android.bookswap.resources.C
+import com.android.bookswap.ui.authentication.SignInScreen
 import com.android.bookswap.ui.map.MapScreen
 import com.android.bookswap.ui.map.TempUser
 import com.android.bookswap.ui.navigation.NavigationActions
@@ -47,7 +48,7 @@ class MainActivity : ComponentActivity() {
 
     NavHost(navController = navController, startDestination = Route.AUTH) {
       navigation(startDestination = Screen.AUTH, route = Route.AUTH) {
-        composable(Screen.AUTH) { /*Todo*/}
+        composable(Screen.AUTH) { SignInScreen(navigationActions) } // *Todo*/}
       }
       navigation(startDestination = Screen.CHATLIST, route = Route.CHAT) {
         composable(Screen.CHATLIST) { /*Todo*/}

@@ -36,7 +36,7 @@ firebaseUiAuth = "8.0.0"
 # Google Service and Maps
 playServicesAuth = "21.2.0"
 playServicesMaps = "19.0.0"
-
+espressoIntents = "3.6.1"
 navigationCompose = "2.8.2"
 volley = "1.2.1" # HTTP request
 json = "20240303" #Json parsing
@@ -91,6 +91,7 @@ play-services-maps = { module = "com.google.android.gms:play-services-maps", ver
 robolectric = { module = "org.robolectric:robolectric", version.ref = "robolectric" }
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
 
+androidx-espresso-intents = { group = "androidx.test.espresso", name = "espresso-intents", version.ref = "espressoIntents" }
 volley = { module = "com.android.volley:volley", version.ref = "volley" }
 json = { module = "org.json:json", version.ref = "json" }
 
