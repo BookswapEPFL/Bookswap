@@ -34,6 +34,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import com.android.bookswap.data.DataMessage
+import com.android.bookswap.data.repository.MessageRepository
 import com.android.bookswap.data.source.network.MessageFirestoreSource
 import com.android.bookswap.ui.theme.ColorVariable
 import com.google.firebase.firestore.ListenerRegistration
@@ -43,7 +44,7 @@ import java.util.Locale
 
 @Composable
 fun ChatScreen(
-    messageRepository: MessageFirestoreSource,
+    messageRepository: MessageRepository,
     currentUserId: String, // To identify the current user for aligning messages
     otherUserId: String
 ) {
