@@ -7,9 +7,17 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Looper
 import androidx.annotation.RequiresApi
+import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.core.app.ActivityCompat
-import com.google.android.gms.location.*
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationCallback
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationResult
+import com.google.android.gms.location.LocationServices
+
+const val REQUEST_LOCATION_PERMISSION = 1
+const val BACKGROUND_LOCATION_PERMISSION_REQUEST_CODE = 2
 
 /**
  * Geolocation class manages the geolocation functionality and handles the required permissions for
@@ -23,16 +31,13 @@ import com.google.android.gms.location.*
  * optionally background location access.
  */
 class Geolocation(private val activity: Activity) {
-
-  private val REQUEST_LOCATION_PERMISSION = 1
-  private val BACKGROUND_LOCATION_PERMISSION_REQUEST_CODE = 2
   private val fusedLocationClient: FusedLocationProviderClient =
       LocationServices.getFusedLocationProviderClient(activity)
   val isRunning = mutableStateOf(false)
-  val latitude = mutableStateOf(Double.NaN) // Change to MutableState
-  val longitude = mutableStateOf(Double.NaN)
+  val latitude = mutableDoubleStateOf(Double.NaN)
+  val longitude = mutableDoubleStateOf(Double.NaN)
 
-  // Location request settings
+  /** Location request settings */
   private val locationRequest: LocationRequest =
       LocationRequest.create().apply {
         interval = 10000 // Update interval in milliseconds
@@ -43,16 +48,16 @@ class Geolocation(private val activity: Activity) {
   private val locationCallback =
       object : LocationCallback() {
         override fun onLocationResult(p0: LocationResult) {
-          p0.lastLocation?.let { location ->
+          p0.lastLocation.let { location ->
             // Handle the updated location here
-            latitude.value = location.latitude
-            longitude.value = location.longitude
+            latitude.doubleValue = location.latitude
+            longitude.doubleValue = location.longitude
             // You can save this location or notify other parts of your app
           }
         }
       }
 
-  // Request location permissions
+  /** Request location permissions */
   private fun requestLocationPermissions() {
     val permissions =
         arrayOf(
@@ -60,7 +65,7 @@ class Geolocation(private val activity: Activity) {
     ActivityCompat.requestPermissions(activity, permissions, REQUEST_LOCATION_PERMISSION)
   }
 
-  // Check if permissions are granted
+  /** Check if permissions are granted */
   private fun hasLocationPermissions(): Boolean {
     return ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_FINE_LOCATION) ==
         PackageManager.PERMISSION_GRANTED &&
@@ -82,7 +87,7 @@ class Geolocation(private val activity: Activity) {
         PackageManager.PERMISSION_GRANTED
   }
 
-  // Start location updates
+  /** Start location updates */
   @SuppressLint("MissingPermission")
   fun startLocationUpdates() {
     if (!isRunning.value) {
@@ -105,7 +110,7 @@ class Geolocation(private val activity: Activity) {
     }
   }
 
-  // Stop location updates
+  /** Stop location updates */
   fun stopLocationUpdates() {
     fusedLocationClient.removeLocationUpdates(locationCallback)
     isRunning.value = false
