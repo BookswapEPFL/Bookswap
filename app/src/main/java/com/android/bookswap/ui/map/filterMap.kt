@@ -1,5 +1,6 @@
 package com.android.bookswap.ui.map
 
+import android.widget.Toast
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -25,14 +26,15 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.android.bookswap.data.LIST_BOOK_GENRES
-import com.android.bookswap.data.LIST_BOOK_LANGUAGES
+import com.android.bookswap.data.BookGenres
+import com.android.bookswap.data.BookLanguages
 import com.android.bookswap.ui.navigation.BackButton
 import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.theme.ColorVariable
@@ -46,11 +48,17 @@ private val TOP_BAR_TITLE_LINE_HEIGHT = 20.sp
 private val TOP_BAR_TITLE_LETTER_SPACING = 0.3.sp
 private val TOP_BAR_TITLE_FONT_WEIGHT = FontWeight(700)
 
-/** This is the main screen for the filter feature. It displays the filters */
+/**
+ * This is the main screen for the filter feature. It displays the filters The parameter is
+ * temporary and will be replaced with the actual data model
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FilterMapScreen(navigationActions: NavigationActions, selectedFilters: MutableList<Any>) {
-  val selectedFiltersTemp = remember { mutableStateListOf<Any>() }
+  val selectedFiltersTemp = remember {
+    mutableStateListOf<Any>()
+  } // Use to store the selected filters before putting it in the VM
+  val context = LocalContext.current
   Scaffold(
       containerColor = ColorVariable.BackGround,
       topBar = {
@@ -81,7 +89,7 @@ fun FilterMapScreen(navigationActions: NavigationActions, selectedFilters: Mutab
         LazyColumn(contentPadding = paddingValues, modifier = Modifier.fillMaxSize()) {
           item {
             ButtonBlock(
-                LIST_BOOK_GENRES.map {
+                BookGenres.values().map {
                   it.toString().lowercase().replaceFirstChar { c -> c.uppercase() }
                 },
                 selectedFiltersTemp)
@@ -89,7 +97,7 @@ fun FilterMapScreen(navigationActions: NavigationActions, selectedFilters: Mutab
           item {
             ButtonBlock(
                 buttonTexts =
-                    LIST_BOOK_LANGUAGES.map {
+                    BookLanguages.values().map {
                       it.toString().lowercase().replaceFirstChar { c -> c.uppercase() }
                     },
                 selectedFiltersTemp)
@@ -102,6 +110,7 @@ fun FilterMapScreen(navigationActions: NavigationActions, selectedFilters: Mutab
             Button(
                 onClick = {
                   selectedFilters.addAll(selectedFiltersTemp)
+                  Toast.makeText(context, "Filters applied", Toast.LENGTH_SHORT).show()
                   navigationActions.goBack()
                 },
                 colors = ButtonDefaults.buttonColors(ColorVariable.Primary),
@@ -129,6 +138,7 @@ private val BUTTON_PADDING_BB = 1.dp
 private val BUTTON_SHAPE_BB = RoundedCornerShape(25.dp)
 private val HORIZONTAL_PADDING_BB = 37.dp
 private val VERTICAL_PADDING_BB = 20.dp
+private const val MAX_ITEMS_PER_ROW_BB = 3
 
 /** This is a composable that displays a row of buttons */
 @OptIn(ExperimentalLayoutApi::class)
@@ -142,7 +152,7 @@ fun ButtonBlock(buttonTexts: List<String>, selectedFilters: MutableList<Any>) {
                   start = HORIZONTAL_PADDING_BB,
                   end = HORIZONTAL_PADDING_BB,
                   bottom = VERTICAL_PADDING_BB),
-      maxItemsInEachRow = 3) {
+      maxItemsInEachRow = MAX_ITEMS_PER_ROW_BB) {
         buttonTexts.forEach { text ->
           val isSelected = selectedFilters.contains(text)
 
