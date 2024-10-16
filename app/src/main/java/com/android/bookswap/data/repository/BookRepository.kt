@@ -45,9 +45,9 @@ interface BooksRepository {
   // succeeds.
   // - onFailure: A callback function that receives an exception if the operation fails.
   fun deleteBooks(
-    id: String,
-    dataBook: DataBook,
-    OnSucess: () -> Unit,
-    onFailure: (Exception) -> Unit
+      id: String,
+      dataBook: DataBook,
+      OnSucess: () -> Unit,
+      onFailure: (Exception) -> Unit
   )
 }

@@ -36,15 +36,15 @@ class BooksFirestoreRepositoryTest {
   private lateinit var booksFirestorerRepository: BooksFirestoreRepository
 
   private val testBook =
-    DataBook(
-      uuid = UUID.randomUUID(),
-      title = "Test Book",
-      author = "Test Author",
-      description = "Test Description",
-      rating = 5,
-      photo = "http://example.com/photo.jpg",
-      language = BookLanguages.ENGLISH,
-      isbn = "1234567890")
+      DataBook(
+          uuid = UUID.randomUUID(),
+          title = "Test Book",
+          author = "Test Author",
+          description = "Test Description",
+          rating = 5,
+          photo = "http://example.com/photo.jpg",
+          language = BookLanguages.ENGLISH,
+          isbn = "1234567890")
 
   @Before
   fun setUp() {
@@ -59,7 +59,7 @@ class BooksFirestoreRepositoryTest {
 
     `when`(mockFirestore.collection(ArgumentMatchers.any())).thenReturn(mockCollectionReference)
     `when`(mockCollectionReference.document(ArgumentMatchers.any()))
-      .thenReturn(mockDocumentReference)
+        .thenReturn(mockDocumentReference)
     `when`(mockCollectionReference.get()).thenReturn(Tasks.forResult(mockQuerySnapshot))
   }
 
@@ -77,12 +77,12 @@ class BooksFirestoreRepositoryTest {
 
     // Act
     booksFirestorerRepository.getBook(
-      OnSucess = { books ->
-        // Assert that the fetched books match the expected values
-        assert(books.isNotEmpty())
-        assert(books.first().title == testBook.title)
-      },
-      onFailure = { fail("Should not fail") })
+        OnSucess = { books ->
+          // Assert that the fetched books match the expected values
+          assert(books.isNotEmpty())
+          assert(books.first().title == testBook.title)
+        },
+        onFailure = { fail("Should not fail") })
 
     // Verify that Firestore collection was called
     verify(mockCollectionReference).get()
@@ -107,12 +107,12 @@ class BooksFirestoreRepositoryTest {
 
     // Act
     booksFirestorerRepository.addBook(
-      testBook,
-      {
-        // Assert success callback
-        assert(true)
-      },
-      { fail("Should not fail") })
+        testBook,
+        {
+          // Assert success callback
+          assert(true)
+        },
+        { fail("Should not fail") })
 
     // Verify Firestore set operation
     verify(mockDocumentReference).set(testBook)
@@ -125,12 +125,12 @@ class BooksFirestoreRepositoryTest {
 
     // Act
     booksFirestorerRepository.updateBook(
-      testBook,
-      {
-        // Assert success callback
-        assert(true)
-      },
-      { fail("Should not fail") })
+        testBook,
+        {
+          // Assert success callback
+          assert(true)
+        },
+        { fail("Should not fail") })
 
     // Verify Firestore update operation
     verify(mockDocumentReference).set(testBook)

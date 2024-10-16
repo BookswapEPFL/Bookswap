@@ -47,28 +47,28 @@ class BooksFirestoreRepository(private val db: FirebaseFirestore) : BooksReposit
   // Calls OnSuccess if the operation is successful, otherwise onFailure with the exception
   override fun addBook(dataBook: DataBook, OnSucess: () -> Unit, onFailure: (Exception) -> Unit) {
     performFirestoreOperation(
-      db.collection(collectionBooks).document(dataBook.title).set(dataBook), OnSucess, onFailure)
+        db.collection(collectionBooks).document(dataBook.title).set(dataBook), OnSucess, onFailure)
   }
   // Updates an existing book in Firestore by replacing the document with the same title
   // Uses performFirestoreOperation to handle success and failure
   override fun updateBook(
-    dataBook: DataBook,
-    OnSucess: () -> Unit,
-    onFailure: (Exception) -> Unit
+      dataBook: DataBook,
+      OnSucess: () -> Unit,
+      onFailure: (Exception) -> Unit
   ) {
     performFirestoreOperation(
-      db.collection(collectionBooks).document(dataBook.title).set(dataBook), OnSucess, onFailure)
+        db.collection(collectionBooks).document(dataBook.title).set(dataBook), OnSucess, onFailure)
   }
   // Deletes a book from Firestore by its title
   // Uses performFirestoreOperation to handle success and failure
   override fun deleteBooks(
-    id: String,
-    dataBook: DataBook,
-    OnSucess: () -> Unit,
-    onFailure: (Exception) -> Unit
+      id: String,
+      dataBook: DataBook,
+      OnSucess: () -> Unit,
+      onFailure: (Exception) -> Unit
   ) {
     performFirestoreOperation(
-      db.collection(collectionBooks).document(dataBook.isbn!!).delete(), OnSucess, onFailure)
+        db.collection(collectionBooks).document(dataBook.isbn!!).delete(), OnSucess, onFailure)
   }
   // Maps a Firestore document to a DataBook object
   // If any required field is missing, returns null to avoid incomplete objects
@@ -82,7 +82,7 @@ class BooksFirestoreRepository(private val db: FirebaseFirestore) : BooksReposit
       val isbn = document.getString("ISBN") ?: return null
       val languageBook = BookLanguages.valueOf(document.getString("Language") ?: return null)
       DataBook(
-        UUID.randomUUID(), title, author, description, rating.toInt(), photo, languageBook, isbn)
+          UUID.randomUUID(), title, author, description, rating.toInt(), photo, languageBook, isbn)
     } catch (e: Exception) {
       null // Return null in case of any exception during the conversion
     }
@@ -90,9 +90,9 @@ class BooksFirestoreRepository(private val db: FirebaseFirestore) : BooksReposit
   // Helper function to perform Firestore operations (add, update, delete)
   // Executes the provided Firestore task and triggers success or failure callbacks
   private fun performFirestoreOperation(
-    task: Task<Void>,
-    OnSucess: () -> Unit,
-    OnFailure: (Exception) -> Unit
+      task: Task<Void>,
+      OnSucess: () -> Unit,
+      OnFailure: (Exception) -> Unit
   ) {
     task.addOnCompleteListener { result ->
       if (result.isSuccessful) {
