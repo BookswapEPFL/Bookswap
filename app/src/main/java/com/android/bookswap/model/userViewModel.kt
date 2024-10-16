@@ -98,17 +98,17 @@ open class UserViewModel(var email: String) : ViewModel() {
       lastName: String = dataUser.lastName,
       email: String = dataUser.email,
       phone: String = dataUser.phoneNumber,
-      address: Address = dataUser.address,
+      latitude: Double = dataUser.latitude,
+      longitude: Double = dataUser.longitude,
       picURL: String = dataUser.profilePictureUrl
   ) {
-    updateUser(DataUser(greeting, firstName, lastName, email, phone, address, picURL, uid))
-    updateAddress(address, {})
+    updateUser(
+        DataUser(greeting, firstName, lastName, email, phone, latitude, longitude, picURL, uid))
     // firebaseConnection.storeData("users", uid, this.user)
   }
 
   fun updateUser(newDataUser: DataUser) {
     this.dataUser = newDataUser
-    updateAddress(newDataUser.address, {})
     this.uid = newDataUser.userId
     // firebaseConnection.storeData("users", uid, this.user)
   }
@@ -170,9 +170,5 @@ open class UserViewModel(var email: String) : ViewModel() {
         }
     }
     */
-  }
-
-  fun updateAddress(newAddress: Address, onComplete: () -> Unit) {
-    this.dataUser.address = newAddress
   }
 }

@@ -96,7 +96,7 @@ class EditProfileScreenTest : TestCase() {
           EditProfileDialog(
               { Log.d("EditProfileTest_Dismiss", "User info discarded") },
               { Log.d("EditProfileTest_Save", "User info saved ${it.printFull1Line()}") },
-              DataUser("", "", "", "", "", myAddress, "", ""))
+              DataUser("", "", "", "", "", 0.0, 0.0, "", ""))
         }
         step("try displaying the alert box") {
           ComposeScreen.onComposeScreen<EditProfileScreen>(composeTestRule) {
@@ -166,7 +166,8 @@ class EditProfileScreenTest : TestCase() {
                   "Doe",
                   "John.Doe@example.com",
                   "+41223456789",
-                  myAddress,
+                  0.0,
+                  0.0,
                   "dummyPic.png",
                   "dummyUUID0000"))
         }
@@ -248,7 +249,8 @@ class EditProfileScreenTest : TestCase() {
                   "Doe",
                   "John.Doe@example.com",
                   "+41223456789",
-                  myAddress,
+                  0.0,
+                  0.0,
                   "dummyPic.png",
                   "dummyUUID0000"))
         }
@@ -363,7 +365,8 @@ class EditProfileScreenTest : TestCase() {
                   "Doe",
                   "John.Doe@example.com",
                   "+41223456789",
-                  myAddress,
+                  0.0,
+                  0.0,
                   "dummyPic.png",
                   "dummyUUID0000"))
         }

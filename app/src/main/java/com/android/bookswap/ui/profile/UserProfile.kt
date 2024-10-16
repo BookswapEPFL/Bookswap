@@ -54,7 +54,8 @@ fun UserProfile(userVM: UserViewModel, modifier: Modifier = Modifier) {
               lastName = it.lastName,
               email = it.email,
               phone = it.phoneNumber,
-              address = user.address,
+              0.0,
+              0.0,
               picURL = user.profilePictureUrl)
           showEditProfile = false
           needRecompose = true
@@ -135,10 +136,7 @@ fun UserProfile(userVM: UserViewModel, modifier: Modifier = Modifier) {
 
                       // User address
                       Text(
-                          text =
-                              "${user.address.getAddressLine(0)}," +
-                                  " ${user.address.postalCode} ${user.address.locality} " +
-                                  "${user.address.countryCode}, ${user.address.countryName}",
+                          text = "${user.latitude}, ${user.longitude}",
                           modifier = mod.testTag("addressTxt"))
 
                       // Save Button

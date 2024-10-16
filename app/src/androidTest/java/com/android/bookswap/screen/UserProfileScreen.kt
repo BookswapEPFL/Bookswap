@@ -16,7 +16,4 @@ class UserProfileScreen(semanticsProvider: SemanticsNodeInteractionsProvider) :
   val phoneNumberTxt: KNode = child { hasTestTag("phoneNumberTxt") }
   val addressTxt: KNode = child { hasTestTag("addressTxt") }
   val editProfileBtn: KNode = child { hasTestTag("editProfileBtn") }
-  val editProfileAld: KNode = child { hasTestTag("editProfileAlert") }
-  val editProfileConfirm: KNode = child { hasTestTag("confirmBtn") }
-  val editProfileDismiss: KNode = child { hasTestTag("dismissBtn") }
 }

@@ -1,6 +1,5 @@
 package com.android.bookswap.ui.profile
 
-import android.location.Address
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -10,7 +9,6 @@ import com.android.bookswap.model.UserViewModel
 import com.android.bookswap.screen.UserProfileScreen
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
 import io.github.kakaocup.compose.node.element.ComposeScreen
-import java.util.Locale
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -29,12 +27,6 @@ class UserProfileScreenTest : TestCase() {
   @Before
   fun setup() {
     val userVM = UserViewModel("email@example.com")
-    val address = Address(Locale.getDefault())
-    address.countryCode = "CH"
-    address.locality = "Lausanne"
-    address.postalCode = "1000"
-    address.countryName = "Switzerland"
-    address.setAddressLine(0, "Rue de la Gare 1")
 
     userVM.updateUser(
         DataUser(
@@ -43,7 +35,8 @@ class UserProfileScreenTest : TestCase() {
             "Doe",
             "John.Doe@example.com",
             "+41223456789",
-            address,
+            0.0,
+            0.0,
             "dummyPic.png",
             "dummyUUID0000"))
     composeTestRule.setContent { UserProfile(userVM = userVM) }

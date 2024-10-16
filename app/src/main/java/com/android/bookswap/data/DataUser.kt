@@ -1,15 +1,13 @@
 package com.android.bookswap.data
 
-import android.location.Address
-import java.util.Locale
-
 data class DataUser(
     var greeting: String = "",
     var firstName: String = "",
     var lastName: String = "",
     var email: String = "",
     var phoneNumber: String = "",
-    var address: Address = Address(Locale.getDefault()),
+    var latitude: Double = 0.0,
+    var longitude: Double = 0.0,
     var profilePictureUrl: String = "",
     var userId: String = ""
 ) {
@@ -21,7 +19,7 @@ data class DataUser(
     return "${this.toString()}:" +
         "¦$greeting|$firstName|$lastName" +
         "¦$email|$phoneNumber" +
-        "¦$address" +
+        "¦$latitude, $longitude" +
         "¦$profilePictureUrl" +
         "¦$userId"
   }
