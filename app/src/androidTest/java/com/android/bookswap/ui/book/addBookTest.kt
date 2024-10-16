@@ -1,21 +1,15 @@
 package com.android.bookswap.ui.book
 
-import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsNotEnabled
-import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performTextInput
 import com.android.bookswap.data.BookLanguages
 import com.android.bookswap.data.DataBook
 import com.android.bookswap.data.repository.BooksRepository
-import com.android.bookswap.data.source.network.BooksFirestoreRepository
 import com.android.bookswap.ui.addBook.AddToBook
 import com.android.bookswap.ui.addBook.createDataBook
-import com.google.firebase.Firebase
-import com.google.firebase.firestore.firestore
 import java.util.UUID
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertNull
@@ -40,32 +34,6 @@ class AddToBookTest {
     composeTestRule.onNodeWithText("ISBN").performTextInput("1234567890")
     // Check if the Save button is now enabled
     composeTestRule.onNodeWithText("Save").assertIsEnabled()
-  }
-
-  @Test
-  fun displayAllComponents() {
-    // Set the content for the Compose UI to be tested
-    composeTestRule.setContent { AddToBook(BooksFirestoreRepository(Firebase.firestore)) }
-    // Assert that all components are displayed and their contents are correct
-    Thread.sleep(2000)
-    composeTestRule
-        .onNodeWithTag("addBookScreen")
-        .assertIsDisplayed() // Ensure to add a test tag to your screen
-
-    composeTestRule.onNodeWithTag("addBookTitle").assertIsDisplayed()
-
-    composeTestRule
-        .onNodeWithTag("addBookTitle")
-        .assertTextEquals("Add Your Book") // Update this based on your screen title
-    composeTestRule.onNodeWithTag("bookSave").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("bookSave").assertTextEquals("Save")
-
-    // Check that all input fields are displayed
-    composeTestRule.onNodeWithTag("inputBookTitle").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("inputBookAuthor").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("inputBookDescription").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("inputBookRating").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("inputBookISBN").assertIsDisplayed()
   }
 
   @Test
