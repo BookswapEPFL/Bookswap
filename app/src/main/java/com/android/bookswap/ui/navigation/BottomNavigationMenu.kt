@@ -11,10 +11,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
-import com.android.bookswap.ui.theme.Primary
+import com.android.bookswap.ui.theme.ColorVariable
 
 @Composable
 fun BottomNavigationMenu(
@@ -24,7 +23,7 @@ fun BottomNavigationMenu(
 ) {
     BottomNavigation(
         modifier = Modifier.fillMaxWidth().height(60.dp).testTag("bottomNavigationMenu"),
-        backgroundColor = Primary, //Color of the bottom navigation bar
+        backgroundColor = ColorVariable.Primary, //Color of the bottom navigation bar
         content = {
             tabList.forEach { tab ->
                 BottomNavigationItem(
