@@ -40,7 +40,7 @@ jobs:
         run: |
           echo "$GOOGLE_SERVICES" | base64 --decode > ./app/google-services.json
           echo "$LOCAL_PROPERTIES" | base64 --decode > ./local.properties
-          echo "$DEBUG_KEYSTORE" | base64 --decode > ~/.android/debug.keystore
+          echo "$DEBUG_KEYSTORE" | base64 --decode > ./app/debug.keystore
 
       # Cache the Gradle dependencies to speed up builds
       - name: Cache Gradle dependencies
