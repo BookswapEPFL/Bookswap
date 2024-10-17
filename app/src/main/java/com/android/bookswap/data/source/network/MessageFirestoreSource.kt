@@ -78,8 +78,7 @@ class MessageFirestoreSource(private val db: FirebaseFirestore) : MessageReposit
                       try {
                         document.toObject(DataMessage::class.java)
                       } catch (ex: Exception) {
-                        Log.e(
-                            "MessageSource", "Error converting document to Message: ${ex.message}")
+                        Log.e("MessageSource", "Error converting document to Message: ${ex.message}")
                         null
                       }
                     }
