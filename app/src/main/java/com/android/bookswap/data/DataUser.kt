@@ -13,6 +13,6 @@ data class DataUser(
 ) {
 
   fun printFullname(): String {
-    return "$greeting $firstName $lastName:"
+    return "$greeting $firstName $lastName"
   }
 }
