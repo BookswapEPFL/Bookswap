@@ -11,10 +11,8 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.sharp.ArrowBack
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.rounded.AccountCircle
 import androidx.compose.material3.*
@@ -25,19 +23,27 @@ import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import com.android.bookswap.model.UserViewModel
+import com.android.bookswap.ui.navigation.BackButton
+import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.theme.*
+import com.android.bookswap.user
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun UserProfile(userVM: UserViewModel, modifier: Modifier = Modifier) {
+fun UserProfile(
+    userVM: UserViewModel = UserViewModel(),
+    navigationActions: NavigationActions =
+        NavigationActions(NavHostController(LocalContext.current))
+) {
   var user = userVM.getUser()
   var showEditProfile by remember { mutableStateOf(false) }
 
   var needRecompose by remember { mutableStateOf(false) }
-  val mod = modifier
 
   if (showEditProfile) {
     EditProfileDialog(
@@ -71,43 +77,36 @@ fun UserProfile(userVM: UserViewModel, modifier: Modifier = Modifier) {
 
     // Scaffold to provide basic UI structure with a top app bar
     Scaffold(
-        modifier = mod.testTag("profileScreenContainer"),
+        modifier = Modifier.testTag("profileScreenContainer"),
         topBar = {
           TopAppBar(
-              modifier = mod.testTag("profileTopAppBar"),
+              modifier = Modifier.testTag("profileTopAppBar"),
               // Title of the screen
-              title = { Text("Your Profile", modifier = mod.testTag("profileTitleTxt")) },
+              title = { Text("Your Profile", modifier = Modifier.testTag("profileTitleTxt")) },
               // Icon button for navigation (currently no action defined)
-              navigationIcon = {
-                IconButton(modifier = mod.size(32.dp), onClick = {}) {
-                  Icon(
-                      imageVector = Icons.AutoMirrored.Sharp.ArrowBack,
-                      contentDescription = "",
-                      modifier = mod.size(30.dp))
-                }
-              })
+              navigationIcon = { BackButton(navController = navigationActions) })
         }) {
           // Column layout to stack input fields vertically with spacing
           Row(
-              modifier = mod.padding(it).consumeWindowInsets(it).fillMaxWidth(),
+              modifier = Modifier.padding(it).consumeWindowInsets(it).fillMaxWidth(),
               horizontalArrangement = Arrangement.spacedBy(5f.dp)) {
-                Column(modifier = mod.fillMaxWidth(0.25f)) {
+                Column(modifier = Modifier.fillMaxWidth(0.25f)) {
                   Box {
-                    IconButton(onClick = { /*TODO*/}, modifier = mod.aspectRatio(1f)) {
+                    IconButton(onClick = { /*TODO*/}, modifier = Modifier.aspectRatio(1f)) {
                       Box(
                           modifier =
-                              mod.padding(2.5f.dp)
+                              Modifier.padding(2.5f.dp)
                                   .border(3.5f.dp, Color(0xFFA98467), CircleShape)) {
                             Image(
                                 imageVector = Icons.Rounded.AccountCircle,
                                 contentDescription = "",
-                                modifier = mod.fillMaxSize().scale(1.2f).clipToBounds(),
+                                modifier = Modifier.fillMaxSize().scale(1.2f).clipToBounds(),
                                 colorFilter = ColorFilter.tint(Color(0xFF6C584C)))
                           }
                       Box(
-                          modifier = mod.fillMaxSize().padding(0f.dp),
+                          modifier = Modifier.fillMaxSize().padding(0f.dp),
                           contentAlignment = Alignment.TopEnd) {
-                            IconButton(onClick = { /*TODO*/}, modifier = mod) {
+                            IconButton(onClick = { /*TODO*/}, modifier = Modifier) {
                               Image(
                                   imageVector = Icons.Outlined.Edit,
                                   contentDescription = "",
@@ -121,24 +120,24 @@ fun UserProfile(userVM: UserViewModel, modifier: Modifier = Modifier) {
                   // Full name text
                   Text(
                       text = "${user.greeting} ${user.firstName} ${user.lastName}",
-                      modifier = mod.testTag("fullNameTxt"))
+                      modifier = Modifier.testTag("fullNameTxt"))
 
                   // Email text
-                  Text(text = user.email, modifier = mod.testTag("emailTxt"))
+                  Text(text = user.email, modifier = Modifier.testTag("emailTxt"))
 
                   // Phone number text
-                  Text(text = user.phoneNumber, modifier = mod.testTag("phoneNumberTxt"))
+                  Text(text = user.phoneNumber, modifier = Modifier.testTag("phoneNumberTxt"))
 
                   // User address
                   Text(
                       text = "${user.latitude}, ${user.longitude}",
-                      modifier = mod.testTag("addressTxt"))
+                      modifier = Modifier.testTag("addressTxt"))
 
                   // Edit Button
                   ElevatedButton(
                       onClick = { showEditProfile = true },
                       border = BorderStroke(1f.dp, Color(0xFFA98467)),
-                      modifier = mod.testTag("editProfileBtn")) {
+                      modifier = Modifier.testTag("editProfileBtn")) {
                         // Text displayed on the button
                         Text("Edit Profile")
                       }
