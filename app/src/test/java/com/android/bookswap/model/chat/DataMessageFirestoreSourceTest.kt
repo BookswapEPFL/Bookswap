@@ -3,6 +3,7 @@ package com.android.bookswap.model.chat
 import androidx.test.core.app.ApplicationProvider
 import com.android.bookswap.data.DataMessage
 import com.android.bookswap.data.source.network.MessageFirestoreSource
+import com.android.bookswap.data.source.network.documentToMessage
 import com.google.android.gms.tasks.Tasks
 import com.google.firebase.FirebaseApp
 import com.google.firebase.firestore.CollectionReference
@@ -119,5 +120,19 @@ class DataMessageFirestoreSourceTest {
 
     // Verify Firestore set operation
     verify(mockDocumentReference).set(messageMap)
+  }
+
+  @Test
+  fun `documentToMessage converts DocumentSnapshot to DataMessage`() {
+    `when`(mockDocumentSnapshot.getString("id")).thenReturn(testMessage.id)
+    `when`(mockDocumentSnapshot.getString("text")).thenReturn(testMessage.text)
+    `when`(mockDocumentSnapshot.getString("senderId")).thenReturn(testMessage.senderId)
+    `when`(mockDocumentSnapshot.getString("receiverId")).thenReturn(testMessage.receiverId)
+    `when`(mockDocumentSnapshot.getLong("timestamp")).thenReturn(testMessage.timestamp)
+
+    val result = documentToMessage(mockDocumentSnapshot)
+
+    assertTrue(result.isSuccess)
+    assertEquals(testMessage, result.getOrNull())
   }
 }
