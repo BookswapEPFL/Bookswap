@@ -49,7 +49,9 @@ android {
 
     buildTypes {
         release {
-            signingConfig = signingConfigs.getByName("release") // Reference the signing config
+            if (System.getenv("CI") != null || System.getenv("GITHUB_ACTIONS") != null) {
+                signingConfig = signingConfigs.getByName("release") // Reference the signing config
+            }
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
