@@ -37,8 +37,21 @@ android {
         manifestPlaceholders["MAPS_API_KEY"] = mapsApiKey
     }
 
+    // Signing configuration for release builds
+    signingConfigs {
+        create("release") { // Use 'create' method to define the signing configuration
+            storeFile = file("keyStore.jks") // Reference the keystore file
+            storePassword = System.getenv("RELEASE_KEYSTORE_PASSWORD") // Read from GitHub Secrets
+            keyAlias = System.getenv("RELEASE_KEYSTORE_ALIAS") // Read from GitHub Secrets
+            keyPassword = System.getenv("RELEASE_KEY_PASSWORD") // Read from GitHub Secrets
+        }
+    }
+
     buildTypes {
         release {
+            if (System.getenv("CI") != null || System.getenv("GITHUB_ACTIONS") != null) {
+                signingConfig = signingConfigs.getByName("release") // Reference the signing config
+            }
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
@@ -107,9 +120,9 @@ android {
 
 sonar {
     properties {
-        property("sonar.projectKey", "gf_android-bookswap")
-        property("sonar.projectName", "Android-BookSwap")
-        property("sonar.organization", "gabrielfleischer")
+        property("sonar.projectKey", "BookswapEPFL_Bookswap")
+        property("sonar.projectName", "BookSwapApp")
+        property("sonar.organization", "bookswapepfl")
         property("sonar.host.url", "https://sonarcloud.io")
         // Comma-separated paths to the various directories containing the *.xml JUnit report files. Each path may be absolute or relative to the project base directory.
         property("sonar.junit.reportPaths", "${project.layout.buildDirectory.get()}/test-results/testDebugunitTest/")
@@ -163,6 +176,7 @@ dependencies {
     implementation(libs.maps.compose.utils)
 
     // ------------- Jetpack Compose ------------------
+    implementation("androidx.compose.material:material:1.7.1")
     val composeBom = platform(libs.compose.bom)
     implementation(composeBom)
     globalTestImplementation(composeBom)
@@ -190,6 +204,8 @@ dependencies {
     testImplementation(libs.mockito.core)
     testImplementation(libs.mockito.inline)
     testImplementation(libs.mockito.kotlin)
+    androidTestImplementation(libs.mockito.android)
+    androidTestImplementation(libs.mockito.kotlin)
     // ----------       Robolectric     ------------
     testImplementation(libs.robolectric)
 
