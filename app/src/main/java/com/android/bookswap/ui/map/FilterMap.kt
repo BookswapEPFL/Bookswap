@@ -2,6 +2,7 @@ package com.android.bookswap.ui.map
 
 import android.widget.Toast
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
@@ -171,7 +172,8 @@ fun ButtonBlock(
                   start = HORIZONTAL_PADDING_BB,
                   end = HORIZONTAL_PADDING_BB,
                   bottom = VERTICAL_PADDING_BB),
-      maxItemsInEachRow = MAX_ITEMS_PER_ROW_BB) {
+      maxItemsInEachRow = MAX_ITEMS_PER_ROW_BB,
+      horizontalArrangement = Arrangement.Center) {
         buttonTexts.forEach { text ->
           val isSelected = selectedFilters.contains(text)
 
