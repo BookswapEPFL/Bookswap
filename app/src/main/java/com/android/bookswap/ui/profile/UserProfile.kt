@@ -25,13 +25,9 @@ import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
 import com.android.bookswap.model.UserViewModel
-import com.android.bookswap.ui.navigation.BackButton
-import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.theme.*
 import com.android.bookswap.user
 
@@ -82,12 +78,14 @@ fun UserProfile(userVM: UserViewModel = UserViewModel()) {
               // Title of the screen
               title = { Text("Your Profile", modifier = Modifier.testTag("profileTitleTxt")) },
               // Icon button for navigation (currently no action defined)
-              navigationIcon = {  IconButton(modifier = Modifier.size(32.dp), onClick = {}) {
-                Icon(
-                  imageVector = Icons.AutoMirrored.Sharp.ArrowBack,
-                  contentDescription = "",
-                  modifier = Modifier.size(30.dp))
-              }})
+              navigationIcon = {
+                IconButton(modifier = Modifier.size(32.dp), onClick = {}) {
+                  Icon(
+                      imageVector = Icons.AutoMirrored.Sharp.ArrowBack,
+                      contentDescription = "",
+                      modifier = Modifier.size(30.dp))
+                }
+              })
         }) {
           // Column layout to stack input fields vertically with spacing
           Row(
