@@ -23,7 +23,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
@@ -100,41 +99,39 @@ fun AddToBookScreen(repository: BooksRepository) {
                   ) // Adding padding to the input field
               )
 
-            // Genre Dropdown
-            ExposedDropdownMenuBox(
-                expanded = expanded,
-                onExpandedChange = { expanded = !expanded },
-                modifier = Modifier.background(ColorVariable.BackGround) // Set background color here
-            ) {
+          // Genre Dropdown
+          ExposedDropdownMenuBox(
+              expanded = expanded,
+              onExpandedChange = { expanded = !expanded },
+              modifier = Modifier.background(ColorVariable.BackGround) // Set background color here
+              ) {
                 OutlinedTextField(
                     value = selectedGenre?.Genre ?: "Select Genre",
                     onValueChange = {},
                     label = { Text("Genre") },
                     readOnly = true,
-                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                    modifier = Modifier.menuAnchor()
-                )
-                ExposedDropdownMenu(
-                    expanded = expanded,
-                    onDismissRequest = { expanded = false }
-                ) {
-                    BookGenres.values().forEach { genre ->
-                        DropdownMenuItem(
-                            text = {
-                                Text(
-                                    text = genre.Genre,
-                                    //color = ColorVariable.Secondary // Green text in dropdownmenu
-                                ) },
-                            onClick = {
-                                selectedGenre = genre
-                                expanded = false
-                            }
-                        )
-                    }
+                    trailingIcon = {
+                      ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+                    },
+                    modifier = Modifier.menuAnchor())
+                ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+                  BookGenres.values().forEach { genre ->
+                    DropdownMenuItem(
+                        text = {
+                          Text(
+                              text = genre.Genre,
+                              // color = ColorVariable.Secondary // Green text in dropdownmenu
+                          )
+                        },
+                        onClick = {
+                          selectedGenre = genre
+                          expanded = false
+                        })
+                  }
                 }
-            }
+              }
 
-            // Author Input Field
+          // Author Input Field
           OutlinedTextField(
               value = author,
               onValueChange = { author = it },
@@ -246,8 +243,7 @@ fun AddToBookScreen(repository: BooksRepository) {
                           photo,
                           language,
                           isbn,
-                          listOf(selectedGenre!!)
-                      )
+                          listOf(selectedGenre!!))
                   if (book == null) {
                     Toast.makeText(context, "Invalid argument", Toast.LENGTH_SHORT).show()
                   } else {

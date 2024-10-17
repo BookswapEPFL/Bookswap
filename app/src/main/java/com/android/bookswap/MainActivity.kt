@@ -27,7 +27,6 @@ import com.android.bookswap.ui.navigation.Route
 import com.android.bookswap.ui.navigation.Screen
 import com.android.bookswap.ui.theme.BookSwapAppTheme
 import com.google.firebase.Firebase
-import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.firestore
 import java.util.UUID
 
@@ -53,9 +52,7 @@ class MainActivity : ComponentActivity() {
     val navigationActions = NavigationActions(navController)
     val bookfire = BooksFirestoreRepository(Firebase.firestore)
 
-
-
-      NavHost(navController = navController, startDestination = Route.AUTH) {
+    NavHost(navController = navController, startDestination = Route.AUTH) {
       navigation(startDestination = Screen.AUTH, route = Route.AUTH) {
         composable(Screen.AUTH) { SignInScreen(navigationActions) } // *Todo*/}
       }

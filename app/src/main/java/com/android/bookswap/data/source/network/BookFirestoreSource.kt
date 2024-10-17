@@ -83,15 +83,24 @@ class BooksFirestoreRepository(private val db: FirebaseFirestore) : BooksReposit
       val isbn = document.getString("ISBN") ?: return null
       val languageBook = BookLanguages.valueOf(document.getString("Language") ?: return null)
       val genres = document.get("genres") as? List<String> ?: emptyList()
-      val bookGenres = genres.mapNotNull { genre ->
-        try {
-          BookGenres.valueOf(genre)
-        } catch (e: IllegalArgumentException) {
-          null
-        }
-      }
+      val bookGenres =
+          genres.mapNotNull { genre ->
+            try {
+              BookGenres.valueOf(genre)
+            } catch (e: IllegalArgumentException) {
+              null
+            }
+          }
       DataBook(
-          UUID.randomUUID(), title, author, description, rating.toInt(), photo, languageBook, isbn,bookGenres)
+          UUID.randomUUID(),
+          title,
+          author,
+          description,
+          rating.toInt(),
+          photo,
+          languageBook,
+          isbn,
+          bookGenres)
     } catch (e: Exception) {
       null // Return null in case of any exception during the conversion
     }

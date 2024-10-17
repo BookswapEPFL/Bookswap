@@ -4,6 +4,7 @@ import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import com.android.bookswap.data.BookGenres
 import com.android.bookswap.data.BookLanguages
@@ -34,6 +35,7 @@ class AddToBookTest {
     composeTestRule.onNodeWithText("Title").performTextInput("My Book Title")
     composeTestRule.onNodeWithText("ISBN").performTextInput("1234567890")
     // Check if the Save button is now enabled
+    composeTestRule.onNodeWithText("Select Genre").performClick()
     composeTestRule.onNodeWithText("Save").assertIsEnabled()
   }
 
@@ -50,8 +52,7 @@ class AddToBookTest {
             photo = "https://example.com/photo.jpg",
             bookLanguageStr = "ENGLISH",
             isbn = "1234567890",
-            genres = listOf(BookGenres.TRAVEL)
-        )
+            genres = listOf(BookGenres.TRAVEL))
 
     // Assert the book is created correctly
     assertEquals("My Book", book?.title)
@@ -76,8 +77,7 @@ class AddToBookTest {
             photo = "https://example.com/photo.jpg",
             bookLanguageStr = "ENGLISH",
             isbn = "1234567890",
-            genres = listOf(BookGenres.TRAVEL)
-        )
+            genres = listOf(BookGenres.TRAVEL))
 
     // Assert that the book is null due to invalid title
     assertNull(book)
@@ -93,8 +93,7 @@ class AddToBookTest {
             photo = "https://example.com/photo.jpg",
             bookLanguageStr = "ENGLISH",
             isbn = "1234567890",
-            genres = listOf(BookGenres.TRAVEL)
-        )
+            genres = listOf(BookGenres.TRAVEL))
 
     // Assert that the book is null due to invalid rating
     assertNull(book)
@@ -110,8 +109,7 @@ class AddToBookTest {
             photo = "https://example.com/photo.jpg",
             bookLanguageStr = "INVALID_LANGUAGE",
             isbn = "1234567890",
-            genres = listOf(BookGenres.TRAVEL)
-        )
+            genres = listOf(BookGenres.TRAVEL))
 
     // Assert that the book is null due to invalid language
     assertNull(book)
