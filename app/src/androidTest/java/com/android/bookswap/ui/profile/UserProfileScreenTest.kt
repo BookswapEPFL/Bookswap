@@ -164,10 +164,6 @@ class MockUserRepo : UsersRepository {
     TODO("Not yet implemented")
   }
 
-  override fun getNewUid(): String {
-    return java.util.UUID.randomUUID().toString()
-  }
-
   override fun getUsers(callback: (Result<List<DataUser>>) -> Unit) {
     callback(Result.success(mockUserList.values.toList()))
   }
