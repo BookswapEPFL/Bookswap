@@ -1,6 +1,5 @@
-package com.android.bookswap.ui.books.add
+package com.android.bookswap.ui.addBook
 
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -278,39 +277,38 @@ fun createDataBook(
 ): DataBook? {
   // Validate UUID
   if (uuid.toString().isBlank()) {
-    Log.e("AddToBookScreen", "UUID cannot be empty.")
+    println("UUID cannot be empty.")
     return null
   }
 
   // Validate Title
   if (title.isBlank()) {
-    Log.e("AddToBookScreen", "Title cannot be empty.")
+    println("Title cannot be empty.")
     return null
   }
 
   // Validate Author
   if (author.isBlank()) {
-    Log.e("AddToBookScreen", "Author cannot be empty.")
+    println("Author cannot be empty.")
     return null
   }
-
   // Validate Rating
   val rating: Int =
       try {
         ratingStr.toInt().also {
           if (it !in 0..5) {
-            Log.e("AddToBookScreen", "Rating must be between 0 and 5.")
+            println("Rating must be between 0 and 5.")
             return null
           }
         }
       } catch (e: NumberFormatException) {
-        Log.e("AddToBookScreen", "Rating must be a valid number.")
+        println("Rating must be a valid number.")
         return null
       }
 
-  // Validate Photo (assuming basic validation here, just checking if not empty)
+  // Validate Photo  (assuming basic validation here, just checking if not empty)
   if (photo.isBlank()) {
-    Log.e("AddToBookScreen", "Photo URL cannot be empty.")
+    println("Photo URL cannot be empty.")
     return null
   }
 
@@ -319,18 +317,15 @@ fun createDataBook(
       try {
         BookLanguages.valueOf(bookLanguageStr.uppercase())
       } catch (e: IllegalArgumentException) {
-        Log.e(
-            "AddToBookScreen",
-            "Invalid language: $bookLanguageStr. Please use one of the supported languages.")
+        println("Invalid language: $bookLanguageStr. Please use one of the supported languages.")
         return null
       }
 
   // Validate ISBN
   if (isbn.isBlank()) {
-    Log.e("AddToBookScreen", "ISBN cannot be empty.")
+    println("ISBN cannot be empty.")
     return null
   }
-
   // If all validations pass, return a new DataBook instance
   return DataBook(
       uuid = uuid,
