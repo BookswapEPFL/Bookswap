@@ -16,7 +16,9 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
 import com.android.bookswap.data.BookLanguages
 import com.android.bookswap.data.DataBook
+import com.android.bookswap.data.source.network.BooksFirestoreRepository
 import com.android.bookswap.resources.C
+import com.android.bookswap.ui.addBook.AddToBookScreen
 import com.android.bookswap.ui.authentication.SignInScreen
 import com.android.bookswap.ui.map.MapScreen
 import com.android.bookswap.ui.map.TempUser
@@ -24,11 +26,14 @@ import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.navigation.Route
 import com.android.bookswap.ui.navigation.Screen
 import com.android.bookswap.ui.theme.BookSwapAppTheme
+import com.google.firebase.Firebase
+import com.google.firebase.firestore.firestore
 import java.util.UUID
 
 class MainActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
+
     setContent {
       BookSwapAppTheme {
         // A surface container using the 'background' color from the theme
@@ -45,6 +50,7 @@ class MainActivity : ComponentActivity() {
   fun BookSwapApp() {
     val navController = rememberNavController()
     val navigationActions = NavigationActions(navController)
+    val bookfire = BooksFirestoreRepository(Firebase.firestore)
 
     NavHost(navController = navController, startDestination = Route.AUTH) {
       navigation(startDestination = Screen.AUTH, route = Route.AUTH) {
@@ -58,7 +64,7 @@ class MainActivity : ComponentActivity() {
         composable(Screen.MAP) { MapScreen(user) }
       }
       navigation(startDestination = Screen.NEWBOOK, route = Route.NEWBOOK) {
-        composable(Screen.NEWBOOK) { /*Todo*/}
+        composable(Screen.NEWBOOK) { AddToBookScreen(bookfire) }
         composable(Screen.ADD_BOOK_MANUALLY) { /*Todo*/}
         composable(Screen.ADD_BOOK_SCAN) { /*Todo*/}
         composable(Screen.ADD_BOOK_ISBN) { /*Todo*/}
