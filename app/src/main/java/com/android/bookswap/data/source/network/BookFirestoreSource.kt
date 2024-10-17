@@ -1,5 +1,6 @@
 package com.android.bookswap.data.source.network
 
+import com.android.bookswap.data.BookGenres
 import com.android.bookswap.data.BookLanguages
 import com.android.bookswap.data.DataBook
 import com.android.bookswap.data.repository.BooksRepository
@@ -81,8 +82,16 @@ class BooksFirestoreRepository(private val db: FirebaseFirestore) : BooksReposit
       val photo = document.getString("Photo") ?: return null
       val isbn = document.getString("ISBN") ?: return null
       val languageBook = BookLanguages.valueOf(document.getString("Language") ?: return null)
+      val genres = document.get("genres") as? List<String> ?: emptyList()
+      val bookGenres = genres.mapNotNull { genre ->
+        try {
+          BookGenres.valueOf(genre)
+        } catch (e: IllegalArgumentException) {
+          null
+        }
+      }
       DataBook(
-          UUID.randomUUID(), title, author, description, rating.toInt(), photo, languageBook, isbn)
+          UUID.randomUUID(), title, author, description, rating.toInt(), photo, languageBook, isbn,bookGenres)
     } catch (e: Exception) {
       null // Return null in case of any exception during the conversion
     }

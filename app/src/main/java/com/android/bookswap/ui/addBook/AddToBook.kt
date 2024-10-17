@@ -1,12 +1,16 @@
 package com.android.bookswap.ui.addBook
 
 import android.widget.Toast
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -19,14 +23,17 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.android.bookswap.data.BookGenres
 import com.android.bookswap.data.BookLanguages
 import com.android.bookswap.data.DataBook
 import com.android.bookswap.data.repository.BooksRepository
+import com.android.bookswap.ui.theme.ColorVariable
 import com.android.bookswap.ui.theme.ColorVariable.Accent
 import com.android.bookswap.ui.theme.ColorVariable.BackGround
 import com.android.bookswap.ui.theme.ColorVariable.Primary
@@ -35,7 +42,7 @@ import java.util.UUID
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddToBook(repository: BooksRepository) {
+fun AddToBookScreen(repository: BooksRepository) {
   // State variables to store the values entered by the user
   var title by remember { mutableStateOf("") }
   var author by remember { mutableStateOf("") }
@@ -44,12 +51,14 @@ fun AddToBook(repository: BooksRepository) {
   var isbn by remember { mutableStateOf("") }
   var photo by remember { mutableStateOf("") }
   var language by remember { mutableStateOf("") }
+  var selectedGenre by remember { mutableStateOf<BookGenres?>(null) } // Genre selection state
+  var expanded by remember { mutableStateOf(false) } // State for dropdown menu
   // Getting the context for showing Toast messages
   val context = LocalContext.current
 
   // Scaffold to provide basic UI structure with a top app bar
   Scaffold(
-      modifier = Modifier.testTag("addBookScreen"),
+      modifier = Modifier.testTag("addBookScreen").background(BackGround),
       topBar = {
         TopAppBar(
             // Title of the screen
@@ -91,7 +100,41 @@ fun AddToBook(repository: BooksRepository) {
                   ) // Adding padding to the input field
               )
 
-          // Author Input Field
+            // Genre Dropdown
+            ExposedDropdownMenuBox(
+                expanded = expanded,
+                onExpandedChange = { expanded = !expanded },
+                modifier = Modifier.background(ColorVariable.BackGround) // Set background color here
+            ) {
+                OutlinedTextField(
+                    value = selectedGenre?.Genre ?: "Select Genre",
+                    onValueChange = {},
+                    label = { Text("Genre") },
+                    readOnly = true,
+                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                    modifier = Modifier.menuAnchor()
+                )
+                ExposedDropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false }
+                ) {
+                    BookGenres.values().forEach { genre ->
+                        DropdownMenuItem(
+                            text = {
+                                Text(
+                                    text = genre.Genre,
+                                    //color = ColorVariable.Secondary // Green text in dropdownmenu
+                                ) },
+                            onClick = {
+                                selectedGenre = genre
+                                expanded = false
+                            }
+                        )
+                    }
+                }
+            }
+
+            // Author Input Field
           OutlinedTextField(
               value = author,
               onValueChange = { author = it },
@@ -191,7 +234,7 @@ fun AddToBook(repository: BooksRepository) {
                       contentColor = BackGround),
               onClick = {
                 // Check if title and ISBN are not blank (required fields)
-                if (title.isNotBlank() && isbn.isNotBlank()) {
+                if (title.isNotBlank() && isbn.isNotBlank() && selectedGenre != null) {
                   // You can handle book object creation here (e.g., save the book)
                   val book =
                       createDataBook(
@@ -202,7 +245,9 @@ fun AddToBook(repository: BooksRepository) {
                           rating,
                           photo,
                           language,
-                          isbn)
+                          isbn,
+                          listOf(selectedGenre!!)
+                      )
                   if (book == null) {
                     Toast.makeText(context, "Invalid argument", Toast.LENGTH_SHORT).show()
                   } else {
@@ -231,7 +276,8 @@ fun createDataBook(
     ratingStr: String,
     photo: String,
     bookLanguageStr: String,
-    isbn: String
+    isbn: String,
+    genres: List<BookGenres>
 ): DataBook? {
   // Validate UUID
   if (uuid.toString().isBlank()) {
@@ -293,5 +339,6 @@ fun createDataBook(
       rating = rating,
       photo = photo,
       language = languages,
-      isbn = isbn)
+      isbn = isbn,
+      genres = genres)
 }
