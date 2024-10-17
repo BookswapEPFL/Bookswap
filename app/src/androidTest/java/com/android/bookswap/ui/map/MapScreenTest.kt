@@ -179,4 +179,27 @@ class MapScreenTest {
     // Assert that after swiping, the menu is still displayed but in a new position
     composeTestRule.onNodeWithTag("mapDraggableMenu").assertIsDisplayed()
   }
+
+    @Test
+    fun filterButtonIsDisplayed() {
+        composeTestRule.setContent {
+            val navController = rememberNavController()
+            val navigationActions = NavigationActions(navController)
+            MapScreen(user, user[0], navigationActions, BookFilter())
+        }
+        composeTestRule.onNodeWithTag("filterButton").assertIsDisplayed()
+    }
+
+    @Test
+    fun bookChangedWhenFilterApplied() {
+        val bookFilter = BookFilter()
+        bookFilter.setGenres(listOf("Horror"))
+        composeTestRule.setContent {
+            val navController = rememberNavController()
+            val navigationActions = NavigationActions(navController)
+            MapScreen(user, user[0], navigationActions, bookFilter)
+        }
+        composeTestRule.onNodeWithTag("mapDraggableMenuBookBox").assertIsDisplayed()
+        composeTestRule.onAllNodesWithTag("mapDraggableMenuBookBox").assertCountEquals(1)
+    }
 }
