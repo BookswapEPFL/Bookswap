@@ -1,6 +1,5 @@
 name: Build APK
 
-# This workflow is triggered on push to the 'main' or 'M1' branches
 on:
   push:
     branches:
@@ -9,8 +8,6 @@ on:
       - M2
       - M3
       - apkBuild
-
-  # You can manually trigger the workflow from the GitHub UI
   workflow_dispatch:
 
 jobs:
@@ -47,17 +44,17 @@ jobs:
             RELEASE_KEYSTORE_ALIAS: ${{ secrets.ALIAS }}
             RELEASE_KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: |
-          echo $ENCODED_STRING | base64 --decode > keystore.jks
-          # Debug: List files to ensure keystore exists
-          ls -l keystore.jks
+          echo "$ENCODED_STRING" | base64 --decode > ./app/keystore.jks # Save in the app directory
+          ls -l ./app/keystore.jks # List files to confirm creation
 
       - name: Build Release bundle
         env:
           RELEASE_KEYSTORE_PASSWORD: ${{ secrets.KEY_STORE_PASSWORD }}
           RELEASE_KEYSTORE_ALIAS: ${{ secrets.ALIAS }}
           RELEASE_KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-        run: ./gradlew assembleRelease
-
+        run: |
+          ls -l ./app/keystore.jks # Confirm the keystore file is present before building
+          ./gradlew assembleRelease # Build the release version
 
       - name: Upload Release Build to Artifacts
         uses: actions/upload-artifact@v3
