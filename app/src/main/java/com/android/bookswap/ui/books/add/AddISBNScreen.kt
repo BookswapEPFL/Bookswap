@@ -135,7 +135,6 @@ fun AddISBNScreen(navigationActions: NavigationActions) {
             }
       },
       bottomBar = {
-        // TODO: Change to navbar
         BottomAppBar(modifier = Modifier.background(color = ColorVariable.BackGround)) {}
       })
 }
