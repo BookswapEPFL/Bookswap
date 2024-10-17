@@ -16,6 +16,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
 import com.android.bookswap.data.BookLanguages
 import com.android.bookswap.data.DataBook
+import com.android.bookswap.model.chat.PermissionHandler
 import com.android.bookswap.resources.C
 import com.android.bookswap.ui.authentication.SignInScreen
 import com.android.bookswap.ui.map.MapScreen
@@ -27,8 +28,13 @@ import com.android.bookswap.ui.theme.BookSwapAppTheme
 import java.util.UUID
 
 class MainActivity : ComponentActivity() {
+
+  private lateinit var permissionHandler: PermissionHandler
+
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
+    permissionHandler = PermissionHandler(this)
+    permissionHandler.askNotificationPermission()
     setContent {
       BookSwapAppTheme {
         // A surface container using the 'background' color from the theme
