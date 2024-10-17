@@ -64,7 +64,6 @@ fun BookAdditionChoiceScreen(navController: NavigationActions) {
                   text = "Manually",
                   leftIcon = Icons.Default.Add,
                   leftIconPainter = null,
-                  rightIcon = Icons.AutoMirrored.Filled.ArrowForward,
                   navController = navController,
                   navDestination = "AddBookManually",
                   buttonWidth = buttonWidth)
@@ -73,7 +72,6 @@ fun BookAdditionChoiceScreen(navController: NavigationActions) {
                   text = "From ISBN",
                   leftIcon = null,
                   leftIconPainter = painterResource(id = R.drawable.download),
-                  rightIcon = Icons.AutoMirrored.Filled.ArrowForward,
                   navController = navController,
                   navDestination = "AddBookISBN",
                   buttonWidth = buttonWidth)
@@ -82,7 +80,6 @@ fun BookAdditionChoiceScreen(navController: NavigationActions) {
                   text = "From Photo",
                   leftIcon = null,
                   leftIconPainter = painterResource(id = R.drawable.photoicon),
-                  rightIcon = Icons.AutoMirrored.Filled.ArrowForward,
                   navController = navController,
                   navDestination = "AddBookScan",
                   buttonWidth = buttonWidth)
@@ -95,7 +92,6 @@ fun ButtonWithIcon(
     text: String,
     leftIcon: ImageVector? = null,
     leftIconPainter: Painter? = null,
-    rightIcon: ImageVector,
     navController: NavigationActions,
     navDestination: String,
     buttonWidth: Dp
@@ -122,18 +118,18 @@ fun ButtonWithIcon(
                 Icon(
                     imageVector = leftIcon,
                     contentDescription = null,
-                    modifier = Modifier.size(iconSize))
+                    modifier = Modifier.size(iconSize).testTag("leftIcon_$text"))
               } else if (leftIconPainter != null) {
                 Image(
                     painter = leftIconPainter,
                     contentDescription = null,
-                    modifier = Modifier.size(pngSize))
+                    modifier = Modifier.size(pngSize).testTag("leftPngIcon_$text"))
               }
               Text(text, fontSize = textSize)
               Icon(
-                  imageVector = rightIcon,
+                  imageVector = Icons.AutoMirrored.Filled.ArrowForward,
                   contentDescription = null,
-                  modifier = Modifier.size(iconSize))
+                  modifier = Modifier.size(iconSize).testTag("rightIcon_$text"))
             }
       }
 }
