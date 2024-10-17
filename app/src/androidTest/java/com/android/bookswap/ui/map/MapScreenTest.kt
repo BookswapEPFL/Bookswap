@@ -10,8 +10,10 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.swipe
 import androidx.compose.ui.test.swipeUp
+import androidx.navigation.compose.rememberNavController
 import com.android.bookswap.data.BookLanguages
 import com.android.bookswap.data.DataBook
+import com.android.bookswap.ui.navigation.NavigationActions
 import java.util.UUID
 import org.junit.Rule
 import org.junit.Test
@@ -58,7 +60,11 @@ class MapScreenTest {
 
   @Test
   fun displayAllComponents() {
-    composeTestRule.setContent { MapScreen(user, user[0]) }
+    composeTestRule.setContent {
+      val navController = rememberNavController()
+      val navigationActions = NavigationActions(navController)
+      MapScreen(user, navigationActions, user[0])
+    }
     composeTestRule.onNodeWithTag("mapScreen").assertIsDisplayed()
     composeTestRule.onNodeWithTag("mapGoogleMap").assertIsDisplayed()
     composeTestRule.onNodeWithTag("mapBoxMarker").assertIsDisplayed()
@@ -86,7 +92,11 @@ class MapScreenTest {
 
   @Test
   fun noMarkerDisplayedForUserWithoutBooks() {
-    composeTestRule.setContent { MapScreen(userWithoutBooks, userWithoutBooks[0]) }
+    composeTestRule.setContent {
+      val navController = rememberNavController()
+      val navigationActions = NavigationActions(navController)
+      MapScreen(userWithoutBooks, navigationActions, userWithoutBooks[0])
+    }
 
     // Assert that the marker info window is displayed, but without book entries
     composeTestRule.onNodeWithTag("mapBoxMarker").assertIsNotDisplayed()
@@ -95,7 +105,11 @@ class MapScreenTest {
 
   @Test
   fun noBookDisplayedInDraggableMenuForAllUsersWithNoBook() {
-    composeTestRule.setContent { MapScreen(userWithoutBooks) }
+    composeTestRule.setContent {
+      val navController = rememberNavController()
+      val navigationActions = NavigationActions(navController)
+      MapScreen(userWithoutBooks, navigationActions)
+    }
 
     composeTestRule.onNodeWithTag("mapDraggableMenu").assertIsDisplayed()
     composeTestRule.onAllNodesWithTag("mapDraggableMenuBookBox").assertCountEquals(0) // No books
@@ -103,7 +117,11 @@ class MapScreenTest {
 
   @Test
   fun emptyUserListDoesNotShowMarkers() {
-    composeTestRule.setContent { MapScreen(listOf(), null) }
+    composeTestRule.setContent {
+      val navController = rememberNavController()
+      val navigationActions = NavigationActions(navController)
+      MapScreen(listOf(), navigationActions, null)
+    }
 
     // Assert that the map is displayed but no marker and info window is shown
     composeTestRule.onNodeWithTag("mapGoogleMap").assertIsDisplayed()
@@ -112,7 +130,11 @@ class MapScreenTest {
 
   @Test
   fun emptyUserListGiveEmptyDraggableMenu() {
-    composeTestRule.setContent { MapScreen(userWithoutBooks) }
+    composeTestRule.setContent {
+      val navController = rememberNavController()
+      val navigationActions = NavigationActions(navController)
+      MapScreen(userWithoutBooks, navigationActions)
+    }
 
     // Assert that the marker info window is displayed, but without book entries
     composeTestRule.onNodeWithTag("mapDraggableMenu").assertIsDisplayed()
@@ -121,7 +143,11 @@ class MapScreenTest {
 
   @Test
   fun noUserSelectedInitially() {
-    composeTestRule.setContent { MapScreen(user, null) }
+    composeTestRule.setContent {
+      val navController = rememberNavController()
+      val navigationActions = NavigationActions(navController)
+      MapScreen(user, navigationActions, null)
+    }
 
     // Assert that no info window is displayed when no user is selected
     composeTestRule.onNodeWithTag("mapGoogleMap").assertIsDisplayed()
@@ -130,7 +156,11 @@ class MapScreenTest {
 
   @Test
   fun draggableMenu_canBeDraggedVertically() {
-    composeTestRule.setContent { MapScreen(user, user[0]) }
+    composeTestRule.setContent {
+      val navController = rememberNavController()
+      val navigationActions = NavigationActions(navController)
+      MapScreen(user, navigationActions, user[0])
+    }
 
     // Ensure the DraggableMenu is initially displayed
     composeTestRule.onNodeWithTag("mapDraggableMenu").assertIsDisplayed()
