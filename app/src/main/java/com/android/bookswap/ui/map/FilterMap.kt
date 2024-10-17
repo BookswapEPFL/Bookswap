@@ -96,8 +96,8 @@ fun FilterMapScreen(navigationActions: NavigationActions, bookFilter: BookFilter
             ButtonBlock(
                 BookGenres.values().map { it.Genre }, selectedFiltersGenres.map { it.Genre }) {
                     newSelection ->
-                  bookFilter.setGenres(newSelection)
-                }
+                  bookFilter.setGenres(newSelection) // Actualize the selected genres as OnClick
+            }
           }
           item {
             ButtonBlock(
@@ -108,8 +108,9 @@ fun FilterMapScreen(navigationActions: NavigationActions, bookFilter: BookFilter
                 selectedFiltersLanguages.map {
                   it.name.lowercase().replaceFirstChar { c -> c.uppercase() }
                 }) { newSelection ->
-                  bookFilter.setLanguages(newSelection)
-                }
+                  bookFilter.setLanguages(
+                      newSelection) // Actualize the selected languages as OnClick
+            }
           }
         }
       },
