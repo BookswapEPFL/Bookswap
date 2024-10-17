@@ -44,8 +44,8 @@ jobs:
             RELEASE_KEYSTORE_ALIAS: ${{ secrets.ALIAS }}
             RELEASE_KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: |
-          echo "$ENCODED_STRING" | base64 --decode > ./app/keystore.jks # Save in the app directory
-          ls -l ./app/keystore.jks # List files to confirm creation
+          echo "$ENCODED_STRING" | base64 --decode > ./app/keyStore.jks # Save in the app directory
+          ls -l ./app/keyStore.jks # List files to confirm creation
 
       - name: Build Release bundle
         env:
@@ -53,7 +53,7 @@ jobs:
           RELEASE_KEYSTORE_ALIAS: ${{ secrets.ALIAS }}
           RELEASE_KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: |
-          ls -l ./app/keystore.jks # Confirm the keystore file is present before building
+          ls -l ./app/keyStore.jks # Confirm the keystore file is present before building
           ./gradlew assembleRelease # Build the release version
 
       - name: Upload Release Build to Artifacts
