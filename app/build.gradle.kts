@@ -143,6 +143,7 @@ dependencies {
     implementation(libs.material)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(platform(libs.compose.bom))
+    implementation(libs.androidx.espresso.intents)
     implementation(libs.firebase.firestore.ktx)
     implementation(libs.firebase.auth.ktx)
     implementation(libs.androidx.navigation.compose)
@@ -165,6 +166,7 @@ dependencies {
     implementation(libs.maps.compose.utils)
 
     // ------------- Jetpack Compose ------------------
+    implementation("androidx.compose.material:material:1.7.1")
     val composeBom = platform(libs.compose.bom)
     implementation(composeBom)
     globalTestImplementation(composeBom)
@@ -187,6 +189,14 @@ dependencies {
     // --------- Kaspresso test framework ----------
     globalTestImplementation(libs.kaspresso)
     globalTestImplementation(libs.kaspresso.compose)
+
+
+
+    testImplementation(libs.mockito.core)
+    testImplementation(libs.mockito.inline)
+    testImplementation(libs.mockito.kotlin)
+    androidTestImplementation(libs.mockito.android)
+    androidTestImplementation(libs.mockito.kotlin)
 
     // ----------       Robolectric     ------------
     testImplementation(libs.robolectric)
