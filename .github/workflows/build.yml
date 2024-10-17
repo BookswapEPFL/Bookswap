@@ -2,7 +2,13 @@ name: build
 
 
 on:
-  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - M1
+      - M2
+      - M3
+      - apkBuild
 jobs:
   build:
     runs-on: ubuntu-latest
