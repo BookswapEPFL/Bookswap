@@ -45,6 +45,8 @@ import com.android.bookswap.data.DataBook
 import com.android.bookswap.ui.navigation.BottomNavigationMenu
 import com.android.bookswap.ui.navigation.List_Navigation_Bar_Destinations
 import com.android.bookswap.ui.navigation.NavigationActions
+import com.android.bookswap.model.map.BookFilter
+import com.android.bookswap.ui.navigation.Screen
 import com.android.bookswap.ui.theme.ColorVariable
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
@@ -66,12 +68,20 @@ const val INIT_ZOOM = 10F
  *   deleted as the code should in the future use a class to get the user from the database.
  * @param selectedUser An optional user [TempUser] to be initially selected and focused on the map.
  *   This user’s info window will be shown if not null.
+ * @param navigationActions An instance of [NavigationActions] to handle navigation actions.
+ * @param bookFilter An instance of [BookFilter] to filter the books displayed on the map.
  */
 @Composable
 fun MapScreen(
     listUser: List<TempUser>,
     navigationActions: NavigationActions,
     selectedUser: TempUser? = null
+) {
+fun MapScreen(
+    listUser: List<TempUser>,
+    selectedUser: TempUser? = null,
+    navigationActions: NavigationActions,
+    bookFilter: BookFilter
 ) {
 
   val cameraPositionState = rememberCameraPositionState {
@@ -81,6 +91,16 @@ fun MapScreen(
   var mutableStateSelectedUser by remember { mutableStateOf(selectedUser) }
   var markerScreenPosition by remember { mutableStateOf<Offset?>(null) }
   val listAllBooks = listUser.flatMap { it.listBook }
+
+  // Filter the books based on the selected filters
+  val genresFilter by bookFilter.genresFilter.collectAsState()
+  val languagesFilter by bookFilter.languagesFilter.collectAsState()
+
+  val filteredBooks =
+      remember(genresFilter, languagesFilter) { bookFilter.filterBooks(listAllBooks) }
+
+  val filteredUsers =
+      listUser.filter { user -> user.listBook.any { book -> filteredBooks.contains(book) } }
 
   // compute the position of the marker on the screen given the camera position and the marker's
   // position on the map
@@ -123,7 +143,7 @@ fun MapScreen(
             modifier = Modifier.fillMaxSize().padding(pd).testTag("mapGoogleMap"),
             cameraPositionState = cameraPositionState,
         ) {
-          listUser
+          filteredUsers
               .filter { !it.longitude.isNaN() && !it.latitude.isNaN() && it.listBook.isNotEmpty() }
               .forEach { item ->
                 val markerState = MarkerState(position = LatLng(item.latitude, item.longitude))
@@ -139,6 +159,7 @@ fun MapScreen(
                     })
               }
         }
+        FilterButton { navigationActions.navigateTo(Screen.FILTER) }
 
         // Custom info window linked to the marker
         markerScreenPosition?.let { screenPos ->
@@ -152,7 +173,7 @@ fun MapScreen(
           }
         }
         // Draggable Bottom List
-        DraggableMenu(listAllBooks)
+        DraggableMenu(filteredBooks)
       })
 }
 
@@ -245,7 +266,7 @@ const val SPACER_HEIGHT_DP = 20
 const val STAR_HEIGHT_DP = 30
 const val STAR_SIZE_DP = 26
 const val STAR_INNER_SIZE_DP = STAR_SIZE_DP / 2
-const val WIDTH_TITLE_BOX_DP = 180
+const val WIDTH_TITLE_BOX_DP = 150
 const val MAX_RATING = 5
 
 /**
@@ -380,7 +401,7 @@ private fun DraggableMenu(listAllBooks: List<DataBook>) {
                               // text for the tags of the book, will be added at a later date
                               // It isn't decided how we will handle the tag for the books
                               Text(
-                                  text = "Action, Mystery, Fantasy", // Placeholder
+                                  text = book.genres.joinToString(separator = ", ") { it.Genre },
                                   modifier =
                                       Modifier.fillMaxWidth().testTag("mapDraggableMenuBookBoxTag"),
                                   fontSize = SECONDARY_TEXT_FONT_SP.sp,
