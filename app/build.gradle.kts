@@ -163,7 +163,7 @@ dependencies {
     implementation(libs.maps.compose.utils)
 
     // ------------- Jetpack Compose ------------------
-    implementation("androidx.compose.material:material:1.8.0-alpha01")
+    implementation("androidx.compose.material:material:1.7.1")
     val composeBom = platform(libs.compose.bom)
     implementation(composeBom)
     globalTestImplementation(composeBom)
