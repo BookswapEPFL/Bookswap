@@ -13,7 +13,7 @@ import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.theme.ColorVariable
 
 @Composable
-fun BackButton(navController: NavigationActions) {
+fun BackButtonComponent(navController: NavigationActions) {
   IconButton(onClick = { navController.goBack() }, modifier = Modifier.testTag("backButton")) {
     Icon(
         imageVector = Icons.AutoMirrored.Filled.ArrowBack,

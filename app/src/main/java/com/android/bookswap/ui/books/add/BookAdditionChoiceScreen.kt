@@ -29,7 +29,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.times
 import com.android.bookswap.R
-import com.android.bookswap.ui.components.BackButton
+import com.android.bookswap.ui.components.BackButtonComponent
 import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.profile.ProfileIcon
 import com.android.bookswap.ui.theme.ColorVariable
@@ -43,7 +43,7 @@ fun BookAdditionChoiceScreen(navController: NavigationActions) {
       topBar = {
         TopAppBar(
             title = { Text("Book Addition Choice", color = ColorVariable.BackGround) },
-            navigationIcon = { BackButton(navController) },
+            navigationIcon = { BackButtonComponent(navController) },
             actions = { ProfileIcon() },
             colors = TopAppBarDefaults.topAppBarColors(containerColor = ColorVariable.BackGround))
       },
