@@ -22,7 +22,7 @@ import com.android.bookswap.model.chat.MessageBox
 import com.android.bookswap.resources.C
 import com.android.bookswap.ui.addBook.AddToBookScreen
 import com.android.bookswap.ui.authentication.SignInScreen
-import com.android.bookswap.ui.bookAddition.BookAdditionChoiceScreen
+import com.android.bookswap.ui.books.add.BookAdditionChoiceScreen
 import com.android.bookswap.ui.chat.ChatScreen
 import com.android.bookswap.ui.chat.ListChatScreen
 import com.android.bookswap.ui.map.MapScreen

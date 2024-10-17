@@ -31,7 +31,7 @@ import com.android.bookswap.data.BookGenres
 import com.android.bookswap.data.BookLanguages
 import com.android.bookswap.data.DataBook
 import com.android.bookswap.data.repository.BooksRepository
-import com.android.bookswap.ui.navigation.BackButton
+import com.android.bookswap.ui.components.BackButtonComponent
 import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.theme.ColorVariable
 import com.android.bookswap.ui.theme.ColorVariable.Accent
@@ -73,7 +73,7 @@ fun AddToBookScreen(repository: BooksRepository, navController: NavigationAction
             // Icon button for navigation (currently no action defined)
             // navigationIcon = { BackButton(navController) },
             navigationIcon = {
-              BackButton(navController)
+              BackButtonComponent(navController)
               // You can add an icon here for the button
             })
       },
