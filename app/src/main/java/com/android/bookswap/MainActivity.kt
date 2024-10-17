@@ -20,8 +20,8 @@ import com.android.bookswap.data.DataBook
 import com.android.bookswap.data.source.network.BooksFirestoreRepository
 import com.android.bookswap.model.map.BookFilter
 import com.android.bookswap.resources.C
-import com.android.bookswap.ui.addBook.AddToBookScreen
 import com.android.bookswap.ui.authentication.SignInScreen
+import com.android.bookswap.ui.books.add.AddToBookScreen
 import com.android.bookswap.ui.map.FilterMapScreen
 import com.android.bookswap.ui.map.MapScreen
 import com.android.bookswap.ui.map.TempUser
