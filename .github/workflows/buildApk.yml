@@ -62,5 +62,5 @@ jobs:
       - name: Upload Release Build to Artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: app-debug
-          path: app/build/outputs/apk/debug/app-debug.apk
+          name: release-artifacts
+          path: ${{ steps.releaseApk.outputs.apkfile }}
