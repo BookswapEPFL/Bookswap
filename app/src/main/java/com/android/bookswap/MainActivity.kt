@@ -24,17 +24,19 @@ import com.android.bookswap.model.map.BookFilter
 import com.android.bookswap.resources.C
 import com.android.bookswap.ui.authentication.SignInScreen
 import com.android.bookswap.ui.books.add.AddToBookScreen
-import com.android.bookswap.ui.map.FilterMapScreen
 import com.android.bookswap.ui.books.add.BookAdditionChoiceScreen
 import com.android.bookswap.ui.chat.ChatScreen
 import com.android.bookswap.ui.chat.ListChatScreen
+import com.android.bookswap.ui.map.FilterMapScreen
 import com.android.bookswap.ui.map.MapScreen
 import com.android.bookswap.ui.map.TempUser
 import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.navigation.Route
 import com.android.bookswap.ui.navigation.Screen
 import com.android.bookswap.ui.theme.BookSwapAppTheme
+import com.google.firebase.Firebase
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.firestore
 import java.util.UUID
 
 class MainActivity : ComponentActivity() {

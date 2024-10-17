@@ -42,10 +42,10 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.bookswap.data.DataBook
+import com.android.bookswap.model.map.BookFilter
 import com.android.bookswap.ui.navigation.BottomNavigationMenu
 import com.android.bookswap.ui.navigation.List_Navigation_Bar_Destinations
 import com.android.bookswap.ui.navigation.NavigationActions
-import com.android.bookswap.model.map.BookFilter
 import com.android.bookswap.ui.navigation.Screen
 import com.android.bookswap.ui.theme.ColorVariable
 import com.google.android.gms.maps.model.CameraPosition
@@ -72,11 +72,6 @@ const val INIT_ZOOM = 10F
  * @param bookFilter An instance of [BookFilter] to filter the books displayed on the map.
  */
 @Composable
-fun MapScreen(
-    listUser: List<TempUser>,
-    navigationActions: NavigationActions,
-    selectedUser: TempUser? = null
-) {
 fun MapScreen(
     listUser: List<TempUser>,
     selectedUser: TempUser? = null,
