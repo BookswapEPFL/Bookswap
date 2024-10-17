@@ -56,11 +56,11 @@ jobs:
           RELEASE_KEYSTORE_PASSWORD: ${{ secrets.KEY_STORE_PASSWORD }}
           RELEASE_KEYSTORE_ALIAS: ${{ secrets.ALIAS }}
           RELEASE_KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-        run: ./gradlew bundleRelease --stacktrace
+        run: ./gradlew build
 
 
       - name: Upload Release Build to Artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: release-artifacts
-          path: ${{ steps.releaseApk.outputs.apkfile }}
+          name: app-debug.apk
+          path: app/build/outputs/apk/debug/app-debug.apk
