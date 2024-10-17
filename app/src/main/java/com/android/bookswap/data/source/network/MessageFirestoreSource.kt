@@ -56,7 +56,7 @@ class MessageFirestoreSource(private val db: FirebaseFirestore) : MessageReposit
     }
   }
 
-  fun addMessagesListener(
+  override fun addMessagesListener(
       otherUserId: String,
       currentUserId: String,
       callback: (Result<List<DataMessage>>) -> Unit
