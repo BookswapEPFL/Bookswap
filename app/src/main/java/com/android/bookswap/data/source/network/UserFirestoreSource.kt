@@ -4,8 +4,6 @@ import android.util.Log
 import com.android.bookswap.data.DataUser
 import com.android.bookswap.data.repository.UsersRepository
 import com.google.android.gms.tasks.Task
-import com.google.firebase.Firebase
-import com.google.firebase.auth.auth
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 
@@ -20,13 +18,7 @@ class UserFirestoreSource(private val db: FirebaseFirestore) : UsersRepository {
    * user is authenticated, it triggers the OnSuccess callback
    */
   override fun init(callback: (Result<Unit>) -> Unit) {
-    Firebase.auth.addAuthStateListener {
-      if (it.currentUser != null) {
-        Log.i("current firebase user", it.currentUser!!.uid)
-        callback(Result.success(Unit))
-      }
-      callback(Result.failure(Exception("User is not logged in firestore")))
-    }
+    callback(Result.success(Unit))
   }
   /** Generates and returns a new unique document ID for a user in Firestore */
   override fun getNewUid(): String {
@@ -41,12 +33,9 @@ class UserFirestoreSource(private val db: FirebaseFirestore) : UsersRepository {
     db.collection(COLLECTION_NAME).get().addOnCompleteListener { task ->
       if (task.isSuccessful) {
         // Maps Firestore documents to DataUser objects or returns an empty list
-        val users =
-            task.result?.mapNotNull { document ->
-              val result = documentToUser(document)
-              result.getOrNull()
-            } ?: emptyList()
-        callback(Result.success(users))
+        callback(
+            Result.success(
+                task.result?.mapNotNull { documentToUser(it).getOrNull() } ?: emptyList()))
       } else {
         callback(Result.failure(task.exception!!))
       }
@@ -62,12 +51,9 @@ class UserFirestoreSource(private val db: FirebaseFirestore) : UsersRepository {
     db.collection(COLLECTION_NAME).whereEqualTo("UUID", uuid).get().addOnCompleteListener { task ->
       if (task.isSuccessful) {
         // Maps Firestore documents to DataUser objects or returns an empty list
-        val users =
-            task.result?.mapNotNull { document ->
-              val result = documentToUser(document)
-              result.getOrNull()
-            } ?: emptyList()
-        callback(Result.success(users.first()))
+        callback(
+            Result.success(
+                task.result?.firstNotNullOfOrNull { documentToUser(it).getOrNull() } ?: DataUser()))
       } else {
         callback(Result.failure(task.exception!!))
       }
