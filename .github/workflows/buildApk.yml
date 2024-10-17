@@ -28,6 +28,9 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
+      - name: Setup Android SDK
+        run: android-actions/setup-android@v2.0.10
+
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
 
@@ -36,29 +39,31 @@ jobs:
         env:
           GOOGLE_SERVICES: ${{ secrets.GOOGLE_SERVICES }}
           LOCAL_PROPERTIES: ${{ secrets.LOCAL_PROPERTIES }}
-          DEBUG_KEYSTORE: ${{ secrets.DEBUG_KEYSTORE }}
         run: |
           echo "$GOOGLE_SERVICES" | base64 --decode > ./app/google-services.json
           echo "$LOCAL_PROPERTIES" | base64 --decode > ./local.properties
-          echo "$DEBUG_KEYSTORE" | base64 --decode > ./debug.keystore
 
-      # Cache the Gradle dependencies to speed up builds
-      - name: Cache Gradle dependencies
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            gradle-${{ runner.os }}
+      - name: Decode Keystore
+        env:
+            ENCODED_STRING: ${{ secrets.SIGNING_KEY }}
+            RELEASE_KEYSTORE_PASSWORD: ${{ secrets.KEY_STORE_PASSWORD }}
+            RELEASE_KEYSTORE_ALIAS: ${{ secrets.ALIAS }}
+            RELEASE_KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
 
-      - name: Build APK
-        run: ./gradlew build
+        run: |
+            echo $ENCODED_STRING > keystore-b64.txt
+            base64 -d keystore-b64.txt > keystore.jks
 
-      # Upload the APK as an artifact
-      - name: Upload APK
+      - name: Build Release bundle
+        env:
+          RELEASE_KEYSTORE_PASSWORD: ${{ secrets.KEY_STORE_PASSWORD }}
+          RELEASE_KEYSTORE_ALIAS: ${{ secrets.ALIAS }}
+          RELEASE_KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: ./gradlew bundleRelease --stacktrace
+
+
+      - name: Upload Release Build to Artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: app-debug.apk
+          name: app-debug
           path: app/build/outputs/apk/debug/app-debug.apk
