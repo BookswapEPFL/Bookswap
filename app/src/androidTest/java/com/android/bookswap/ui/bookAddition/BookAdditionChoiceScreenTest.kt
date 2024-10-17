@@ -4,6 +4,7 @@ import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import com.android.bookswap.ui.books.add.BookAdditionChoiceScreen
 import androidx.navigation.compose.rememberNavController
 import com.android.bookswap.ui.navigation.NavigationActions
 import org.junit.Before

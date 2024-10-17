@@ -1,4 +1,4 @@
-package com.android.bookswap.ui.bookAddition
+package com.android.bookswap.ui.books.add
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
