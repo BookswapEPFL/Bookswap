@@ -17,9 +17,14 @@ import androidx.navigation.navigation
 import com.android.bookswap.data.BookLanguages
 import com.android.bookswap.data.DataBook
 import com.android.bookswap.data.source.network.BooksFirestoreRepository
+import com.android.bookswap.data.source.network.MessageFirestoreSource
+import com.android.bookswap.model.chat.MessageBox
 import com.android.bookswap.resources.C
 import com.android.bookswap.ui.addBook.AddToBookScreen
 import com.android.bookswap.ui.authentication.SignInScreen
+import com.android.bookswap.ui.bookAddition.BookAdditionChoiceScreen
+import com.android.bookswap.ui.chat.ChatScreen
+import com.android.bookswap.ui.chat.ListChatScreen
 import com.android.bookswap.ui.map.MapScreen
 import com.android.bookswap.ui.map.TempUser
 import com.android.bookswap.ui.navigation.NavigationActions
@@ -87,7 +92,7 @@ class MainActivity : ComponentActivity() {
       }
       navigation(startDestination = Screen.NEWBOOK, route = Route.NEWBOOK) {
         composable(Screen.NEWBOOK) { BookAdditionChoiceScreen(navigationActions) }
-        composable(Screen.ADD_BOOK_MANUALLY) { AddToBook(bookRepository, navigationActions) }
+        composable(Screen.ADD_BOOK_MANUALLY) { AddToBookScreen(bookRepository, navigationActions) }
         composable(Screen.ADD_BOOK_SCAN) { /*Todo*/}
         composable(Screen.ADD_BOOK_ISBN) { /*Todo*/}
       }
