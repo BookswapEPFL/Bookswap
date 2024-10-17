@@ -41,9 +41,9 @@ android {
     signingConfigs {
         create("release") { // Use 'create' method to define the signing configuration
             storeFile = file("keystore.jks") // Reference the keystore file
-            storePassword = System.getenv("RELEASE_KEYSTORE_PASSWORD") // Read from GitHub Secrets
-            keyAlias = System.getenv("RELEASE_KEYSTORE_ALIAS") // Read from GitHub Secrets
-            keyPassword = System.getenv("RELEASE_KEY_PASSWORD") // Read from GitHub Secrets
+            storePassword = System.getenv("KEY_STORE_PASSWORD") // Read from GitHub Secrets
+            keyAlias = System.getenv("ALIAS") // Read from GitHub Secrets
+            keyPassword = System.getenv("KEY_PASSWORD") // Read from GitHub Secrets
         }
     }
 
