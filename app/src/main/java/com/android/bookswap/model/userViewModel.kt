@@ -1,6 +1,5 @@
 package com.android.bookswap.model
 
-import android.location.Address
 import androidx.lifecycle.ViewModel
 import com.android.bookswap.data.DataUser
 
@@ -16,8 +15,7 @@ open class UserViewModel(var email: String) : ViewModel() {
     return dataUser
   }
 
-  private fun fetchUser() {
-  }
+  private fun fetchUser() {}
 
   fun updateUser(
       greeting: String = dataUser.greeting,
