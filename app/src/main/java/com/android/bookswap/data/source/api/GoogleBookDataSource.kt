@@ -33,8 +33,13 @@ class GoogleBookDataSource(context: Context) {
    * @author EdenKahane
    */
   fun getBookFromISBN(isbn: String, callback: (Result<DataBook>) -> Unit) {
-    require(isbn.all { it.isDigit() }) { "ISBN should only be composed of digits" }
-    require(isbn.length == 10 || isbn.length == 13) { "ISBN should be of length 10 or 13" }
+    try {
+      require(isbn.all { it.isDigit() }) { "ISBN should only be composed of digits" }
+      require(isbn.length == 10 || isbn.length == 13) { "ISBN should be of length 10 or 13" }
+    } catch (exception: Exception) {
+      callback(Result.failure(exception))
+      return
+    }
 
     val stringRequest =
         StringRequest(
