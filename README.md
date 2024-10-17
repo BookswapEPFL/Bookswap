@@ -26,3 +26,5 @@ Lastly, there is a method of connecting with other people to propose the book ex
 [Team review sheet](https://docs.google.com/spreadsheets/d/1hyi3ISzlwAXZ63ztd7Q84RkBFf24cPgatv3uUx4Y4hc/edit?usp=sharing)
 
 [Team minutes](https://docs.google.com/spreadsheets/d/1YF34CWge25Y1hSQsP5UWHCDoyYNJaxIPasSb13gWYao/edit?usp=sharing)
+
+[Architecture Diagram](https://lucid.app/lucidchart/a07f4bb7-a054-40e9-95be-d4cbb0485822/edit?viewport_loc=-1324%2C33%2C6059%2C2938%2C0_0&invitationId=inv_d502a57d-8d89-4e37-9a4f-f06ec2cf1941)
