@@ -46,10 +46,10 @@ jobs:
             RELEASE_KEYSTORE_PASSWORD: ${{ secrets.KEY_STORE_PASSWORD }}
             RELEASE_KEYSTORE_ALIAS: ${{ secrets.ALIAS }}
             RELEASE_KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-
         run: |
-            echo $ENCODED_STRING > keystore-b64.txt
-            base64 -d keystore-b64.txt > keystore.jks
+          echo $ENCODED_STRING | base64 --decode > keystore.jks
+          # Debug: List files to ensure keystore exists
+          ls -l keystore.jks
 
       - name: Build Release bundle
         env:
