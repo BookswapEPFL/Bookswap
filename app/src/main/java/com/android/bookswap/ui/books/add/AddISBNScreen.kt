@@ -36,17 +36,19 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.android.bookswap.data.repository.BooksRepository
 import com.android.bookswap.data.source.api.GoogleBookDataSource
 import com.android.bookswap.ui.components.ButtonComponent
 import com.android.bookswap.ui.components.FieldComponent
 import com.android.bookswap.ui.navigation.NavigationActions
+import com.android.bookswap.ui.navigation.TopLevelDestinations
 import com.android.bookswap.ui.profile.ProfileIcon
 import com.android.bookswap.ui.theme.ColorVariable
 
 /** This is the main screen for the chat feature. It displays the list of messages */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddISBNScreen(navigationActions: NavigationActions) {
+fun AddISBNScreen(navigationActions: NavigationActions, booksRepository: BooksRepository) {
   val context = LocalContext.current
   Scaffold(
       topBar = {
@@ -115,9 +117,10 @@ fun AddISBNScreen(navigationActions: NavigationActions) {
                             if (result.isFailure) {
                               Log.e("AddBook", result.exceptionOrNull().toString())
                             } else {
-                              /** TODO: Add book */
-                              // navigationActions.navigateTo() TODO: currently there is no top
-                              // level for the book list
+                              booksRepository.addBook(
+                                  result.getOrThrow(),
+                                  { navigationActions.navigateTo(TopLevelDestinations.NEW_BOOK) },
+                                  { error -> Log.e("AddBook", error.toString()) })
                             }
                           }
                         }) {
