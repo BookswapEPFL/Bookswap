@@ -9,7 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
-import com.android.bookswap.ui.theme.Accent
+import com.android.bookswap.ui.theme.ColorVariable
 
 /** Profile Icon for the top app bar */
 @Composable
@@ -18,7 +18,7 @@ fun ProfileIcon() {
     Icon(
         Icons.Filled.AccountCircle,
         contentDescription = "Profile Icon",
-        tint = Accent,
+        tint = ColorVariable.Accent,
         modifier = Modifier.size(32.dp).testTag("profileIcon"))
   }
 }

@@ -27,6 +27,7 @@ object Screen {
   const val ADD_BOOK_SCAN = "AddBookScan Screen"
   const val ADD_BOOK_ISBN = "AddBookISBN Screen"
   const val SETTINGS = "Settings Screen"
+  const val FILTER = "Filter Screen"
 }
 
 data class TopLevelDestination(val route: String, val icon: ImageVector, val textId: String)
@@ -35,16 +36,16 @@ object TopLevelDestinations {
   val CHAT =
       TopLevelDestination(route = Route.CHAT, icon = Icons.Filled.MailOutline, textId = "Chat")
   val MAP = TopLevelDestination(route = Route.MAP, icon = Icons.Outlined.Place, textId = "Map")
-  val NEWBOOK =
+  val NEW_BOOK =
       TopLevelDestination(
           route = Route.NEWBOOK, icon = Icons.Outlined.AddCircle, textId = "New Book")
-  val PROFIL =
+  val PROFILE =
       TopLevelDestination(
-          route = Route.PROFIL, icon = Icons.Outlined.AccountCircle, textId = "Profil")
+          route = Route.PROFIL, icon = Icons.Outlined.AccountCircle, textId = "Profile")
 }
 /** List of top level destinations that are shown in the bottom navigation bar */
 val List_Navigation_Bar_Destinations =
-    listOf(TopLevelDestinations.CHAT, TopLevelDestinations.NEWBOOK, TopLevelDestinations.MAP)
+    listOf(TopLevelDestinations.CHAT, TopLevelDestinations.NEW_BOOK, TopLevelDestinations.MAP)
 
 open class NavigationActions(
     private val navController: NavHostController,
@@ -66,10 +67,10 @@ open class NavigationActions(
         inclusive = true
       }
 
-      // Avoid multiple copies of the same destination when reselecting same item
+      // Avoid multiple copies of the same destination when reelecting same item
       launchSingleTop = true
 
-      // Restore state when reselecting a previously selected item
+      // Restore state when reelecting a previously selected item
       if (destination.route != Route.AUTH) {
         restoreState = true
       }
