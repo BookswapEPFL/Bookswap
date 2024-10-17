@@ -3,15 +3,20 @@ package com.android.bookswap.model.chat
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
+import android.content.Context.NOTIFICATION_SERVICE
 import android.content.Intent
 import android.os.Build
 import androidx.core.app.NotificationCompat
+import androidx.core.content.ContextCompat.getSystemService
 import com.android.bookswap.MainActivity
 import com.android.bookswap.R
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 
 /** Service to handle Firebase Cloud Messaging notifications. */
+const val DEFAULT_TITLE = "Hello There!"
+const val DEFAULT_BODY = "You have a new notification"
+
 open class MyFirebaseMessagingService : FirebaseMessagingService() {
   /**
    * Called when a message is received.
@@ -20,8 +25,8 @@ open class MyFirebaseMessagingService : FirebaseMessagingService() {
    */
   override fun onMessageReceived(remoteMessage: RemoteMessage) {
     val notification = remoteMessage.notification
-    val title = notification?.title ?: "Hello There!"
-    val body = notification?.body ?: "You have a new notification"
+    val title = notification?.title ?: DEFAULT_TITLE
+    val body = notification?.body ?: DEFAULT_BODY
     sendNotification(title, body)
   }
 
@@ -38,7 +43,6 @@ open class MyFirebaseMessagingService : FirebaseMessagingService() {
     val pendingIntent =
         PendingIntent.getActivity(
             this, 0, intent, PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_IMMUTABLE)
-
     // Create intent and PendingIntent for the "Accept" action
     val acceptIntent =
         Intent(this, NotificationActionReceiver::class.java).apply { action = "ACTION_ACCEPT" }
@@ -104,6 +108,7 @@ open class MyFirebaseMessagingService : FirebaseMessagingService() {
           NotificationChannel(channelId, channelName, importance).apply {
             description = "Channel for BookSwap notifications"
             enableLights(true)
+
             lightColor = android.graphics.Color.RED
             enableVibration(true)
           }
