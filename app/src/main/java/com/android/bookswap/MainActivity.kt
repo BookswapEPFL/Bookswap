@@ -16,43 +16,61 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
 import com.android.bookswap.data.BookLanguages
 import com.android.bookswap.data.DataBook
+import com.android.bookswap.data.source.network.MessageFirestoreSource
+import com.android.bookswap.model.chat.MessageBox
+import com.android.bookswap.model.map.Geolocation
 import com.android.bookswap.resources.C
 import com.android.bookswap.ui.authentication.SignInScreen
+import com.android.bookswap.ui.chat.ChatScreen
+import com.android.bookswap.ui.chat.ListChatScreen
 import com.android.bookswap.ui.map.MapScreen
 import com.android.bookswap.ui.map.TempUser
 import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.navigation.Route
 import com.android.bookswap.ui.navigation.Screen
 import com.android.bookswap.ui.theme.BookSwapAppTheme
+import com.google.firebase.firestore.FirebaseFirestore
 import java.util.UUID
 
 class MainActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
+
+    // Initialize Firebase Firestore
+    val db = FirebaseFirestore.getInstance()
+
+    // Create the MessageFirestoreSource object
+    val messageRepository = MessageFirestoreSource(db)
+
     setContent {
       BookSwapAppTheme {
         // A surface container using the 'background' color from the theme
         Surface(
             modifier = Modifier.fillMaxSize().semantics { testTag = C.Tag.main_screen_container },
             color = MaterialTheme.colorScheme.background) {
-              BookSwapApp()
+              BookSwapApp(messageRepository)
             }
       }
     }
   }
 
+
+
   @Composable
-  fun BookSwapApp() {
+  fun BookSwapApp(messageRepository: MessageFirestoreSource) {
     val navController = rememberNavController()
     val navigationActions = NavigationActions(navController)
+    val placeHolderData: List<MessageBox> = emptyList()
+    val userid1 = "1";
+    val userid2 = "2";
 
     NavHost(navController = navController, startDestination = Route.AUTH) {
       navigation(startDestination = Screen.AUTH, route = Route.AUTH) {
-        composable(Screen.AUTH) { SignInScreen(navigationActions) } // *Todo*/}
+        composable(Screen.AUTH) { SignInScreen(navigationActions) }
       }
       navigation(startDestination = Screen.CHATLIST, route = Route.CHAT) {
-        composable(Screen.CHATLIST) { /*Todo*/}
-        composable(Screen.CHAT) { /*Todo*/}
+        composable(Screen.CHATLIST) { ListChatScreen(placeHolderData,navigationActions)}
+        composable(Screen.CHAT) { ChatScreen(messageRepository, userid1,userid2) }
       }
       navigation(startDestination = Screen.MAP, route = Route.MAP) {
         composable(Screen.MAP) { MapScreen(user) }
