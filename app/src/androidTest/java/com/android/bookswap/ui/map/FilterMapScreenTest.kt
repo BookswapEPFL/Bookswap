@@ -31,7 +31,7 @@ class FilterMapScreenTest {
 
   @Test
   fun testButtonBlock() {
-    composeTestRule.setContent { ButtonBlock(listOf("test"), listOf()){} }
+    composeTestRule.setContent { ButtonBlock(listOf("test"), listOf()) {} }
     composeTestRule.onNodeWithTag("filter_buttonFilter_test").assertIsDisplayed()
     composeTestRule.onNodeWithTag("filter_buttonFilter_test").assertHasClickAction()
     composeTestRule.onNodeWithTag("filter_buttonFilter_test").assertTextEquals("test")

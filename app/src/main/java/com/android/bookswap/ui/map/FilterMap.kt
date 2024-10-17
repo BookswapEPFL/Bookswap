@@ -22,7 +22,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -57,10 +56,9 @@ private val TOP_BAR_TITLE_FONT_WEIGHT = FontWeight(700)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FilterMapScreen(navigationActions: NavigationActions, bookFilter: BookFilter) {
-    val selectedFiltersGenres by bookFilter.genresFilter.collectAsState()
-    val selectedFiltersLanguages by bookFilter.languagesFilter.collectAsState()
-    val context = LocalContext.current
-
+  val selectedFiltersGenres by bookFilter.genresFilter.collectAsState()
+  val selectedFiltersLanguages by bookFilter.languagesFilter.collectAsState()
+  val context = LocalContext.current
 
   Scaffold(
       containerColor = ColorVariable.BackGround,
@@ -92,11 +90,9 @@ fun FilterMapScreen(navigationActions: NavigationActions, bookFilter: BookFilter
         LazyColumn(contentPadding = paddingValues, modifier = Modifier.fillMaxSize()) {
           item {
             ButtonBlock(
-                BookGenres.values().map {
-                  it.Genre
-                },
-                selectedFiltersGenres.map { it.Genre }){ newSelection ->
-                    bookFilter.setGenres(newSelection)
+                BookGenres.values().map { it.Genre }, selectedFiltersGenres.map { it.Genre }) {
+                    newSelection ->
+                  bookFilter.setGenres(newSelection)
                 }
           }
           item {
@@ -105,8 +101,10 @@ fun FilterMapScreen(navigationActions: NavigationActions, bookFilter: BookFilter
                     BookLanguages.values().map {
                       it.toString().lowercase().replaceFirstChar { c -> c.uppercase() }
                     },
-                selectedFiltersLanguages.map { it.name.lowercase().replaceFirstChar { c -> c.uppercase() } }){ newSelection ->
-                    bookFilter.setLanguages(newSelection)
+                selectedFiltersLanguages.map {
+                  it.name.lowercase().replaceFirstChar { c -> c.uppercase() }
+                }) { newSelection ->
+                  bookFilter.setLanguages(newSelection)
                 }
           }
         }
@@ -116,8 +114,8 @@ fun FilterMapScreen(navigationActions: NavigationActions, bookFilter: BookFilter
           Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
             Button(
                 onClick = {
-                  bookFilter.setGenres( selectedFiltersGenres.map { it.name })
-                    bookFilter.setLanguages( selectedFiltersLanguages.map { it.name })
+                  bookFilter.setGenres(selectedFiltersGenres.map { it.name })
+                  bookFilter.setLanguages(selectedFiltersLanguages.map { it.name })
                   Toast.makeText(context, "Filters applied", Toast.LENGTH_SHORT).show()
                   navigationActions.goBack()
                 },
@@ -151,7 +149,11 @@ private const val MAX_ITEMS_PER_ROW_BB = 3
 /** This is a composable that displays a row of buttons */
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun ButtonBlock(buttonTexts: List<String>, selectedFilters: List<String>, onSelectionChange: (List<String>) -> Unit) {
+fun ButtonBlock(
+    buttonTexts: List<String>,
+    selectedFilters: List<String>,
+    onSelectionChange: (List<String>) -> Unit
+) {
   FlowRow(
       modifier =
           Modifier.fillMaxWidth()
@@ -166,12 +168,13 @@ fun ButtonBlock(buttonTexts: List<String>, selectedFilters: List<String>, onSele
 
           Button(
               onClick = {
-                  val newSelection = if (isSelected) {
+                val newSelection =
+                    if (isSelected) {
                       selectedFilters - text
-                  } else {
+                    } else {
                       selectedFilters + text
-                  }
-                  onSelectionChange(newSelection)
+                    }
+                onSelectionChange(newSelection)
               },
               modifier =
                   Modifier.wrapContentSize()

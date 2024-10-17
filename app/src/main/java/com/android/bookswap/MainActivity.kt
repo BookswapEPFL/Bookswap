@@ -20,7 +20,6 @@ import com.android.bookswap.data.DataBook
 import com.android.bookswap.model.map.BookFilter
 import com.android.bookswap.resources.C
 import com.android.bookswap.ui.authentication.SignInScreen
-import com.android.bookswap.ui.map.FilterButton
 import com.android.bookswap.ui.map.FilterMapScreen
 import com.android.bookswap.ui.map.MapScreen
 import com.android.bookswap.ui.map.TempUser
@@ -60,8 +59,10 @@ class MainActivity : ComponentActivity() {
         composable(Screen.CHAT) { /*Todo*/}
       }
       navigation(startDestination = Screen.MAP, route = Route.MAP) {
-        composable(Screen.MAP) { MapScreen(user,navigationActions = navigationActions,bookFilter = bookFilter) }
-        composable(Screen.FILTER) { FilterMapScreen(navigationActions, bookFilter)}
+        composable(Screen.MAP) {
+          MapScreen(user, navigationActions = navigationActions, bookFilter = bookFilter)
+        }
+        composable(Screen.FILTER) { FilterMapScreen(navigationActions, bookFilter) }
       }
       navigation(startDestination = Screen.NEWBOOK, route = Route.NEWBOOK) {
         composable(Screen.NEWBOOK) { /*Todo*/}
@@ -112,4 +113,5 @@ val user =
                         photo = null,
                         language = BookLanguages.GERMAN,
                         isbn = null,
-                        genres = listOf(BookGenres.SCIENCEFICTION,BookGenres.AUTOBIOGRAPHY)),)))
+                        genres = listOf(BookGenres.SCIENCEFICTION, BookGenres.AUTOBIOGRAPHY)),
+                )))

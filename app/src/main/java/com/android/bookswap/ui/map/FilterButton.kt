@@ -24,24 +24,21 @@ private val BUTTON_CORNER_RADIUS_DP = 50.dp
 
 @Composable
 fun FilterButton(onClick: () -> Unit) {
-    Box(
-        modifier = Modifier
-            .padding(PADDING_DP)
-    ) {
-        IconButton(
-            onClick = onClick,
-            modifier = Modifier
-                .testTag("filterButton")
-                .background(color = ColorVariable.BackGround, shape = RoundedCornerShape(size = BUTTON_CORNER_RADIUS_DP)) // Use constant
+  Box(modifier = Modifier.padding(PADDING_DP)) {
+    IconButton(
+        onClick = onClick,
+        modifier =
+            Modifier.testTag("filterButton")
+                .background(
+                    color = ColorVariable.BackGround,
+                    shape = RoundedCornerShape(size = BUTTON_CORNER_RADIUS_DP)) // Use constant
                 .size(BUTTON_SIZE_DP)
-                .align(Alignment.TopStart)
-        ) {
-            Icon(
-                imageVector = Icons.Default.MoreVert,
-                contentDescription = "Filter",
-                tint = ColorVariable.Accent,
-                modifier = Modifier.size(ICON_SIZE_DP)
-            )
+                .align(Alignment.TopStart)) {
+          Icon(
+              imageVector = Icons.Default.MoreVert,
+              contentDescription = "Filter",
+              tint = ColorVariable.Accent,
+              modifier = Modifier.size(ICON_SIZE_DP))
         }
-    }
+  }
 }

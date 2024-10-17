@@ -66,9 +66,10 @@ class MapScreenTest {
   @Test
   fun displayAllComponents() {
     composeTestRule.setContent {
-        val navController = rememberNavController()
-        val navigationActions = NavigationActions(navController)
-        MapScreen(user, user[0], navigationActions, BookFilter()) }
+      val navController = rememberNavController()
+      val navigationActions = NavigationActions(navController)
+      MapScreen(user, user[0], navigationActions, BookFilter())
+    }
     composeTestRule.onNodeWithTag("mapScreen").assertIsDisplayed()
     composeTestRule.onNodeWithTag("mapGoogleMap").assertIsDisplayed()
     composeTestRule.onNodeWithTag("mapBoxMarker").assertIsDisplayed()
@@ -97,9 +98,10 @@ class MapScreenTest {
   @Test
   fun noMarkerDisplayedForUserWithoutBooks() {
     composeTestRule.setContent {
-        val navController = rememberNavController()
-        val navigationActions = NavigationActions(navController)
-        MapScreen(userWithoutBooks, userWithoutBooks[0], navigationActions, BookFilter()) }
+      val navController = rememberNavController()
+      val navigationActions = NavigationActions(navController)
+      MapScreen(userWithoutBooks, userWithoutBooks[0], navigationActions, BookFilter())
+    }
 
     // Assert that the marker info window is displayed, but without book entries
     composeTestRule.onNodeWithTag("mapBoxMarker").assertIsNotDisplayed()
@@ -109,9 +111,10 @@ class MapScreenTest {
   @Test
   fun noBookDisplayedInDraggableMenuForAllUsersWithNoBook() {
     composeTestRule.setContent {
-        val navController = rememberNavController()
-        val navigationActions = NavigationActions(navController)
-        MapScreen(userWithoutBooks,navigationActions =  navigationActions, bookFilter = BookFilter()) }
+      val navController = rememberNavController()
+      val navigationActions = NavigationActions(navController)
+      MapScreen(userWithoutBooks, navigationActions = navigationActions, bookFilter = BookFilter())
+    }
 
     composeTestRule.onNodeWithTag("mapDraggableMenu").assertIsDisplayed()
     composeTestRule.onAllNodesWithTag("mapDraggableMenuBookBox").assertCountEquals(0) // No books
@@ -120,9 +123,10 @@ class MapScreenTest {
   @Test
   fun emptyUserListDoesNotShowMarkers() {
     composeTestRule.setContent {
-        val navController = rememberNavController()
-        val navigationActions = NavigationActions(navController)
-        MapScreen(listOf(), null,navigationActions, bookFilter = BookFilter()) }
+      val navController = rememberNavController()
+      val navigationActions = NavigationActions(navController)
+      MapScreen(listOf(), null, navigationActions, bookFilter = BookFilter())
+    }
 
     // Assert that the map is displayed but no marker and info window is shown
     composeTestRule.onNodeWithTag("mapGoogleMap").assertIsDisplayed()
@@ -132,9 +136,10 @@ class MapScreenTest {
   @Test
   fun emptyUserListGiveEmptyDraggableMenu() {
     composeTestRule.setContent {
-        val navController = rememberNavController()
-        val navigationActions = NavigationActions(navController)
-        MapScreen(userWithoutBooks,navigationActions = navigationActions, bookFilter = BookFilter()) }
+      val navController = rememberNavController()
+      val navigationActions = NavigationActions(navController)
+      MapScreen(userWithoutBooks, navigationActions = navigationActions, bookFilter = BookFilter())
+    }
 
     // Assert that the marker info window is displayed, but without book entries
     composeTestRule.onNodeWithTag("mapDraggableMenu").assertIsDisplayed()
@@ -144,9 +149,10 @@ class MapScreenTest {
   @Test
   fun noUserSelectedInitially() {
     composeTestRule.setContent {
-        val navController = rememberNavController()
-        val navigationActions = NavigationActions(navController)
-        MapScreen(user, null,navigationActions, bookFilter = BookFilter()) }
+      val navController = rememberNavController()
+      val navigationActions = NavigationActions(navController)
+      MapScreen(user, null, navigationActions, bookFilter = BookFilter())
+    }
 
     // Assert that no info window is displayed when no user is selected
     composeTestRule.onNodeWithTag("mapGoogleMap").assertIsDisplayed()
@@ -156,9 +162,10 @@ class MapScreenTest {
   @Test
   fun draggableMenu_canBeDraggedVertically() {
     composeTestRule.setContent {
-        val navController = rememberNavController()
-        val navigationActions = NavigationActions(navController)
-        MapScreen(user, user[0],navigationActions, bookFilter = BookFilter()) }
+      val navController = rememberNavController()
+      val navigationActions = NavigationActions(navController)
+      MapScreen(user, user[0], navigationActions, bookFilter = BookFilter())
+    }
 
     // Ensure the DraggableMenu is initially displayed
     composeTestRule.onNodeWithTag("mapDraggableMenu").assertIsDisplayed()
@@ -180,26 +187,26 @@ class MapScreenTest {
     composeTestRule.onNodeWithTag("mapDraggableMenu").assertIsDisplayed()
   }
 
-    @Test
-    fun filterButtonIsDisplayed() {
-        composeTestRule.setContent {
-            val navController = rememberNavController()
-            val navigationActions = NavigationActions(navController)
-            MapScreen(user, user[0], navigationActions, BookFilter())
-        }
-        composeTestRule.onNodeWithTag("filterButton").assertIsDisplayed()
+  @Test
+  fun filterButtonIsDisplayed() {
+    composeTestRule.setContent {
+      val navController = rememberNavController()
+      val navigationActions = NavigationActions(navController)
+      MapScreen(user, user[0], navigationActions, BookFilter())
     }
+    composeTestRule.onNodeWithTag("filterButton").assertIsDisplayed()
+  }
 
-    @Test
-    fun bookChangedWhenFilterApplied() {
-        val bookFilter = BookFilter()
-        bookFilter.setGenres(listOf("Horror"))
-        composeTestRule.setContent {
-            val navController = rememberNavController()
-            val navigationActions = NavigationActions(navController)
-            MapScreen(user, user[0], navigationActions, bookFilter)
-        }
-        composeTestRule.onNodeWithTag("mapDraggableMenuBookBox").assertIsDisplayed()
-        composeTestRule.onAllNodesWithTag("mapDraggableMenuBookBox").assertCountEquals(1)
+  @Test
+  fun bookChangedWhenFilterApplied() {
+    val bookFilter = BookFilter()
+    bookFilter.setGenres(listOf("Horror"))
+    composeTestRule.setContent {
+      val navController = rememberNavController()
+      val navigationActions = NavigationActions(navController)
+      MapScreen(user, user[0], navigationActions, bookFilter)
     }
+    composeTestRule.onNodeWithTag("mapDraggableMenuBookBox").assertIsDisplayed()
+    composeTestRule.onAllNodesWithTag("mapDraggableMenuBookBox").assertCountEquals(1)
+  }
 }

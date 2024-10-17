@@ -68,7 +68,12 @@ const val INIT_ZOOM = 10F
  *   This user’s info window will be shown if not null.
  */
 @Composable
-fun MapScreen(listUser: List<TempUser>, selectedUser: TempUser? = null,navigationActions: NavigationActions,bookFilter: BookFilter) {
+fun MapScreen(
+    listUser: List<TempUser>,
+    selectedUser: TempUser? = null,
+    navigationActions: NavigationActions,
+    bookFilter: BookFilter
+) {
 
   val cameraPositionState = rememberCameraPositionState {
     position = CameraPosition.fromLatLngZoom(LatLng(0.0, 0.0), INIT_ZOOM) // Initial camera position
@@ -78,16 +83,14 @@ fun MapScreen(listUser: List<TempUser>, selectedUser: TempUser? = null,navigatio
   var markerScreenPosition by remember { mutableStateOf<Offset?>(null) }
   val listAllBooks = listUser.flatMap { it.listBook }
 
-    val genresFilter by bookFilter.genresFilter.collectAsState()
-    val languagesFilter by bookFilter.languagesFilter.collectAsState()
+  val genresFilter by bookFilter.genresFilter.collectAsState()
+  val languagesFilter by bookFilter.languagesFilter.collectAsState()
 
-    val filteredBooks = remember(genresFilter, languagesFilter) {
-        bookFilter.filterBooks(listAllBooks)
-    }
+  val filteredBooks =
+      remember(genresFilter, languagesFilter) { bookFilter.filterBooks(listAllBooks) }
 
-    val filteredUsers = listUser.filter { user ->
-        user.listBook.any { book -> filteredBooks.contains(book) }
-    }
+  val filteredUsers =
+      listUser.filter { user -> user.listBook.any { book -> filteredBooks.contains(book) } }
 
   // compute the position of the marker on the screen given the camera position and the marker's
   // position on the map
@@ -385,7 +388,7 @@ private fun DraggableMenu(listAllBooks: List<DataBook>) {
                               // text for the tags of the book, will be added at a later date
                               // It isn't decided how we will handle the tag for the books
                               Text(
-                                  text = book.genres.joinToString(separator = ", ") {it.Genre },
+                                  text = book.genres.joinToString(separator = ", ") { it.Genre },
                                   modifier =
                                       Modifier.fillMaxWidth().testTag("mapDraggableMenuBookBoxTag"),
                                   fontSize = SECONDARY_TEXT_FONT_SP.sp,
