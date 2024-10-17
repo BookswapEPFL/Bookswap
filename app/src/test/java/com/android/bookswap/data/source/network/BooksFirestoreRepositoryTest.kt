@@ -17,7 +17,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.ArgumentMatchers
 import org.mockito.Mock
-import org.mockito.Mockito.mock
 import org.mockito.Mockito.`when`
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.doAnswer
@@ -192,22 +191,17 @@ class BooksFirestoreRepositoryTest {
     assert(result == null) // Should return null due to invalid language
   }
 
-  /**@Test
-  fun getNewUid_returnsUniqueDocumentId() {
-    // Arrange
-    val collectionBooks = "Books"
-    val mockDocumentReference = mock(DocumentReference::class.java)
-    val expectedUid = UUID.randomUUID().toString()
-
-    // Mock Firestore to return a document with the desired ID
-    `when`(mockFirestore.collection(collectionBooks).document()).thenReturn(mockDocumentReference)
-    `when`(mockDocumentReference.id).thenReturn(expectedUid)
-
-    // Act
-    val uid = booksFirestorerRepository.getNewUid()
-
-    // Assert
-    assert(uid.toString() == expectedUid) // Ensure the ID matches the expected value
-  }
-  */
+  /**
+   * @Test fun getNewUid_returnsUniqueDocumentId() { // Arrange val collectionBooks = "Books" val
+   *   mockDocumentReference = mock(DocumentReference::class.java) val expectedUid =
+   *   UUID.randomUUID().toString()
+   *
+   * // Mock Firestore to return a document with the desired ID
+   * `when`(mockFirestore.collection(collectionBooks).document()).thenReturn(mockDocumentReference)
+   * `when`(mockDocumentReference.id).thenReturn(expectedUid)
+   *
+   * // Act val uid = booksFirestorerRepository.getNewUid()
+   *
+   * // Assert assert(uid.toString() == expectedUid) // Ensure the ID matches the expected value }
+   */
 }
