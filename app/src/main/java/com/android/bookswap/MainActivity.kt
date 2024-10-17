@@ -46,7 +46,7 @@ class MainActivity : ComponentActivity() {
     val navController = rememberNavController()
     val navigationActions = NavigationActions(navController)
 
-    NavHost(navController = navController, startDestination = Route.MAP) {
+    NavHost(navController = navController, startDestination = Route.AUTH) {
       navigation(startDestination = Screen.AUTH, route = Route.AUTH) {
         composable(Screen.AUTH) { SignInScreen(navigationActions) } // *Todo*/}
       }
