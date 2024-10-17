@@ -35,7 +35,7 @@ jobs:
           echo "$LOCAL_PROPERTIES" | base64 --decode > ./local.properties
       # 2
       - name: Generate Release APK
-        run: ./gradlew assembleFossRelease
+        run: ./gradlew build
       # 3
       - name: Sign APK
         uses: r0adkll/sign-android-release@v1
