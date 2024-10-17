@@ -10,8 +10,12 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.swipe
 import androidx.compose.ui.test.swipeUp
+import androidx.navigation.compose.rememberNavController
+import com.android.bookswap.data.BookGenres
 import com.android.bookswap.data.BookLanguages
 import com.android.bookswap.data.DataBook
+import com.android.bookswap.model.map.BookFilter
+import com.android.bookswap.ui.navigation.NavigationActions
 import java.util.UUID
 import org.junit.Rule
 import org.junit.Test
@@ -32,7 +36,8 @@ class MapScreenTest {
                           rating = 5,
                           photo = "url_to_photo_1",
                           language = BookLanguages.ENGLISH,
-                          isbn = "123-456-789"),
+                          isbn = "123-456-789",
+                          genres = listOf(BookGenres.FICTION, BookGenres.NONFICTION)),
                       DataBook(
                           uuid = UUID.randomUUID(),
                           title = "Book 2",
@@ -41,7 +46,8 @@ class MapScreenTest {
                           rating = 4,
                           photo = "url_to_photo_2",
                           language = BookLanguages.FRENCH,
-                          isbn = "234-567-890"),
+                          isbn = "234-567-890",
+                          genres = listOf(BookGenres.FICTION)),
                       DataBook(
                           uuid = UUID.randomUUID(),
                           title = "Book 3",
@@ -50,7 +56,8 @@ class MapScreenTest {
                           rating = 3,
                           photo = "url_to_photo_3",
                           language = BookLanguages.GERMAN,
-                          isbn = "345-678-901"))))
+                          isbn = "345-678-901",
+                          genres = listOf(BookGenres.HORROR)))))
 
   private val userWithoutBooks =
       listOf(TempUser(latitude = 1.0, longitude = 1.0, listBook = emptyList()))
@@ -58,7 +65,10 @@ class MapScreenTest {
 
   @Test
   fun displayAllComponents() {
-    composeTestRule.setContent { MapScreen(user, user[0]) }
+    composeTestRule.setContent {
+        val navController = rememberNavController()
+        val navigationActions = NavigationActions(navController)
+        MapScreen(user, user[0], navigationActions, BookFilter()) }
     composeTestRule.onNodeWithTag("mapScreen").assertIsDisplayed()
     composeTestRule.onNodeWithTag("mapGoogleMap").assertIsDisplayed()
     composeTestRule.onNodeWithTag("mapBoxMarker").assertIsDisplayed()
@@ -86,7 +96,10 @@ class MapScreenTest {
 
   @Test
   fun noMarkerDisplayedForUserWithoutBooks() {
-    composeTestRule.setContent { MapScreen(userWithoutBooks, userWithoutBooks[0]) }
+    composeTestRule.setContent {
+        val navController = rememberNavController()
+        val navigationActions = NavigationActions(navController)
+        MapScreen(userWithoutBooks, userWithoutBooks[0], navigationActions, BookFilter()) }
 
     // Assert that the marker info window is displayed, but without book entries
     composeTestRule.onNodeWithTag("mapBoxMarker").assertIsNotDisplayed()
@@ -95,7 +108,10 @@ class MapScreenTest {
 
   @Test
   fun noBookDisplayedInDraggableMenuForAllUsersWithNoBook() {
-    composeTestRule.setContent { MapScreen(userWithoutBooks) }
+    composeTestRule.setContent {
+        val navController = rememberNavController()
+        val navigationActions = NavigationActions(navController)
+        MapScreen(userWithoutBooks,navigationActions =  navigationActions, bookFilter = BookFilter()) }
 
     composeTestRule.onNodeWithTag("mapDraggableMenu").assertIsDisplayed()
     composeTestRule.onAllNodesWithTag("mapDraggableMenuBookBox").assertCountEquals(0) // No books
@@ -103,7 +119,10 @@ class MapScreenTest {
 
   @Test
   fun emptyUserListDoesNotShowMarkers() {
-    composeTestRule.setContent { MapScreen(listOf(), null) }
+    composeTestRule.setContent {
+        val navController = rememberNavController()
+        val navigationActions = NavigationActions(navController)
+        MapScreen(listOf(), null,navigationActions, bookFilter = BookFilter()) }
 
     // Assert that the map is displayed but no marker and info window is shown
     composeTestRule.onNodeWithTag("mapGoogleMap").assertIsDisplayed()
@@ -112,7 +131,10 @@ class MapScreenTest {
 
   @Test
   fun emptyUserListGiveEmptyDraggableMenu() {
-    composeTestRule.setContent { MapScreen(userWithoutBooks) }
+    composeTestRule.setContent {
+        val navController = rememberNavController()
+        val navigationActions = NavigationActions(navController)
+        MapScreen(userWithoutBooks,navigationActions = navigationActions, bookFilter = BookFilter()) }
 
     // Assert that the marker info window is displayed, but without book entries
     composeTestRule.onNodeWithTag("mapDraggableMenu").assertIsDisplayed()
@@ -121,7 +143,10 @@ class MapScreenTest {
 
   @Test
   fun noUserSelectedInitially() {
-    composeTestRule.setContent { MapScreen(user, null) }
+    composeTestRule.setContent {
+        val navController = rememberNavController()
+        val navigationActions = NavigationActions(navController)
+        MapScreen(user, null,navigationActions, bookFilter = BookFilter()) }
 
     // Assert that no info window is displayed when no user is selected
     composeTestRule.onNodeWithTag("mapGoogleMap").assertIsDisplayed()
@@ -130,7 +155,10 @@ class MapScreenTest {
 
   @Test
   fun draggableMenu_canBeDraggedVertically() {
-    composeTestRule.setContent { MapScreen(user, user[0]) }
+    composeTestRule.setContent {
+        val navController = rememberNavController()
+        val navigationActions = NavigationActions(navController)
+        MapScreen(user, user[0],navigationActions, bookFilter = BookFilter()) }
 
     // Ensure the DraggableMenu is initially displayed
     composeTestRule.onNodeWithTag("mapDraggableMenu").assertIsDisplayed()
