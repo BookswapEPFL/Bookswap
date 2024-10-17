@@ -1,5 +1,6 @@
 package com.android.bookswap.data
 
+import com.android.bookswap.data.repository.UsersRepository
 import io.mockk.InternalPlatformDsl.toStr
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
@@ -22,7 +23,8 @@ class DataUserTest {
 
   @Test
   fun checkAssign() {
-    val userVM = com.android.bookswap.model.UserViewModel("")
+
+    val userVM = com.android.bookswap.model.UserViewModel("", MockUserRepo())
 
     userVM.updateUser(
         DataUser(
@@ -59,8 +61,7 @@ class DataUserTest {
 
   @Test
   fun checkString() {
-
-    val userVM = com.android.bookswap.model.UserViewModel("")
+    val userVM = com.android.bookswap.model.UserViewModel("", MockUserRepo())
     userVM.updateUser(
         DataUser(
             "M.",
@@ -80,5 +81,77 @@ class DataUserTest {
     assertEquals(
         "M. John Doe:\n  M.|John|Doe\n  John.Doe@example.com|+41223456789\n  0.0, 0.0\n  dummyPic.png\n  dummyUUID0000",
         u1.printFullMultiLine())
+  }
+}
+
+class MockUserRepo : UsersRepository {
+  val mockUserList =
+      mutableMapOf(
+          "usr_01_jd" to
+              DataUser(
+                  "M.",
+                  "John",
+                  "Doe",
+                  "john.doe@example.com",
+                  "+41223456789",
+                  0.0,
+                  0.0,
+                  "",
+                  "usr_01_jd"),
+          "usr_02_jd" to
+              DataUser(
+                  "Mr.",
+                  "Jones",
+                  "Douse",
+                  "jon.doe@example.com",
+                  "+41234567890",
+                  0.0,
+                  0.0,
+                  "",
+                  "usr_02_jd"),
+          "usr_03_jd" to
+              DataUser(
+                  "Ms.",
+                  "Jo",
+                  "Doe",
+                  "jo.doe@example.com",
+                  "+41765432198",
+                  0.0,
+                  0.0,
+                  "",
+                  "usr_03_jd"),
+      )
+
+  override fun init(callback: (Result<Unit>) -> Unit) {
+    TODO("Not yet implemented")
+  }
+
+  override fun getNewUid(): String {
+    return java.util.UUID.randomUUID().toString()
+  }
+
+  override fun getUsers(callback: (Result<List<DataUser>>) -> Unit) {
+    callback(Result.success(mockUserList.values.toList()))
+  }
+
+  override fun getUser(uuid: String, callback: (Result<DataUser>) -> Unit) {
+    val usr = mockUserList.get(uuid)
+    if (usr != null) {
+      callback(Result.success(usr))
+    } else {
+      callback(Result.failure(Throwable("User not found")))
+    }
+  }
+
+  override fun addUser(dataUser: DataUser, callback: (Result<Unit>) -> Unit) {
+    mockUserList.put(dataUser.userId, dataUser)
+  }
+
+  override fun updateUser(dataUser: DataUser, callback: (Result<Unit>) -> Unit) {
+    mockUserList.put(dataUser.userId, dataUser)
+  }
+
+  override fun deleteUser(uuid: String, callback: (Result<Unit>) -> Unit) {
+    mockUserList.remove(uuid)
   }
 }
