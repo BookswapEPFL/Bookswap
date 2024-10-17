@@ -36,6 +36,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.bookswap.model.chat.MessageBox
+import com.android.bookswap.ui.navigation.BottomNavigationMenu
+import com.android.bookswap.ui.navigation.List_Navigation_Bar_Destinations
 import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.navigation.Screen
 import com.android.bookswap.ui.profile.ProfileIcon
@@ -94,7 +96,7 @@ fun ListChatScreen(
               } else {
                 items(placeHolderData.size) { message ->
                   MessageBoxDisplay(placeHolderData[message]) {
-                      navigationActions.navigateTo(Screen.CHAT)
+                    navigationActions.navigateTo(Screen.CHAT)
                   }
                   MessageDivider()
                 }
@@ -102,8 +104,10 @@ fun ListChatScreen(
             }
       },
       bottomBar = {
-        // To Modify with the navbar
-        BottomAppBar(modifier = Modifier.background(color = ColorVariable.BackGround)) {}
+          BottomNavigationMenu(
+              onTabSelect = { destination -> navigationActions.navigateTo(destination) },
+              tabList = List_Navigation_Bar_Destinations,
+              selectedItem = navigationActions.currentRoute())
       })
 }
 

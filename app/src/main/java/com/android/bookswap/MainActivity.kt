@@ -16,11 +16,13 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
 import com.android.bookswap.data.BookLanguages
 import com.android.bookswap.data.DataBook
+import com.android.bookswap.data.source.network.BooksFirestoreRepository
 import com.android.bookswap.data.source.network.MessageFirestoreSource
 import com.android.bookswap.model.chat.MessageBox
-import com.android.bookswap.model.map.Geolocation
 import com.android.bookswap.resources.C
+import com.android.bookswap.ui.addBook.AddToBook
 import com.android.bookswap.ui.authentication.SignInScreen
+import com.android.bookswap.ui.bookAddition.BookAdditionChoiceScreen
 import com.android.bookswap.ui.chat.ChatScreen
 import com.android.bookswap.ui.chat.ListChatScreen
 import com.android.bookswap.ui.map.MapScreen
@@ -41,6 +43,7 @@ class MainActivity : ComponentActivity() {
 
     // Create the MessageFirestoreSource object
     val messageRepository = MessageFirestoreSource(db)
+    val bookRepository = BooksFirestoreRepository(db)
 
     setContent {
       BookSwapAppTheme {
@@ -48,36 +51,45 @@ class MainActivity : ComponentActivity() {
         Surface(
             modifier = Modifier.fillMaxSize().semantics { testTag = C.Tag.main_screen_container },
             color = MaterialTheme.colorScheme.background) {
-              BookSwapApp(messageRepository)
+              BookSwapApp(messageRepository, bookRepository)
             }
       }
     }
   }
 
-
-
   @Composable
-  fun BookSwapApp(messageRepository: MessageFirestoreSource) {
+  fun BookSwapApp(
+      messageRepository: MessageFirestoreSource,
+      bookRepository: BooksFirestoreRepository
+  ) {
     val navController = rememberNavController()
     val navigationActions = NavigationActions(navController)
-    val placeHolderData: List<MessageBox> = emptyList()
-    val userid1 = "1";
-    val userid2 = "2";
+
+
+    val placeHolder = List(12) {
+              MessageBox(
+                  "Contact ${it + 1}",
+                  "Test message $it test for the feature of ellipsis in the message",
+                  "01.01.24")
+          }
+
+    val userid1 = "user123"
+    val userid2 = "user124"
 
     NavHost(navController = navController, startDestination = Route.AUTH) {
       navigation(startDestination = Screen.AUTH, route = Route.AUTH) {
         composable(Screen.AUTH) { SignInScreen(navigationActions) }
       }
       navigation(startDestination = Screen.CHATLIST, route = Route.CHAT) {
-        composable(Screen.CHATLIST) { ListChatScreen(placeHolderData,navigationActions)}
-        composable(Screen.CHAT) { ChatScreen(messageRepository, userid1,userid2) }
+        composable(Screen.CHATLIST) { ListChatScreen(placeHolder, navigationActions) }
+        composable(Screen.CHAT) { ChatScreen(messageRepository, userid1, userid2) }
       }
       navigation(startDestination = Screen.MAP, route = Route.MAP) {
-        composable(Screen.MAP) { MapScreen(user) }
+        composable(Screen.MAP) { MapScreen(user, navigationActions) }
       }
       navigation(startDestination = Screen.NEWBOOK, route = Route.NEWBOOK) {
-        composable(Screen.NEWBOOK) { /*Todo*/}
-        composable(Screen.ADD_BOOK_MANUALLY) { /*Todo*/}
+        composable(Screen.NEWBOOK) { BookAdditionChoiceScreen(navigationActions) }
+        composable(Screen.ADD_BOOK_MANUALLY) { AddToBook(bookRepository, navigationActions) }
         composable(Screen.ADD_BOOK_SCAN) { /*Todo*/}
         composable(Screen.ADD_BOOK_ISBN) { /*Todo*/}
       }

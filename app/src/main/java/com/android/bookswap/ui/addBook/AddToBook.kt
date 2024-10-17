@@ -27,6 +27,8 @@ import androidx.compose.ui.unit.sp
 import com.android.bookswap.data.BookLanguages
 import com.android.bookswap.data.DataBook
 import com.android.bookswap.data.repository.BooksRepository
+import com.android.bookswap.ui.navigation.BackButton
+import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.theme.ColorVariable.Accent
 import com.android.bookswap.ui.theme.ColorVariable.BackGround
 import com.android.bookswap.ui.theme.ColorVariable.Primary
@@ -35,7 +37,7 @@ import java.util.UUID
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddToBook(repository: BooksRepository) {
+fun AddToBook(repository: BooksRepository, navController: NavigationActions) {
   // State variables to store the values entered by the user
   var title by remember { mutableStateOf("") }
   var author by remember { mutableStateOf("") }
@@ -62,10 +64,10 @@ fun AddToBook(repository: BooksRepository) {
                   modifier = Modifier.testTag("addBookTitle"))
             },
             // Icon button for navigation (currently no action defined)
+            //navigationIcon = { BackButton(navController) },
             navigationIcon = {
-              IconButton(onClick = {}) {
+                BackButton(navController)
                 // You can add an icon here for the button
-              }
             })
       },
       content = { paddingValues ->
