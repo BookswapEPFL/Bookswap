@@ -71,15 +71,6 @@ class UserFirestoreSourceTest {
   @Test fun init() {}
 
   @Test
-  fun getNewUid() {
-    // Arrange
-    `when`(mockCollectionReference.document()).thenReturn(mockDocumentReference)
-    `when`(mockDocumentReference.id).thenReturn(testUser.userId)
-    val uid = userFirestoreSource.getNewUid()
-    assert(uid.isNotEmpty())
-  }
-
-  @Test
   fun getUsers() {
     // Arrange
     `when`(mockQuerySnapshot.documents).thenReturn(listOf(mockDocumentSnapshot))

@@ -14,12 +14,6 @@ interface UsersRepository {
   fun init(callback: (Result<Unit>) -> Unit)
 
   /**
-   * Function to generate and return a new unique identifier (UID) for a user. This default
-   * implementation returns an empty string, but it should be overridden to generate actual UIDs.*
-   */
-  fun getNewUid(): String
-
-  /**
    * Function to fetch a list of users from the repository.
    *
    * @param callback callback function that receives list of user if success

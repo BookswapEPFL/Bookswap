@@ -20,10 +20,6 @@ class UserFirestoreSource(private val db: FirebaseFirestore) : UsersRepository {
   override fun init(callback: (Result<Unit>) -> Unit) {
     callback(Result.success(Unit))
   }
-  /** Generates and returns a new unique document ID for a user in Firestore */
-  override fun getNewUid(): String {
-    return db.collection(COLLECTION_NAME).document().id
-  }
   /**
    * Fetches the list of users from the Firestore collection If the task is successful, maps the
    * Firestore documents to DataUser objects Calls OnSuccess with the list of users, or onFailure if
