@@ -7,14 +7,15 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performTextClearance
 import androidx.compose.ui.test.performTextInput
-import androidx.navigation.compose.rememberNavController
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.android.bookswap.data.repository.BooksRepository
 import com.android.bookswap.ui.navigation.NavigationActions
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
 import org.junit.Assert
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.mock
 
 @RunWith(AndroidJUnit4::class)
 class ISBNAddTest : TestCase() {
@@ -23,9 +24,10 @@ class ISBNAddTest : TestCase() {
   @Test
   fun elementsAreDisplayed() {
     composeTestRule.setContent {
-      val navController = rememberNavController()
-      val navigationActions = NavigationActions(navController)
-      AddISBNScreen(navigationActions)
+      val mockNavigationActions: NavigationActions = mock()
+      val mockBooksRepository: BooksRepository = mock()
+
+      AddISBNScreen(mockNavigationActions, mockBooksRepository)
     }
 
     val isbnField = composeTestRule.onNodeWithTag("isbn_field")
@@ -40,9 +42,9 @@ class ISBNAddTest : TestCase() {
   @Test
   fun isbnFieldWork() {
     composeTestRule.setContent {
-      val navController = rememberNavController()
-      val navigationActions = NavigationActions(navController)
-      AddISBNScreen(navigationActions)
+      val mockNavigationActions: NavigationActions = mock()
+      val mockBooksRepository: BooksRepository = mock()
+      AddISBNScreen(mockNavigationActions, mockBooksRepository)
     }
     val isbnField = composeTestRule.onNodeWithTag("isbn_field")
 
