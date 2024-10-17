@@ -76,7 +76,7 @@ class DataUserTest {
     assertEquals("M. John Doe", u1.toString())
     assertEquals(
         "M. John Doe:¦M.|John|Doe¦John.Doe@example.com|+41223456789¦0.0, 0.0¦dummyPic.png¦dummyUUID0000",
-        u1.printFull1Line())
+        u1.printFullname())
     assertEquals(
         "M. John Doe:\n  M.|John|Doe\n  John.Doe@example.com|+41223456789\n  0.0, 0.0\n  dummyPic.png\n  dummyUUID0000",
         u1.printFullMultiLine())

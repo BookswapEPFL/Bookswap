@@ -29,7 +29,7 @@ class EditProfileScreenTest : TestCase() {
         composeTestRule.setContent {
           EditProfileDialog(
               { Log.d("EditProfileTest_Dismiss", "User info discarded") },
-              { Log.d("EditProfileTest_Save", "User info saved ${it.printFull1Line()}") },
+              { Log.d("EditProfileTest_Save", "User info saved ${it.printFullname()}") },
               DataUser("", "", "", "", "", 0.0, 0.0, "", ""))
         }
         step("try displaying the alert box") {
@@ -93,7 +93,7 @@ class EditProfileScreenTest : TestCase() {
         composeTestRule.setContent {
           EditProfileDialog(
               { Log.d("EditProfileTest_Dismiss", "User info discarded") },
-              { Log.d("EditProfileTest_Save", "User info saved ${it.printFull1Line()}") },
+              { Log.d("EditProfileTest_Save", "User info saved ${it.printFullname()}") },
               DataUser(
                   "M.",
                   "John",
@@ -176,7 +176,7 @@ class EditProfileScreenTest : TestCase() {
         composeTestRule.setContent {
           EditProfileDialog(
               { Log.d("EditProfileTest_Dismiss", "User info discarded") },
-              { Log.d("EditProfileTest_Save", "User info saved ${it.printFull1Line()}") },
+              { Log.d("EditProfileTest_Save", "User info saved ${it.printFullname()}") },
               DataUser(
                   "M.",
                   "John",
@@ -292,7 +292,7 @@ class EditProfileScreenTest : TestCase() {
         composeTestRule.setContent {
           EditProfileDialog(
               { Log.d("EditProfileTest_Dismiss", "User info discarded") },
-              { Log.d("EditProfileTest_Save", "User info saved ${it.printFull1Line()}") },
+              { Log.d("EditProfileTest_Save", "User info saved ${it.printFullname()}") },
               DataUser(
                   "M.",
                   "John",
