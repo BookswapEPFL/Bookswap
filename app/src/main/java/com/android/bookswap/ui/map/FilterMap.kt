@@ -37,7 +37,7 @@ import androidx.compose.ui.unit.sp
 import com.android.bookswap.data.BookGenres
 import com.android.bookswap.data.BookLanguages
 import com.android.bookswap.model.map.BookFilter
-import com.android.bookswap.ui.navigation.BackButton
+import com.android.bookswap.ui.components.BackButtonComponent
 import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.theme.ColorVariable
 
@@ -88,7 +88,7 @@ fun FilterMapScreen(navigationActions: NavigationActions, bookFilter: BookFilter
                           letterSpacing = TOP_BAR_TITLE_LETTER_SPACING,
                       ))
             },
-            navigationIcon = { BackButton(navigationActions) })
+            navigationIcon = { BackButtonComponent(navigationActions) })
       },
       content = { paddingValues ->
         LazyColumn(contentPadding = paddingValues, modifier = Modifier.fillMaxSize()) {
