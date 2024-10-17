@@ -10,8 +10,8 @@ import com.android.bookswap.data.BookGenres
 import com.android.bookswap.data.BookLanguages
 import com.android.bookswap.data.DataBook
 import com.android.bookswap.data.repository.BooksRepository
-import com.android.bookswap.ui.addBook.AddToBookScreen
-import com.android.bookswap.ui.addBook.createDataBook
+import com.android.bookswap.ui.books.add.AddToBookScreen
+import com.android.bookswap.ui.books.add.createDataBook
 import java.util.UUID
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertNull
