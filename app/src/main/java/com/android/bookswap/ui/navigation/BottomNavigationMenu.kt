@@ -35,7 +35,10 @@ fun BottomNavigationMenu(
           BottomNavigationItem(
               icon = {
                 // Display the icon for each tab
-                Icon(tab.icon, contentDescription = null, tint = ColorVariable.BackGround)
+                Icon(
+                    tab.icon,
+                    contentDescription = "icon_${tab.textId}",
+                    tint = ColorVariable.BackGround)
               },
               selected = tab.route == selectedItem,
               onClick = { onTabSelect(tab) },
