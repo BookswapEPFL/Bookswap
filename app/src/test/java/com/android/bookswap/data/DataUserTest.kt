@@ -126,7 +126,6 @@ class MockUserRepo : UsersRepository {
     TODO("Not yet implemented")
   }
 
-
   override fun getUsers(callback: (Result<List<DataUser>>) -> Unit) {
     callback(Result.success(mockUserList.values.toList()))
   }
