@@ -12,27 +12,27 @@ import org.mockito.Mockito.mock
 
 class BookAdditionChoiceScreenTest {
 
-    @get:Rule val composeTestRule = createComposeRule()
-    private lateinit var mockNavController: NavigationActions
+  @get:Rule val composeTestRule = createComposeRule()
+  private lateinit var mockNavController: NavigationActions
 
-    @Before
-    fun setUp() {
-        mockNavController = mock(NavigationActions::class.java)
-    }
+  @Before
+  fun setUp() {
+    mockNavController = mock(NavigationActions::class.java)
+  }
 
-    @Test
-    fun hasRequiredComponents() {
-        composeTestRule.setContent { BookAdditionChoiceScreen(navController = mockNavController) }
-        composeTestRule.onNodeWithTag("button_Manually").assertIsDisplayed()
-        composeTestRule.onNodeWithTag("button_From ISBN").assertIsDisplayed()
-        composeTestRule.onNodeWithTag("button_From Photo").assertIsDisplayed()
-    }
+  @Test
+  fun hasRequiredComponents() {
+    composeTestRule.setContent { BookAdditionChoiceScreen(navController = mockNavController) }
+    composeTestRule.onNodeWithTag("button_Manually").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("button_From ISBN").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("button_From Photo").assertIsDisplayed()
+  }
 
-    @Test
-    fun hasClickableComponents() {
-        composeTestRule.setContent { BookAdditionChoiceScreen(navController = mockNavController) }
-        composeTestRule.onNodeWithTag("button_Manually").assertHasClickAction()
-        composeTestRule.onNodeWithTag("button_From ISBN").assertHasClickAction()
-        composeTestRule.onNodeWithTag("button_From Photo").assertHasClickAction()
-    }
+  @Test
+  fun hasClickableComponents() {
+    composeTestRule.setContent { BookAdditionChoiceScreen(navController = mockNavController) }
+    composeTestRule.onNodeWithTag("button_Manually").assertHasClickAction()
+    composeTestRule.onNodeWithTag("button_From ISBN").assertHasClickAction()
+    composeTestRule.onNodeWithTag("button_From Photo").assertHasClickAction()
+  }
 }
