@@ -50,14 +50,17 @@ private val TOP_BAR_TITLE_LETTER_SPACING = 0.3.sp
 private val TOP_BAR_TITLE_FONT_WEIGHT = FontWeight(700)
 
 /**
- * This is the main screen for the filter feature. It displays the filters The parameter is
- * temporary and will be replaced with the actual data model
+ * This is the main screen for the filter feature. It displays the filters for the user to select
+ *
+ * @param navigationActions The navigation actions to navigate between screens
+ * @param bookFilter The filter object that contains the selected filters
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FilterMapScreen(navigationActions: NavigationActions, bookFilter: BookFilter) {
-  val selectedFiltersGenres by bookFilter.genresFilter.collectAsState()
-  val selectedFiltersLanguages by bookFilter.languagesFilter.collectAsState()
+
+  val selectedFiltersGenres by bookFilter.genresFilter.collectAsState() // genre filter
+  val selectedFiltersLanguages by bookFilter.languagesFilter.collectAsState() // language filter
   val context = LocalContext.current
 
   Scaffold(
@@ -146,7 +149,13 @@ private val HORIZONTAL_PADDING_BB = 37.dp
 private val VERTICAL_PADDING_BB = 20.dp
 private const val MAX_ITEMS_PER_ROW_BB = 3
 
-/** This is a composable that displays a row of buttons */
+/**
+ * This is a composable that displays a row of buttons
+ *
+ * @param buttonTexts The list of strings to display on the buttons
+ * @param selectedFilters The list of strings that are currently selected
+ * @param onSelectionChange The function to call when the selection changes
+ */
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun ButtonBlock(

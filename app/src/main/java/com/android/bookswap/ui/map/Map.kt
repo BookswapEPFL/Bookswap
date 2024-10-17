@@ -66,6 +66,8 @@ const val INIT_ZOOM = 10F
  *   deleted as the code should in the future use a class to get the user from the database.
  * @param selectedUser An optional user [TempUser] to be initially selected and focused on the map.
  *   This user’s info window will be shown if not null.
+ * @param navigationActions An instance of [NavigationActions] to handle navigation actions.
+ * @param bookFilter An instance of [BookFilter] to filter the books displayed on the map.
  */
 @Composable
 fun MapScreen(
@@ -83,6 +85,7 @@ fun MapScreen(
   var markerScreenPosition by remember { mutableStateOf<Offset?>(null) }
   val listAllBooks = listUser.flatMap { it.listBook }
 
+  // Filter the books based on the selected filters
   val genresFilter by bookFilter.genresFilter.collectAsState()
   val languagesFilter by bookFilter.languagesFilter.collectAsState()
 
