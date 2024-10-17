@@ -22,7 +22,7 @@ import androidx.compose.material3.CardColors
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -36,10 +36,10 @@ import androidx.compose.ui.unit.dp
 import com.android.bookswap.data.DataMessage
 import com.android.bookswap.data.repository.MessageRepository
 import com.android.bookswap.ui.theme.ColorVariable
-import com.google.firebase.firestore.ListenerRegistration
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import kotlinx.coroutines.delay
 
 @Composable
 fun ChatScreen(
@@ -49,20 +49,18 @@ fun ChatScreen(
 ) {
   var messages by remember { mutableStateOf(emptyList<DataMessage>()) }
   var newMessageText by remember { mutableStateOf(TextFieldValue("")) }
-
-  var listenerRegistration: ListenerRegistration?
-  DisposableEffect(Unit) {
-    listenerRegistration =
-        messageRepository.addMessagesListener(
-            otherUserId = otherUserId, currentUserId = currentUserId) { result ->
-              if (result.isSuccess) {
-                messages = result.getOrThrow()
-              } else {
-                Log.e(
-                    "MessageView", "Failed to fetch messages: ${result.exceptionOrNull()?.message}")
-              }
-            }
-    onDispose { listenerRegistration?.remove() }
+  LaunchedEffect(Unit) {
+    while (true) {
+      messageRepository.getMessages { result ->
+        if (result.isSuccess) {
+          messages = result.getOrThrow().sortedBy { it.timestamp }
+          Log.d("ChatScreen", "Fetched messages: $messages")
+        } else {
+          Log.e("ChatScreen", "Failed to fetch messages: ${result.exceptionOrNull()?.message}")
+        }
+      }
+      delay(2000) // Delay for 2 seconds
+    }
   }
   Box(modifier = Modifier.fillMaxSize().background(ColorVariable.BackGround)) {
     Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.SpaceBetween) {
