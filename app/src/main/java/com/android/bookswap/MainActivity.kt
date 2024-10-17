@@ -14,10 +14,14 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
+import com.android.bookswap.data.BookGenres
 import com.android.bookswap.data.BookLanguages
 import com.android.bookswap.data.DataBook
+import com.android.bookswap.model.map.BookFilter
 import com.android.bookswap.resources.C
 import com.android.bookswap.ui.authentication.SignInScreen
+import com.android.bookswap.ui.map.FilterButton
+import com.android.bookswap.ui.map.FilterMapScreen
 import com.android.bookswap.ui.map.MapScreen
 import com.android.bookswap.ui.map.TempUser
 import com.android.bookswap.ui.navigation.NavigationActions
@@ -45,6 +49,7 @@ class MainActivity : ComponentActivity() {
   fun BookSwapApp() {
     val navController = rememberNavController()
     val navigationActions = NavigationActions(navController)
+    val bookFilter = BookFilter()
 
     NavHost(navController = navController, startDestination = Route.AUTH) {
       navigation(startDestination = Screen.AUTH, route = Route.AUTH) {
@@ -55,7 +60,8 @@ class MainActivity : ComponentActivity() {
         composable(Screen.CHAT) { /*Todo*/}
       }
       navigation(startDestination = Screen.MAP, route = Route.MAP) {
-        composable(Screen.MAP) { MapScreen(user) }
+        composable(Screen.MAP) { MapScreen(user,navigationActions = navigationActions,bookFilter = bookFilter) }
+        composable(Screen.FILTER) { FilterMapScreen(navigationActions, bookFilter)}
       }
       navigation(startDestination = Screen.NEWBOOK, route = Route.NEWBOOK) {
         composable(Screen.NEWBOOK) { /*Todo*/}
@@ -85,7 +91,8 @@ val user =
                         rating = 5,
                         photo = null,
                         language = BookLanguages.ENGLISH,
-                        isbn = null),
+                        isbn = null,
+                        genres = listOf(BookGenres.FANTASY)),
                     DataBook(
                         uuid = UUID.randomUUID(),
                         title = "Book 2",
@@ -94,7 +101,8 @@ val user =
                         rating = 4,
                         photo = null,
                         language = BookLanguages.FRENCH,
-                        isbn = null),
+                        isbn = null,
+                        genres = listOf(BookGenres.FICTION)),
                     DataBook(
                         uuid = UUID.randomUUID(),
                         title = "Book 3",
@@ -103,4 +111,5 @@ val user =
                         rating = null,
                         photo = null,
                         language = BookLanguages.GERMAN,
-                        isbn = null))))
+                        isbn = null,
+                        genres = listOf(BookGenres.SCIENCEFICTION,BookGenres.AUTOBIOGRAPHY)),)))
