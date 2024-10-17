@@ -1,4 +1,4 @@
-package com.android.bookswap.ui.navigation
+package com.android.bookswap.ui.components
 
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
+import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.theme.ColorVariable
 
 @Composable

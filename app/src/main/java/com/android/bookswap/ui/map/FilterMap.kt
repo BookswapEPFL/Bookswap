@@ -35,7 +35,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.bookswap.data.BookGenres
 import com.android.bookswap.data.BookLanguages
-import com.android.bookswap.ui.navigation.BackButton
+import com.android.bookswap.ui.components.BackButton
 import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.theme.ColorVariable
 
