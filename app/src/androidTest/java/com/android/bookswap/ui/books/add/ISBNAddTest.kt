@@ -18,41 +18,41 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class ISBNAddTest : TestCase() {
-    @get:Rule val composeTestRule = createComposeRule()
+  @get:Rule val composeTestRule = createComposeRule()
 
-    @Test
-    fun elementsAreDisplayed() {
-        composeTestRule.setContent {
-            val navController = rememberNavController()
-            val navigationActions = NavigationActions(navController)
-            AddISBNScreen(navigationActions)
-        }
-
-        val isbnField = composeTestRule.onNodeWithTag("isbn_field")
-        isbnField.assertIsDisplayed()
-        Assert.assertEquals(
-            "ISBN*", isbnField.fetchSemanticsNode().config[SemanticsProperties.Text][0].text)
-
-        composeTestRule.onNodeWithTag("isbn_searchButton").assertIsDisplayed()
-        composeTestRule.onNodeWithTag("isbn_searchButton").assertHasClickAction()
+  @Test
+  fun elementsAreDisplayed() {
+    composeTestRule.setContent {
+      val navController = rememberNavController()
+      val navigationActions = NavigationActions(navController)
+      AddISBNScreen(navigationActions)
     }
 
-    @Test
-    fun isbnFieldWork() {
-        composeTestRule.setContent {
-            val navController = rememberNavController()
-            val navigationActions = NavigationActions(navController)
-            AddISBNScreen(navigationActions)
-        }
-        val isbnField = composeTestRule.onNodeWithTag("isbn_field")
+    val isbnField = composeTestRule.onNodeWithTag("isbn_field")
+    isbnField.assertIsDisplayed()
+    Assert.assertEquals(
+        "ISBN*", isbnField.fetchSemanticsNode().config[SemanticsProperties.Text][0].text)
 
-        isbnField.performTextInput("testEmpty")
-        Assert.assertEquals(
-            "", isbnField.fetchSemanticsNode().config[SemanticsProperties.EditableText].text)
+    composeTestRule.onNodeWithTag("isbn_searchButton").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("isbn_searchButton").assertHasClickAction()
+  }
 
-        isbnField.performTextClearance()
-        isbnField.performTextInput("12845")
-        Assert.assertEquals(
-            "12845", isbnField.fetchSemanticsNode().config[SemanticsProperties.EditableText].text)
+  @Test
+  fun isbnFieldWork() {
+    composeTestRule.setContent {
+      val navController = rememberNavController()
+      val navigationActions = NavigationActions(navController)
+      AddISBNScreen(navigationActions)
     }
+    val isbnField = composeTestRule.onNodeWithTag("isbn_field")
+
+    isbnField.performTextInput("testEmpty")
+    Assert.assertEquals(
+        "", isbnField.fetchSemanticsNode().config[SemanticsProperties.EditableText].text)
+
+    isbnField.performTextClearance()
+    isbnField.performTextInput("12845")
+    Assert.assertEquals(
+        "12845", isbnField.fetchSemanticsNode().config[SemanticsProperties.EditableText].text)
+  }
 }

@@ -47,81 +47,81 @@ import com.android.bookswap.ui.theme.ColorVariable
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddISBNScreen(navigationActions: NavigationActions) {
-    val context = LocalContext.current
-    Scaffold(
-        topBar = {
-            MediumTopAppBar(
-                colors =
+  val context = LocalContext.current
+  Scaffold(
+      topBar = {
+        MediumTopAppBar(
+            colors =
                 TopAppBarDefaults.topAppBarColors(
                     containerColor = ColorVariable.BackGround,
                 ),
-                title = {
-                    Box(modifier = Modifier) {
-                        Row(
-                            horizontalArrangement = Arrangement.Center,
-                            modifier = Modifier.fillMaxWidth(0.85f)) {
-                            IconButton(
-                                onClick = { /*TODO navigate back*/},
-                                modifier = Modifier.testTag("go_back_button"),
-                            ) {
-                                Icon(
-                                    Icons.AutoMirrored.Filled.ArrowBack,
-                                    contentDescription = "Back Icon",
-                                    tint = ColorVariable.Accent,
-                                    modifier = Modifier.size(64.dp),
-                                )
-                            }
-                            Text(
-                                text = "Search ISBN",
-                                style =
-                                TextStyle(
-                                    fontSize = 30.sp,
-                                    lineHeight = 20.sp,
-                                    fontWeight = FontWeight(700),
-                                    color = ColorVariable.Accent,
-                                    letterSpacing = 0.3.sp,
-                                ),
-                                modifier = Modifier.padding(top = 4.dp))
-                        }
+            title = {
+              Box(modifier = Modifier) {
+                Row(
+                    horizontalArrangement = Arrangement.Center,
+                    modifier = Modifier.fillMaxWidth(0.85f)) {
+                      IconButton(
+                          onClick = { /*TODO navigate back*/},
+                          modifier = Modifier.testTag("go_back_button"),
+                      ) {
+                        Icon(
+                            Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Back Icon",
+                            tint = ColorVariable.Accent,
+                            modifier = Modifier.size(64.dp),
+                        )
+                      }
+                      Text(
+                          text = "Search ISBN",
+                          style =
+                              TextStyle(
+                                  fontSize = 30.sp,
+                                  lineHeight = 20.sp,
+                                  fontWeight = FontWeight(700),
+                                  color = ColorVariable.Accent,
+                                  letterSpacing = 0.3.sp,
+                              ),
+                          modifier = Modifier.padding(top = 4.dp))
                     }
-                },
-                actions = { Box(modifier = Modifier.padding(top = 30.dp)) { ProfileIcon() } })
-        },
-        content = { pv ->
-            Box(
-                modifier =
+              }
+            },
+            actions = { Box(modifier = Modifier.padding(top = 30.dp)) { ProfileIcon() } })
+      },
+      content = { pv ->
+        Box(
+            modifier =
                 Modifier.fillMaxSize()
                     .padding(pv)
                     .padding()
                     .background(color = ColorVariable.BackGround)) {
-                var isbn by remember { mutableStateOf("") }
+              var isbn by remember { mutableStateOf("") }
 
-                Column(
-                    modifier = Modifier.fillMaxWidth().padding(top = 40.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(45.dp)) {
+              Column(
+                  modifier = Modifier.fillMaxWidth().padding(top = 40.dp),
+                  horizontalAlignment = Alignment.CenterHorizontally,
+                  verticalArrangement = Arrangement.spacedBy(45.dp)) {
                     FieldComponent(
                         modifier = Modifier.testTag("isbn_field"),
                         labelText = "ISBN*",
                         value = isbn) {
-                        if (it.all { c -> c.isDigit() } && it.length <= 13) {
+                          if (it.all { c -> c.isDigit() } && it.length <= 13) {
                             isbn = it
+                          }
                         }
-                    }
                     ButtonComponent(
                         modifier = Modifier.testTag("isbn_searchButton"),
                         onClick = {
-                            GoogleBookDataSource(context).getBookFromISBN(isbn) { result ->
-                                if (result.isFailure) {
-                                    Log.e("AddBook", result.exceptionOrNull().toString())
-                                } else {
-                                    /** TODO: Add book */
-                                    // navigationActions.navigateTo() TODO: currently there is no top
-                                    // level for the book list
-                                }
+                          GoogleBookDataSource(context).getBookFromISBN(isbn) { result ->
+                            if (result.isFailure) {
+                              Log.e("AddBook", result.exceptionOrNull().toString())
+                            } else {
+                              /** TODO: Add book */
+                              // navigationActions.navigateTo() TODO: currently there is no top
+                              // level for the book list
                             }
+                          }
                         }) {
-                        Row(Modifier.fillMaxWidth()) {
+                          Row(Modifier.fillMaxWidth()) {
                             Text("Search", style = TextStyle(color = Color.White))
                             Spacer(Modifier.weight(1f))
                             Icon(
@@ -129,12 +129,12 @@ fun AddISBNScreen(navigationActions: NavigationActions) {
                                 contentDescription = "Search icon",
                                 tint = Color.White,
                             )
+                          }
                         }
-                    }
-                }
+                  }
             }
-        },
-        bottomBar = {
-            BottomAppBar(modifier = Modifier.background(color = ColorVariable.BackGround)) {}
-        })
+      },
+      bottomBar = {
+        BottomAppBar(modifier = Modifier.background(color = ColorVariable.BackGround)) {}
+      })
 }
