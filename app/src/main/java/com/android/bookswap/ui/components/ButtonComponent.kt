@@ -22,16 +22,16 @@ fun ButtonComponent(
     enabled: Boolean = true,
     content: @Composable() (RowScope.() -> Unit)
 ) {
-    OutlinedButton(
-        modifier =
-        modifier
-            .border(width = 1.dp, color = Color.Black, shape = RoundedCornerShape(size = 28.dp))
-            .padding(0.5.dp)
-            .width(120.dp)
-            .height(38.dp)
-            .focusable(),
-        colors = ButtonDefaults.buttonColors(containerColor = ColorVariable.Primary),
-        onClick = onClick,
-        enabled = enabled,
-        content = content)
+  OutlinedButton(
+      modifier =
+          modifier
+              .border(width = 1.dp, color = Color.Black, shape = RoundedCornerShape(size = 28.dp))
+              .padding(0.5.dp)
+              .width(120.dp)
+              .height(38.dp)
+              .focusable(),
+      colors = ButtonDefaults.buttonColors(containerColor = ColorVariable.Primary),
+      onClick = onClick,
+      enabled = enabled,
+      content = content)
 }

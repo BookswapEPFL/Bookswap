@@ -18,26 +18,26 @@ fun FieldComponent(
     modifier: Modifier = Modifier,
     onValueChange: (String) -> Unit = {}
 ) {
-    OutlinedTextField(
-        modifier = modifier.scale(1.0f, 0.8f),
-        shape = RoundedCornerShape(25.dp),
-        value = value,
-        colors =
-        TextFieldDefaults.colors(
-            unfocusedContainerColor = ColorVariable.Secondary,
-            focusedContainerColor = ColorVariable.Secondary,
-            cursorColor = ColorVariable.Secondary, // Custom green for the cursor
-            focusedLabelColor = ColorVariable.Secondary, // Custom green for focused label
-            unfocusedLabelColor = ColorVariable.Secondary, // Lighter color for unfocused label
-        ),
-        onValueChange = onValueChange,
-        label = {
-            Text(
-                labelText,
-                style =
+  OutlinedTextField(
+      modifier = modifier.scale(1.0f, 0.8f),
+      shape = RoundedCornerShape(25.dp),
+      value = value,
+      colors =
+          TextFieldDefaults.colors(
+              unfocusedContainerColor = ColorVariable.Secondary,
+              focusedContainerColor = ColorVariable.Secondary,
+              cursorColor = ColorVariable.Secondary, // Custom green for the cursor
+              focusedLabelColor = ColorVariable.Secondary, // Custom green for focused label
+              unfocusedLabelColor = ColorVariable.Secondary, // Lighter color for unfocused label
+          ),
+      onValueChange = onValueChange,
+      label = {
+        Text(
+            labelText,
+            style =
                 TextStyle(
                     color = ColorVariable.AccentSecondary,
                 ),
-            )
-        })
+        )
+      })
 }
