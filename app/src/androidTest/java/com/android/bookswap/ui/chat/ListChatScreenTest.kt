@@ -38,7 +38,8 @@ class ListChatScreenTest {
     composeTestRule.setContent {
       val navController = rememberNavController()
       val navigationActions = NavigationActions(navController)
-      ListChatScreen(placeHolderData, navigationActions) }
+      ListChatScreen(placeHolderData, navigationActions)
+    }
     composeTestRule.onNodeWithTag("chat_messageScreenTitle").assertIsDisplayed()
     composeTestRule.onNodeWithTag("profileIconButton").assertIsDisplayed()
     composeTestRule.onNodeWithContentDescription("Profile Icon").assertIsDisplayed()
@@ -53,7 +54,8 @@ class ListChatScreenTest {
     composeTestRule.setContent {
       val navController = rememberNavController()
       val navigationActions = NavigationActions(navController)
-      ListChatScreen(placeHolderData, navigationActions) }
+      ListChatScreen(placeHolderData, navigationActions)
+    }
     composeTestRule.onNodeWithTag("chat_messageScreenTitle").assertIsDisplayed()
     composeTestRule.onNodeWithTag("profileIconButton").assertIsDisplayed()
     composeTestRule.onNodeWithContentDescription("Profile Icon").assertIsDisplayed()
@@ -70,7 +72,8 @@ class ListChatScreenTest {
     composeTestRule.setContent {
       val navController = rememberNavController()
       val navigationActions = NavigationActions(navController)
-      ListChatScreen(placeHolderData, navigationActions) }
+      ListChatScreen(placeHolderData, navigationActions)
+    }
     composeTestRule.onNodeWithTag("profileIconButton").assertHasClickAction()
   }
 
@@ -79,7 +82,8 @@ class ListChatScreenTest {
     composeTestRule.setContent {
       val navController = rememberNavController()
       val navigationActions = NavigationActions(navController)
-      ListChatScreen(placeHolderData, navigationActions) }
+      ListChatScreen(placeHolderData, navigationActions)
+    }
     val messageNodes = composeTestRule.onAllNodesWithTag("chat_messageBox")
     assert(messageNodes.fetchSemanticsNodes().isNotEmpty())
     messageNodes.assertAll(hasClickAction())

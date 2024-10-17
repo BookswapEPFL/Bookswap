@@ -32,14 +32,11 @@ import com.android.bookswap.ui.navigation.Route
 import com.android.bookswap.ui.navigation.Screen
 import com.android.bookswap.ui.theme.BookSwapAppTheme
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.Firebase
-import com.google.firebase.firestore.firestore
 import java.util.UUID
 
 class MainActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-
 
     // Initialize Firebase Firestore
     val db = FirebaseFirestore.getInstance()
@@ -68,13 +65,13 @@ class MainActivity : ComponentActivity() {
     val navController = rememberNavController()
     val navigationActions = NavigationActions(navController)
 
-
-    val placeHolder = List(12) {
-              MessageBox(
-                  "Contact ${it + 1}",
-                  "Test message $it test for the feature of ellipsis in the message",
-                  "01.01.24")
-          }
+    val placeHolder =
+        List(12) {
+          MessageBox(
+              "Contact ${it + 1}",
+              "Test message $it test for the feature of ellipsis in the message",
+              "01.01.24")
+        }
 
     val userid1 = "user123"
     val userid2 = "user124"

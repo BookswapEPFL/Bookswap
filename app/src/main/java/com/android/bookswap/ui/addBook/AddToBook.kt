@@ -11,7 +11,6 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -32,9 +31,9 @@ import com.android.bookswap.data.BookGenres
 import com.android.bookswap.data.BookLanguages
 import com.android.bookswap.data.DataBook
 import com.android.bookswap.data.repository.BooksRepository
-import com.android.bookswap.ui.theme.ColorVariable
 import com.android.bookswap.ui.navigation.BackButton
 import com.android.bookswap.ui.navigation.NavigationActions
+import com.android.bookswap.ui.theme.ColorVariable
 import com.android.bookswap.ui.theme.ColorVariable.Accent
 import com.android.bookswap.ui.theme.ColorVariable.BackGround
 import com.android.bookswap.ui.theme.ColorVariable.Primary
@@ -72,10 +71,10 @@ fun AddToBookScreen(repository: BooksRepository, navController: NavigationAction
                   modifier = Modifier.testTag("addBookTitle"))
             },
             // Icon button for navigation (currently no action defined)
-            //navigationIcon = { BackButton(navController) },
+            // navigationIcon = { BackButton(navController) },
             navigationIcon = {
-                BackButton(navController)
-                // You can add an icon here for the button
+              BackButton(navController)
+              // You can add an icon here for the button
             })
       },
       content = { paddingValues ->
