@@ -4,11 +4,13 @@ import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
+import com.android.bookswap.data.BookGenres
 import com.android.bookswap.data.BookLanguages
 import com.android.bookswap.data.DataBook
 import com.android.bookswap.data.repository.BooksRepository
-import com.android.bookswap.ui.addBook.AddToBook
+import com.android.bookswap.ui.addBook.AddToBookScreen
 import com.android.bookswap.ui.addBook.createDataBook
 import java.util.UUID
 import junit.framework.TestCase.assertEquals
@@ -21,18 +23,19 @@ class AddToBookTest {
 
   @Test
   fun testSaveButtonDisabledInitially() {
-    composeTestRule.setContent { AddToBook(MockBooksRepository()) }
+    composeTestRule.setContent { AddToBookScreen(MockBooksRepository()) }
     // Check if the Save button is initially disabled
     composeTestRule.onNodeWithText("Save").assertIsNotEnabled()
   }
 
   @Test
   fun testSaveButtonEnabledWhenRequiredFieldsAreFilled() {
-    composeTestRule.setContent { AddToBook(MockBooksRepository()) }
+    composeTestRule.setContent { AddToBookScreen(MockBooksRepository()) }
     // Fill in the Title and ISBN fields
     composeTestRule.onNodeWithText("Title").performTextInput("My Book Title")
     composeTestRule.onNodeWithText("ISBN").performTextInput("1234567890")
     // Check if the Save button is now enabled
+    composeTestRule.onNodeWithText("Select Genre").performClick()
     composeTestRule.onNodeWithText("Save").assertIsEnabled()
   }
 
@@ -48,7 +51,8 @@ class AddToBookTest {
             ratingStr = "4",
             photo = "https://example.com/photo.jpg",
             bookLanguageStr = "ENGLISH",
-            isbn = "1234567890")
+            isbn = "1234567890",
+            genres = listOf(BookGenres.TRAVEL))
 
     // Assert the book is created correctly
     assertEquals("My Book", book?.title)
@@ -72,7 +76,8 @@ class AddToBookTest {
             ratingStr = "4",
             photo = "https://example.com/photo.jpg",
             bookLanguageStr = "ENGLISH",
-            isbn = "1234567890")
+            isbn = "1234567890",
+            genres = listOf(BookGenres.TRAVEL))
 
     // Assert that the book is null due to invalid title
     assertNull(book)
@@ -87,7 +92,8 @@ class AddToBookTest {
             ratingStr = "invalid_rating",
             photo = "https://example.com/photo.jpg",
             bookLanguageStr = "ENGLISH",
-            isbn = "1234567890")
+            isbn = "1234567890",
+            genres = listOf(BookGenres.TRAVEL))
 
     // Assert that the book is null due to invalid rating
     assertNull(book)
@@ -102,7 +108,8 @@ class AddToBookTest {
             ratingStr = "4",
             photo = "https://example.com/photo.jpg",
             bookLanguageStr = "INVALID_LANGUAGE",
-            isbn = "1234567890")
+            isbn = "1234567890",
+            genres = listOf(BookGenres.TRAVEL))
 
     // Assert that the book is null due to invalid language
     assertNull(book)
@@ -110,7 +117,7 @@ class AddToBookTest {
 
   @Test
   fun testSaveButtonDisabledWhenTitleIsEmpty() {
-    composeTestRule.setContent { AddToBook(MockBooksRepository()) }
+    composeTestRule.setContent { AddToBookScreen(MockBooksRepository()) }
     // Fill in the ISBN field but leave the Title field empty
     composeTestRule.onNodeWithText("ISBN").performTextInput("1234567890")
 
