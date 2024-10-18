@@ -84,7 +84,7 @@ class MainActivity : ComponentActivity() {
     val userid1 = "user123"
     val userid2 = "user124"
 
-    NavHost(navController = navController, startDestination = Route.AUTH) {
+    NavHost(navController = navController, startDestination = Route.MAP) {
       navigation(startDestination = Screen.AUTH, route = Route.AUTH) {
         composable(Screen.AUTH) { SignInScreen(navigationActions) }
       }
@@ -144,6 +144,32 @@ val user =
                         author = "Author 3",
                         description = "Description of Book 3",
                         rating = null,
+                        photo = null,
+                        language = BookLanguages.GERMAN,
+                        isbn = null,
+                        genres = listOf(BookGenres.SCIENCEFICTION, BookGenres.AUTOBIOGRAPHY)),
+                )),
+        TempUser(
+            latitude = 3.0,
+            longitude = -2.0,
+            listBook =
+                listOf(
+                    DataBook(
+                        uuid = UUID.randomUUID(),
+                        title = "Book 4",
+                        author = "Author 4",
+                        description = "Description of Book 4",
+                        rating = 4,
+                        photo = null,
+                        language = BookLanguages.FRENCH,
+                        isbn = null,
+                        genres = listOf(BookGenres.FICTION)),
+                    DataBook(
+                        uuid = UUID.randomUUID(),
+                        title = "Book 5",
+                        author = "Author 5",
+                        description = "Description of Book 5",
+                        rating = 1,
                         photo = null,
                         language = BookLanguages.GERMAN,
                         isbn = null,
