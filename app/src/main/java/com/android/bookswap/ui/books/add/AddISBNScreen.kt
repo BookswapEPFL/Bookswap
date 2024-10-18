@@ -124,8 +124,5 @@ fun AddISBNScreen(navigationActions: NavigationActions, booksRepository: BooksRe
                         }
                   }
             }
-      },
-      bottomBar = {
-        BottomAppBar(modifier = Modifier.background(color = ColorVariable.BackGround)) {}
       })
 }

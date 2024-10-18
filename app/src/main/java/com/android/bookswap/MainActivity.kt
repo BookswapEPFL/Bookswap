@@ -23,6 +23,7 @@ import com.android.bookswap.model.chat.MessageBox
 import com.android.bookswap.model.map.BookFilter
 import com.android.bookswap.resources.C
 import com.android.bookswap.ui.authentication.SignInScreen
+import com.android.bookswap.ui.books.add.AddISBNScreen
 import com.android.bookswap.ui.books.add.AddToBookScreen
 import com.android.bookswap.ui.books.add.BookAdditionChoiceScreen
 import com.android.bookswap.ui.chat.ChatScreen
@@ -101,7 +102,7 @@ class MainActivity : ComponentActivity() {
         composable(Screen.NEWBOOK) { BookAdditionChoiceScreen(navigationActions) }
         composable(Screen.ADD_BOOK_MANUALLY) { AddToBookScreen(bookRepository, navigationActions) }
         composable(Screen.ADD_BOOK_SCAN) { /*Todo*/}
-        composable(Screen.ADD_BOOK_ISBN) { /*Todo*/}
+        composable(Screen.ADD_BOOK_ISBN) { AddISBNScreen(navigationActions,bookRepository) }
       }
     }
   }
