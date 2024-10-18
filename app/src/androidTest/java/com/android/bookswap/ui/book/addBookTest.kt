@@ -1,5 +1,7 @@
 package com.android.bookswap.ui.book
 
+import android.content.Context
+import android.widget.Toast
 import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -17,11 +19,20 @@ import com.android.bookswap.ui.navigation.NavigationActions
 import java.util.UUID
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertNull
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.Mockito
+import org.mockito.kotlin.mock
 
 class AddToBookTest {
   @get:Rule val composeTestRule = createComposeRule()
+  val mockContext: Context = mock()
+
+  @Before
+  fun init() {
+    val toast = Mockito.mockStatic(Toast::class.java)
+  }
 
   @Test
   fun testSaveButtonDisabledInitially() {
@@ -54,6 +65,7 @@ class AddToBookTest {
     // Test with valid data
     val book =
         createDataBook(
+            context = mockContext,
             uuid = UUID.randomUUID(),
             title = "My Book",
             author = "Author Name",
@@ -79,6 +91,7 @@ class AddToBookTest {
     // Test with invalid data (empty title)
     var book =
         createDataBook(
+            context = mockContext,
             uuid = UUID.randomUUID(),
             title = "",
             author = "Author Name",
@@ -95,6 +108,7 @@ class AddToBookTest {
     // Test with invalid rating
     book =
         createDataBook(
+            context = mockContext,
             uuid = UUID.randomUUID(),
             title = "My Book",
             author = "Author Name",
@@ -111,6 +125,7 @@ class AddToBookTest {
     // Test with invalid language
     book =
         createDataBook(
+            context = mockContext,
             uuid = UUID.randomUUID(),
             title = "My Book",
             author = "Author Name",
