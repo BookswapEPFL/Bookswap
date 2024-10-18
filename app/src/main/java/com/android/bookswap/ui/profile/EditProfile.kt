@@ -105,7 +105,7 @@ fun EditProfileDialog(
                     {
                       Log.d(
                           "EditProfile_ClickBtn",
-                          "Save Clicked, User info: ${dataUser.printFull1Line()}")
+                          "Save Clicked, User info: ${dataUser.printFullname()}")
                       onSave(dataUser)
                     },
                     Modifier.testTag("confirmBtn")) {

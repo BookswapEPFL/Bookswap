@@ -11,20 +11,8 @@ data class DataUser(
     var profilePictureUrl: String = "",
     var userId: String = ""
 ) {
-  override fun toString(): String {
+
+  fun printFullname(): String {
     return "$greeting $firstName $lastName"
-  }
-
-  fun printFull1Line(): String {
-    return "${this.toString()}:" +
-        "¦$greeting|$firstName|$lastName" +
-        "¦$email|$phoneNumber" +
-        "¦$latitude, $longitude" +
-        "¦$profilePictureUrl" +
-        "¦$userId"
-  }
-
-  fun printFullMultiLine(): String {
-    return printFull1Line().replace("¦", "\n  ")
   }
 }
