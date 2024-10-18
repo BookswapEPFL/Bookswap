@@ -66,7 +66,7 @@ class MainActivity : ComponentActivity() {
   @Composable
   fun BookSwapApp(
       messageRepository: MessageFirestoreSource,
-      bookRepository: BooksFirestoreRepository
+      bookRepository: BooksFirestoreRepository,
   ) {
     val navController = rememberNavController()
     val navigationActions = NavigationActions(navController)
@@ -84,7 +84,7 @@ class MainActivity : ComponentActivity() {
     val userid1 = "user123"
     val userid2 = "user124"
 
-    NavHost(navController = navController, startDestination = Route.AUTH) {
+    NavHost(navController = navController, startDestination = Route.MAP) {
       navigation(startDestination = Screen.AUTH, route = Route.AUTH) {
         composable(Screen.AUTH) { SignInScreen(navigationActions) }
       }
