@@ -29,11 +29,6 @@ class NavigationBarEndToEnd {
 
   @Test
   fun testNavigationBar() {
-
-    // Click on the Map tab and check if the MapScreen is displayed
-    composeTestRule.onNodeWithTag("Map").assertExists().performClick()
-    composeTestRule.onNodeWithTag("mapScreen").assertExists()
-
     // Click on the Add Book tab and check if the AddToBookScreen is displayed
     composeTestRule.onNodeWithTag("New Book").assertExists().performClick()
     composeTestRule.onNodeWithTag("addBookChoiceScreen").assertExists()
@@ -41,5 +36,10 @@ class NavigationBarEndToEnd {
     // Click on the Chat tab and check if the ListChatScreen is displayed
     composeTestRule.onNodeWithTag("Chat").assertExists().performClick()
     composeTestRule.onNodeWithTag("chat_listScreen").assertExists()
+
+    // Click on the Map tab and check if the MapScreen is displayed
+    composeTestRule.onNodeWithTag("Map").assertExists().performClick()
+    composeTestRule.onNodeWithTag("mapScreen").assertExists()
+
   }
 }
