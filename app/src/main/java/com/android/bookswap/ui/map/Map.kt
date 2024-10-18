@@ -249,7 +249,8 @@ private fun CustomInfoWindow(modifier: Modifier = Modifier, user: TempUser) {
       }
 }
 
-const val HEIGHT_RETRACTED_DRAGGABLE_MENU_DP = 50
+const val HEIGHT_RETRACTED_DRAGGABLE_MENU_DP = 110
+const val DRAGGABLE_MENU_CORNER_RADIUS_DP = 50
 const val MIN_BOX_BOOK_HEIGHT_DP = 90
 const val IMAGE_HEIGHT_DP = MIN_BOX_BOOK_HEIGHT_DP - PADDING_VERTICAL_DP * 2
 // 1.5:1 ratio + the padding
@@ -310,8 +311,8 @@ private fun DraggableMenu(listAllBooks: List<DataBook>) {
                   color = ColorVariable.BackGround,
                   shape =
                       RoundedCornerShape(
-                          topStart = HEIGHT_RETRACTED_DRAGGABLE_MENU_DP.dp,
-                          topEnd = HEIGHT_RETRACTED_DRAGGABLE_MENU_DP.dp))
+                          topStart = DRAGGABLE_MENU_CORNER_RADIUS_DP.dp,
+                          topEnd = DRAGGABLE_MENU_CORNER_RADIUS_DP.dp))
               .testTag("mapDraggableMenu")) {
         Column(
             modifier =
