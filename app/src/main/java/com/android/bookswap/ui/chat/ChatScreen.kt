@@ -49,7 +49,7 @@ fun ChatScreen(
     currentUserId: String, // To identify the current user for aligning messages
     otherUserId: String
 ) {
-    val context = LocalContext.current
+  val context = LocalContext.current
   var messages by remember { mutableStateOf(emptyList<DataMessage>()) }
   var newMessageText by remember { mutableStateOf(TextFieldValue("")) }
 
@@ -112,7 +112,7 @@ fun ChatScreen(
                           "MessageView",
                           "Failed to send message: ${result.exceptionOrNull()?.message}")
                     }
-                      Toast.makeText(context, "Message could not be sent.", Toast.LENGTH_LONG).show()
+                    Toast.makeText(context, "Message could not be sent.", Toast.LENGTH_LONG).show()
                   }
                 },
                 colors =

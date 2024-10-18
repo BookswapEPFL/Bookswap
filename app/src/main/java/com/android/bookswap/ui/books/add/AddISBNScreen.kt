@@ -103,15 +103,16 @@ fun AddISBNScreen(navigationActions: NavigationActions, booksRepository: BooksRe
                         onClick = {
                           GoogleBookDataSource(context).getBookFromISBN(isbn) { result ->
                             if (result.isFailure) {
-                              Toast.makeText(context, "Search unsuccessful", Toast.LENGTH_LONG).show()
+                              Toast.makeText(context, "Search unsuccessful", Toast.LENGTH_LONG)
+                                  .show()
                               Log.e("AddBook", result.exceptionOrNull().toString())
                             } else {
                               booksRepository.addBook(
                                   result.getOrThrow(),
                                   { navigationActions.navigateTo(TopLevelDestinations.NEW_BOOK) },
                                   { error ->
-                                      Log.e("AddBook", error.toString())
-                                      Toast.makeText(context, error.message, Toast.LENGTH_LONG).show()
+                                    Log.e("AddBook", error.toString())
+                                    Toast.makeText(context, error.message, Toast.LENGTH_LONG).show()
                                   })
                             }
                           }
