@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.bookswap.R
 import com.android.bookswap.ui.navigation.NavigationActions
+import com.android.bookswap.ui.navigation.TopLevelDestinations
 import com.android.bookswap.ui.theme.ColorVariable
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
@@ -54,8 +55,7 @@ fun SignInScreen(navigationActions: NavigationActions) { // Add this when naviga
           onAuthComplete = { result ->
             Log.d("SignInScreen", "User signed in: ${result.user?.displayName}")
             Toast.makeText(context, "Login successful!", Toast.LENGTH_LONG).show()
-            // navigationActions.navigateTo(TopLevelDestinations.OVERVIEW) //TO DO: implement
-            // navigation and make navigateTo(TopLevelDestinations.MAP)
+            navigationActions.navigateTo(TopLevelDestinations.MAP)
           },
           onAuthError = {
             Log.e("SignInScreen", "Failed to sign in: ${it.statusCode}")

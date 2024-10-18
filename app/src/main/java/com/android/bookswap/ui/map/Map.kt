@@ -42,6 +42,11 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.bookswap.data.DataBook
+import com.android.bookswap.model.map.BookFilter
+import com.android.bookswap.ui.navigation.BottomNavigationMenu
+import com.android.bookswap.ui.navigation.List_Navigation_Bar_Destinations
+import com.android.bookswap.ui.navigation.NavigationActions
+import com.android.bookswap.ui.navigation.Screen
 import com.android.bookswap.ui.theme.ColorVariable
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
@@ -63,9 +68,16 @@ const val INIT_ZOOM = 10F
  *   deleted as the code should in the future use a class to get the user from the database.
  * @param selectedUser An optional user [TempUser] to be initially selected and focused on the map.
  *   This user’s info window will be shown if not null.
+ * @param navigationActions An instance of [NavigationActions] to handle navigation actions.
+ * @param bookFilter An instance of [BookFilter] to filter the books displayed on the map.
  */
 @Composable
-fun MapScreen(listUser: List<TempUser>, selectedUser: TempUser? = null) {
+fun MapScreen(
+    listUser: List<TempUser>,
+    selectedUser: TempUser? = null,
+    navigationActions: NavigationActions,
+    bookFilter: BookFilter
+) {
 
   val cameraPositionState = rememberCameraPositionState {
     position = CameraPosition.fromLatLngZoom(LatLng(0.0, 0.0), INIT_ZOOM) // Initial camera position
@@ -74,6 +86,16 @@ fun MapScreen(listUser: List<TempUser>, selectedUser: TempUser? = null) {
   var mutableStateSelectedUser by remember { mutableStateOf(selectedUser) }
   var markerScreenPosition by remember { mutableStateOf<Offset?>(null) }
   val listAllBooks = listUser.flatMap { it.listBook }
+
+  // Filter the books based on the selected filters
+  val genresFilter by bookFilter.genresFilter.collectAsState()
+  val languagesFilter by bookFilter.languagesFilter.collectAsState()
+
+  val filteredBooks =
+      remember(genresFilter, languagesFilter) { bookFilter.filterBooks(listAllBooks) }
+
+  val filteredUsers =
+      listUser.filter { user -> user.listBook.any { book -> filteredBooks.contains(book) } }
 
   // compute the position of the marker on the screen given the camera position and the marker's
   // position on the map
@@ -105,7 +127,10 @@ fun MapScreen(listUser: List<TempUser>, selectedUser: TempUser? = null) {
   Scaffold(
       modifier = Modifier.testTag("mapScreen"),
       bottomBar = {
-        // To add a bottom navigation bar when it will be created
+        BottomNavigationMenu(
+            onTabSelect = { destination -> navigationActions.navigateTo(destination) },
+            tabList = List_Navigation_Bar_Destinations,
+            selectedItem = navigationActions.currentRoute())
       },
       content = { pd ->
         GoogleMap(
@@ -113,7 +138,7 @@ fun MapScreen(listUser: List<TempUser>, selectedUser: TempUser? = null) {
             modifier = Modifier.fillMaxSize().padding(pd).testTag("mapGoogleMap"),
             cameraPositionState = cameraPositionState,
         ) {
-          listUser
+          filteredUsers
               .filter { !it.longitude.isNaN() && !it.latitude.isNaN() && it.listBook.isNotEmpty() }
               .forEach { item ->
                 val markerState = MarkerState(position = LatLng(item.latitude, item.longitude))
@@ -129,6 +154,7 @@ fun MapScreen(listUser: List<TempUser>, selectedUser: TempUser? = null) {
                     })
               }
         }
+        FilterButton { navigationActions.navigateTo(Screen.FILTER) }
 
         // Custom info window linked to the marker
         markerScreenPosition?.let { screenPos ->
@@ -142,7 +168,7 @@ fun MapScreen(listUser: List<TempUser>, selectedUser: TempUser? = null) {
           }
         }
         // Draggable Bottom List
-        DraggableMenu(listAllBooks)
+        DraggableMenu(filteredBooks)
       })
 }
 
@@ -223,7 +249,8 @@ private fun CustomInfoWindow(modifier: Modifier = Modifier, user: TempUser) {
       }
 }
 
-const val HEIGHT_RETRACTED_DRAGGABLE_MENU_DP = 50
+const val HEIGHT_RETRACTED_DRAGGABLE_MENU_DP = 110
+const val DRAGGABLE_MENU_CORNER_RADIUS_DP = 50
 const val MIN_BOX_BOOK_HEIGHT_DP = 90
 const val IMAGE_HEIGHT_DP = MIN_BOX_BOOK_HEIGHT_DP - PADDING_VERTICAL_DP * 2
 // 1.5:1 ratio + the padding
@@ -235,7 +262,7 @@ const val SPACER_HEIGHT_DP = 20
 const val STAR_HEIGHT_DP = 30
 const val STAR_SIZE_DP = 26
 const val STAR_INNER_SIZE_DP = STAR_SIZE_DP / 2
-const val WIDTH_TITLE_BOX_DP = 180
+const val WIDTH_TITLE_BOX_DP = 150
 const val MAX_RATING = 5
 
 /**
@@ -284,8 +311,8 @@ private fun DraggableMenu(listAllBooks: List<DataBook>) {
                   color = ColorVariable.BackGround,
                   shape =
                       RoundedCornerShape(
-                          topStart = HEIGHT_RETRACTED_DRAGGABLE_MENU_DP.dp,
-                          topEnd = HEIGHT_RETRACTED_DRAGGABLE_MENU_DP.dp))
+                          topStart = DRAGGABLE_MENU_CORNER_RADIUS_DP.dp,
+                          topEnd = DRAGGABLE_MENU_CORNER_RADIUS_DP.dp))
               .testTag("mapDraggableMenu")) {
         Column(
             modifier =
@@ -370,7 +397,7 @@ private fun DraggableMenu(listAllBooks: List<DataBook>) {
                               // text for the tags of the book, will be added at a later date
                               // It isn't decided how we will handle the tag for the books
                               Text(
-                                  text = "Action, Mystery, Fantasy", // Placeholder
+                                  text = book.genres.joinToString(separator = ", ") { it.Genre },
                                   modifier =
                                       Modifier.fillMaxWidth().testTag("mapDraggableMenuBookBoxTag"),
                                   fontSize = SECONDARY_TEXT_FONT_SP.sp,

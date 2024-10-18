@@ -1,0 +1,63 @@
+name: Build APK
+
+on:
+  push:
+    branches:
+      - main
+      - M1
+      - M2
+      - M3
+      - apkBuild
+  workflow_dispatch:
+
+jobs:
+  build-apk:
+    name: Build APK
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x ./gradlew
+
+      # Load google-services.json and local.properties from the secrets
+      - name: Decode secrets
+        env:
+          GOOGLE_SERVICES: ${{ secrets.GOOGLE_SERVICES }}
+          LOCAL_PROPERTIES: ${{ secrets.LOCAL_PROPERTIES }}
+        run: |
+          echo "$GOOGLE_SERVICES" | base64 --decode > ./app/google-services.json
+          echo "$LOCAL_PROPERTIES" | base64 --decode > ./local.properties
+
+      - name: Decode Keystore
+        env:
+            ENCODED_STRING: ${{ secrets.SIGNING_KEY }}
+            RELEASE_KEYSTORE_PASSWORD: ${{ secrets.KEY_STORE_PASSWORD }}
+            RELEASE_KEYSTORE_ALIAS: ${{ secrets.ALIAS }}
+            RELEASE_KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          echo "$ENCODED_STRING" | base64 --decode > ./app/keyStore.jks # Save in the app directory
+          ls -l ./app/keyStore.jks # List files to confirm creation
+
+      - name: Build Release bundle
+        env:
+          RELEASE_KEYSTORE_PASSWORD: ${{ secrets.KEY_STORE_PASSWORD }}
+          RELEASE_KEYSTORE_ALIAS: ${{ secrets.ALIAS }}
+          RELEASE_KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          ls -l ./app/keyStore.jks # Confirm the keystore file is present before building
+          ./gradlew assembleRelease # Build the release version
+
+      - name: Upload Release Build to Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: app-release.apk
+          path: app/build/outputs/apk/release/app-release.apk

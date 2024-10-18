@@ -1,5 +1,6 @@
 package com.android.bookswap.data.source.network
 
+import com.android.bookswap.data.BookGenres
 import com.android.bookswap.data.BookLanguages
 import com.android.bookswap.data.DataBook
 import com.android.bookswap.data.repository.BooksRepository
@@ -27,7 +28,7 @@ class BooksFirestoreRepository(private val db: FirebaseFirestore) : BooksReposit
   }
   // Generates and returns a new unique document ID for a book in Firestore
   override fun getNewUid(): UUID {
-    return UUID.fromString(db.collection(collectionBooks).document().id)
+    return UUID.randomUUID()
   }
   // Fetches the list of books from the Firestore collection
   // If the task is successful, maps the Firestore documents to DataBook objects
@@ -47,7 +48,9 @@ class BooksFirestoreRepository(private val db: FirebaseFirestore) : BooksReposit
   // Calls OnSuccess if the operation is successful, otherwise onFailure with the exception
   override fun addBook(dataBook: DataBook, OnSucess: () -> Unit, onFailure: (Exception) -> Unit) {
     performFirestoreOperation(
-        db.collection(collectionBooks).document(dataBook.title).set(dataBook), OnSucess, onFailure)
+        db.collection(collectionBooks).document(dataBook.uuid.toString()).set(dataBook),
+        OnSucess,
+        onFailure)
   }
   // Updates an existing book in Firestore by replacing the document with the same title
   // Uses performFirestoreOperation to handle success and failure
@@ -57,7 +60,9 @@ class BooksFirestoreRepository(private val db: FirebaseFirestore) : BooksReposit
       onFailure: (Exception) -> Unit
   ) {
     performFirestoreOperation(
-        db.collection(collectionBooks).document(dataBook.title).set(dataBook), OnSucess, onFailure)
+        db.collection(collectionBooks).document(dataBook.uuid.toString()).set(dataBook),
+        OnSucess,
+        onFailure)
   }
   // Deletes a book from Firestore by its title
   // Uses performFirestoreOperation to handle success and failure
@@ -68,7 +73,9 @@ class BooksFirestoreRepository(private val db: FirebaseFirestore) : BooksReposit
       onFailure: (Exception) -> Unit
   ) {
     performFirestoreOperation(
-        db.collection(collectionBooks).document(dataBook.isbn!!).delete(), OnSucess, onFailure)
+        db.collection(collectionBooks).document(dataBook.uuid.toString()).delete(),
+        OnSucess,
+        onFailure)
   }
   // Maps a Firestore document to a DataBook object
   // If any required field is missing, returns null to avoid incomplete objects
@@ -81,8 +88,25 @@ class BooksFirestoreRepository(private val db: FirebaseFirestore) : BooksReposit
       val photo = document.getString("Photo") ?: return null
       val isbn = document.getString("ISBN") ?: return null
       val languageBook = BookLanguages.valueOf(document.getString("Language") ?: return null)
+      val genres = document.get("genres") as? List<String> ?: emptyList()
+      val bookGenres =
+          genres.mapNotNull { genre ->
+            try {
+              BookGenres.valueOf(genre)
+            } catch (e: IllegalArgumentException) {
+              null
+            }
+          }
       DataBook(
-          UUID.randomUUID(), title, author, description, rating.toInt(), photo, languageBook, isbn)
+          UUID.randomUUID(),
+          title,
+          author,
+          description,
+          rating.toInt(),
+          photo,
+          languageBook,
+          isbn,
+          bookGenres)
     } catch (e: Exception) {
       null // Return null in case of any exception during the conversion
     }
