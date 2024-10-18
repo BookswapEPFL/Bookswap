@@ -102,7 +102,7 @@ class MainActivity : ComponentActivity() {
         composable(Screen.NEWBOOK) { BookAdditionChoiceScreen(navigationActions) }
         composable(Screen.ADD_BOOK_MANUALLY) { AddToBookScreen(bookRepository, navigationActions) }
         composable(Screen.ADD_BOOK_SCAN) { /*Todo*/}
-        composable(Screen.ADD_BOOK_ISBN) { AddISBNScreen(navigationActions,bookRepository) }
+        composable(Screen.ADD_BOOK_ISBN) { AddISBNScreen(navigationActions, bookRepository) }
       }
     }
   }
