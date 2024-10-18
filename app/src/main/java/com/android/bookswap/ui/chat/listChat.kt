@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -36,13 +35,20 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.bookswap.model.chat.MessageBox
+import com.android.bookswap.ui.navigation.BottomNavigationMenu
+import com.android.bookswap.ui.navigation.List_Navigation_Bar_Destinations
+import com.android.bookswap.ui.navigation.NavigationActions
+import com.android.bookswap.ui.navigation.Screen
 import com.android.bookswap.ui.profile.ProfileIcon
 import com.android.bookswap.ui.theme.ColorVariable
 
 /** This is the main screen for the chat feature. It displays the list of messages */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ListChatScreen(placeHolderData: List<MessageBox> = emptyList()) {
+fun ListChatScreen(
+    placeHolderData: List<MessageBox> = emptyList(),
+    navigationActions: NavigationActions
+) {
   Scaffold(
       topBar = {
         TopAppBar(
@@ -88,15 +94,19 @@ fun ListChatScreen(placeHolderData: List<MessageBox> = emptyList()) {
                 }
               } else {
                 items(placeHolderData.size) { message ->
-                  MessageBoxDisplay(placeHolderData[message]) { /*TODO on click*/}
+                  MessageBoxDisplay(placeHolderData[message]) {
+                    navigationActions.navigateTo(Screen.CHAT)
+                  }
                   MessageDivider()
                 }
               }
             }
       },
       bottomBar = {
-        // To Modify with the navbar
-        BottomAppBar(modifier = Modifier.background(color = ColorVariable.BackGround)) {}
+        BottomNavigationMenu(
+            onTabSelect = { destination -> navigationActions.navigateTo(destination) },
+            tabList = List_Navigation_Bar_Destinations,
+            selectedItem = navigationActions.currentRoute())
       })
 }
 

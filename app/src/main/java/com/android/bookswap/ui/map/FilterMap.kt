@@ -2,6 +2,7 @@ package com.android.bookswap.ui.map
 
 import android.widget.Toast
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
@@ -22,8 +23,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -35,6 +36,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.bookswap.data.BookGenres
 import com.android.bookswap.data.BookLanguages
+import com.android.bookswap.model.map.BookFilter
 import com.android.bookswap.ui.components.BackButtonComponent
 import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.theme.ColorVariable
@@ -49,16 +51,19 @@ private val TOP_BAR_TITLE_LETTER_SPACING = 0.3.sp
 private val TOP_BAR_TITLE_FONT_WEIGHT = FontWeight(700)
 
 /**
- * This is the main screen for the filter feature. It displays the filters The parameter is
- * temporary and will be replaced with the actual data model
+ * This is the main screen for the filter feature. It displays the filters for the user to select
+ *
+ * @param navigationActions The navigation actions to navigate between screens
+ * @param bookFilter The filter object that contains the selected filters
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FilterMapScreen(navigationActions: NavigationActions, selectedFilters: MutableList<Any>) {
-  val selectedFiltersTemp = remember {
-    mutableStateListOf<Any>()
-  } // Use to store the selected filters before putting it in the VM
+fun FilterMapScreen(navigationActions: NavigationActions, bookFilter: BookFilter) {
+
+  val selectedFiltersGenres by bookFilter.genresFilter.collectAsState() // genre filter
+  val selectedFiltersLanguages by bookFilter.languagesFilter.collectAsState() // language filter
   val context = LocalContext.current
+
   Scaffold(
       containerColor = ColorVariable.BackGround,
       topBar = {
@@ -89,10 +94,10 @@ fun FilterMapScreen(navigationActions: NavigationActions, selectedFilters: Mutab
         LazyColumn(contentPadding = paddingValues, modifier = Modifier.fillMaxSize()) {
           item {
             ButtonBlock(
-                BookGenres.values().map {
-                  it.toString().lowercase().replaceFirstChar { c -> c.uppercase() }
-                },
-                selectedFiltersTemp)
+                BookGenres.values().map { it.Genre }, selectedFiltersGenres.map { it.Genre }) {
+                    newSelection ->
+                  bookFilter.setGenres(newSelection) // Actualize the selected genres as OnClick
+            }
           }
           item {
             ButtonBlock(
@@ -100,7 +105,12 @@ fun FilterMapScreen(navigationActions: NavigationActions, selectedFilters: Mutab
                     BookLanguages.values().map {
                       it.toString().lowercase().replaceFirstChar { c -> c.uppercase() }
                     },
-                selectedFiltersTemp)
+                selectedFiltersLanguages.map {
+                  it.name.lowercase().replaceFirstChar { c -> c.uppercase() }
+                }) { newSelection ->
+                  bookFilter.setLanguages(
+                      newSelection) // Actualize the selected languages as OnClick
+            }
           }
         }
       },
@@ -109,7 +119,8 @@ fun FilterMapScreen(navigationActions: NavigationActions, selectedFilters: Mutab
           Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
             Button(
                 onClick = {
-                  selectedFilters.addAll(selectedFiltersTemp)
+                  bookFilter.setGenres(selectedFiltersGenres.map { it.name })
+                  bookFilter.setLanguages(selectedFiltersLanguages.map { it.name })
                   Toast.makeText(context, "Filters applied", Toast.LENGTH_SHORT).show()
                   navigationActions.goBack()
                 },
@@ -140,10 +151,20 @@ private val HORIZONTAL_PADDING_BB = 37.dp
 private val VERTICAL_PADDING_BB = 20.dp
 private const val MAX_ITEMS_PER_ROW_BB = 3
 
-/** This is a composable that displays a row of buttons */
+/**
+ * This is a composable that displays a row of buttons
+ *
+ * @param buttonTexts The list of strings to display on the buttons
+ * @param selectedFilters The list of strings that are currently selected
+ * @param onSelectionChange The function to call when the selection changes
+ */
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun ButtonBlock(buttonTexts: List<String>, selectedFilters: MutableList<Any>) {
+fun ButtonBlock(
+    buttonTexts: List<String>,
+    selectedFilters: List<String>,
+    onSelectionChange: (List<String>) -> Unit
+) {
   FlowRow(
       modifier =
           Modifier.fillMaxWidth()
@@ -152,17 +173,20 @@ fun ButtonBlock(buttonTexts: List<String>, selectedFilters: MutableList<Any>) {
                   start = HORIZONTAL_PADDING_BB,
                   end = HORIZONTAL_PADDING_BB,
                   bottom = VERTICAL_PADDING_BB),
-      maxItemsInEachRow = MAX_ITEMS_PER_ROW_BB) {
+      maxItemsInEachRow = MAX_ITEMS_PER_ROW_BB,
+      horizontalArrangement = Arrangement.Center) {
         buttonTexts.forEach { text ->
           val isSelected = selectedFilters.contains(text)
 
           Button(
               onClick = {
-                if (isSelected) {
-                  selectedFilters.remove(text)
-                } else {
-                  selectedFilters.add(text)
-                }
+                val newSelection =
+                    if (isSelected) {
+                      selectedFilters - text
+                    } else {
+                      selectedFilters + text
+                    }
+                onSelectionChange(newSelection)
               },
               modifier =
                   Modifier.wrapContentSize()

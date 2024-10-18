@@ -1,5 +1,6 @@
-package com.android.bookswap.ui.addBook
+package com.android.bookswap.ui.books.add
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -11,7 +12,6 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -32,6 +32,8 @@ import com.android.bookswap.data.BookGenres
 import com.android.bookswap.data.BookLanguages
 import com.android.bookswap.data.DataBook
 import com.android.bookswap.data.repository.BooksRepository
+import com.android.bookswap.ui.components.BackButtonComponent
+import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.theme.ColorVariable
 import com.android.bookswap.ui.theme.ColorVariable.Accent
 import com.android.bookswap.ui.theme.ColorVariable.BackGround
@@ -41,7 +43,7 @@ import java.util.UUID
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddToBookScreen(repository: BooksRepository) {
+fun AddToBookScreen(repository: BooksRepository, navController: NavigationActions) {
   // State variables to store the values entered by the user
   var title by remember { mutableStateOf("") }
   var author by remember { mutableStateOf("") }
@@ -70,10 +72,10 @@ fun AddToBookScreen(repository: BooksRepository) {
                   modifier = Modifier.testTag("addBookTitle"))
             },
             // Icon button for navigation (currently no action defined)
+            // navigationIcon = { BackButton(navController) },
             navigationIcon = {
-              IconButton(onClick = {}) {
-                // You can add an icon here for the button
-              }
+              BackButtonComponent(navController)
+              // You can add an icon here for the button
             })
       },
       content = { paddingValues ->
@@ -277,38 +279,39 @@ fun createDataBook(
 ): DataBook? {
   // Validate UUID
   if (uuid.toString().isBlank()) {
-    println("UUID cannot be empty.")
+    Log.e("AddToBookScreen", "UUID cannot be empty.")
     return null
   }
 
   // Validate Title
   if (title.isBlank()) {
-    println("Title cannot be empty.")
+    Log.e("AddToBookScreen", "Title cannot be empty.")
     return null
   }
 
   // Validate Author
   if (author.isBlank()) {
-    println("Author cannot be empty.")
+    Log.e("AddToBookScreen", "Author cannot be empty.")
     return null
   }
+
   // Validate Rating
   val rating: Int =
       try {
         ratingStr.toInt().also {
           if (it !in 0..5) {
-            println("Rating must be between 0 and 5.")
+            Log.e("AddToBookScreen", "Rating must be between 0 and 5.")
             return null
           }
         }
       } catch (e: NumberFormatException) {
-        println("Rating must be a valid number.")
+        Log.e("AddToBookScreen", "Rating must be a valid number.")
         return null
       }
 
-  // Validate Photo  (assuming basic validation here, just checking if not empty)
+  // Validate Photo (assuming basic validation here, just checking if not empty)
   if (photo.isBlank()) {
-    println("Photo URL cannot be empty.")
+    Log.e("AddToBookScreen", "Photo URL cannot be empty.")
     return null
   }
 
@@ -317,15 +320,18 @@ fun createDataBook(
       try {
         BookLanguages.valueOf(bookLanguageStr.uppercase())
       } catch (e: IllegalArgumentException) {
-        println("Invalid language: $bookLanguageStr. Please use one of the supported languages.")
+        Log.e(
+            "AddToBookScreen",
+            "Invalid language: $bookLanguageStr. Please use one of the supported languages.")
         return null
       }
 
   // Validate ISBN
   if (isbn.isBlank()) {
-    println("ISBN cannot be empty.")
+    Log.e("AddToBookScreen", "ISBN cannot be empty.")
     return null
   }
+
   // If all validations pass, return a new DataBook instance
   return DataBook(
       uuid = uuid,
