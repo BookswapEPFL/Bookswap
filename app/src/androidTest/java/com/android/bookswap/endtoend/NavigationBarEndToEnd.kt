@@ -40,6 +40,5 @@ class NavigationBarEndToEnd {
     // Click on the Map tab and check if the MapScreen is displayed
     composeTestRule.onNodeWithTag("Map").assertExists().performClick()
     composeTestRule.onNodeWithTag("mapScreen").assertExists()
-
   }
 }
