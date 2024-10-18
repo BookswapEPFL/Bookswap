@@ -12,7 +12,6 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -33,6 +32,8 @@ import com.android.bookswap.data.BookGenres
 import com.android.bookswap.data.BookLanguages
 import com.android.bookswap.data.DataBook
 import com.android.bookswap.data.repository.BooksRepository
+import com.android.bookswap.ui.components.BackButtonComponent
+import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.theme.ColorVariable
 import com.android.bookswap.ui.theme.ColorVariable.Accent
 import com.android.bookswap.ui.theme.ColorVariable.BackGround
@@ -42,7 +43,7 @@ import java.util.UUID
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddToBookScreen(repository: BooksRepository) {
+fun AddToBookScreen(repository: BooksRepository, navController: NavigationActions) {
   // State variables to store the values entered by the user
   var title by remember { mutableStateOf("") }
   var author by remember { mutableStateOf("") }
@@ -71,10 +72,10 @@ fun AddToBookScreen(repository: BooksRepository) {
                   modifier = Modifier.testTag("addBookTitle"))
             },
             // Icon button for navigation (currently no action defined)
+            // navigationIcon = { BackButton(navController) },
             navigationIcon = {
-              IconButton(onClick = {}) {
-                // You can add an icon here for the button
-              }
+              BackButtonComponent(navController)
+              // You can add an icon here for the button
             })
       },
       content = { paddingValues ->

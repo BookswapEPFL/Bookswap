@@ -43,6 +43,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.bookswap.data.DataBook
 import com.android.bookswap.model.map.BookFilter
+import com.android.bookswap.ui.navigation.BottomNavigationMenu
+import com.android.bookswap.ui.navigation.List_Navigation_Bar_Destinations
 import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.navigation.Screen
 import com.android.bookswap.ui.theme.ColorVariable
@@ -125,7 +127,10 @@ fun MapScreen(
   Scaffold(
       modifier = Modifier.testTag("mapScreen"),
       bottomBar = {
-        // To add a bottom navigation bar when it will be created
+        BottomNavigationMenu(
+            onTabSelect = { destination -> navigationActions.navigateTo(destination) },
+            tabList = List_Navigation_Bar_Destinations,
+            selectedItem = navigationActions.currentRoute())
       },
       content = { pd ->
         GoogleMap(
