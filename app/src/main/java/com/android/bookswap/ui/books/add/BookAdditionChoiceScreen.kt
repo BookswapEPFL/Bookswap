@@ -43,6 +43,7 @@ fun BookAdditionChoiceScreen(navController: NavigationActions) {
   val columnPadding = 16.dp
   val buttonWidth = (LocalConfiguration.current.screenWidthDp.dp * (0.75f))
   Scaffold(
+      modifier = Modifier.testTag("addBookChoiceScreen"),
       topBar = {
         TopAppBar(
             title = { Text("Book Addition Choice", color = ColorVariable.BackGround) },

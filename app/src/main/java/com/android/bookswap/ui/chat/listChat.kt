@@ -50,6 +50,7 @@ fun ListChatScreen(
     navigationActions: NavigationActions
 ) {
   Scaffold(
+      modifier = Modifier.testTag("chat_listScreen"),
       topBar = {
         TopAppBar(
             colors =
