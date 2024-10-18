@@ -59,7 +59,7 @@ open class MyFirebaseMessagingService : FirebaseMessagingService() {
     val declinePendingIntent =
         PendingIntent.getBroadcast(
             this,
-            0,
+            1,
             declineIntent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
 
