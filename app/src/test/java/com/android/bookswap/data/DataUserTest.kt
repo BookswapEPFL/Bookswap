@@ -26,6 +26,7 @@ class DataUserTest {
 
     val userVM = com.android.bookswap.model.UserViewModel("", MockUserRepo())
 
+
     userVM.updateUser(
         DataUser(
             "M.",
@@ -62,6 +63,7 @@ class DataUserTest {
   @Test
   fun checkString() {
     val userVM = com.android.bookswap.model.UserViewModel("", MockUserRepo())
+
     userVM.updateUser(
         DataUser(
             "M.",

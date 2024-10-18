@@ -34,14 +34,17 @@ import com.android.bookswap.user
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UserProfile(userVM: UserViewModel = UserViewModel()) {
+
   var user = userVM.getUser()
   var showEditProfile by remember { mutableStateOf(false) }
 
   var needRecompose by remember { mutableStateOf(false) }
 
+
   if (showEditProfile) {
     EditProfileDialog(
         onDismiss = {
+
           showEditProfile = false
           needRecompose = true
         },
@@ -97,6 +100,7 @@ fun UserProfile(userVM: UserViewModel = UserViewModel()) {
                       Box(
                           modifier =
                               Modifier.padding(2.5f.dp)
+
                                   .border(3.5f.dp, Color(0xFFA98467), CircleShape)) {
                             Image(
                                 imageVector = Icons.Rounded.AccountCircle,
@@ -108,6 +112,7 @@ fun UserProfile(userVM: UserViewModel = UserViewModel()) {
                           modifier = Modifier.fillMaxSize().padding(0f.dp),
                           contentAlignment = Alignment.TopEnd) {
                             IconButton(onClick = { /*TODO*/}, modifier = Modifier) {
+
                               Image(
                                   imageVector = Icons.Outlined.Edit,
                                   contentDescription = "",
