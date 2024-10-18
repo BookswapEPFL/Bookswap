@@ -1,6 +1,5 @@
 package com.android.bookswap.ui.profile
 
-import android.util.Log
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -30,20 +29,22 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.android.bookswap.model.UserViewModel
 import com.android.bookswap.ui.theme.*
+import com.android.bookswap.user
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun UserProfile(userVM: UserViewModel, modifier: Modifier = Modifier) {
+fun UserProfile(userVM: UserViewModel = UserViewModel()) {
+
   var user = userVM.getUser()
   var showEditProfile by remember { mutableStateOf(false) }
 
   var needRecompose by remember { mutableStateOf(false) }
-  val mod = modifier
+
 
   if (showEditProfile) {
     EditProfileDialog(
         onDismiss = {
-          Log.d("EditProfile_Dismiss", "Edit profile alert dismissed")
+
           showEditProfile = false
           needRecompose = true
         },
@@ -54,8 +55,8 @@ fun UserProfile(userVM: UserViewModel, modifier: Modifier = Modifier) {
               lastName = it.lastName,
               email = it.email,
               phone = it.phoneNumber,
-              0.0,
-              0.0,
+              user.latitude,
+              user.longitude,
               picURL = user.profilePictureUrl)
           showEditProfile = false
           needRecompose = true
@@ -64,7 +65,7 @@ fun UserProfile(userVM: UserViewModel, modifier: Modifier = Modifier) {
         modifier = Modifier.testTag("editProfileAld"))
   }
 
-  LaunchedEffect(userVM.uid, needRecompose) {
+  LaunchedEffect(userVM.uuid, needRecompose) {
     user = userVM.getUser()
     needRecompose = false
   }
@@ -73,44 +74,45 @@ fun UserProfile(userVM: UserViewModel, modifier: Modifier = Modifier) {
 
     // Scaffold to provide basic UI structure with a top app bar
     Scaffold(
-        modifier = mod.testTag("profileScreenContainer"),
+        modifier = Modifier.testTag("profileScreenContainer"),
         topBar = {
           TopAppBar(
-              modifier = mod.testTag("profileTopAppBar"),
+              modifier = Modifier.testTag("profileTopAppBar"),
               // Title of the screen
-              title = { Text("Your Profile", modifier = mod.testTag("profileTitleTxt")) },
+              title = { Text("Your Profile", modifier = Modifier.testTag("profileTitleTxt")) },
               // Icon button for navigation (currently no action defined)
               navigationIcon = {
-                IconButton(modifier = mod.size(50.dp), onClick = {}) {
+                IconButton(modifier = Modifier.size(32.dp), onClick = {}) {
                   Icon(
                       imageVector = Icons.AutoMirrored.Sharp.ArrowBack,
                       contentDescription = "",
-                      modifier = mod.size(30.dp))
+                      modifier = Modifier.size(30.dp))
                 }
               })
-        },
-        content = { paddingValues ->
+        }) {
           // Column layout to stack input fields vertically with spacing
           Row(
-              modifier = mod.padding(paddingValues).consumeWindowInsets(paddingValues),
+              modifier = Modifier.padding(it).consumeWindowInsets(it).fillMaxWidth(),
               horizontalArrangement = Arrangement.spacedBy(5f.dp)) {
-                Column(modifier = mod.fillMaxWidth(0.25f)) {
+                Column(modifier = Modifier.fillMaxWidth(0.25f)) {
                   Box {
-                    IconButton(onClick = { /*TODO*/}, modifier = mod.aspectRatio(1f)) {
+                    IconButton(onClick = { /*TODO*/}, modifier = Modifier.aspectRatio(1f)) {
                       Box(
                           modifier =
-                              mod.padding(2.5f.dp)
+                              Modifier.padding(2.5f.dp)
+
                                   .border(3.5f.dp, Color(0xFFA98467), CircleShape)) {
                             Image(
                                 imageVector = Icons.Rounded.AccountCircle,
                                 contentDescription = "",
-                                modifier = mod.fillMaxSize().scale(1.2f).clipToBounds(),
+                                modifier = Modifier.fillMaxSize().scale(1.2f).clipToBounds(),
                                 colorFilter = ColorFilter.tint(Color(0xFF6C584C)))
                           }
                       Box(
-                          modifier = mod.fillMaxSize().padding(0f.dp),
+                          modifier = Modifier.fillMaxSize().padding(0f.dp),
                           contentAlignment = Alignment.TopEnd) {
-                            IconButton(onClick = { /*TODO*/}, modifier = mod) {
+                            IconButton(onClick = { /*TODO*/}, modifier = Modifier) {
+
                               Image(
                                   imageVector = Icons.Outlined.Edit,
                                   contentDescription = "",
@@ -120,61 +122,52 @@ fun UserProfile(userVM: UserViewModel, modifier: Modifier = Modifier) {
                     }
                   }
                 }
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                    modifier = mod.fillMaxHeight()) {
-                      // Title Input Field
-                      Text(
-                          text = "${user.greeting} ${user.firstName} ${user.lastName}",
-                          modifier = mod.testTag("fullNameTxt"))
+                Column(Modifier.fillMaxHeight().fillMaxWidth(), Arrangement.spacedBy(8.dp)) {
+                  // Full name text
+                  Text(
+                      text = "${user.greeting} ${user.firstName} ${user.lastName}",
+                      modifier = Modifier.testTag("fullNameTxt"))
 
-                      // Author Input Field
-                      Text(text = user.email, modifier = mod.testTag("emailTxt"))
+                  // Email text
+                  Text(text = user.email, modifier = Modifier.testTag("emailTxt"))
 
-                      // Description Input Field
-                      Text(text = user.phoneNumber, modifier = mod.testTag("phoneNumberTxt"))
+                  // Phone number text
+                  Text(text = user.phoneNumber, modifier = Modifier.testTag("phoneNumberTxt"))
 
-                      // User address
-                      Text(
-                          text = "${user.latitude}, ${user.longitude}",
-                          modifier = mod.testTag("addressTxt"))
+                  // User address
+                  Text(
+                      text = "${user.latitude}, ${user.longitude}",
+                      modifier = Modifier.testTag("addressTxt"))
 
-                      // Save Button
-                      Button(
-                          onClick = { showEditProfile = true },
-                          border = BorderStroke(1f.dp, Color(0xFFA98467)),
-                          modifier = mod.testTag("editProfileBtn")) {
-                            // Text displayed on the button
-                            Text("Edit Profile")
-                          }
-                    }
+                  // Edit Button
+                  ElevatedButton(
+                      onClick = { showEditProfile = true },
+                      border = BorderStroke(1f.dp, Color(0xFFA98467)),
+                      modifier = Modifier.testTag("editProfileBtn")) {
+                        // Text displayed on the button
+                        Text("Edit Profile")
+                      }
+                }
               }
-        })
+        }
   }
 }
 
-/*
-@Preview(showBackground = true, backgroundColor = 0xFFF0EAD2)
-@Composable
-fun UserProfilePreview() {
-  val address = Address(Locale.getDefault())
-  address.countryCode = "CH"
-  address.locality = "Lausanne"
-  address.postalCode = "1000"
-  address.countryName = "Switzerland"
-  address.setAddressLine(0, "Rue de la Gare 1")
-  val userVM = UserViewModel("")
-  userVM.updateUser(
-      User(
-          "M.",
-          "John",
-          "Doe",
-          "John.Doe@example.com",
-          "+41223456789",
-          address,
-          "dummyPic.png",
-          "dummyUUID0000"))
-
-  UserProfile(userVM)
-}
-*/
+// @Preview(showBackground = true, widthDp = 540, heightDp = 1110)
+// @Composable
+// fun UserProfilePreview() {
+//  val userVM = UserViewModel("")
+//  userVM.updateUser(
+//    DataUser(
+//      "M.",
+//      "John",
+//      "Doe",
+//      "John.Doe@example.com",
+//      "+41223456789",
+//      0.0,
+//      0.0,
+//      "dummyPic.png",
+//      "dummyUUID0000")
+//  )
+//  UserProfile(userVM)
+// }
