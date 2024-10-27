@@ -7,19 +7,19 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.navigation.compose.rememberNavController
 import com.android.bookswap.ui.books.add.BookAdditionChoiceScreen
 import com.android.bookswap.ui.navigation.NavigationActions
+import io.mockk.mockk
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.Mockito.mock
 
 class BookAdditionChoiceScreenTest {
 
   @get:Rule val composeTestRule = createComposeRule()
-  private lateinit var mockNavController: NavigationActions
+  private lateinit var mockNavigationActions: NavigationActions
 
   @Before
   fun setUp() {
-    mockNavController = mock(NavigationActions::class.java)
+    mockNavigationActions = mockk()
   }
 
   @Test

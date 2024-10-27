@@ -168,7 +168,6 @@ dependencies {
     testImplementation(libs.mockito.inline)
     globalTestImplementation(libs.androidx.junit)
     globalTestImplementation(libs.androidx.espresso.core)
-    androidTestImplementation(libs.mockito.android)
     androidTestImplementation(libs.mockk.android)
 
     // Google Service and Maps
