@@ -11,11 +11,11 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.android.bookswap.data.repository.BooksRepository
 import com.android.bookswap.ui.navigation.NavigationActions
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
+import io.mockk.mockk
 import org.junit.Assert
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.kotlin.mock
 
 @RunWith(AndroidJUnit4::class)
 class ISBNAddTest : TestCase() {
@@ -24,8 +24,8 @@ class ISBNAddTest : TestCase() {
   @Test
   fun elementsAreDisplayed() {
     composeTestRule.setContent {
-      val mockNavigationActions: NavigationActions = mock()
-      val mockBooksRepository: BooksRepository = mock()
+      val mockNavigationActions: NavigationActions = mockk()
+      val mockBooksRepository: BooksRepository = mockk()
 
       AddISBNScreen(mockNavigationActions, mockBooksRepository)
     }
@@ -42,8 +42,8 @@ class ISBNAddTest : TestCase() {
   @Test
   fun isbnFieldWork() {
     composeTestRule.setContent {
-      val mockNavigationActions: NavigationActions = mock()
-      val mockBooksRepository: BooksRepository = mock()
+      val mockNavigationActions: NavigationActions = mockk()
+      val mockBooksRepository: BooksRepository = mockk()
       AddISBNScreen(mockNavigationActions, mockBooksRepository)
     }
     val isbnField = composeTestRule.onNodeWithTag("isbn_field")
