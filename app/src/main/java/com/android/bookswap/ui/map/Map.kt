@@ -138,7 +138,6 @@ fun MapScreen(
             modifier = Modifier.fillMaxSize().padding(pd).testTag("mapGoogleMap"),
             cameraPositionState = cameraPositionState,
             uiSettings = MapUiSettings(zoomControlsEnabled = false),
-
         ) {
           filteredUsers
               .filter { !it.longitude.isNaN() && !it.latitude.isNaN() && it.listBook.isNotEmpty() }

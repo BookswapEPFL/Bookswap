@@ -216,9 +216,9 @@ class MapScreenTest {
     val bookFilter = BookFilter()
     bookFilter.setGenres(listOf("Horror"))
     composeTestRule.setContent {
-        val navController = rememberNavController()
-        val navigationActions = NavigationActions(navController)
-        MapScreen(user, user[0], navigationActions, bookFilter)
+      val navController = rememberNavController()
+      val navigationActions = NavigationActions(navController)
+      MapScreen(user, user[0], navigationActions, bookFilter)
     }
     composeTestRule.onNodeWithTag("mapBoxMarkerListBox").assertIsDisplayed()
     composeTestRule.onAllNodesWithTag("mapBoxMarkerListBox").assertCountEquals(1)
