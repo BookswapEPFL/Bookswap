@@ -89,6 +89,8 @@ android {
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
+            merges += "META-INF/LICENSE.md"
+            merges += "META-INF/LICENSE-notice.md"
         }
     }
 
@@ -166,6 +168,8 @@ dependencies {
     testImplementation(libs.mockito.inline)
     globalTestImplementation(libs.androidx.junit)
     globalTestImplementation(libs.androidx.espresso.core)
+    androidTestImplementation(libs.mockito.android)
+    androidTestImplementation(libs.mockk.android)
 
     // Google Service and Maps
     implementation(libs.play.services.maps)
@@ -205,8 +209,6 @@ dependencies {
     testImplementation(libs.mockito.core)
     testImplementation(libs.mockito.inline)
     testImplementation(libs.mockito.kotlin)
-    androidTestImplementation(libs.mockito.android)
-    androidTestImplementation(libs.mockito.kotlin)
     // ----------       Robolectric     ------------
     testImplementation(libs.robolectric)
 

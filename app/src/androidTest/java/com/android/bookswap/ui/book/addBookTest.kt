@@ -16,22 +16,26 @@ import com.android.bookswap.data.repository.BooksRepository
 import com.android.bookswap.ui.books.add.AddToBookScreen
 import com.android.bookswap.ui.books.add.createDataBook
 import com.android.bookswap.ui.navigation.NavigationActions
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.mockkStatic
 import java.util.UUID
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertNull
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.Mockito
-import org.mockito.kotlin.mock
 
 class AddToBookTest {
   @get:Rule val composeTestRule = createComposeRule()
-  val mockContext: Context = mock()
+  private val mockContext: Context = mockk()
 
   @Before
   fun init() {
-    val toast = Mockito.mockStatic(Toast::class.java)
+    mockkStatic(Toast::class)
+    val toastMock = mockk<Toast>()
+    every { toastMock.show() } returns Unit
+    every { Toast.makeText(any(), any<String>(), any()) } returns toastMock
   }
 
   @Test
