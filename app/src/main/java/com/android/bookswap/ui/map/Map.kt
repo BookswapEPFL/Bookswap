@@ -137,6 +137,8 @@ fun MapScreen(
             onMapClick = { mutableStateSelectedUser = null },
             modifier = Modifier.fillMaxSize().padding(pd).testTag("mapGoogleMap"),
             cameraPositionState = cameraPositionState,
+            uiSettings = MapUiSettings(zoomControlsEnabled = false),
+
         ) {
           filteredUsers
               .filter { !it.longitude.isNaN() && !it.latitude.isNaN() && it.listBook.isNotEmpty() }
@@ -164,7 +166,7 @@ fun MapScreen(
                     Modifier.offset {
                       IntOffset(screenPos.x.roundToInt(), screenPos.y.roundToInt())
                     },
-                user = user)
+                userBooks = bookFilter.filterBooks(user.listBook))
           }
         }
         // Draggable Bottom List
@@ -195,7 +197,7 @@ const val SECONDARY_TEXT_FONT_SP = 16
  *   window.
  */
 @Composable
-private fun CustomInfoWindow(modifier: Modifier = Modifier, user: TempUser) {
+private fun CustomInfoWindow(modifier: Modifier = Modifier, userBooks: List<DataBook>) {
   Card(
       modifier =
           modifier
@@ -218,7 +220,7 @@ private fun CustomInfoWindow(modifier: Modifier = Modifier, user: TempUser) {
               0.dp, CARD_CORNER_RADIUS.dp, CARD_CORNER_RADIUS.dp, CARD_CORNER_RADIUS.dp)) {
         Spacer(modifier.height(CARD_CORNER_RADIUS.dp))
         LazyColumn(modifier = Modifier.fillMaxWidth().testTag("mapBoxMarkerList")) {
-          itemsIndexed(user.listBook) { index, book ->
+          itemsIndexed(userBooks) { index, book ->
             Column(
                 modifier =
                     Modifier.padding(horizontal = PADDING_HORIZONTAL_DP.dp)
@@ -235,7 +237,7 @@ private fun CustomInfoWindow(modifier: Modifier = Modifier, user: TempUser) {
                       fontSize = SECONDARY_TEXT_FONT_SP.sp,
                       modifier = Modifier.testTag("mapBoxMarkerListBoxAuthor"))
                 }
-            if (index < user.listBook.size - 1)
+            if (index < userBooks.size - 1)
                 HorizontalDivider(
                     modifier =
                         Modifier.fillMaxWidth()
