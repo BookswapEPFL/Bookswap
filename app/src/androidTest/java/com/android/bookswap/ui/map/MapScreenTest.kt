@@ -4,6 +4,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
+import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
@@ -208,5 +209,19 @@ class MapScreenTest {
     }
     composeTestRule.onNodeWithTag("mapDraggableMenuBookBox").assertIsDisplayed()
     composeTestRule.onAllNodesWithTag("mapDraggableMenuBookBox").assertCountEquals(1)
+  }
+
+  @Test
+  fun listMarkerBookChangedWhenFilterApplied() {
+    val bookFilter = BookFilter()
+    bookFilter.setGenres(listOf("Horror"))
+    composeTestRule.setContent {
+        val navController = rememberNavController()
+        val navigationActions = NavigationActions(navController)
+        MapScreen(user, user[0], navigationActions, bookFilter)
+    }
+    composeTestRule.onNodeWithTag("mapBoxMarkerListBox").assertIsDisplayed()
+    composeTestRule.onAllNodesWithTag("mapBoxMarkerListBox").assertCountEquals(1)
+    composeTestRule.onNodeWithTag("mapBoxMarkerListBoxTitle").assertTextContains("Book 3")
   }
 }
