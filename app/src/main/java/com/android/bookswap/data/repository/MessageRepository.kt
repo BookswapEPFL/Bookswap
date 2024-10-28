@@ -47,4 +47,6 @@ interface MessageRepository {
       currentUserId: String,
       callback: (Result<List<DataMessage>>) -> Unit
   ): ListenerRegistration
+
+  fun fetchMessagesForUser(otherUserId: String, callback: (Result<List<DataMessage>>) -> Unit)
 }

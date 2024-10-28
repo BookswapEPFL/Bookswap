@@ -17,9 +17,13 @@ import androidx.navigation.navigation
 import com.android.bookswap.data.BookLanguages
 import com.android.bookswap.data.DataBook
 import com.android.bookswap.data.source.network.BooksFirestoreRepository
+import com.android.bookswap.data.source.network.MessageFirestoreSource
+import com.android.bookswap.model.chat.ChatViewModel
 import com.android.bookswap.resources.C
-import com.android.bookswap.ui.addBook.AddToBookScreen
 import com.android.bookswap.ui.authentication.SignInScreen
+import com.android.bookswap.ui.books.add.AddToBookScreen
+import com.android.bookswap.ui.chat.ChatScreen
+import com.android.bookswap.ui.chat.ListChatScreen
 import com.android.bookswap.ui.map.MapScreen
 import com.android.bookswap.ui.map.TempUser
 import com.android.bookswap.ui.navigation.NavigationActions
@@ -51,14 +55,19 @@ class MainActivity : ComponentActivity() {
     val navController = rememberNavController()
     val navigationActions = NavigationActions(navController)
     val bookfire = BooksFirestoreRepository(Firebase.firestore)
-
+    val chatViewModel = ChatViewModel(MessageFirestoreSource(Firebase.firestore))
     NavHost(navController = navController, startDestination = Route.AUTH) {
       navigation(startDestination = Screen.AUTH, route = Route.AUTH) {
-        composable(Screen.AUTH) { SignInScreen(navigationActions) } // *Todo*/}
+        composable(Screen.AUTH) { SignInScreen(navigationActions) }
       }
       navigation(startDestination = Screen.CHATLIST, route = Route.CHAT) {
-        composable(Screen.CHATLIST) { /*Todo*/}
-        composable(Screen.CHAT) { /*Todo*/}
+        composable(Screen.CHATLIST) {
+          ListChatScreen(navController = navController, viewModel = chatViewModel)
+        }
+        composable("chatScreen/{userId}") { backStackEntry ->
+          val userId = backStackEntry.arguments?.getString("userId")
+          userId?.let { ChatScreen(userId, viewModel = chatViewModel) }
+        }
       }
       navigation(startDestination = Screen.MAP, route = Route.MAP) {
         composable(Screen.MAP) { MapScreen(user) }

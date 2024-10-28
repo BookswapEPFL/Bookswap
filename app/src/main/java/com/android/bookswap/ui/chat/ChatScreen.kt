@@ -1,6 +1,5 @@
 package com.android.bookswap.ui.chat
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -34,35 +33,23 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import com.android.bookswap.data.DataMessage
-import com.android.bookswap.data.repository.MessageRepository
+import com.android.bookswap.model.chat.ChatViewModel
 import com.android.bookswap.ui.theme.ColorVariable
-import com.google.firebase.firestore.ListenerRegistration
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
 @Composable
 fun ChatScreen(
-    messageRepository: MessageRepository,
     currentUserId: String, // To identify the current user for aligning messages
-    otherUserId: String
+    viewModel: ChatViewModel
 ) {
   var messages by remember { mutableStateOf(emptyList<DataMessage>()) }
   var newMessageText by remember { mutableStateOf(TextFieldValue("")) }
 
-  var listenerRegistration: ListenerRegistration?
-  DisposableEffect(Unit) {
-    listenerRegistration =
-        messageRepository.addMessagesListener(
-            otherUserId = otherUserId, currentUserId = currentUserId) { result ->
-              if (result.isSuccess) {
-                messages = result.getOrThrow()
-              } else {
-                Log.e(
-                    "MessageView", "Failed to fetch messages: ${result.exceptionOrNull()?.message}")
-              }
-            }
-    onDispose { listenerRegistration?.remove() }
+  DisposableEffect(viewModel) {
+    viewModel.addMessagesListener(currentUserId)
+    onDispose { viewModel.onCleared() }
   }
   Box(modifier = Modifier.fillMaxSize().background(ColorVariable.BackGround)) {
     Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.SpaceBetween) {
@@ -91,26 +78,16 @@ fun ChatScreen(
             )
             Button(
                 onClick = {
-                  val messageId = messageRepository.getNewUid()
+                  val messageId = viewModel.getNewUid()
                   val newMessage =
                       DataMessage(
                           id = messageId,
                           text = newMessageText.text,
                           senderId = currentUserId,
-                          receiverId = otherUserId, // Ensure receiverId is set here
+                          receiverId = viewModel.getOtherUserId(), // Ensure receiverId is set here
                           timestamp = System.currentTimeMillis())
                   // Send the message
-                  messageRepository.sendMessage(
-                      message = newMessage,
-                  ) { result ->
-                    if (result.isSuccess) {
-                      newMessageText = TextFieldValue("")
-                    } else {
-                      Log.e(
-                          "MessageView",
-                          "Failed to send message: ${result.exceptionOrNull()?.message}")
-                    }
-                  }
+                  viewModel.sendMessage(newMessage)
                 },
                 colors =
                     ButtonColors(

@@ -35,6 +35,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import com.android.bookswap.model.chat.ChatViewModel
 import com.android.bookswap.model.chat.MessageBox
 import com.android.bookswap.ui.profile.ProfileIcon
 import com.android.bookswap.ui.theme.ColorVariable
@@ -42,7 +44,11 @@ import com.android.bookswap.ui.theme.ColorVariable
 /** This is the main screen for the chat feature. It displays the list of messages */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ListChatScreen(placeHolderData: List<MessageBox> = emptyList()) {
+fun ListChatScreen(
+    navController: NavController,
+    placeHolderData: List<MessageBox> = emptyList(),
+    viewModel: ChatViewModel
+) {
   Scaffold(
       topBar = {
         TopAppBar(
@@ -88,7 +94,11 @@ fun ListChatScreen(placeHolderData: List<MessageBox> = emptyList()) {
                 }
               } else {
                 items(placeHolderData.size) { message ->
-                  MessageBoxDisplay(placeHolderData[message]) { /*TODO on click*/}
+                  MessageBoxDisplay(placeHolderData[message]) {
+                    ListToChat(
+                        viewModel, placeHolderData[message], placeHolderData[message].contactName)
+                    navController.navigate("chatScreen/${placeHolderData[message].contactName}")
+                  }
                   MessageDivider()
                 }
               }
@@ -152,4 +162,17 @@ fun MessageBoxDisplay(message: MessageBox, onClick: () -> Unit = {}) {
 fun MessageDivider() {
   HorizontalDivider(
       modifier = Modifier.fillMaxWidth().border(width = 2.dp, color = Color(0xFF6C584C)))
+}
+
+/**
+ * Sets up the chat to display messages for a specific contact. Changes the other user in the chat
+ * view model to match the selected contact.
+ *
+ * @param viewModel The ChatViewModel managing the messages.
+ * @param MessageBox The MessageBox containing information about the contact.
+ * @param user The ID of the current user (could be used for further configuration).
+ */
+fun ListToChat(viewModel: ChatViewModel, MessageBox: MessageBox, user: String) {
+  // Change the other user's ID in the chat ViewModel to the contact's name
+  viewModel.changeOtherUserId(MessageBox.contactName)
 }

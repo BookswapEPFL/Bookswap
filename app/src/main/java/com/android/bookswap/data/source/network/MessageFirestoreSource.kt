@@ -90,6 +90,26 @@ class MessageFirestoreSource(private val db: FirebaseFirestore) : MessageReposit
           }
         }
   }
+
+  override fun fetchMessagesForUser(
+      otherUserId: String,
+      callback: (Result<List<DataMessage>>) -> Unit
+  ) {
+    db.collection(COLLECTION_PATH)
+        .whereEqualTo("receiverId", otherUserId)
+        .get()
+        .addOnCompleteListener { response ->
+          if (response.isSuccessful) {
+            val messages =
+                response.result?.mapNotNull { document -> documentToMessage(document).getOrNull() }
+                    ?: emptyList()
+            callback(Result.success(messages))
+          } else {
+            callback(
+                Result.failure(response.exception ?: Exception("Unknown error fetching messages")))
+          }
+        }
+  }
 }
 
 fun documentToMessage(document: DocumentSnapshot): Result<DataMessage> {
