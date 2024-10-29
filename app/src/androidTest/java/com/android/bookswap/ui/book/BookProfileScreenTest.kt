@@ -2,9 +2,11 @@ package com.android.bookswap.ui.book
 
 import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollToNode
 import androidx.navigation.compose.rememberNavController
 import com.android.bookswap.data.BookGenres
 import com.android.bookswap.data.BookLanguages
@@ -50,6 +52,9 @@ class BookProfileScreenTest {
 
     composeTestRule.onNodeWithTag("bookTitle").assertIsDisplayed()
     composeTestRule.onNodeWithTag("bookAuthor").assertIsDisplayed()
+    composeTestRule
+        .onNodeWithTag("bookProfileScroll")
+        .performScrollToNode(hasTestTag("bookProfileEditionPlace"))
     composeTestRule.onNodeWithTag("bookProfileLanguage").assertIsDisplayed()
     composeTestRule.onNodeWithTag("bookProfileGenresTitle").assertIsDisplayed()
     testBook.genres.forEach { genre ->
@@ -71,8 +76,8 @@ class BookProfileScreenTest {
       BookProfileScreen(testBook, navigationActions)
     }
 
-    composeTestRule.onNodeWithTag("leftIcon_Manually").assertHasClickAction()
-    composeTestRule.onNodeWithTag("rightIcon_Manually").assertHasClickAction()
+    composeTestRule.onNodeWithTag("bookProfileImageLeft").assertHasClickAction()
+    composeTestRule.onNodeWithTag("bookProfileImageRight").assertHasClickAction()
   }
 
   @Test
@@ -84,12 +89,12 @@ class BookProfileScreenTest {
     }
 
     // Verify the first picture is displayed
-    composeTestRule.onNodeWithTag("bookProfilePicture1").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("bookProfileImage Isabel La Catolica").assertIsDisplayed()
 
     // Perform a click action on the icon
-    composeTestRule.onNodeWithTag("rightIcon_Manually").performClick()
+    composeTestRule.onNodeWithTag("bookProfileImageRight").performClick()
 
     // Verify the next picture is displayed
-    composeTestRule.onNodeWithTag("bookProfilePicture2").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("bookProfileImage Felipe II").assertIsDisplayed()
   }
 }

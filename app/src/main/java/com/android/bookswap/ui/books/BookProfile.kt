@@ -76,7 +76,10 @@ fun BookProfileScreen(DataBook: DataBook, navController: NavigationActions) {
       }) { innerPadding ->
         LazyColumn(
             modifier =
-                Modifier.fillMaxSize().padding(innerPadding).background(ColorVariable.BackGround),
+                Modifier.fillMaxSize()
+                    .padding(innerPadding)
+                    .background(ColorVariable.BackGround)
+                    .testTag("bookProfileScroll"),
             verticalArrangement = Arrangement.spacedBy(columnPadding),
             horizontalAlignment = Alignment.CenterHorizontally) {
               item {
