@@ -90,7 +90,7 @@ class UserFirestoreSourceTest {
           {
             // Assert proper data transfert
             assert(it.isNotEmpty())
-            assert(it.first().printFull1Line() == testUser.printFull1Line())
+            assert(it.first().printFullname() == testUser.printFullname())
           },
           { fail("Should not fail!") })
     }
@@ -121,7 +121,7 @@ class UserFirestoreSourceTest {
       result.fold(
           {
             // Assert proper data transfert
-            assert(it.printFull1Line() == testUser.printFull1Line())
+            assert(it.printFullname() == testUser.printFullname())
           },
           { fail("Should not fail!") })
     }
@@ -190,7 +190,7 @@ class UserFirestoreSourceTest {
 
     // Assert
     assert(result.getOrNull() != null)
-    result.onSuccess { assert(it.printFull1Line() == testUser.printFull1Line()) }
+    result.onSuccess { assert(it.printFullname() == testUser.printFullname()) }
   }
 
   @Test

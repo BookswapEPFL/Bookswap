@@ -11,10 +11,8 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.sharp.ArrowBack
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.rounded.AccountCircle
 import androidx.compose.material3.*
@@ -28,23 +26,24 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.android.bookswap.model.UserViewModel
+import com.android.bookswap.ui.components.BackButtonComponent
+import com.android.bookswap.ui.components.ButtonComponent
+import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.theme.*
 import com.android.bookswap.user
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun UserProfile(userVM: UserViewModel = UserViewModel()) {
+fun UserProfile(userVM: UserViewModel = UserViewModel(), navigationActions: NavigationActions) {
 
   var user = userVM.getUser()
   var showEditProfile by remember { mutableStateOf(false) }
 
   var needRecompose by remember { mutableStateOf(false) }
 
-
   if (showEditProfile) {
     EditProfileDialog(
         onDismiss = {
-
           showEditProfile = false
           needRecompose = true
         },
@@ -61,8 +60,7 @@ fun UserProfile(userVM: UserViewModel = UserViewModel()) {
           showEditProfile = false
           needRecompose = true
         },
-        dataUser = user,
-        modifier = Modifier.testTag("editProfileAld"))
+        dataUser = user)
   }
 
   LaunchedEffect(userVM.uuid, needRecompose) {
@@ -81,14 +79,7 @@ fun UserProfile(userVM: UserViewModel = UserViewModel()) {
               // Title of the screen
               title = { Text("Your Profile", modifier = Modifier.testTag("profileTitleTxt")) },
               // Icon button for navigation (currently no action defined)
-              navigationIcon = {
-                IconButton(modifier = Modifier.size(32.dp), onClick = {}) {
-                  Icon(
-                      imageVector = Icons.AutoMirrored.Sharp.ArrowBack,
-                      contentDescription = "",
-                      modifier = Modifier.size(30.dp))
-                }
-              })
+              navigationIcon = { BackButtonComponent(navActions = navigationActions) })
         }) {
           // Column layout to stack input fields vertically with spacing
           Row(
@@ -96,30 +87,28 @@ fun UserProfile(userVM: UserViewModel = UserViewModel()) {
               horizontalArrangement = Arrangement.spacedBy(5f.dp)) {
                 Column(modifier = Modifier.fillMaxWidth(0.25f)) {
                   Box {
-                    IconButton(onClick = { /*TODO*/}, modifier = Modifier.aspectRatio(1f)) {
-                      Box(
-                          modifier =
-                              Modifier.padding(2.5f.dp)
-
-                                  .border(3.5f.dp, Color(0xFFA98467), CircleShape)) {
-                            Image(
-                                imageVector = Icons.Rounded.AccountCircle,
-                                contentDescription = "",
-                                modifier = Modifier.fillMaxSize().scale(1.2f).clipToBounds(),
-                                colorFilter = ColorFilter.tint(Color(0xFF6C584C)))
-                          }
-                      Box(
-                          modifier = Modifier.fillMaxSize().padding(0f.dp),
-                          contentAlignment = Alignment.TopEnd) {
-                            IconButton(onClick = { /*TODO*/}, modifier = Modifier) {
-
-                              Image(
-                                  imageVector = Icons.Outlined.Edit,
-                                  contentDescription = "",
-                                  colorFilter = ColorFilter.tint(Color(0xFFAAAAAA)))
-                            }
-                          }
-                    }
+                    IconButton(
+                        onClick = { /*TODO: Edit profile picture*/},
+                        modifier = Modifier.aspectRatio(1f)) {
+                          Box(
+                              modifier =
+                                  Modifier.padding(2.5f.dp)
+                                      .border(3.5f.dp, Color(0xFFA98467), CircleShape)) {
+                                Image(
+                                    imageVector = Icons.Rounded.AccountCircle,
+                                    contentDescription = "",
+                                    modifier = Modifier.fillMaxSize().scale(1.2f).clipToBounds(),
+                                    colorFilter = ColorFilter.tint(Color(0xFF6C584C)))
+                              }
+                          Box(
+                              modifier = Modifier.fillMaxSize().padding(0f.dp),
+                              contentAlignment = Alignment.TopEnd) {
+                                Image(
+                                    imageVector = Icons.Outlined.Edit,
+                                    contentDescription = "",
+                                    colorFilter = ColorFilter.tint(Color(0xFFAAAAAA)))
+                              }
+                        }
                   }
                 }
                 Column(Modifier.fillMaxHeight().fillMaxWidth(), Arrangement.spacedBy(8.dp)) {
@@ -140,13 +129,9 @@ fun UserProfile(userVM: UserViewModel = UserViewModel()) {
                       modifier = Modifier.testTag("addressTxt"))
 
                   // Edit Button
-                  ElevatedButton(
-                      onClick = { showEditProfile = true },
-                      border = BorderStroke(1f.dp, Color(0xFFA98467)),
-                      modifier = Modifier.testTag("editProfileBtn")) {
-                        // Text displayed on the button
-                        Text("Edit Profile")
-                      }
+                  ButtonComponent({ showEditProfile = true }, Modifier.testTag("editProfileBtn")) {
+                    Text("Edit Profile")
+                  }
                 }
               }
         }

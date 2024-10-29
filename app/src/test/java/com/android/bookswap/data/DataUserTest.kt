@@ -26,7 +26,6 @@ class DataUserTest {
 
     val userVM = com.android.bookswap.model.UserViewModel("", MockUserRepo())
 
-
     userVM.updateUser(
         DataUser(
             "M.",
