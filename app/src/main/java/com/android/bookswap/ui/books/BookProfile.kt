@@ -102,7 +102,11 @@ fun BookProfileScreen(DataBook: DataBook, navController: NavigationActions) {
                       Image(
                           painter = painterResource(id = images[currentImageIndex]),
                           contentDescription = imagesDescription[currentImageIndex],
-                          modifier = Modifier.height(pictureHeight).fillMaxWidth())
+                          modifier =
+                              Modifier.height(pictureHeight)
+                                  .fillMaxWidth()
+                                  .testTag(
+                                      "bookProfileImage ${imagesDescription[currentImageIndex]}"))
                     }
               }
               item {
@@ -114,7 +118,8 @@ fun BookProfileScreen(DataBook: DataBook, navController: NavigationActions) {
                           onClick = {
                             currentImageIndex = (currentImageIndex - 1 + images.size) % images.size
                           },
-                          modifier = Modifier.height(buttonsHeight)) {
+                          modifier =
+                              Modifier.height(buttonsHeight).testTag("bookProfileImageLeft")) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                                 contentDescription = "Previous Image",
@@ -126,7 +131,8 @@ fun BookProfileScreen(DataBook: DataBook, navController: NavigationActions) {
                           modifier = Modifier.padding(horizontal = 8.dp))
                       IconButton(
                           onClick = { currentImageIndex = (currentImageIndex + 1) % images.size },
-                          modifier = Modifier.height(buttonsHeight)) {
+                          modifier =
+                              Modifier.height(buttonsHeight).testTag("bookProfileImageRight")) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.ArrowForward,
                                 contentDescription = "Next Image",
@@ -141,7 +147,7 @@ fun BookProfileScreen(DataBook: DataBook, navController: NavigationActions) {
                       text = "Rating: $it/10",
                       color = ColorVariable.Accent,
                       style = MaterialTheme.typography.bodyMedium,
-                      modifier = Modifier.padding(vertical = 8.dp))
+                      modifier = Modifier.padding(vertical = 8.dp).testTag("bookProfileRating"))
                 }
               }
               item { Spacer(modifier = Modifier.height(columnPadding)) }
@@ -150,14 +156,15 @@ fun BookProfileScreen(DataBook: DataBook, navController: NavigationActions) {
                     text = "Synopsis",
                     color = ColorVariable.Accent,
                     style = MaterialTheme.typography.titleSmall,
-                    modifier = Modifier.padding(vertical = 8.dp))
+                    modifier =
+                        Modifier.padding(vertical = 8.dp).testTag("bookProfileSynopsisTitle"))
               }
               item {
                 Text(
                     text = DataBook.description ?: "No description available",
                     color = ColorVariable.Accent,
                     style = MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier.padding(vertical = 8.dp),
+                    modifier = Modifier.padding(vertical = 8.dp).testTag("bookProfileSynopsis"),
                     textAlign = TextAlign.Center)
               }
               item { Spacer(modifier = Modifier.height(columnPadding)) }
@@ -168,24 +175,27 @@ fun BookProfileScreen(DataBook: DataBook, navController: NavigationActions) {
                         text = "Language: ${DataBook.language.languageCode}",
                         color = ColorVariable.Accent,
                         style = MaterialTheme.typography.bodyMedium,
-                        modifier = Modifier.padding(vertical = 8.dp))
+                        modifier = Modifier.padding(vertical = 8.dp).testTag("bookProfileLanguage"))
                     Text(
                         text = "Genres:",
                         color = ColorVariable.Accent,
                         style = MaterialTheme.typography.bodyMedium,
-                        modifier = Modifier.padding(vertical = 8.dp))
+                        modifier =
+                            Modifier.padding(vertical = 8.dp).testTag("bookProfileGenresTitle"))
                     DataBook.genres.forEach { genre ->
                       Text(
                           text = "- ${genre.Genre}",
                           color = ColorVariable.AccentSecondary,
                           style = MaterialTheme.typography.bodyMedium,
-                          modifier = Modifier.padding(top = 2.dp, start = 16.dp))
+                          modifier =
+                              Modifier.padding(top = 2.dp, start = 16.dp)
+                                  .testTag("bookProfileGenre${genre.Genre}"))
                     }
                     Text(
                         text = "ISBN: ${DataBook.isbn ?: "ISBN doesn't exits or is not available"}",
                         color = ColorVariable.Accent,
                         style = MaterialTheme.typography.bodyMedium,
-                        modifier = Modifier.padding(vertical = 8.dp))
+                        modifier = Modifier.padding(vertical = 8.dp).testTag("bookProfileISBN"))
                   }
 
                   VerticalDivider(color = ColorVariable.Accent, thickness = 1.dp)
@@ -195,27 +205,29 @@ fun BookProfileScreen(DataBook: DataBook, navController: NavigationActions) {
                         text = "Date of Publication: [Temporary Date]",
                         color = ColorVariable.Accent,
                         style = MaterialTheme.typography.bodyMedium,
-                        modifier = Modifier.padding(vertical = 8.dp))
+                        modifier = Modifier.padding(vertical = 8.dp).testTag("bookProfileDate"))
                     Text(
                         text = "Volume: [Temporary Volume]",
                         color = ColorVariable.Accent,
                         style = MaterialTheme.typography.bodyMedium,
-                        modifier = Modifier.padding(vertical = 8.dp))
+                        modifier = Modifier.padding(vertical = 8.dp).testTag("bookProfileVolume"))
                     Text(
                         text = "Issue: [Temporary Issue]",
                         color = ColorVariable.Accent,
                         style = MaterialTheme.typography.bodyMedium,
-                        modifier = Modifier.padding(vertical = 8.dp))
+                        modifier = Modifier.padding(vertical = 8.dp).testTag("bookProfileIssue"))
                     Text(
                         text = "Editorial: [Temporary Editorial]",
                         color = ColorVariable.Accent,
                         style = MaterialTheme.typography.bodyMedium,
-                        modifier = Modifier.padding(vertical = 8.dp))
+                        modifier =
+                            Modifier.padding(vertical = 8.dp).testTag("bookProfileEditorial"))
                     Text(
                         text = "Place of Edition: [Temporary Place]",
                         color = ColorVariable.Accent,
                         style = MaterialTheme.typography.bodyMedium,
-                        modifier = Modifier.padding(vertical = 8.dp))
+                        modifier =
+                            Modifier.padding(vertical = 8.dp).testTag("bookProfileEditionPlace"))
                   }
                 }
               }
