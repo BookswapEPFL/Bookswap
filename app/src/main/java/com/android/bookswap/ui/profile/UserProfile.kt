@@ -11,8 +11,10 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.sharp.ArrowBack
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.rounded.AccountCircle
 import androidx.compose.material3.*
@@ -26,15 +28,13 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.android.bookswap.model.UserViewModel
-import com.android.bookswap.ui.components.BackButtonComponent
 import com.android.bookswap.ui.components.ButtonComponent
-import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.theme.*
 import com.android.bookswap.user
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun UserProfile(userVM: UserViewModel = UserViewModel(), navigationActions: NavigationActions) {
+fun UserProfile(userVM: UserViewModel = UserViewModel()) {
 
   var user = userVM.getUser()
   var showEditProfile by remember { mutableStateOf(false) }
@@ -79,7 +79,14 @@ fun UserProfile(userVM: UserViewModel = UserViewModel(), navigationActions: Navi
               // Title of the screen
               title = { Text("Your Profile", modifier = Modifier.testTag("profileTitleTxt")) },
               // Icon button for navigation (currently no action defined)
-              navigationIcon = { BackButtonComponent(navActions = navigationActions) })
+              navigationIcon = {
+                IconButton(modifier = Modifier.size(32.dp), onClick = {}) {
+                  Icon(
+                      imageVector = Icons.AutoMirrored.Sharp.ArrowBack,
+                      contentDescription = "",
+                      modifier = Modifier.size(30.dp))
+                }
+              })
         }) {
           // Column layout to stack input fields vertically with spacing
           Row(
