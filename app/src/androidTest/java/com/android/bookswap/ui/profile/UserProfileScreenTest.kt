@@ -15,7 +15,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.Mockito
+import org.mockito.Mockito.mock
 
 /**
  * Instrumented test, which will execute on an Android device.
@@ -44,7 +44,7 @@ class UserProfileScreenTest : TestCase() {
             "dummyPic.png",
             "dummyUUID0000"))
 
-    mockNavActions = Mockito.mock(NavigationActions::class.java)
+    mockNavActions = mock(NavigationActions::class.java)
 
     composeTestRule.setContent { UserProfile(userVM = userVM, mockNavActions) }
   }
