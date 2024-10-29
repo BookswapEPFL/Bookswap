@@ -155,16 +155,14 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(platform(libs.compose.bom))
     implementation(libs.androidx.espresso.intents)
-    globalTestImplementation(libs.androidx.espresso.intents)
     implementation(libs.firebase.firestore.ktx)
     implementation(libs.firebase.auth.ktx)
     implementation(libs.androidx.navigation.compose)
-    globalTestImplementation(libs.junit)
-    globalTestImplementation(libs.mockk)
-    globalTestImplementation(libs.mockito.core)
-    globalTestImplementation(libs.mockito.kotlin)
-    globalTestImplementation(libs.mockito.inline)
-    globalTestImplementation(libs.mockito.android)
+    testImplementation(libs.junit)
+    testImplementation(libs.mockito.core)
+    testImplementation(libs.mockito.kotlin)
+    testImplementation(libs.mockk)
+    testImplementation(libs.mockito.inline)
     globalTestImplementation(libs.androidx.junit)
     globalTestImplementation(libs.androidx.espresso.core)
 
@@ -202,8 +200,14 @@ dependencies {
     globalTestImplementation(libs.kaspresso)
     globalTestImplementation(libs.kaspresso.compose)
 
+
+    testImplementation(libs.mockito.core)
+    testImplementation(libs.mockito.inline)
+    testImplementation(libs.mockito.kotlin)
+    androidTestImplementation(libs.mockito.android)
+    androidTestImplementation(libs.mockito.kotlin)
     // ----------       Robolectric     ------------
-    globalTestImplementation(libs.robolectric)
+    testImplementation(libs.robolectric)
 
     implementation(libs.volley) //HTTP request
     implementation(libs.json) //JSON parser
