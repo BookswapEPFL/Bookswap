@@ -12,14 +12,6 @@ private const val COLLECTION_NAME = "Users"
 
 /** Implement [UsersRepository] interface using Firebase's Firestore as the data source */
 class UserFirestoreSource(private val db: FirebaseFirestore) : UsersRepository {
-
-  /**
-   * Initializes the repository by adding an auth state listener to Firebase Authentication If the
-   * user is authenticated, it triggers the OnSuccess callback
-   */
-  override fun init(callback: (Result<Unit>) -> Unit) {
-    callback(Result.success(Unit))
-  }
   /**
    * Fetches the list of users from the Firestore collection If the task is successful, maps the
    * Firestore documents to DataUser objects Calls OnSuccess with the list of users, or onFailure if

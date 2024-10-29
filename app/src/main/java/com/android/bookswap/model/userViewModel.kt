@@ -1,6 +1,5 @@
 package com.android.bookswap.model
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.android.bookswap.data.DataUser
 import com.android.bookswap.data.repository.UsersRepository
@@ -13,6 +12,7 @@ open class UserViewModel(
 ) : ViewModel() {
   private var dataUser = DataUser(uuid)
   private var isLoaded = false
+  var isStored = false
   private val userRepository: UsersRepository = repository
 
   open fun getUser(force: Boolean = false): DataUser {
@@ -24,13 +24,11 @@ open class UserViewModel(
 
   private fun fetchUser() {
     userRepository.getUser(uuid) { result ->
-      result.fold(
-          {
-            Log.i("UserViewModel", "User fetched successfully")
-            dataUser = it
-            isLoaded = true
-          },
-          { Log.e("UserViewModel", "Failed to fetch user from remote source", it) })
+      result.onSuccess {
+        dataUser = it
+        isLoaded = true
+        isStored = true
+      }
     }
   }
 
@@ -53,9 +51,7 @@ open class UserViewModel(
     this.uuid = newDataUser.userId
     isLoaded = true
     userRepository.updateUser(dataUser) { result ->
-      result.fold(
-          { Log.i("UserViewModel", "User updated successfully") },
-          { Log.e("UserViewModel", "Failed to update user on remote source", it) })
+      result.fold({ isStored = true }, { isStored = false })
     }
   }
 }

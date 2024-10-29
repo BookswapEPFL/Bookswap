@@ -1,80 +1,451 @@
 package com.android.bookswap.data
 
 import com.android.bookswap.data.repository.UsersRepository
-import io.mockk.InternalPlatformDsl.toStr
+import com.android.bookswap.model.UserViewModel
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
+import org.junit.Before
 import org.junit.Test
 
 class DataUserTest {
+
+  private lateinit var userVM: UserViewModel
+
+  @Before
+  fun setUp() {
+    userVM = UserViewModel("usr_01_jd", MockUserRepo())
+  }
+
   @Test
   fun checkCreate() {
     val u1 = DataUser()
-    assertEquals(u1.greeting, "")
-    assertEquals(u1.firstName, "")
-    assertEquals(u1.lastName, "")
-    assertEquals(u1.email, "")
-    assertEquals(u1.phoneNumber, "")
-    assertEquals(u1.profilePictureUrl, "")
-    assertEquals(u1.userId, "")
-    assertEquals(u1.latitude.toStr(), 0.0.toString())
-    assertEquals(u1.longitude.toStr(), 0.0.toString())
+    assertEquals("", u1.greeting)
+    assertEquals("", u1.firstName)
+    assertEquals("", u1.lastName)
+    assertEquals("", u1.email)
+    assertEquals("", u1.phoneNumber)
+    assertEquals(0.0, u1.latitude, 0.000001)
+    assertEquals(0.0, u1.longitude, 0.000001)
+    assertEquals("", u1.profilePictureUrl)
+    assertEquals("", u1.userId)
   }
 
   @Test
   fun checkAssign() {
-
-    val userVM = com.android.bookswap.model.UserViewModel("", MockUserRepo())
-
-    userVM.updateUser(
+    val u1 =
         DataUser(
             "M.",
             "John",
             "Doe",
-            "John.Doe@example.com",
+            "john.doe@example.com",
             "+41223456789",
             1.0,
             7.0,
             "dummyPic.png",
-            "dummyUUID0000"))
-    var u1 = userVM.getUser()
-    assertEquals(u1.greeting, "M.")
-    assertEquals(u1.firstName, "John")
-    assertEquals(u1.lastName, "Doe")
-    assertEquals(u1.email, "John.Doe@example.com")
-    assertEquals(u1.phoneNumber, "+41223456789")
-    assertEquals(u1.profilePictureUrl, "dummyPic.png")
-    assertEquals(u1.userId, "dummyUUID0000")
-    assertEquals(u1.latitude.toStr(), 1.0.toString())
-    assertEquals(u1.longitude.toStr(), 7.0.toString())
-    userVM.updateUser(greeting = "Mr.")
-    u1 = userVM.getUser()
-    assertNotEquals(u1.greeting, "M.")
-    assertEquals(u1.greeting, "Mr.")
-    assertEquals(u1.firstName, "John")
-    assertEquals(u1.lastName, "Doe")
-    assertEquals(u1.email, "John.Doe@example.com")
-    assertEquals(u1.phoneNumber, "+41223456789")
-    assertEquals(u1.profilePictureUrl, "dummyPic.png")
-    assertEquals(u1.userId, "dummyUUID0000")
+            "usr_01_jd")
+
+    assertEquals("M.", u1.greeting)
+    assertEquals("John", u1.firstName)
+    assertEquals("Doe", u1.lastName)
+    assertEquals("john.doe@example.com", u1.email)
+    assertEquals("+41223456789", u1.phoneNumber)
+    assertEquals(1.0, u1.latitude, 0.000001)
+    assertEquals(7.0, u1.longitude, 0.000001)
+    assertEquals("dummyPic.png", u1.profilePictureUrl)
+    assertEquals("usr_01_jd", u1.userId)
   }
 
   @Test
-  fun checkString() {
-    val userVM = com.android.bookswap.model.UserViewModel("", MockUserRepo())
-
+  fun checkUpdate_ExistingUser() {
     userVM.updateUser(
         DataUser(
             "M.",
             "John",
             "Doe",
-            "John.Doe@example.com",
+            "john.doe@example.com",
             "+41223456789",
-            0.0,
-            0.0,
+            1.0,
+            7.0,
             "dummyPic.png",
-            "dummyUUID0000"))
+            "usr_01_jd"))
+
     val u1 = userVM.getUser()
+
+    assertEquals("M.", u1.greeting)
+    assertEquals("John", u1.firstName)
+    assertEquals("Doe", u1.lastName)
+    assertEquals("john.doe@example.com", u1.email)
+    assertEquals("+41223456789", u1.phoneNumber)
+    assertEquals(1.0, u1.latitude, 0.000001)
+    assertEquals(7.0, u1.longitude, 0.000001)
+    assertEquals("dummyPic.png", u1.profilePictureUrl)
+    assertEquals("usr_01_jd", u1.userId)
+
+    assert(userVM.isStored)
+  }
+
+  @Test
+  fun checkUpdate_NotExistentUser() {
+    userVM.updateUser(
+        DataUser(
+            "M.",
+            "John",
+            "Doe",
+            "john.doe@example.com",
+            "+41223456789",
+            1.0,
+            7.0,
+            "dummyPic.png",
+            "usr_04_jd"))
+
+    val u1 = userVM.getUser()
+
+    assertEquals("M.", u1.greeting)
+    assertEquals("John", u1.firstName)
+    assertEquals("Doe", u1.lastName)
+    assertEquals("john.doe@example.com", u1.email)
+    assertEquals("+41223456789", u1.phoneNumber)
+    assertEquals(1.0, u1.latitude, 0.000001)
+    assertEquals(7.0, u1.longitude, 0.000001)
+    assertEquals("dummyPic.png", u1.profilePictureUrl)
+    assertEquals("usr_04_jd", u1.userId)
+
+    assert(!userVM.isStored)
+  }
+
+  @Test
+  fun checkUpdate_greeting() {
+    userVM.updateUser(
+        DataUser(
+            "M.",
+            "John",
+            "Doe",
+            "john.doe@example.com",
+            "+41223456789",
+            1.0,
+            7.0,
+            "dummyPic.png",
+            "usr_01_jd"))
+
+    var u1 = userVM.getUser()
+
+    assertEquals("M.", u1.greeting)
+    assertEquals("John", u1.firstName)
+    assertEquals("Doe", u1.lastName)
+    assertEquals("john.doe@example.com", u1.email)
+    assertEquals("+41223456789", u1.phoneNumber)
+    assertEquals(1.0, u1.latitude, 0.000001)
+    assertEquals(7.0, u1.longitude, 0.000001)
+    assertEquals("dummyPic.png", u1.profilePictureUrl)
+    assertEquals("usr_01_jd", u1.userId)
+
+    userVM.updateUser(greeting = "Mr.")
+    u1 = userVM.getUser(true)
+
+    assertNotEquals("M.", u1.greeting)
+    assertEquals("Mr.", u1.greeting)
+    assertEquals("John", u1.firstName)
+    assertEquals("Doe", u1.lastName)
+    assertEquals("john.doe@example.com", u1.email)
+    assertEquals("+41223456789", u1.phoneNumber)
+    assertEquals(1.0, u1.latitude, 0.000001)
+    assertEquals(7.0, u1.longitude, 0.000001)
+    assertEquals("dummyPic.png", u1.profilePictureUrl)
+    assertEquals("usr_01_jd", u1.userId)
+  }
+
+  @Test
+  fun checkUpdate_firstName() {
+    userVM.updateUser(
+        DataUser(
+            "M.",
+            "John",
+            "Doe",
+            "john.doe@example.com",
+            "+41223456789",
+            1.0,
+            7.0,
+            "dummyPic.png",
+            "usr_01_jd"))
+
+    var u1 = userVM.getUser()
+
+    assertEquals("M.", u1.greeting)
+    assertEquals("John", u1.firstName)
+    assertEquals("Doe", u1.lastName)
+    assertEquals("john.doe@example.com", u1.email)
+    assertEquals("+41223456789", u1.phoneNumber)
+    assertEquals(1.0, u1.latitude, 0.000001)
+    assertEquals(7.0, u1.longitude, 0.000001)
+    assertEquals("dummyPic.png", u1.profilePictureUrl)
+    assertEquals("usr_01_jd", u1.userId)
+
+    userVM.updateUser(firstName = "Joe")
+    u1 = userVM.getUser(true)
+
+    assertEquals("M.", u1.greeting)
+    assertNotEquals("John", u1.firstName)
+    assertEquals("Joe", u1.firstName)
+    assertEquals("Doe", u1.lastName)
+    assertEquals("john.doe@example.com", u1.email)
+    assertEquals("+41223456789", u1.phoneNumber)
+    assertEquals(1.0, u1.latitude, 0.000001)
+    assertEquals(7.0, u1.longitude, 0.000001)
+    assertEquals("dummyPic.png", u1.profilePictureUrl)
+    assertEquals("usr_01_jd", u1.userId)
+  }
+
+  @Test
+  fun checkUpdate_lastName() {
+    userVM.updateUser(
+        DataUser(
+            "M.",
+            "John",
+            "Doe",
+            "john.doe@example.com",
+            "+41223456789",
+            1.0,
+            7.0,
+            "dummyPic.png",
+            "usr_01_jd"))
+
+    var u1 = userVM.getUser()
+
+    assertEquals("M.", u1.greeting)
+    assertEquals("John", u1.firstName)
+    assertEquals("Doe", u1.lastName)
+    assertEquals("john.doe@example.com", u1.email)
+    assertEquals("+41223456789", u1.phoneNumber)
+    assertEquals(1.0, u1.latitude, 0.000001)
+    assertEquals(7.0, u1.longitude, 0.000001)
+    assertEquals("dummyPic.png", u1.profilePictureUrl)
+    assertEquals("usr_01_jd", u1.userId)
+
+    userVM.updateUser(lastName = "Douse")
+    u1 = userVM.getUser(true)
+
+    assertEquals("M.", u1.greeting)
+    assertEquals("John", u1.firstName)
+    assertNotEquals("Doe", u1.lastName)
+    assertEquals("Douse", u1.lastName)
+    assertEquals("john.doe@example.com", u1.email)
+    assertEquals("+41223456789", u1.phoneNumber)
+    assertEquals(1.0, u1.latitude, 0.000001)
+    assertEquals(7.0, u1.longitude, 0.000001)
+    assertEquals("dummyPic.png", u1.profilePictureUrl)
+    assertEquals("usr_01_jd", u1.userId)
+  }
+
+  @Test
+  fun checkUpdate_email() {
+    userVM.updateUser(
+        DataUser(
+            "M.",
+            "John",
+            "Doe",
+            "john.doe@example.com",
+            "+41223456789",
+            1.0,
+            7.0,
+            "dummyPic.png",
+            "usr_01_jd"))
+
+    var u1 = userVM.getUser()
+
+    assertEquals("M.", u1.greeting)
+    assertEquals("John", u1.firstName)
+    assertEquals("Doe", u1.lastName)
+    assertEquals("john.doe@example.com", u1.email)
+    assertEquals("+41223456789", u1.phoneNumber)
+    assertEquals(1.0, u1.latitude, 0.000001)
+    assertEquals(7.0, u1.longitude, 0.000001)
+    assertEquals("dummyPic.png", u1.profilePictureUrl)
+    assertEquals("usr_01_jd", u1.userId)
+
+    userVM.updateUser(email = "john.doe@example.swiss")
+    u1 = userVM.getUser(true)
+
+    assertEquals("M.", u1.greeting)
+    assertEquals("John", u1.firstName)
+    assertEquals("Doe", u1.lastName)
+    assertNotEquals("john.doe@example.com", u1.email)
+    assertEquals("john.doe@example.swiss", u1.email)
+    assertEquals("+41223456789", u1.phoneNumber)
+    assertEquals(1.0, u1.latitude, 0.000001)
+    assertEquals(7.0, u1.longitude, 0.000001)
+    assertEquals("dummyPic.png", u1.profilePictureUrl)
+    assertEquals("usr_01_jd", u1.userId)
+  }
+
+  @Test
+  fun checkUpdate_phoneNumber() {
+    userVM.updateUser(
+        DataUser(
+            "M.",
+            "John",
+            "Doe",
+            "john.doe@example.com",
+            "+41223456789",
+            1.0,
+            7.0,
+            "dummyPic.png",
+            "usr_01_jd"))
+
+    var u1 = userVM.getUser()
+
+    assertEquals("M.", u1.greeting)
+    assertEquals("John", u1.firstName)
+    assertEquals("Doe", u1.lastName)
+    assertEquals("john.doe@example.com", u1.email)
+    assertEquals("+41223456789", u1.phoneNumber)
+    assertEquals(1.0, u1.latitude, 0.000001)
+    assertEquals(7.0, u1.longitude, 0.000001)
+    assertEquals("dummyPic.png", u1.profilePictureUrl)
+    assertEquals("usr_01_jd", u1.userId)
+
+    userVM.updateUser(phone = "+41234567890")
+    u1 = userVM.getUser(true)
+
+    assertEquals("M.", u1.greeting)
+    assertEquals("John", u1.firstName)
+    assertEquals("Doe", u1.lastName)
+    assertEquals("john.doe@example.com", u1.email)
+    assertNotEquals("+41223456789", u1.phoneNumber)
+    assertEquals("+41234567890", u1.phoneNumber)
+    assertEquals(1.0, u1.latitude, 0.000001)
+    assertEquals(7.0, u1.longitude, 0.000001)
+    assertEquals("dummyPic.png", u1.profilePictureUrl)
+    assertEquals("usr_01_jd", u1.userId)
+  }
+
+  @Test
+  fun checkUpdate_latitude() {
+    userVM.updateUser(
+        DataUser(
+            "M.",
+            "John",
+            "Doe",
+            "john.doe@example.com",
+            "+41223456789",
+            1.0,
+            7.0,
+            "dummyPic.png",
+            "usr_01_jd"))
+
+    var u1 = userVM.getUser()
+
+    assertEquals("M.", u1.greeting)
+    assertEquals("John", u1.firstName)
+    assertEquals("Doe", u1.lastName)
+    assertEquals("john.doe@example.com", u1.email)
+    assertEquals("+41223456789", u1.phoneNumber)
+    assertEquals(1.0, u1.latitude, 0.000001)
+    assertEquals(7.0, u1.longitude, 0.000001)
+    assertEquals("dummyPic.png", u1.profilePictureUrl)
+    assertEquals("usr_01_jd", u1.userId)
+
+    userVM.updateUser(latitude = 2.7)
+    u1 = userVM.getUser(true)
+
+    assertEquals("M.", u1.greeting)
+    assertEquals("John", u1.firstName)
+    assertEquals("Doe", u1.lastName)
+    assertEquals("john.doe@example.com", u1.email)
+    assertEquals("+41223456789", u1.phoneNumber)
+    assertNotEquals(1.0, u1.latitude)
+    assertEquals(2.7, u1.latitude, 0.000001)
+    assertEquals(7.0, u1.longitude, 0.000001)
+    assertEquals("dummyPic.png", u1.profilePictureUrl)
+    assertEquals("usr_01_jd", u1.userId)
+  }
+
+  @Test
+  fun checkUpdate_longitude() {
+    userVM.updateUser(
+        DataUser(
+            "M.",
+            "John",
+            "Doe",
+            "john.doe@example.com",
+            "+41223456789",
+            1.0,
+            7.0,
+            "dummyPic.png",
+            "usr_01_jd"))
+
+    var u1 = userVM.getUser()
+
+    assertEquals("M.", u1.greeting)
+    assertEquals("John", u1.firstName)
+    assertEquals("Doe", u1.lastName)
+    assertEquals("john.doe@example.com", u1.email)
+    assertEquals("+41223456789", u1.phoneNumber)
+    assertEquals(1.0, u1.latitude, 0.000001)
+    assertEquals(7.0, u1.longitude, 0.000001)
+    assertEquals("dummyPic.png", u1.profilePictureUrl)
+    assertEquals("usr_01_jd", u1.userId)
+
+    userVM.updateUser(longitude = 6.3)
+    u1 = userVM.getUser(true)
+
+    assertEquals("M.", u1.greeting)
+    assertEquals("John", u1.firstName)
+    assertEquals("Doe", u1.lastName)
+    assertEquals("john.doe@example.com", u1.email)
+    assertEquals("+41223456789", u1.phoneNumber)
+    assertEquals(1.0, u1.latitude, 0.000001)
+    assertNotEquals(7.0, u1.longitude)
+    assertEquals(6.3, u1.longitude, 0.000001)
+    assertEquals("dummyPic.png", u1.profilePictureUrl)
+    assertEquals("usr_01_jd", u1.userId)
+  }
+
+  @Test
+  fun checkUpdate_profilePictureURI() {
+    userVM.updateUser(
+        DataUser(
+            "M.",
+            "John",
+            "Doe",
+            "john.doe@example.com",
+            "+41223456789",
+            1.0,
+            7.0,
+            "dummyPic.png",
+            "usr_01_jd"))
+
+    var u1 = userVM.getUser()
+
+    assertEquals("M.", u1.greeting)
+    assertEquals("John", u1.firstName)
+    assertEquals("Doe", u1.lastName)
+    assertEquals("john.doe@example.com", u1.email)
+    assertEquals("+41223456789", u1.phoneNumber)
+    assertEquals(1.0, u1.latitude, 0.000001)
+    assertEquals(7.0, u1.longitude, 0.000001)
+    assertEquals("dummyPic.png", u1.profilePictureUrl)
+    assertEquals("usr_01_jd", u1.userId)
+
+    userVM.updateUser(picURL = "pl4c3h0ld3rP1c.jpg")
+    u1 = userVM.getUser(true)
+
+    assertEquals("M.", u1.greeting)
+    assertEquals("John", u1.firstName)
+    assertEquals("Doe", u1.lastName)
+    assertEquals("john.doe@example.com", u1.email)
+    assertEquals("+41223456789", u1.phoneNumber)
+    assertEquals(1.0, u1.latitude, 0.000001)
+    assertEquals(7.0, u1.longitude, 0.000001)
+    assertNotEquals("dummyPic.png", u1.profilePictureUrl)
+    assertEquals("pl4c3h0ld3rP1c.jpg", u1.profilePictureUrl)
+    assertEquals("usr_01_jd", u1.userId)
+  }
+
+  @Test
+  fun checkString() {
+    val u1 =
+        DataUser(
+            "M.", "John", "Doe", "john.doe@example.com", "+41223456789", 0.0, 0.0, "", "usr_01_jd")
     assertEquals("M. John Doe", u1.printFullname())
   }
 }
@@ -117,10 +488,6 @@ class MockUserRepo : UsersRepository {
                   "usr_03_jd"),
       )
 
-  override fun init(callback: (Result<Unit>) -> Unit) {
-    TODO("Not yet implemented")
-  }
-
   override fun getUsers(callback: (Result<List<DataUser>>) -> Unit) {
     callback(Result.success(mockUserList.values.toList()))
   }
@@ -139,7 +506,14 @@ class MockUserRepo : UsersRepository {
   }
 
   override fun updateUser(dataUser: DataUser, callback: (Result<Unit>) -> Unit) {
-    mockUserList.put(dataUser.userId, dataUser)
+    getUser(dataUser.userId) { result ->
+      result.fold(
+          {
+            mockUserList.put(dataUser.userId, dataUser)
+            callback(Result.success(Unit))
+          },
+          { callback(Result.failure(it)) })
+    }
   }
 
   override fun deleteUser(uuid: String, callback: (Result<Unit>) -> Unit) {
