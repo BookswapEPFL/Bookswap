@@ -1,5 +1,6 @@
 package com.android.bookswap.ui.books.add
 
+import android.content.Context
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
@@ -237,6 +238,7 @@ fun AddToBookScreen(repository: BooksRepository, navController: NavigationAction
                   // You can handle book object creation here (e.g., save the book)
                   val book =
                       createDataBook(
+                          context,
                           repository.getNewUid(),
                           title,
                           author,
@@ -267,6 +269,7 @@ fun AddToBookScreen(repository: BooksRepository, navController: NavigationAction
 }
 
 fun createDataBook(
+    context: Context,
     uuid: UUID,
     title: String,
     author: String,
@@ -280,18 +283,23 @@ fun createDataBook(
   // Validate UUID
   if (uuid.toString().isBlank()) {
     Log.e("AddToBookScreen", "UUID cannot be empty.")
+    Toast.makeText(context, "UUID cannot be empty.", Toast.LENGTH_LONG).show()
     return null
   }
 
   // Validate Title
   if (title.isBlank()) {
     Log.e("AddToBookScreen", "Title cannot be empty.")
+    Toast.makeText(context, "Title cannot be empty.", Toast.LENGTH_LONG).show()
+
     return null
   }
 
   // Validate Author
   if (author.isBlank()) {
     Log.e("AddToBookScreen", "Author cannot be empty.")
+    Toast.makeText(context, "Author cannot be empty.", Toast.LENGTH_LONG).show()
+
     return null
   }
 
@@ -301,17 +309,23 @@ fun createDataBook(
         ratingStr.toInt().also {
           if (it !in 0..5) {
             Log.e("AddToBookScreen", "Rating must be between 0 and 5.")
+            Toast.makeText(context, "Rating must be between 0 and 5.", Toast.LENGTH_LONG).show()
+
             return null
           }
         }
       } catch (e: NumberFormatException) {
         Log.e("AddToBookScreen", "Rating must be a valid number.")
+        Toast.makeText(context, "Rating must be a valid number.", Toast.LENGTH_LONG).show()
+
         return null
       }
 
   // Validate Photo (assuming basic validation here, just checking if not empty)
   if (photo.isBlank()) {
     Log.e("AddToBookScreen", "Photo URL cannot be empty.")
+    Toast.makeText(context, "Photo URL cannot be empty.", Toast.LENGTH_LONG).show()
+
     return null
   }
 
@@ -323,12 +337,16 @@ fun createDataBook(
         Log.e(
             "AddToBookScreen",
             "Invalid language: $bookLanguageStr. Please use one of the supported languages.")
+        Toast.makeText(context, "Invalid language: $bookLanguageStr.", Toast.LENGTH_LONG).show()
+
         return null
       }
 
   // Validate ISBN
   if (isbn.isBlank()) {
     Log.e("AddToBookScreen", "ISBN cannot be empty.")
+    Toast.makeText(context, "ISBN cannot be empty.", Toast.LENGTH_LONG).show()
+
     return null
   }
 

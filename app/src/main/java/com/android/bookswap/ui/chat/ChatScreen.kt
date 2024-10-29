@@ -1,6 +1,7 @@
 package com.android.bookswap.ui.chat
 
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -30,6 +31,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
@@ -47,6 +49,7 @@ fun ChatScreen(
     currentUserId: String, // To identify the current user for aligning messages
     otherUserId: String
 ) {
+  val context = LocalContext.current
   var messages by remember { mutableStateOf(emptyList<DataMessage>()) }
   var newMessageText by remember { mutableStateOf(TextFieldValue("")) }
 
@@ -109,6 +112,7 @@ fun ChatScreen(
                           "MessageView",
                           "Failed to send message: ${result.exceptionOrNull()?.message}")
                     }
+                    Toast.makeText(context, "Message could not be sent.", Toast.LENGTH_LONG).show()
                   }
                 },
                 colors =
