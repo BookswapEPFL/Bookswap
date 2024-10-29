@@ -56,6 +56,123 @@ class MessageFirestoreSource(private val db: FirebaseFirestore) : MessageReposit
     }
   }
 
+  override fun deleteMessage(messageId: String, callback: (Result<Unit>) -> Unit) {
+    val fifteenMinutesInMillis = 15 * 60 * 1000
+    val currentTime = System.currentTimeMillis()
+
+    db.collection(COLLECTION_PATH).document(messageId).get().addOnCompleteListener { task ->
+      if (task.isSuccessful) {
+        val document = task.result
+        if (document != null && document.exists()) {
+          val existingMessage = documentToMessage(document).getOrNull()
+          if (existingMessage != null) {
+            if (currentTime - existingMessage.timestamp <= fifteenMinutesInMillis) {
+              db.collection(COLLECTION_PATH).document(messageId).delete().addOnCompleteListener {
+                  deleteTask ->
+                if (deleteTask.isSuccessful) {
+                  callback(Result.success(Unit))
+                } else {
+                  callback(
+                      Result.failure(
+                          deleteTask.exception ?: Exception("Unknown error deleting message")))
+                }
+              }
+            } else {
+              callback(
+                  Result.failure(
+                      Exception("Message can only be deleted within 15 minutes of being sent")))
+            }
+          } else {
+            callback(Result.failure(Exception("Message not found")))
+          }
+        } else {
+          callback(Result.failure(Exception("Message not found")))
+        }
+      } else {
+        callback(Result.failure(task.exception ?: Exception("Unknown error fetching message")))
+      }
+    }
+  }
+
+  override fun deleteAllMessages(
+      user1Id: String,
+      user2Id: String,
+      callback: (Result<Unit>) -> Unit
+  ) {
+    db.collection(COLLECTION_PATH)
+        .whereIn("senderId", listOf(user1Id, user2Id))
+        .whereIn("receiverId", listOf(user1Id, user2Id))
+        .whereNotEqualTo("senderId", "receiverId")
+        .get()
+        .addOnCompleteListener { task ->
+          if (task.isSuccessful) {
+            val documents = task.result
+            if (documents != null && !documents.isEmpty) {
+              val batch = db.batch()
+              documents.documents.forEach { document -> batch.delete(document.reference) }
+              batch.commit().addOnCompleteListener { deleteTask ->
+                if (deleteTask.isSuccessful) {
+                  callback(Result.success(Unit))
+                } else {
+                  callback(
+                      Result.failure(
+                          deleteTask.exception ?: Exception("Unknown error deleting messages")))
+                }
+              }
+            } else {
+              callback(Result.success(Unit))
+            }
+          } else {
+            callback(Result.failure(task.exception ?: Exception("Unknown error fetching messages")))
+          }
+        }
+  }
+
+  override fun updateMessage(message: DataMessage, callback: (Result<Unit>) -> Unit) {
+    val fifteenMinutesInMillis = 15 * 60 * 1000
+    val currentTime = System.currentTimeMillis()
+
+    db.collection(COLLECTION_PATH).document(message.id).get().addOnCompleteListener { task ->
+      if (task.isSuccessful) {
+        val document = task.result
+        if (document != null && document.exists()) {
+          val existingMessage = documentToMessage(document).getOrNull()
+          if (existingMessage != null) {
+            if (currentTime - existingMessage.timestamp <= fifteenMinutesInMillis) {
+              val messageMap =
+                  mapOf(
+                      "text" to message.text,
+                      "timestamp" to currentTime // Update the timestamp to the current time
+                      )
+              db.collection(COLLECTION_PATH)
+                  .document(message.id)
+                  .update(messageMap)
+                  .addOnCompleteListener { updateTask ->
+                    if (updateTask.isSuccessful) {
+                      callback(Result.success(Unit))
+                    } else {
+                      callback(
+                          Result.failure(
+                              updateTask.exception ?: Exception("Unknown error updating message")))
+                    }
+                  }
+            } else {
+              callback(
+                  Result.failure(
+                      Exception("Message can only be updated within 15 minutes of being sent")))
+            }
+          } else {
+            callback(Result.failure(Exception("Message not found")))
+          }
+        } else {
+          callback(Result.failure(Exception("Message not found")))
+        }
+      } else {
+        callback(Result.failure(task.exception ?: Exception("Unknown error fetching message")))
+      }
+    }
+  }
+
   override fun addMessagesListener(
       otherUserId: String,
       currentUserId: String,

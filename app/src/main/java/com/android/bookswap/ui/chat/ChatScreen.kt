@@ -1,8 +1,10 @@
 package com.android.bookswap.ui.chat
 
 import android.util.Log
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -29,10 +31,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Popup
 import com.android.bookswap.data.DataMessage
 import com.android.bookswap.data.repository.MessageRepository
 import com.android.bookswap.ui.theme.ColorVariable
@@ -49,6 +53,7 @@ fun ChatScreen(
 ) {
   var messages by remember { mutableStateOf(emptyList<DataMessage>()) }
   var newMessageText by remember { mutableStateOf(TextFieldValue("")) }
+  var selectedMessage by remember { mutableStateOf<DataMessage?>(null) }
 
   LaunchedEffect(Unit) {
     while (true) {
@@ -69,7 +74,10 @@ fun ChatScreen(
       LazyColumn(
           modifier = Modifier.weight(1f).padding(8.dp), verticalArrangement = Arrangement.Bottom) {
             items(messages) { message ->
-              MessageItem(message = message, currentUserId = currentUserId)
+              MessageItem(
+                  message = message,
+                  currentUserId = currentUserId,
+                  onLongPress = { selectedMessage = message })
             }
           }
 
@@ -122,11 +130,61 @@ fun ChatScreen(
                 }
           }
     }
+    selectedMessage?.let { message ->
+      Popup(alignment = Alignment.Center, onDismissRequest = { selectedMessage = null }) {
+        Column(modifier = Modifier.background(Color.Transparent).padding(8.dp)) {
+          Button(
+              onClick = {
+                // Handle edit
+                selectedMessage?.let { message ->
+                  messageRepository.updateMessage(message.copy(text = newMessageText.text)) { result
+                    ->
+                    if (result.isSuccess) {
+                      Log.d("ChatScreen", "Message updated successfully")
+                      selectedMessage = null
+                    } else {
+                      Log.e(
+                          "ChatScreen",
+                          "Failed to update message: ${result.exceptionOrNull()?.message}")
+                    }
+                  }
+                }
+              },
+              modifier =
+                  Modifier.background(ColorVariable.Primary, shape = RoundedCornerShape(50))
+                      .padding(8.dp)) {
+                Text("Edit")
+              }
+          Button(
+              onClick = {
+                // Handle delete
+                selectedMessage?.let { message ->
+                  messageRepository.deleteMessage(message.id) { result ->
+                    if (result.isSuccess) {
+                      Log.d("ChatScreen", "Message deleted successfully")
+                      selectedMessage = null
+                    } else {
+                      Log.e(
+                          "ChatScreen",
+                          "Failed to delete message: ${result.exceptionOrNull()?.message}")
+                    }
+                  }
+                }
+              },
+              modifier =
+                  Modifier.background(ColorVariable.Primary, shape = RoundedCornerShape(50))
+                      .padding(8.dp)) {
+                Text("Delete")
+              }
+        }
+      }
+    }
   }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun MessageItem(message: DataMessage, currentUserId: String) {
+fun MessageItem(message: DataMessage, currentUserId: String, onLongPress: () -> Unit) {
   val isCurrentUser = message.senderId == currentUserId
   val cornerRadius = 25.dp
   val shape =
@@ -144,7 +202,7 @@ fun MessageItem(message: DataMessage, currentUserId: String) {
             bottomEnd = cornerRadius)
       }
   Row(
-      modifier = Modifier.fillMaxWidth(),
+      modifier = Modifier.fillMaxWidth().combinedClickable(onClick = {}, onLongClick = onLongPress),
       horizontalArrangement = if (isCurrentUser) Arrangement.End else Arrangement.Start) {
         Card(
             colors =

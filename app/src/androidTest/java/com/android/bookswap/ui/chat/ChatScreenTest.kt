@@ -187,6 +187,22 @@ class ChatScreenTest {
       callback(sendMessageResult)
     }
 
+    override fun deleteMessage(message: DataMessage, callback: (Result<Unit>) -> Unit) {
+      TODO("Not yet implemented")
+    }
+
+    override fun deleteAllMessages(
+        user1Id: String,
+        user2Id: String,
+        callback: (Result<Unit>) -> Unit
+    ) {
+      TODO("Not yet implemented")
+    }
+
+    override fun updateMessage(message: DataMessage, callback: (Result<Unit>) -> Unit) {
+      TODO("Not yet implemented")
+    }
+
     override fun addMessagesListener(
         otherUserId: String,
         currentUserId: String,
