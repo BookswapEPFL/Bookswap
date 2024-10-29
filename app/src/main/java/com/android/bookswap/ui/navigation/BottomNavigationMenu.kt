@@ -14,7 +14,7 @@ import androidx.compose.ui.unit.dp
 import com.android.bookswap.ui.theme.ColorVariable
 
 /** Constants * */
-private val BOTTOM_NAV_HEIGHT = 60.dp
+val BOTTOM_NAV_HEIGHT = 60.dp
 private val ROUNDED_CORNER_SIZE = 60.dp
 
 /**
