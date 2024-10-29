@@ -8,12 +8,14 @@ import com.android.bookswap.data.DataUser
 import com.android.bookswap.data.repository.UsersRepository
 import com.android.bookswap.model.UserViewModel
 import com.android.bookswap.screen.UserProfileScreen
+import com.android.bookswap.ui.navigation.NavigationActions
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
 import io.github.kakaocup.compose.node.element.ComposeScreen
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.Mockito.mock
 
 /**
  * Instrumented test, which will execute on an Android device.
@@ -24,6 +26,7 @@ import org.junit.runner.RunWith
 class UserProfileScreenTest : TestCase() {
 
   @get:Rule val composeTestRule = createComposeRule()
+  private lateinit var mockNavActions: NavigationActions
 
   @Before
   fun setup() {
@@ -41,7 +44,9 @@ class UserProfileScreenTest : TestCase() {
             "dummyPic.png",
             "dummyUUID0000"))
 
-    composeTestRule.setContent { UserProfile(userVM = userVM) }
+    mockNavActions = mock()
+
+    composeTestRule.setContent { UserProfile(userVM = userVM, mockNavActions) }
   }
 
   @Test
