@@ -54,6 +54,7 @@ fun ChatScreen(
   var messages by remember { mutableStateOf(emptyList<DataMessage>()) }
   var newMessageText by remember { mutableStateOf(TextFieldValue("")) }
   var selectedMessage by remember { mutableStateOf<DataMessage?>(null) }
+  var updateActive by remember { mutableStateOf(false) }
 
   LaunchedEffect(Unit) {
     while (true) {
@@ -96,89 +97,101 @@ fun ChatScreen(
                         .padding(8.dp)
                         .testTag("message_input_field"),
             )
-            Button(
-                onClick = {
-                  val messageId = messageRepository.getNewUid()
-                  val newMessage =
-                      DataMessage(
+          Button(
+              onClick = {
+                  if (updateActive) {
+                      // Update the message
+                      messageRepository.updateMessage(selectedMessage!!.copy(text = newMessageText.text)) { result ->
+                          if (result.isSuccess) {
+                              Log.d("ChatScreen", "Message updated successfully")
+                              selectedMessage = null
+                              newMessageText = TextFieldValue("")
+                              updateActive = false
+                          } else {
+                              Log.e("ChatScreen", "Failed to update message: ${result.exceptionOrNull()?.message}")
+                          }
+                      }
+                  } else {
+                      // Send a new message
+                      val messageId = messageRepository.getNewUid()
+                      val newMessage = DataMessage(
                           id = messageId,
                           text = newMessageText.text,
                           senderId = currentUserId,
-                          receiverId = otherUserId, // Ensure receiverId is set here
-                          timestamp = System.currentTimeMillis())
-                  // Send the message
-                  messageRepository.sendMessage(
-                      message = newMessage,
-                  ) { result ->
-                    if (result.isSuccess) {
-                      newMessageText = TextFieldValue("")
-                    } else {
-                      Log.e(
-                          "MessageView",
-                          "Failed to send message: ${result.exceptionOrNull()?.message}")
-                    }
+                          receiverId = otherUserId,
+                          timestamp = System.currentTimeMillis()
+                      )
+                      messageRepository.sendMessage(newMessage) { result ->
+                          if (result.isSuccess) {
+                              newMessageText = TextFieldValue("")
+                          } else {
+                              Log.e("ChatScreen", "Failed to send message: ${result.exceptionOrNull()?.message}")
+                          }
+                      }
                   }
-                },
-                colors =
-                    ButtonColors(
-                        ColorVariable.Secondary,
-                        ColorVariable.Accent,
-                        ColorVariable.Secondary,
-                        ColorVariable.Accent),
-                modifier = Modifier.padding(horizontal = 8.dp).testTag("send_button")) {
-                  Text("Send")
-                }
+              },
+              colors = ButtonColors(
+                  ColorVariable.Secondary,
+                  ColorVariable.Accent,
+                  ColorVariable.Secondary,
+                  ColorVariable.Accent
+              ),
+              modifier = Modifier.padding(horizontal = 8.dp).testTag("send_button")
+          ) {
+              Text(if (updateActive) "Update" else "Send")
           }
-    }
-    selectedMessage?.let { message ->
-      Popup(alignment = Alignment.Center, onDismissRequest = { selectedMessage = null }) {
-        Column(modifier = Modifier.background(Color.Transparent).padding(8.dp)) {
-          Button(
-              onClick = {
-                // Handle edit
-                selectedMessage?.let { message ->
-                  messageRepository.updateMessage(message.copy(text = newMessageText.text)) { result
-                    ->
-                    if (result.isSuccess) {
-                      Log.d("ChatScreen", "Message updated successfully")
-                      selectedMessage = null
-                    } else {
-                      Log.e(
-                          "ChatScreen",
-                          "Failed to update message: ${result.exceptionOrNull()?.message}")
-                    }
-                  }
-                }
-              },
-              modifier =
-                  Modifier.background(ColorVariable.Primary, shape = RoundedCornerShape(50))
-                      .padding(8.dp)) {
-                Text("Edit")
-              }
-          Button(
-              onClick = {
-                // Handle delete
-                selectedMessage?.let { message ->
-                  messageRepository.deleteMessage(message.id) { result ->
-                    if (result.isSuccess) {
-                      Log.d("ChatScreen", "Message deleted successfully")
-                      selectedMessage = null
-                    } else {
-                      Log.e(
-                          "ChatScreen",
-                          "Failed to delete message: ${result.exceptionOrNull()?.message}")
-                    }
-                  }
-                }
-              },
-              modifier =
-                  Modifier.background(ColorVariable.Primary, shape = RoundedCornerShape(50))
-                      .padding(8.dp)) {
-                Text("Delete")
-              }
-        }
       }
     }
+    if(!updateActive){
+        selectedMessage?.let { message ->
+            Popup(alignment = Alignment.Center, onDismissRequest = {
+                if (!updateActive) {
+                    selectedMessage = null
+                }
+            }) {
+                Column(modifier = Modifier
+                    .background(ColorVariable.Primary, shape = RoundedCornerShape(8.dp))
+                    .border(2.dp, ColorVariable.Accent, shape = RoundedCornerShape(8.dp))
+                    .padding(8.dp),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally) {
+                    Button(
+                        onClick = {
+                            // Handle edit
+                            newMessageText = TextFieldValue(message.text)
+                            updateActive = true
+                        },
+                        modifier =
+                        Modifier.background(ColorVariable.Primary, shape = RoundedCornerShape(50))
+                            .padding(8.dp)) {
+                        Text("Edit")
+                    }
+                    Button(
+                        onClick = {
+                            // Handle delete
+                            selectedMessage?.let { message ->
+                                messageRepository.deleteMessage(message.id) { result ->
+                                    if (result.isSuccess) {
+                                        Log.d("ChatScreen", "Message deleted successfully")
+                                        selectedMessage = null
+                                    } else {
+                                        Log.e(
+                                            "ChatScreen",
+                                            "Failed to delete message: ${result.exceptionOrNull()?.message}")
+                                    }
+                                }
+                            }
+                        },
+                        modifier =
+                        Modifier.background(ColorVariable.Primary, shape = RoundedCornerShape(50))
+                            .padding(8.dp)) {
+                        Text("Delete")
+                    }
+                }
+            }
+        }
+    }
+
   }
 }
 
