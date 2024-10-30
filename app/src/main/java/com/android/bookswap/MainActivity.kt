@@ -18,10 +18,16 @@ import com.android.bookswap.data.BookGenres
 import com.android.bookswap.data.BookLanguages
 import com.android.bookswap.data.DataBook
 import com.android.bookswap.data.source.network.BooksFirestoreRepository
+import com.android.bookswap.data.source.network.MessageFirestoreSource
+import com.android.bookswap.model.chat.MessageBox
 import com.android.bookswap.model.map.BookFilter
 import com.android.bookswap.resources.C
 import com.android.bookswap.ui.authentication.SignInScreen
+import com.android.bookswap.ui.books.add.AddISBNScreen
 import com.android.bookswap.ui.books.add.AddToBookScreen
+import com.android.bookswap.ui.books.add.BookAdditionChoiceScreen
+import com.android.bookswap.ui.chat.ChatScreen
+import com.android.bookswap.ui.chat.ListChatScreen
 import com.android.bookswap.ui.map.FilterMapScreen
 import com.android.bookswap.ui.map.MapScreen
 import com.android.bookswap.ui.map.TempUser
@@ -30,6 +36,7 @@ import com.android.bookswap.ui.navigation.Route
 import com.android.bookswap.ui.navigation.Screen
 import com.android.bookswap.ui.theme.BookSwapAppTheme
 import com.google.firebase.Firebase
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.firestore
 import java.util.UUID
 
@@ -37,32 +44,54 @@ class MainActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
 
+    // Initialize Firebase Firestore
+    val db = FirebaseFirestore.getInstance()
+
+    // Create the MessageFirestoreSource object
+    val messageRepository = MessageFirestoreSource(db)
+    val bookRepository = BooksFirestoreRepository(db)
+
     setContent {
       BookSwapAppTheme {
         // A surface container using the 'background' color from the theme
         Surface(
             modifier = Modifier.fillMaxSize().semantics { testTag = C.Tag.main_screen_container },
             color = MaterialTheme.colorScheme.background) {
-              BookSwapApp()
+              BookSwapApp(messageRepository, bookRepository)
             }
       }
     }
   }
 
   @Composable
-  fun BookSwapApp() {
+  fun BookSwapApp(
+      messageRepository: MessageFirestoreSource,
+      bookRepository: BooksFirestoreRepository,
+      startDestination: String = Route.AUTH
+  ) {
     val navController = rememberNavController()
     val navigationActions = NavigationActions(navController)
     val bookFilter = BookFilter()
     val bookfire = BooksFirestoreRepository(Firebase.firestore)
 
-    NavHost(navController = navController, startDestination = Route.AUTH) {
+    val placeHolder =
+        List(12) {
+          MessageBox(
+              "Contact ${it + 1}",
+              "Test message $it test for the feature of ellipsis in the message",
+              "01.01.24")
+        }
+
+    val userid1 = "user123"
+    val userid2 = "user124"
+
+    NavHost(navController = navController, startDestination = startDestination) {
       navigation(startDestination = Screen.AUTH, route = Route.AUTH) {
-        composable(Screen.AUTH) { SignInScreen(navigationActions) } // *Todo*/}
+        composable(Screen.AUTH) { SignInScreen(navigationActions) }
       }
       navigation(startDestination = Screen.CHATLIST, route = Route.CHAT) {
-        composable(Screen.CHATLIST) { /*Todo*/}
-        composable(Screen.CHAT) { /*Todo*/}
+        composable(Screen.CHATLIST) { ListChatScreen(placeHolder, navigationActions) }
+        composable(Screen.CHAT) { ChatScreen(messageRepository, userid1, userid2) }
       }
       navigation(startDestination = Screen.MAP, route = Route.MAP) {
         composable(Screen.MAP) {
@@ -71,10 +100,10 @@ class MainActivity : ComponentActivity() {
         composable(Screen.FILTER) { FilterMapScreen(navigationActions, bookFilter) }
       }
       navigation(startDestination = Screen.NEWBOOK, route = Route.NEWBOOK) {
-        composable(Screen.NEWBOOK) { AddToBookScreen(bookfire) }
-        composable(Screen.ADD_BOOK_MANUALLY) { /*Todo*/}
+        composable(Screen.NEWBOOK) { BookAdditionChoiceScreen(navigationActions) }
+        composable(Screen.ADD_BOOK_MANUALLY) { AddToBookScreen(bookRepository, navigationActions) }
         composable(Screen.ADD_BOOK_SCAN) { /*Todo*/}
-        composable(Screen.ADD_BOOK_ISBN) { /*Todo*/}
+        composable(Screen.ADD_BOOK_ISBN) { AddISBNScreen(navigationActions, bookRepository) }
       }
     }
   }

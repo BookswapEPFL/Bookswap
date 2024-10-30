@@ -43,6 +43,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.bookswap.data.DataBook
 import com.android.bookswap.model.map.BookFilter
+import com.android.bookswap.ui.navigation.BottomNavigationMenu
+import com.android.bookswap.ui.navigation.List_Navigation_Bar_Destinations
 import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.navigation.Screen
 import com.android.bookswap.ui.theme.ColorVariable
@@ -125,7 +127,10 @@ fun MapScreen(
   Scaffold(
       modifier = Modifier.testTag("mapScreen"),
       bottomBar = {
-        // To add a bottom navigation bar when it will be created
+        BottomNavigationMenu(
+            onTabSelect = { destination -> navigationActions.navigateTo(destination) },
+            tabList = List_Navigation_Bar_Destinations,
+            selectedItem = navigationActions.currentRoute())
       },
       content = { pd ->
         GoogleMap(
@@ -244,7 +249,8 @@ private fun CustomInfoWindow(modifier: Modifier = Modifier, user: TempUser) {
       }
 }
 
-const val HEIGHT_RETRACTED_DRAGGABLE_MENU_DP = 50
+const val HEIGHT_RETRACTED_DRAGGABLE_MENU_DP = 110
+const val DRAGGABLE_MENU_CORNER_RADIUS_DP = 50
 const val MIN_BOX_BOOK_HEIGHT_DP = 90
 const val IMAGE_HEIGHT_DP = MIN_BOX_BOOK_HEIGHT_DP - PADDING_VERTICAL_DP * 2
 // 1.5:1 ratio + the padding
@@ -305,8 +311,8 @@ private fun DraggableMenu(listAllBooks: List<DataBook>) {
                   color = ColorVariable.BackGround,
                   shape =
                       RoundedCornerShape(
-                          topStart = HEIGHT_RETRACTED_DRAGGABLE_MENU_DP.dp,
-                          topEnd = HEIGHT_RETRACTED_DRAGGABLE_MENU_DP.dp))
+                          topStart = DRAGGABLE_MENU_CORNER_RADIUS_DP.dp,
+                          topEnd = DRAGGABLE_MENU_CORNER_RADIUS_DP.dp))
               .testTag("mapDraggableMenu")) {
         Column(
             modifier =
