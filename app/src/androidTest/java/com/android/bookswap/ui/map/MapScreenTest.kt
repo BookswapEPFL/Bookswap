@@ -83,6 +83,83 @@ class MapScreenTest {
                   }))
 
   @Test
+  fun displayComponent1() {
+    composeTestRule.setContent {
+      val navController = rememberNavController()
+      val navigationActions = NavigationActions(navController)
+      MapScreen(user, user[0], navigationActions, BookFilter())
+    }
+    composeTestRule.onNodeWithTag("mapScreen").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("mapGoogleMap").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("mapBoxMarker").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("mapBoxMarkerList").assertIsDisplayed()
+    composeTestRule.onAllNodesWithTag("mapBoxMarkerListBox").assertCountEquals(3)
+    composeTestRule.onAllNodesWithTag("mapBoxMarkerListBoxTitle").assertCountEquals(3)
+    composeTestRule.onAllNodesWithTag("mapBoxMarkerListBoxAuthor").assertCountEquals(3)
+    composeTestRule.onAllNodesWithTag("mapBoxMarkerListDivider").assertCountEquals(2)
+  }
+
+  @Test
+  fun displayComponent2() {
+    composeTestRule.setContent {
+      val navController = rememberNavController()
+      val navigationActions = NavigationActions(navController)
+      MapScreen(user, user[0], navigationActions, BookFilter())
+    }
+    composeTestRule.onNodeWithTag("mapDraggableMenu").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("mapDraggableMenuStructure").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("mapDraggableMenuHandle").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("mapDraggableMenuHandleDivider").assertIsDisplayed()
+  }
+
+  @Test
+  fun displayComponent3() {
+    composeTestRule.setContent {
+      val navController = rememberNavController()
+      val navigationActions = NavigationActions(navController)
+      MapScreen(user, user[0], navigationActions, BookFilter())
+    }
+    composeTestRule.onNodeWithTag("mapDraggableMenuBookBox0").assertIsDisplayed()
+  }
+
+  @Test
+  fun displayComponent4() {
+    composeTestRule.setContent {
+      val navController = rememberNavController()
+      val navigationActions = NavigationActions(navController)
+      MapScreen(user, user[0], navigationActions, BookFilter())
+    }
+    composeTestRule.onNodeWithTag("mapDraggableMenuBookBox1").assertIsDisplayed()
+  }
+
+  @Test
+  fun displayComponent5() {
+    composeTestRule.setContent {
+      val navController = rememberNavController()
+      val navigationActions = NavigationActions(navController)
+      MapScreen(user, user[0], navigationActions, BookFilter())
+    }
+    composeTestRule.onNodeWithTag("mapDraggableMenuBookBox2").assertIsDisplayed()
+  }
+
+  @Test
+  fun displayComponent6() {
+    composeTestRule.setContent {
+      val navController = rememberNavController()
+      val navigationActions = NavigationActions(navController)
+      MapScreen(user, user[0], navigationActions, BookFilter())
+    }
+    composeTestRule.onAllNodesWithTag("mapDraggableMenuBookBoxImage").assertCountEquals(3)
+    composeTestRule.onAllNodesWithTag("mapDraggableMenuBookBoxTitle").assertCountEquals(3)
+    composeTestRule.onAllNodesWithTag("mapDraggableMenuBookBoxAuthor").assertCountEquals(3)
+    composeTestRule.onAllNodesWithTag("mapDraggableMenuBookBoxRating").assertCountEquals(3)
+    composeTestRule.onAllNodesWithTag("mapDraggableMenuBookBoxStar").assertCountEquals(12)
+    composeTestRule.onAllNodesWithTag("mapDraggableMenuBookBoxEmptyStar").assertCountEquals(3)
+    composeTestRule.onAllNodesWithTag("mapDraggableMenuBookBoxTag").assertCountEquals(3)
+    composeTestRule.onAllNodesWithTag("mapDraggableMenuBookBoxDivider").assertCountEquals(3)
+  }
+
+  @Test
   fun displayAllComponents() {
     composeTestRule.setContent {
       val navController = rememberNavController()
