@@ -1,11 +1,10 @@
-package com.android.bookswap.ui.bookAddition
+package com.android.bookswap.ui.books.add
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Add
@@ -31,7 +30,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.times
 import com.android.bookswap.R
-import com.android.bookswap.ui.navigation.BackButton
+import com.android.bookswap.ui.components.BackButtonComponent
+import com.android.bookswap.ui.navigation.BottomNavigationMenu
+import com.android.bookswap.ui.navigation.List_Navigation_Bar_Destinations
 import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.profile.ProfileIcon
 import com.android.bookswap.ui.theme.ColorVariable
@@ -42,15 +43,19 @@ fun BookAdditionChoiceScreen(navController: NavigationActions) {
   val columnPadding = 16.dp
   val buttonWidth = (LocalConfiguration.current.screenWidthDp.dp * (0.75f))
   Scaffold(
+      modifier = Modifier.testTag("addBookChoiceScreen"),
       topBar = {
         TopAppBar(
             title = { Text("Book Addition Choice", color = ColorVariable.BackGround) },
-            navigationIcon = { BackButton(navController) },
+            navigationIcon = { BackButtonComponent(navController) },
             actions = { ProfileIcon() },
             colors = TopAppBarDefaults.topAppBarColors(containerColor = ColorVariable.BackGround))
       },
       bottomBar = {
-        // BottomNavigationBar
+        BottomNavigationMenu(
+            onTabSelect = { destination -> navController.navigateTo(destination) },
+            tabList = List_Navigation_Bar_Destinations,
+            selectedItem = navController.currentRoute())
       }) { innerPadding ->
         Column(
             modifier =
@@ -65,7 +70,7 @@ fun BookAdditionChoiceScreen(navController: NavigationActions) {
                   leftIcon = Icons.Default.Add,
                   leftIconPainter = null,
                   navController = navController,
-                  navDestination = "AddBookManually",
+                  navDestination = "AddBookManually Screen",
                   buttonWidth = buttonWidth)
               Spacer(modifier = Modifier.height(2f * columnPadding))
               ButtonWithIcon(
@@ -73,7 +78,7 @@ fun BookAdditionChoiceScreen(navController: NavigationActions) {
                   leftIcon = null,
                   leftIconPainter = painterResource(id = R.drawable.download),
                   navController = navController,
-                  navDestination = "AddBookISBN",
+                  navDestination = "AddBookISBN Screen",
                   buttonWidth = buttonWidth)
               Spacer(modifier = Modifier.height(2f * columnPadding))
               ButtonWithIcon(
@@ -81,7 +86,7 @@ fun BookAdditionChoiceScreen(navController: NavigationActions) {
                   leftIcon = null,
                   leftIconPainter = painterResource(id = R.drawable.photoicon),
                   navController = navController,
-                  navDestination = "AddBookScan",
+                  navDestination = "AddBookScan Screen",
                   buttonWidth = buttonWidth)
             }
       }

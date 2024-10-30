@@ -1,6 +1,7 @@
 package com.android.bookswap.ui.chat
 
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -22,7 +23,7 @@ import androidx.compose.material3.CardColors
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -30,16 +31,17 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import com.android.bookswap.data.DataMessage
 import com.android.bookswap.data.repository.MessageRepository
 import com.android.bookswap.ui.theme.ColorVariable
-import com.google.firebase.firestore.ListenerRegistration
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import kotlinx.coroutines.delay
 
 @Composable
 fun ChatScreen(
@@ -47,22 +49,22 @@ fun ChatScreen(
     currentUserId: String, // To identify the current user for aligning messages
     otherUserId: String
 ) {
+  val context = LocalContext.current
   var messages by remember { mutableStateOf(emptyList<DataMessage>()) }
   var newMessageText by remember { mutableStateOf(TextFieldValue("")) }
 
-  var listenerRegistration: ListenerRegistration?
-  DisposableEffect(Unit) {
-    listenerRegistration =
-        messageRepository.addMessagesListener(
-            otherUserId = otherUserId, currentUserId = currentUserId) { result ->
-              if (result.isSuccess) {
-                messages = result.getOrThrow()
-              } else {
-                Log.e(
-                    "MessageView", "Failed to fetch messages: ${result.exceptionOrNull()?.message}")
-              }
-            }
-    onDispose { listenerRegistration?.remove() }
+  LaunchedEffect(Unit) {
+    while (true) {
+      messageRepository.getMessages { result ->
+        if (result.isSuccess) {
+          messages = result.getOrThrow().sortedBy { it.timestamp }
+          Log.d("ChatScreen", "Fetched messages: $messages")
+        } else {
+          Log.e("ChatScreen", "Failed to fetch messages: ${result.exceptionOrNull()?.message}")
+        }
+      }
+      delay(2000) // Delay for 2 seconds
+    }
   }
   Box(modifier = Modifier.fillMaxSize().background(ColorVariable.BackGround)) {
     Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.SpaceBetween) {
@@ -110,6 +112,7 @@ fun ChatScreen(
                           "MessageView",
                           "Failed to send message: ${result.exceptionOrNull()?.message}")
                     }
+                    Toast.makeText(context, "Message could not be sent.", Toast.LENGTH_LONG).show()
                   }
                 },
                 colors =

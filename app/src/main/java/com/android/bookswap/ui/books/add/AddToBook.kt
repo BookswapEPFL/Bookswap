@@ -1,13 +1,18 @@
-package com.android.bookswap.ui.addBook
+package com.android.bookswap.ui.books.add
 
+import android.content.Context
+import android.util.Log
 import android.widget.Toast
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.IconButton
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -24,9 +29,13 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.android.bookswap.data.BookGenres
 import com.android.bookswap.data.BookLanguages
 import com.android.bookswap.data.DataBook
 import com.android.bookswap.data.repository.BooksRepository
+import com.android.bookswap.ui.components.BackButtonComponent
+import com.android.bookswap.ui.navigation.NavigationActions
+import com.android.bookswap.ui.theme.ColorVariable
 import com.android.bookswap.ui.theme.ColorVariable.Accent
 import com.android.bookswap.ui.theme.ColorVariable.BackGround
 import com.android.bookswap.ui.theme.ColorVariable.Primary
@@ -35,7 +44,7 @@ import java.util.UUID
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddToBook(repository: BooksRepository) {
+fun AddToBookScreen(repository: BooksRepository, navController: NavigationActions) {
   // State variables to store the values entered by the user
   var title by remember { mutableStateOf("") }
   var author by remember { mutableStateOf("") }
@@ -44,12 +53,14 @@ fun AddToBook(repository: BooksRepository) {
   var isbn by remember { mutableStateOf("") }
   var photo by remember { mutableStateOf("") }
   var language by remember { mutableStateOf("") }
+  var selectedGenre by remember { mutableStateOf<BookGenres?>(null) } // Genre selection state
+  var expanded by remember { mutableStateOf(false) } // State for dropdown menu
   // Getting the context for showing Toast messages
   val context = LocalContext.current
 
   // Scaffold to provide basic UI structure with a top app bar
   Scaffold(
-      modifier = Modifier.testTag("addBookScreen"),
+      modifier = Modifier.testTag("addBookScreen").background(BackGround),
       topBar = {
         TopAppBar(
             // Title of the screen
@@ -62,10 +73,10 @@ fun AddToBook(repository: BooksRepository) {
                   modifier = Modifier.testTag("addBookTitle"))
             },
             // Icon button for navigation (currently no action defined)
+            // navigationIcon = { BackButton(navController) },
             navigationIcon = {
-              IconButton(onClick = {}) {
-                // You can add an icon here for the button
-              }
+              BackButtonComponent(navController)
+              // You can add an icon here for the button
             })
       },
       content = { paddingValues ->
@@ -90,6 +101,38 @@ fun AddToBook(repository: BooksRepository) {
                       unfocusedLabelColor = Secondary, // Lighter color for unfocused label
                   ) // Adding padding to the input field
               )
+
+          // Genre Dropdown
+          ExposedDropdownMenuBox(
+              expanded = expanded,
+              onExpandedChange = { expanded = !expanded },
+              modifier = Modifier.background(ColorVariable.BackGround) // Set background color here
+              ) {
+                OutlinedTextField(
+                    value = selectedGenre?.Genre ?: "Select Genre",
+                    onValueChange = {},
+                    label = { Text("Genre") },
+                    readOnly = true,
+                    trailingIcon = {
+                      ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+                    },
+                    modifier = Modifier.menuAnchor())
+                ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+                  BookGenres.values().forEach { genre ->
+                    DropdownMenuItem(
+                        text = {
+                          Text(
+                              text = genre.Genre,
+                              // color = ColorVariable.Secondary // Green text in dropdownmenu
+                          )
+                        },
+                        onClick = {
+                          selectedGenre = genre
+                          expanded = false
+                        })
+                  }
+                }
+              }
 
           // Author Input Field
           OutlinedTextField(
@@ -191,10 +234,11 @@ fun AddToBook(repository: BooksRepository) {
                       contentColor = BackGround),
               onClick = {
                 // Check if title and ISBN are not blank (required fields)
-                if (title.isNotBlank() && isbn.isNotBlank()) {
+                if (title.isNotBlank() && isbn.isNotBlank() && selectedGenre != null) {
                   // You can handle book object creation here (e.g., save the book)
                   val book =
                       createDataBook(
+                          context,
                           repository.getNewUid(),
                           title,
                           author,
@@ -202,7 +246,8 @@ fun AddToBook(repository: BooksRepository) {
                           rating,
                           photo,
                           language,
-                          isbn)
+                          isbn,
+                          listOf(selectedGenre!!))
                   if (book == null) {
                     Toast.makeText(context, "Invalid argument", Toast.LENGTH_SHORT).show()
                   } else {
@@ -224,6 +269,7 @@ fun AddToBook(repository: BooksRepository) {
 }
 
 fun createDataBook(
+    context: Context,
     uuid: UUID,
     title: String,
     author: String,
@@ -231,42 +277,55 @@ fun createDataBook(
     ratingStr: String,
     photo: String,
     bookLanguageStr: String,
-    isbn: String
+    isbn: String,
+    genres: List<BookGenres>
 ): DataBook? {
   // Validate UUID
   if (uuid.toString().isBlank()) {
-    println("UUID cannot be empty.")
+    Log.e("AddToBookScreen", "UUID cannot be empty.")
+    Toast.makeText(context, "UUID cannot be empty.", Toast.LENGTH_LONG).show()
     return null
   }
 
   // Validate Title
   if (title.isBlank()) {
-    println("Title cannot be empty.")
+    Log.e("AddToBookScreen", "Title cannot be empty.")
+    Toast.makeText(context, "Title cannot be empty.", Toast.LENGTH_LONG).show()
+
     return null
   }
 
   // Validate Author
   if (author.isBlank()) {
-    println("Author cannot be empty.")
+    Log.e("AddToBookScreen", "Author cannot be empty.")
+    Toast.makeText(context, "Author cannot be empty.", Toast.LENGTH_LONG).show()
+
     return null
   }
+
   // Validate Rating
   val rating: Int =
       try {
         ratingStr.toInt().also {
           if (it !in 0..5) {
-            println("Rating must be between 0 and 5.")
+            Log.e("AddToBookScreen", "Rating must be between 0 and 5.")
+            Toast.makeText(context, "Rating must be between 0 and 5.", Toast.LENGTH_LONG).show()
+
             return null
           }
         }
       } catch (e: NumberFormatException) {
-        println("Rating must be a valid number.")
+        Log.e("AddToBookScreen", "Rating must be a valid number.")
+        Toast.makeText(context, "Rating must be a valid number.", Toast.LENGTH_LONG).show()
+
         return null
       }
 
-  // Validate Photo  (assuming basic validation here, just checking if not empty)
+  // Validate Photo (assuming basic validation here, just checking if not empty)
   if (photo.isBlank()) {
-    println("Photo URL cannot be empty.")
+    Log.e("AddToBookScreen", "Photo URL cannot be empty.")
+    Toast.makeText(context, "Photo URL cannot be empty.", Toast.LENGTH_LONG).show()
+
     return null
   }
 
@@ -275,15 +334,22 @@ fun createDataBook(
       try {
         BookLanguages.valueOf(bookLanguageStr.uppercase())
       } catch (e: IllegalArgumentException) {
-        println("Invalid language: $bookLanguageStr. Please use one of the supported languages.")
+        Log.e(
+            "AddToBookScreen",
+            "Invalid language: $bookLanguageStr. Please use one of the supported languages.")
+        Toast.makeText(context, "Invalid language: $bookLanguageStr.", Toast.LENGTH_LONG).show()
+
         return null
       }
 
   // Validate ISBN
   if (isbn.isBlank()) {
-    println("ISBN cannot be empty.")
+    Log.e("AddToBookScreen", "ISBN cannot be empty.")
+    Toast.makeText(context, "ISBN cannot be empty.", Toast.LENGTH_LONG).show()
+
     return null
   }
+
   // If all validations pass, return a new DataBook instance
   return DataBook(
       uuid = uuid,
@@ -293,5 +359,6 @@ fun createDataBook(
       rating = rating,
       photo = photo,
       language = languages,
-      isbn = isbn)
+      isbn = isbn,
+      genres = genres)
 }

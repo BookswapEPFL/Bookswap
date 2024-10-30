@@ -22,7 +22,8 @@ data class DataBook(
     val rating: Int?,
     val photo: String?,
     val language: BookLanguages,
-    val isbn: String?
+    val isbn: String?,
+    val genres: List<BookGenres> = emptyList()
 )
 
 /** All supported book language type */
@@ -35,25 +36,25 @@ enum class BookLanguages(val languageCode: String) {
   ROMANSH("RM"), // Romansh, a language spoken in Switzerland
   OTHER("OTHER") // All languages that are not yet implemented
 }
-
 /** Genre of a book */
-enum class BookGenres {
-  Fiction,
-  NonFiction,
-  Fantasy,
-  ScienceFiction,
-  Mystery,
-  Thriller,
-  Romance,
-  Horror,
-  Historical,
-  Western,
-  Dystopian,
-  Memoir,
-  Biography,
-  Autobiography,
-  SelfHelp,
-  Health,
-  Travel,
-  Guide
+enum class BookGenres(val Genre: String = "Other") {
+  FICTION("Fiction"),
+  NONFICTION("Non-Fiction"),
+  FANTASY("Fantasy"),
+  SCIENCEFICTION("Science-Fiction"),
+  MYSTERY("Mystery"),
+  THRILLER("Thriller"),
+  ROMANCE("Romance"),
+  HORROR("Horror"),
+  HISTORICAL("Historical"),
+  WESTERN("Western"),
+  DYSTOPIAN("Dystopian"),
+  MEMOIR("Memoir"),
+  BIOGRAPHY("Biography"),
+  AUTOBIOGRAPHY("Autobiography"),
+  SELFHELP("Self-Help"),
+  HEALTH("Health"),
+  TRAVEL("Travel"),
+  GUIDE("Guide"),
+  OTHER("Other") // Allows custom genre name
 }
