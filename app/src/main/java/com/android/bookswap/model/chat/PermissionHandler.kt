@@ -12,7 +12,6 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import com.google.firebase.messaging.FirebaseMessaging
 
-
 class PermissionHandler(private val activity: ComponentActivity) {
 
   @RequiresApi(Build.VERSION_CODES.TIRAMISU)
