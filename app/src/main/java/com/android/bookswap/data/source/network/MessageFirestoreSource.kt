@@ -1,6 +1,8 @@
 package com.android.bookswap.data.source.network
 
+import android.content.Context
 import android.util.Log
+import android.widget.Toast
 import com.android.bookswap.data.DataMessage
 import com.android.bookswap.data.repository.MessageRepository
 import com.google.firebase.firestore.DocumentSnapshot
@@ -56,7 +58,11 @@ class MessageFirestoreSource(private val db: FirebaseFirestore) : MessageReposit
     }
   }
 
-  override fun deleteMessage(messageId: String, callback: (Result<Unit>) -> Unit) {
+  override fun deleteMessage(
+      messageId: String,
+      callback: (Result<Unit>) -> Unit,
+      context: Context
+  ) {
     val fifteenMinutesInMillis = 15 * 60 * 1000
     val currentTime = System.currentTimeMillis()
 
@@ -78,6 +84,11 @@ class MessageFirestoreSource(private val db: FirebaseFirestore) : MessageReposit
                 }
               }
             } else {
+              Toast.makeText(
+                      context,
+                      "Message can only be deleted within 15 minutes of being sent",
+                      Toast.LENGTH_LONG)
+                  .show()
               callback(
                   Result.failure(
                       Exception("Message can only be deleted within 15 minutes of being sent")))
@@ -128,7 +139,11 @@ class MessageFirestoreSource(private val db: FirebaseFirestore) : MessageReposit
         }
   }
 
-  override fun updateMessage(message: DataMessage, callback: (Result<Unit>) -> Unit) {
+  override fun updateMessage(
+      message: DataMessage,
+      callback: (Result<Unit>) -> Unit,
+      context: Context
+  ) {
     val fifteenMinutesInMillis = 15 * 60 * 1000
     val currentTime = System.currentTimeMillis()
 
@@ -157,6 +172,11 @@ class MessageFirestoreSource(private val db: FirebaseFirestore) : MessageReposit
                     }
                   }
             } else {
+              Toast.makeText(
+                      context,
+                      "Message can only be updated within 15 minutes of being sent",
+                      Toast.LENGTH_LONG)
+                  .show()
               callback(
                   Result.failure(
                       Exception("Message can only be updated within 15 minutes of being sent")))

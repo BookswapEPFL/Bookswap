@@ -1,6 +1,7 @@
 package com.android.bookswap.ui.chat
 
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -12,17 +13,25 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardColors
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -33,24 +42,30 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import com.android.bookswap.data.DataMessage
 import com.android.bookswap.data.repository.MessageRepository
+import com.android.bookswap.ui.components.BackButtonComponent
+import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.theme.ColorVariable
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import kotlinx.coroutines.delay
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChatScreen(
     messageRepository: MessageRepository,
     currentUserId: String, // To identify the current user for aligning messages
-    otherUserId: String
+    otherUserId: String,
+    navController: NavigationActions
 ) {
+  val context = LocalContext.current
   var messages by remember { mutableStateOf(emptyList<DataMessage>()) }
   var newMessageText by remember { mutableStateOf(TextFieldValue("")) }
   var selectedMessage by remember { mutableStateOf<DataMessage?>(null) }
@@ -70,128 +85,178 @@ fun ChatScreen(
     }
   }
   Box(modifier = Modifier.fillMaxSize().background(ColorVariable.BackGround)) {
-    Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.SpaceBetween) {
-      // Message list
-      LazyColumn(
-          modifier = Modifier.weight(1f).padding(8.dp), verticalArrangement = Arrangement.Bottom) {
-            items(messages) { message ->
-              MessageItem(
-                  message = message,
-                  currentUserId = currentUserId,
-                  onLongPress = { selectedMessage = message })
-            }
-          }
-
-      // Message input field and send button
-      Row(
-          modifier = Modifier.fillMaxWidth().padding(top = 8.dp).background(ColorVariable.Primary),
-          verticalAlignment = Alignment.CenterVertically) {
-            BasicTextField(
-                value = newMessageText,
-                onValueChange = { newMessageText = it },
+    Column(modifier = Modifier.fillMaxSize()) {
+      TopAppBar(
+          title = {
+            Text(
+                text = otherUserId,
+                style = MaterialTheme.typography.titleMedium,
+                color = ColorVariable.Accent,
                 modifier =
-                    Modifier.weight(1f)
-                        .padding(8.dp)
-                        .background(ColorVariable.Secondary, MaterialTheme.shapes.small)
-                        .border(1.dp, ColorVariable.Accent, MaterialTheme.shapes.small)
-                        .padding(8.dp)
-                        .testTag("message_input_field"),
-            )
-          Button(
-              onClick = {
-                  if (updateActive) {
+                    Modifier.testTag("chatName")
+                        .align(Alignment.CenterHorizontally)
+                        .padding(start = 24.dp))
+          },
+          navigationIcon = { BackButtonComponent(navController) },
+          actions = {
+            IconButton(onClick = { /* Handle profile icon click */}) {
+              Icon(
+                  imageVector = Icons.Default.Person,
+                  contentDescription = "Profile",
+                  modifier = Modifier.testTag("profileIcon").size(36.dp),
+                  tint = ColorVariable.Accent)
+            }
+          },
+          colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
+          modifier = Modifier.testTag("chatTopAppBar"))
+      Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.SpaceBetween) {
+        // Message list
+        LazyColumn(
+            modifier = Modifier.weight(1f).padding(8.dp),
+            verticalArrangement = Arrangement.Bottom) {
+              items(messages) { message ->
+                MessageItem(
+                    message = message,
+                    currentUserId = currentUserId,
+                    onLongPress = { selectedMessage = message })
+              }
+            }
+
+        // Message input field and send button
+        Row(
+            modifier =
+                Modifier.fillMaxWidth().padding(top = 8.dp).background(ColorVariable.Primary),
+            verticalAlignment = Alignment.CenterVertically) {
+              BasicTextField(
+                  value = newMessageText,
+                  onValueChange = { newMessageText = it },
+                  modifier =
+                      Modifier.weight(1f)
+                          .padding(8.dp)
+                          .background(ColorVariable.Secondary, MaterialTheme.shapes.small)
+                          .border(1.dp, ColorVariable.Accent, MaterialTheme.shapes.small)
+                          .padding(8.dp)
+                          .testTag("message_input_field"),
+              )
+              Button(
+                  onClick = {
+                    if (updateActive) {
                       // Update the message
-                      messageRepository.updateMessage(selectedMessage!!.copy(text = newMessageText.text)) { result ->
-                          if (result.isSuccess) {
+                      messageRepository.updateMessage(
+                          selectedMessage!!.copy(text = newMessageText.text),
+                          { result: Result<Unit> ->
+                            if (result.isSuccess) {
                               Log.d("ChatScreen", "Message updated successfully")
                               selectedMessage = null
                               newMessageText = TextFieldValue("")
                               updateActive = false
-                          } else {
-                              Log.e("ChatScreen", "Failed to update message: ${result.exceptionOrNull()?.message}")
-                          }
-                      }
-                  } else {
+                            } else {
+                              Log.e(
+                                  "ChatScreen",
+                                  "Failed to update message: ${result.exceptionOrNull()?.message}")
+                              selectedMessage = null
+                              newMessageText = TextFieldValue("")
+                              updateActive = false
+                            }
+                          },
+                          context)
+                    } else {
                       // Send a new message
                       val messageId = messageRepository.getNewUid()
-                      val newMessage = DataMessage(
-                          id = messageId,
-                          text = newMessageText.text,
-                          senderId = currentUserId,
-                          receiverId = otherUserId,
-                          timestamp = System.currentTimeMillis()
-                      )
-                      messageRepository.sendMessage(newMessage) { result ->
-                          if (result.isSuccess) {
-                              newMessageText = TextFieldValue("")
-                          } else {
-                              Log.e("ChatScreen", "Failed to send message: ${result.exceptionOrNull()?.message}")
-                          }
+                      val newMessage =
+                          DataMessage(
+                              id = messageId,
+                              text = newMessageText.text,
+                              senderId = currentUserId,
+                              receiverId = otherUserId, // Ensure receiverId is set here
+                              timestamp = System.currentTimeMillis())
+                      // Send the message
+                      messageRepository.sendMessage(
+                          message = newMessage,
+                      ) { result ->
+                        if (result.isSuccess) {
+                          newMessageText = TextFieldValue("")
+                        } else {
+                          Toast.makeText(context, "Message could not be sent.", Toast.LENGTH_LONG)
+                              .show()
+                          Log.e(
+                              "MessageView",
+                              "Failed to send message: ${result.exceptionOrNull()?.message}")
+                        }
                       }
+                    }
+                  },
+                  colors =
+                      ButtonColors(
+                          ColorVariable.Secondary,
+                          ColorVariable.Accent,
+                          ColorVariable.Secondary,
+                          ColorVariable.Accent),
+                  modifier = Modifier.padding(horizontal = 8.dp).testTag("send_button")) {
+                    Text(if (updateActive) "Update" else "Send")
                   }
-              },
-              colors = ButtonColors(
-                  ColorVariable.Secondary,
-                  ColorVariable.Accent,
-                  ColorVariable.Secondary,
-                  ColorVariable.Accent
-              ),
-              modifier = Modifier.padding(horizontal = 8.dp).testTag("send_button")
-          ) {
-              Text(if (updateActive) "Update" else "Send")
-          }
+            }
       }
     }
-    if(!updateActive){
-        selectedMessage?.let { message ->
-            Popup(alignment = Alignment.Center, onDismissRequest = {
-                if (!updateActive) {
-                    selectedMessage = null
-                }
+    if (!updateActive) {
+      selectedMessage?.let { message ->
+        Popup(
+            alignment = Alignment.Center,
+            onDismissRequest = {
+              if (!updateActive) {
+                selectedMessage = null
+              }
             }) {
-                Column(modifier = Modifier
-                    .background(ColorVariable.Primary, shape = RoundedCornerShape(8.dp))
-                    .border(2.dp, ColorVariable.Accent, shape = RoundedCornerShape(8.dp))
-                    .padding(8.dp),
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally) {
+              Column(
+                  modifier =
+                      Modifier.background(ColorVariable.Primary, shape = RoundedCornerShape(8.dp))
+                          .border(2.dp, ColorVariable.Accent, shape = RoundedCornerShape(8.dp))
+                          .padding(8.dp),
+                  verticalArrangement = Arrangement.Center,
+                  horizontalAlignment = Alignment.CenterHorizontally) {
                     Button(
                         onClick = {
-                            // Handle edit
-                            newMessageText = TextFieldValue(message.text)
-                            updateActive = true
+                          // Handle edit
+                          newMessageText = TextFieldValue(message.text)
+                          updateActive = true
                         },
                         modifier =
-                        Modifier.background(ColorVariable.Primary, shape = RoundedCornerShape(50))
-                            .padding(8.dp)) {
-                        Text("Edit")
-                    }
+                            Modifier.background(
+                                    ColorVariable.Primary, shape = RoundedCornerShape(50))
+                                .padding(8.dp)
+                                .testTag("editButton")) {
+                          Text("Edit")
+                        }
                     Button(
                         onClick = {
-                            // Handle delete
-                            selectedMessage?.let { message ->
-                                messageRepository.deleteMessage(message.id) { result ->
-                                    if (result.isSuccess) {
-                                        Log.d("ChatScreen", "Message deleted successfully")
-                                        selectedMessage = null
-                                    } else {
-                                        Log.e(
-                                            "ChatScreen",
-                                            "Failed to delete message: ${result.exceptionOrNull()?.message}")
-                                    }
-                                }
-                            }
+                          // Handle delete
+                          selectedMessage?.let { message ->
+                            messageRepository.deleteMessage(
+                                message.id,
+                                { result ->
+                                  if (result.isSuccess) {
+                                    Log.d("ChatScreen", "Message deleted successfully")
+                                    selectedMessage = null
+                                  } else {
+                                    Log.e(
+                                        "ChatScreen",
+                                        "Failed to delete message: ${result.exceptionOrNull()?.message}")
+                                  }
+                                },
+                                context)
+                          }
                         },
                         modifier =
-                        Modifier.background(ColorVariable.Primary, shape = RoundedCornerShape(50))
-                            .padding(8.dp)) {
-                        Text("Delete")
-                    }
-                }
+                            Modifier.background(
+                                    ColorVariable.Primary, shape = RoundedCornerShape(50))
+                                .padding(8.dp)
+                                .testTag("deleteButton")) {
+                          Text("Delete")
+                        }
+                  }
             }
-        }
+      }
     }
-
   }
 }
 
@@ -215,7 +280,7 @@ fun MessageItem(message: DataMessage, currentUserId: String, onLongPress: () -> 
             bottomEnd = cornerRadius)
       }
   Row(
-      modifier = Modifier.fillMaxWidth().combinedClickable(onClick = {}, onLongClick = onLongPress),
+      modifier = Modifier.fillMaxWidth(),
       horizontalArrangement = if (isCurrentUser) Arrangement.End else Arrangement.Start) {
         Card(
             colors =
@@ -237,6 +302,7 @@ fun MessageItem(message: DataMessage, currentUserId: String, onLongPress: () -> 
                 Modifier.padding(8.dp)
                     .widthIn(max = (LocalConfiguration.current.screenWidthDp.dp * 2 / 3))
                     .border(1.dp, ColorVariable.Accent, shape)
+                    .combinedClickable(onClick = {}, onLongClick = { onLongPress() })
                     .testTag("message_item ${message.id}")) {
               Column(modifier = Modifier.padding(16.dp)) {
                 Text(
