@@ -59,4 +59,3 @@ jobs:
           name: apk-signed.apk
           path: ${{ env.ANDROID_SIGNED_FILE }}
           if-no-files-found: error
-          overwrite: true
