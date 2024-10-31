@@ -224,4 +224,20 @@ class MapScreenTest {
     composeTestRule.onAllNodesWithTag("mapBoxMarkerListBox").assertCountEquals(1)
     composeTestRule.onNodeWithTag("mapBoxMarkerListBoxTitle").assertTextContains("Book 3")
   }
+
+  @Test
+  fun noBooksTextDisplayedWhenNoBooksFound() {
+    val bookFilter = BookFilter()
+    bookFilter.setGenres(listOf("Dystopian"))
+    composeTestRule.setContent {
+      val navController = rememberNavController()
+      val navigationActions = NavigationActions(navController)
+      MapScreen(user, user[0], navigationActions, bookFilter)
+    }
+    composeTestRule
+        .onNodeWithTag("mapDraggableMenuNoBook")
+        .assertIsDisplayed()
+        .assertTextContains("No books found")
+    composeTestRule.onNodeWithTag("mapDraggableMenuBookBox").assertIsNotDisplayed()
+  }
 }

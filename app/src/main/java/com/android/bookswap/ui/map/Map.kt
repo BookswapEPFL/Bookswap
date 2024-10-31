@@ -336,81 +336,98 @@ private fun DraggableMenu(listAllBooks: List<DataBook>) {
                   thickness = DIVIDER_THICKNESS_DP.dp,
                   color = ColorVariable.Accent)
               LazyColumn() {
-                items(listAllBooks) { book ->
-                  Spacer(modifier = Modifier.height(PADDING_VERTICAL_DP.dp))
-                  Row(
-                      modifier =
-                          Modifier.heightIn(min = MIN_BOX_BOOK_HEIGHT_DP.dp)
-                              .testTag("mapDraggableMenuBookBox")) {
-                        // Image Box
-                        Box(
-                            modifier =
-                                Modifier.height(IMAGE_HEIGHT_DP.dp)
-                                    .width(IMAGE_WIDTH_DP.dp)
-                                    .padding(
-                                        start = PADDING_HORIZONTAL_DP.dp,
-                                        end = PADDING_HORIZONTAL_DP.dp)
-                                    .testTag("mapDraggableMenuBookBoxImage")) {
-                              // Image of the books, will be added at a later date
-                              // We didn't discussed about how we will store the image or how we
-                              // will
-                              // encode them
-                              Box(
-                                  modifier =
-                                      Modifier.fillMaxSize()
-                                          .background(Color.Gray) // Placeholder for the image
-                                  )
-                            }
+                if (listAllBooks.isEmpty()) {
+                  item {
+                    Text(
+                        text = "No books found",
+                        color = ColorVariable.Accent,
+                        fontSize = PRIMARY_TEXT_FONT_SP.sp,
+                        textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                        modifier =
+                            Modifier.padding(PADDING_HORIZONTAL_DP.dp)
+                                .fillMaxWidth()
+                                .align(Alignment.CenterHorizontally)
+                                .testTag("mapDraggableMenuNoBook"))
+                  }
+                } else {
+                  items(listAllBooks) { book ->
+                    Spacer(modifier = Modifier.height(PADDING_VERTICAL_DP.dp))
+                    Row(
+                        modifier =
+                            Modifier.heightIn(min = MIN_BOX_BOOK_HEIGHT_DP.dp)
+                                .testTag("mapDraggableMenuBookBox")) {
+                          // Image Box
+                          Box(
+                              modifier =
+                                  Modifier.height(IMAGE_HEIGHT_DP.dp)
+                                      .width(IMAGE_WIDTH_DP.dp)
+                                      .padding(
+                                          start = PADDING_HORIZONTAL_DP.dp,
+                                          end = PADDING_HORIZONTAL_DP.dp)
+                                      .testTag("mapDraggableMenuBookBoxImage")) {
+                                // Image of the books, will be added at a later date
+                                // We didn't discussed about how we will store the image or how we
+                                // will
+                                // encode them
+                                Box(
+                                    modifier =
+                                        Modifier.fillMaxSize()
+                                            .background(Color.Gray) // Placeholder for the image
+                                    )
+                              }
 
-                        // Column for text content
-                        Column(
-                            modifier =
-                                Modifier.padding(vertical = PADDING_VERTICAL_DP.dp)
-                                    .width(WIDTH_TITLE_BOX_DP.dp)
-                                    .testTag("mapDraggableMenuBookBoxMiddle")) {
-                              Text(
-                                  text = book.title,
-                                  color = ColorVariable.Accent,
-                                  fontSize = PRIMARY_TEXT_FONT_SP.sp,
-                                  modifier =
-                                      Modifier.padding(bottom = PADDING_VERTICAL_DP.dp)
-                                          .width(WIDTH_TITLE_BOX_DP.dp)
-                                          .testTag("mapDraggableMenuBookBoxTitle"))
-                              Text(
-                                  text = book.author ?: "",
-                                  color = ColorVariable.AccentSecondary,
-                                  fontSize = SECONDARY_TEXT_FONT_SP.sp,
-                                  modifier =
-                                      Modifier.width(WIDTH_TITLE_BOX_DP.dp)
-                                          .testTag("mapDraggableMenuBookBoxAuthor"))
-                            }
-                        Column(
-                            modifier =
-                                Modifier.fillMaxWidth().testTag("mapDraggableMenuBookRight")) {
-                              Row(
-                                  modifier =
-                                      Modifier.fillMaxWidth()
-                                          .height(STAR_HEIGHT_DP.dp)
-                                          .testTag("mapDraggableMenuBookBoxRating")) {
-                                    // leave all stars empty if no rating
-                                    DisplayStarReview(book.rating ?: 0)
-                                  }
-                              // text for the tags of the book, will be added at a later date
-                              // It isn't decided how we will handle the tag for the books
-                              Text(
-                                  text = book.genres.joinToString(separator = ", ") { it.Genre },
-                                  modifier =
-                                      Modifier.fillMaxWidth().testTag("mapDraggableMenuBookBoxTag"),
-                                  fontSize = SECONDARY_TEXT_FONT_SP.sp,
-                                  color = ColorVariable.AccentSecondary)
-                            }
-                      }
+                          // Column for text content
+                          Column(
+                              modifier =
+                                  Modifier.padding(vertical = PADDING_VERTICAL_DP.dp)
+                                      .width(WIDTH_TITLE_BOX_DP.dp)
+                                      .testTag("mapDraggableMenuBookBoxMiddle")) {
+                                Text(
+                                    text = book.title,
+                                    color = ColorVariable.Accent,
+                                    fontSize = PRIMARY_TEXT_FONT_SP.sp,
+                                    modifier =
+                                        Modifier.padding(bottom = PADDING_VERTICAL_DP.dp)
+                                            .width(WIDTH_TITLE_BOX_DP.dp)
+                                            .testTag("mapDraggableMenuBookBoxTitle"))
+                                Text(
+                                    text = book.author ?: "",
+                                    color = ColorVariable.AccentSecondary,
+                                    fontSize = SECONDARY_TEXT_FONT_SP.sp,
+                                    modifier =
+                                        Modifier.width(WIDTH_TITLE_BOX_DP.dp)
+                                            .testTag("mapDraggableMenuBookBoxAuthor"))
+                              }
+                          Column(
+                              modifier =
+                                  Modifier.fillMaxWidth().testTag("mapDraggableMenuBookRight")) {
+                                Row(
+                                    modifier =
+                                        Modifier.fillMaxWidth()
+                                            .height(STAR_HEIGHT_DP.dp)
+                                            .testTag("mapDraggableMenuBookBoxRating")) {
+                                      // leave all stars empty if no rating
+                                      DisplayStarReview(book.rating ?: 0)
+                                    }
+                                // text for the tags of the book, will be added at a later date
+                                // It isn't decided how we will handle the tag for the books
+                                Text(
+                                    text = book.genres.joinToString(separator = ", ") { it.Genre },
+                                    modifier =
+                                        Modifier.fillMaxWidth()
+                                            .testTag("mapDraggableMenuBookBoxTag"),
+                                    fontSize = SECONDARY_TEXT_FONT_SP.sp,
+                                    color = ColorVariable.AccentSecondary)
+                              }
+                        }
 
-                  // Divider below each item
-                  HorizontalDivider(
-                      modifier = Modifier.fillMaxWidth().testTag("mapDraggableMenuBookBoxDivider"),
-                      thickness = DIVIDER_THICKNESS_DP.dp,
-                      color = ColorVariable.Accent)
+                    // Divider below each item
+                    HorizontalDivider(
+                        modifier =
+                            Modifier.fillMaxWidth().testTag("mapDraggableMenuBookBoxDivider"),
+                        thickness = DIVIDER_THICKNESS_DP.dp,
+                        color = ColorVariable.Accent)
+                  }
                 }
               }
             }
