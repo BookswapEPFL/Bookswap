@@ -43,6 +43,14 @@ jobs:
       - name: Move files
         run: |
           mv app/build/outputs/apk/release/app-release-unsigned.apk app/build/outputs/app-release.apk
+          ls -l app/build/outputs/app-release.apk
+      - name: Print debug
+        run: |
+          echo ${{ secrets.ANDROID_SIGNING_KEY }}
+          echo ${{ secrets.ANDROID_KEY_ALIAS }}
+          echo ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          echo $${{ secrets.ANDROID_KEY_PASSWORD }}
+          echo $(ls app/build/outputs/)
       - name: Sign App
         id: sign_app
         uses: ilharp/sign-android-release@v1.0.4
