@@ -15,6 +15,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
 import com.android.bookswap.data.DataUser
+import com.android.bookswap.data.repository.BooksRepository
 import com.android.bookswap.data.source.network.BooksFirestoreRepository
 import com.android.bookswap.data.source.network.MessageFirestoreSource
 import com.android.bookswap.model.chat.MessageBox
@@ -63,8 +64,8 @@ class MainActivity : ComponentActivity() {
   @Composable
   fun BookSwapApp(
       messageRepository: MessageFirestoreSource,
-      bookRepository: BooksFirestoreRepository,
-      startDestination: String = Route.AUTH
+      bookRepository: BooksRepository,
+      startDestination: String = Route.MAP
   ) {
     val navController = rememberNavController()
     val navigationActions = NavigationActions(navController)
