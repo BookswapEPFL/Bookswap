@@ -83,7 +83,7 @@ class BooksFirestoreRepository(private val db: FirebaseFirestore) : BooksReposit
     return try {
       val mostSignificantBits = document.getLong("uuid.mostSignificantBits") ?: return null
       val leastSignificantBits = document.getLong("uuid.leastSignificantBits") ?: return null
-      val title = document.getString("title") ?: "return null"
+      val title = document.getString("title") ?: return null
       val author = document.getString("author")
       val description = document.getString("description")
       val rating = document.getLong("rating")
