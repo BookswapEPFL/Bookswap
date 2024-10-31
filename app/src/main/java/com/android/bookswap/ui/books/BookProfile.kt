@@ -16,8 +16,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -39,7 +37,6 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.times
 import com.android.bookswap.R
 import com.android.bookswap.data.DataBook
 import com.android.bookswap.ui.components.BackButtonComponent
@@ -174,17 +171,10 @@ fun BookProfileScreen(DataBook: DataBook, navController: NavigationActions) {
               item {
                 Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)) {
                   Column(modifier = Modifier.weight(1f)) {
-                    Text(
+                    ProfileText(
                         text = "Language: ${DataBook.language.languageCode}",
-                        color = ColorVariable.Accent,
-                        style = MaterialTheme.typography.bodyMedium,
-                        modifier = Modifier.padding(vertical = 8.dp).testTag("bookProfileLanguage"))
-                    Text(
-                        text = "Genres:",
-                        color = ColorVariable.Accent,
-                        style = MaterialTheme.typography.bodyMedium,
-                        modifier =
-                            Modifier.padding(vertical = 8.dp).testTag("bookProfileGenresTitle"))
+                        testTag = "bookProfileLanguage")
+                    ProfileText(text = "Genres:", testTag = "bookProfileGenresTitle")
                     DataBook.genres.forEach { genre ->
                       Text(
                           text = "- ${genre.Genre}",
@@ -194,46 +184,35 @@ fun BookProfileScreen(DataBook: DataBook, navController: NavigationActions) {
                               Modifier.padding(top = 2.dp, start = 16.dp)
                                   .testTag("bookProfileGenre${genre.Genre}"))
                     }
-                    Text(
-                        text = "ISBN: ${DataBook.isbn ?: "ISBN doesn't exits or is not available"}",
-                        color = ColorVariable.Accent,
-                        style = MaterialTheme.typography.bodyMedium,
-                        modifier = Modifier.padding(vertical = 8.dp).testTag("bookProfileISBN"))
+                    ProfileText(
+                        text = "ISBN: ${DataBook.isbn ?: "ISBN doesn't exist or is not available"}",
+                        testTag = "bookProfileISBN")
                   }
 
                   VerticalDivider(color = ColorVariable.Accent, thickness = 1.dp)
 
                   Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = "Date of Publication: [Temporary Date]",
-                        color = ColorVariable.Accent,
-                        style = MaterialTheme.typography.bodyMedium,
-                        modifier = Modifier.padding(vertical = 8.dp).testTag("bookProfileDate"))
-                    Text(
-                        text = "Volume: [Temporary Volume]",
-                        color = ColorVariable.Accent,
-                        style = MaterialTheme.typography.bodyMedium,
-                        modifier = Modifier.padding(vertical = 8.dp).testTag("bookProfileVolume"))
-                    Text(
-                        text = "Issue: [Temporary Issue]",
-                        color = ColorVariable.Accent,
-                        style = MaterialTheme.typography.bodyMedium,
-                        modifier = Modifier.padding(vertical = 8.dp).testTag("bookProfileIssue"))
-                    Text(
-                        text = "Editorial: [Temporary Editorial]",
-                        color = ColorVariable.Accent,
-                        style = MaterialTheme.typography.bodyMedium,
-                        modifier =
-                            Modifier.padding(vertical = 8.dp).testTag("bookProfileEditorial"))
-                    Text(
+                    ProfileText(
+                        text = "Date of Publication: [Temporary Date]", testTag = "bookProfileDate")
+                    ProfileText(text = "Volume: [Temporary Volume]", testTag = "bookProfileVolume")
+                    ProfileText(text = "Issue: [Temporary Issue]", testTag = "bookProfileIssue")
+                    ProfileText(
+                        text = "Editorial: [Temporary Editorial]", testTag = "bookProfileEditorial")
+                    ProfileText(
                         text = "Place of Edition: [Temporary Place]",
-                        color = ColorVariable.Accent,
-                        style = MaterialTheme.typography.bodyMedium,
-                        modifier =
-                            Modifier.padding(vertical = 8.dp).testTag("bookProfileEditionPlace"))
+                        testTag = "bookProfileEditionPlace")
                   }
                 }
               }
             }
       }
+}
+
+@Composable
+fun ProfileText(text: String, testTag: String) {
+  Text(
+      text = text,
+      color = ColorVariable.Accent,
+      style = MaterialTheme.typography.bodyMedium,
+      modifier = Modifier.padding(vertical = 8.dp).testTag(testTag))
 }
