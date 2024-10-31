@@ -47,8 +47,8 @@ class MainActivity : ComponentActivity() {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    permissionHandler = PermissionHandler(this)
-    permissionHandler.askNotificationPermission()
+    //permissionHandler = PermissionHandler(this)
+    //permissionHandler.askNotificationPermission()
 
     // Initialize Firebase Firestore
     val db = FirebaseFirestore.getInstance()
