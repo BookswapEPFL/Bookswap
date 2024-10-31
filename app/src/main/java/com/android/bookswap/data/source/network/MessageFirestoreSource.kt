@@ -27,14 +27,17 @@ class MessageFirestoreSource(private val db: FirebaseFirestore) : MessageReposit
   }
 
   override fun getMessages(callback: (Result<List<DataMessage>>) -> Unit) {
-    db.collection(COLLECTION_PATH).get().addOnCompleteListener { response ->
-      if (response.isSuccessful) {
-        val messages =
-            response.result?.mapNotNull { document -> documentToMessage(document).getOrNull() }
-                ?: emptyList()
-        callback(Result.success(messages))
+    db.collection(COLLECTION_PATH).get().addOnCompleteListener { task ->
+      if (task.isSuccessful) {
+        val documents = task.result?.documents
+        if (documents != null && documents.isNotEmpty()) {
+          val messages = documents.mapNotNull { documentToMessage(it).getOrNull() }
+          callback(Result.success(messages))
+        } else {
+          callback(Result.success(emptyList()))
+        }
       } else {
-        callback(Result.failure(response.exception ?: Exception("Unknown error fetching messages")))
+        callback(Result.failure(task.exception ?: Exception("Unknown error fetching messages")))
       }
     }
   }

@@ -27,6 +27,7 @@ import org.mockito.Mockito.mock
 import org.mockito.Mockito.never
 import org.mockito.Mockito.`when`
 import org.mockito.MockitoAnnotations
+import org.mockito.kotlin.argThat
 import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.verify
 import org.robolectric.RobolectricTestRunner
@@ -86,6 +87,50 @@ class DataMessageFirestoreSourceTest {
     val callback = mock<(Result<Unit>) -> Unit>()
     messageRepository.init(callback)
     verify(callback).invoke(Result.success(Unit))
+  }
+
+  @Test
+  fun `test init calls onFailure when initialization fails`() {
+    val callback = mock<(Result<Unit>) -> Unit>()
+    val exceptionMessage = "Initialization failed"
+    val exception = RuntimeException(exceptionMessage)
+    messageRepository.init { callback(Result.failure(exception)) }
+    verify(callback).invoke(argThat { isFailure && exceptionOrNull()?.message == exceptionMessage })
+  }
+
+  @Test
+  fun `getMessages calls onSuccess`() {
+    // Arrange
+    val callback = mock<(Result<List<DataMessage>>) -> Unit>()
+    val messages = listOf(testMessage)
+
+    // Ensure the documents list is not null
+    `when`(mockQuerySnapshot.documents).thenReturn(messages.map { mockDocumentSnapshot })
+
+    // Mock the document snapshot fields
+    `when`(mockDocumentSnapshot.getString("id")).thenReturn(testMessage.id)
+    `when`(mockDocumentSnapshot.getString("text")).thenReturn(testMessage.text)
+    `when`(mockDocumentSnapshot.getString("senderId")).thenReturn(testMessage.senderId)
+    `when`(mockDocumentSnapshot.getString("receiverId")).thenReturn(testMessage.receiverId)
+    `when`(mockDocumentSnapshot.getLong("timestamp")).thenReturn(testMessage.timestamp)
+
+    // Act
+    messageRepository.getMessages(callback)
+    shadowOf(Looper.getMainLooper()).idle()
+
+    // Assert
+    verify(callback).invoke(argThat { isSuccess && getOrNull() == messages })
+    verify(mockCollectionReference).get()
+  }
+
+  @Test
+  fun `getMessages calls onFailure when Firestore query fails`() {
+    val callback = mock<(Result<List<DataMessage>>) -> Unit>()
+    val exception = RuntimeException("Firestore query failed")
+    `when`(mockCollectionReference.get()).thenReturn(Tasks.forException(exception))
+    messageRepository.getMessages(callback)
+    shadowOf(Looper.getMainLooper()).idle()
+    verify(callback).invoke(argThat { isFailure && exceptionOrNull() == exception })
   }
 
   @Test
