@@ -60,9 +60,9 @@ fun BookProfileScreen(DataBook: DataBook, navController: NavigationActions) {
       modifier = Modifier.testTag("bookProfileScreen"),
       topBar = {
         TopAppBar(
-            title = { Text("Book Profile", color = ColorVariable.BackGround) },
+            title = { Text("Book Profile", color = Color.Transparent) },
             navigationIcon = { BackButtonComponent(navController) },
-            colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent))
+            colors = TopAppBarDefaults.topAppBarColors(containerColor = ColorVariable.BackGround))
       },
       bottomBar = {
         BottomNavigationMenu(
