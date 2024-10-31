@@ -2,6 +2,7 @@ package com.android.bookswap.model
 
 import androidx.lifecycle.ViewModel
 import com.android.bookswap.data.DataUser
+import java.util.UUID
 
 open class UserViewModel(var email: String) : ViewModel() {
   var uid = "ERROR_UUID"
@@ -25,10 +26,11 @@ open class UserViewModel(var email: String) : ViewModel() {
       phone: String = dataUser.phoneNumber,
       latitude: Double = dataUser.latitude,
       longitude: Double = dataUser.longitude,
-      picURL: String = dataUser.profilePictureUrl
+      picURL: String = dataUser.profilePictureUrl,
+      bookList : List<UUID> = dataUser.bookList
   ) {
     updateUser(
-        DataUser(greeting, firstName, lastName, email, phone, latitude, longitude, picURL, uid))
+        DataUser(greeting, firstName, lastName, email, phone, latitude, longitude, picURL, uid, bookList))
   }
 
   fun updateUser(newDataUser: DataUser) {
