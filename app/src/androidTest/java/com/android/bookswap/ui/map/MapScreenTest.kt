@@ -23,6 +23,20 @@ import java.util.UUID
 import org.junit.Rule
 import org.junit.Test
 
+val longListBook =
+    List(20) {
+      DataBook(
+          uuid = UUID(2000, 2000),
+          title = "Book 1",
+          author = "Author 1",
+          description = "Description of Book 1",
+          rating = 5,
+          photo = "url_to_photo_1",
+          language = BookLanguages.ENGLISH,
+          isbn = "123-456-789",
+          genres = listOf(BookGenres.FICTION, BookGenres.NONFICTION))
+    }
+
 val books =
     listOf(
         DataBook(
@@ -44,33 +58,14 @@ val books =
             photo = "url_to_photo_2",
             language = BookLanguages.FRENCH,
             isbn = "234-567-890",
-            genres = listOf(BookGenres.FICTION)))
+            genres = listOf(BookGenres.FICTION))) + longListBook
 
 class MapScreenTest {
-  private val user =
-      listOf(DataUser(bookList = listOf(UUID(1000, 1000), UUID(2000, 1000))))
+  private val user = listOf(DataUser(bookList = listOf(UUID(1000, 1000), UUID(2000, 1000))))
+  private val userLongListOnly = listOf(DataUser(bookList = listOf(UUID(2000, 2000))))
 
   private val userWithoutBooks = listOf(DataUser(bookList = emptyList()))
   @get:Rule val composeTestRule = createComposeRule()
-
-  private val longListUser =
-      listOf(
-          TempUser(
-              latitude = 0.0,
-              longitude = 0.0,
-              listBook =
-                  List(20) {
-                    DataBook(
-                        uuid = UUID.randomUUID(),
-                        title = "Book 1",
-                        author = "Author 1",
-                        description = "Description of Book 1",
-                        rating = 5,
-                        photo = "url_to_photo_1",
-                        language = BookLanguages.ENGLISH,
-                        isbn = "123-456-789",
-                        genres = listOf(BookGenres.FICTION, BookGenres.NONFICTION))
-                  }))
 
   @Test
   fun displayAllComponents() {
@@ -225,7 +220,7 @@ class MapScreenTest {
       val navController = rememberNavController()
       val navigationActions = NavigationActions(navController)
       // Passing multiple books to ensure list needs scrolling
-      MapScreen(longListUser, longListUser[0], navigationActions, BookFilter())
+      MapScreen(userLongListOnly, navigationActions, BookFilter(), MockBooksRepository(), 0)
     }
 
     // Assert initial state: Only first item(s) are visible
@@ -248,7 +243,7 @@ class MapScreenTest {
     composeTestRule.setContent {
       val navController = rememberNavController()
       val navigationActions = NavigationActions(navController)
-      MapScreen(user, user[0], navigationActions, bookFilter)
+      MapScreen(user, navigationActions, bookFilter, MockBooksRepository(), 0)
     }
     composeTestRule.onNodeWithTag("mapBoxMarkerListBox").assertIsDisplayed()
     composeTestRule.onAllNodesWithTag("mapBoxMarkerListBox").assertCountEquals(1)
@@ -262,7 +257,7 @@ class MapScreenTest {
     composeTestRule.setContent {
       val navController = rememberNavController()
       val navigationActions = NavigationActions(navController)
-      MapScreen(user, user[0], navigationActions, bookFilter)
+      MapScreen(user, navigationActions, bookFilter, MockBooksRepository(), 0)
     }
     composeTestRule
         .onNodeWithTag("mapDraggableMenuNoBook")
