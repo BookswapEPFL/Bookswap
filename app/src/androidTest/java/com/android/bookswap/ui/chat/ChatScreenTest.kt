@@ -11,13 +11,13 @@ import com.android.bookswap.data.DataMessage
 import com.android.bookswap.data.repository.MessageRepository
 import com.android.bookswap.ui.theme.ColorVariable
 import com.google.firebase.firestore.ListenerRegistration
+import io.mockk.mockk
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.Mockito.mock
 
 class ChatScreenTest {
 
@@ -196,7 +196,7 @@ class ChatScreenTest {
       requireNotNull(currentUserId) { "currentUserId must not be null" }
 
       callback(Result.success(messages)) // Or whatever logic you'd like to simulate
-      return mock(ListenerRegistration::class.java)
+      return mockk()
     }
   }
 }
