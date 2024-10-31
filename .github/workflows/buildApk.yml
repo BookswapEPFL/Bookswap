@@ -7,7 +7,6 @@ on:
       - M1
       - M2
       - M3
-      - feature/EdenKahane/apkBuild
   workflow_dispatch:
 
 jobs:
