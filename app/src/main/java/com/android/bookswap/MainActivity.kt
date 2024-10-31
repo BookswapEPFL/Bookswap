@@ -54,7 +54,7 @@ class MainActivity : ComponentActivity() {
     val messageRepository = MessageFirestoreSource(db)
     val bookRepository = BooksFirestoreRepository(db)
 
-    //Initialize the geolocation
+    // Initialize the geolocation
     val geolocation = Geolocation(this)
 
     setContent {
@@ -63,7 +63,11 @@ class MainActivity : ComponentActivity() {
         Surface(
             modifier = Modifier.fillMaxSize().semantics { testTag = C.Tag.main_screen_container },
             color = MaterialTheme.colorScheme.background) {
-              BookSwapApp(messageRepository, bookRepository, startDestination = Route.MAP,geolocation = geolocation)
+              BookSwapApp(
+                  messageRepository,
+                  bookRepository,
+                  startDestination = Route.MAP,
+                  geolocation = geolocation)
             }
       }
     }
@@ -104,7 +108,11 @@ class MainActivity : ComponentActivity() {
       }
       navigation(startDestination = Screen.MAP, route = Route.MAP) {
         composable(Screen.MAP) {
-          MapScreen(user, navigationActions = navigationActions, bookFilter = bookFilter, geolocation = geolocation)
+          MapScreen(
+              user,
+              navigationActions = navigationActions,
+              bookFilter = bookFilter,
+              geolocation = geolocation)
         }
         composable(Screen.FILTER) { FilterMapScreen(navigationActions, bookFilter) }
       }

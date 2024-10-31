@@ -89,30 +89,18 @@ fun MapScreen(
     bookFilter: BookFilter,
     geolocation: IGeolocation = DefaultGeolocation(),
 ) {
-    val cameraPositionState = rememberCameraPositionState()
+  val cameraPositionState = rememberCameraPositionState()
   // Get the user's current location
-    val latitude by remember { geolocation.latitude }
-    val longitude by remember { geolocation.longitude }
-    // Start location updates
-    LaunchedEffect(Unit) {
-        geolocation.startLocationUpdates()
-        cameraPositionState.position = CameraPosition.fromLatLngZoom(
-            LatLng(latitude, longitude), INIT_ZOOM)
-    }
-    /*LaunchedEffect(latitude, longitude) {
-        if (!latitude.isNaN() && !longitude.isNaN()) {
-            val currentZoom = cameraPositionState.position.zoom
-            cameraPositionState.position = CameraPosition.fromLatLngZoom(
-                LatLng(latitude, longitude), currentZoom
-            )
-        }
-    }*/
-    // Stop location updates when the screen is disposed
-    DisposableEffect(Unit) {
-        onDispose {
-            geolocation.stopLocationUpdates()
-        }
-    }
+  val latitude by remember { geolocation.latitude }
+  val longitude by remember { geolocation.longitude }
+  // Start location updates
+  LaunchedEffect(Unit) {
+    geolocation.startLocationUpdates()
+    cameraPositionState.position =
+        CameraPosition.fromLatLngZoom(LatLng(latitude, longitude), INIT_ZOOM)
+  }
+  // Stop location updates when the screen is disposed
+  DisposableEffect(Unit) { onDispose { geolocation.stopLocationUpdates() } }
 
   var mutableStateSelectedUser by remember { mutableStateOf(selectedUser) }
   var markerScreenPosition by remember { mutableStateOf<Offset?>(null) }
@@ -166,17 +154,19 @@ fun MapScreen(
       content = { pd ->
         GoogleMap(
             onMapClick = { mutableStateSelectedUser = null },
-            modifier = Modifier.fillMaxSize().padding(pd).testTag("mapGoogleMap").semantics { cameraPosition = cameraPositionState },
+            modifier =
+                Modifier.fillMaxSize().padding(pd).testTag("mapGoogleMap").semantics {
+                  cameraPosition = cameraPositionState
+                },
             cameraPositionState = cameraPositionState,
         ) {
-            // Marker for user's current location
-            if (!latitude.isNaN() && !longitude.isNaN()) {
-                Marker(
-                    state = MarkerState(position = LatLng(latitude, longitude)),
-                    title = "Your Location",
-                    icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)
-                )
-            }
+          // Marker for user's current location
+          if (!latitude.isNaN() && !longitude.isNaN()) {
+            Marker(
+                state = MarkerState(position = LatLng(latitude, longitude)),
+                title = "Your Location",
+                icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE))
+          }
           filteredUsers
               .filter { !it.longitude.isNaN() && !it.latitude.isNaN() && it.listBook.isNotEmpty() }
               .forEach { item ->

@@ -30,7 +30,7 @@ const val BACKGROUND_LOCATION_PERMISSION_REQUEST_CODE = 2
  * This class requires appropriate location permissions to function, including both foreground and
  * optionally background location access.
  */
-class Geolocation(private val activity: Activity): IGeolocation {
+class Geolocation(private val activity: Activity) : IGeolocation {
   private val fusedLocationClient: FusedLocationProviderClient =
       LocationServices.getFusedLocationProviderClient(activity)
   val isRunning = mutableStateOf(false)

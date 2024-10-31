@@ -1,25 +1,17 @@
 package com.android.bookswap.ui.map
 
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.semantics.getOrNull
-import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithTag
-import androidx.compose.ui.test.onChild
-import androidx.compose.ui.test.onChildAt
 import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.performSemanticsAction
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.swipe
 import androidx.compose.ui.test.swipeUp
 import androidx.navigation.compose.rememberNavController
-import androidx.test.espresso.Espresso.onView
-import androidx.test.espresso.matcher.ViewMatchers.withId
-import com.android.bookswap.R
 import com.android.bookswap.data.BookGenres
 import com.android.bookswap.data.BookLanguages
 import com.android.bookswap.data.DataBook
@@ -27,8 +19,8 @@ import com.android.bookswap.model.map.BookFilter
 import com.android.bookswap.model.map.DefaultGeolocation
 import com.android.bookswap.ui.navigation.NavigationActions
 import com.google.maps.android.compose.CameraPositionState
-import junit.framework.TestCase.assertEquals
 import java.util.UUID
+import junit.framework.TestCase.assertEquals
 import org.junit.Rule
 import org.junit.Test
 
@@ -224,16 +216,16 @@ class MapScreenTest {
 
   @Test
   fun mapHasGeoLocation() {
-      val geolocation = DefaultGeolocation()
+    val geolocation = DefaultGeolocation()
     composeTestRule.setContent {
-        val navController = rememberNavController()
+      val navController = rememberNavController()
       val navigationActions = NavigationActions(navController)
       MapScreen(user, user[0], navigationActions, BookFilter(), geolocation)
     }
-      val node1 = composeTestRule.onNodeWithTag("mapGoogleMap").fetchSemanticsNode()
-      val cameraPositionState: CameraPositionState? = node1.config.getOrNull(CameraPositionKey)
+    val node1 = composeTestRule.onNodeWithTag("mapGoogleMap").fetchSemanticsNode()
+    val cameraPositionState: CameraPositionState? = node1.config.getOrNull(CameraPositionKey)
 
-      assertEquals(geolocation.latitude.value, cameraPositionState?.position?.target?.latitude)
-      assertEquals(geolocation.longitude.value, cameraPositionState?.position?.target?.longitude)
+    assertEquals(geolocation.latitude.value, cameraPositionState?.position?.target?.latitude)
+    assertEquals(geolocation.longitude.value, cameraPositionState?.position?.target?.longitude)
   }
 }

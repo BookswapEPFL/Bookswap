@@ -12,8 +12,10 @@ import androidx.compose.runtime.MutableState
  * the use of mock or fake data sources.
  */
 interface IGeolocation {
-    val latitude: MutableState<Double>
-    val longitude: MutableState<Double>
-    fun startLocationUpdates()
-    fun stopLocationUpdates()
+  val latitude: MutableState<Double>
+  val longitude: MutableState<Double>
+
+  fun startLocationUpdates()
+
+  fun stopLocationUpdates()
 }
