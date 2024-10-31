@@ -13,8 +13,8 @@ import com.android.bookswap.data.BookLanguages
 import com.android.bookswap.data.DataBook
 import com.android.bookswap.ui.books.BookProfileScreen
 import com.android.bookswap.ui.navigation.NavigationActions
-import java.util.UUID
 import io.mockk.mockk
+import java.util.UUID
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
