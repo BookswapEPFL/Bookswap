@@ -1,5 +1,7 @@
 package com.android.bookswap.ui.book
 
+import android.content.Context
+import android.widget.Toast
 import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -14,14 +16,27 @@ import com.android.bookswap.data.repository.BooksRepository
 import com.android.bookswap.ui.books.add.AddToBookScreen
 import com.android.bookswap.ui.books.add.createDataBook
 import com.android.bookswap.ui.navigation.NavigationActions
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.mockkStatic
 import java.util.UUID
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertNull
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
 class AddToBookTest {
   @get:Rule val composeTestRule = createComposeRule()
+  private val mockContext: Context = mockk()
+
+  @Before
+  fun init() {
+    mockkStatic(Toast::class)
+    val toastMock = mockk<Toast>()
+    every { toastMock.show() } returns Unit
+    every { Toast.makeText(any(), any<String>(), any()) } returns toastMock
+  }
 
   @Test
   fun testSaveButtonDisabledInitially() {
@@ -54,6 +69,7 @@ class AddToBookTest {
     // Test with valid data
     val book =
         createDataBook(
+            context = mockContext,
             uuid = UUID.randomUUID(),
             title = "My Book",
             author = "Author Name",
@@ -79,6 +95,7 @@ class AddToBookTest {
     // Test with invalid data (empty title)
     var book =
         createDataBook(
+            context = mockContext,
             uuid = UUID.randomUUID(),
             title = "",
             author = "Author Name",
@@ -95,6 +112,7 @@ class AddToBookTest {
     // Test with invalid rating
     book =
         createDataBook(
+            context = mockContext,
             uuid = UUID.randomUUID(),
             title = "My Book",
             author = "Author Name",
@@ -111,6 +129,7 @@ class AddToBookTest {
     // Test with invalid language
     book =
         createDataBook(
+            context = mockContext,
             uuid = UUID.randomUUID(),
             title = "My Book",
             author = "Author Name",

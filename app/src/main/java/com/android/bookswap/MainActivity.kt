@@ -91,7 +91,9 @@ class MainActivity : ComponentActivity() {
       }
       navigation(startDestination = Screen.CHATLIST, route = Route.CHAT) {
         composable(Screen.CHATLIST) { ListChatScreen(placeHolder, navigationActions) }
-        composable(Screen.CHAT) { ChatScreen(messageRepository, userid1, userid2) }
+        composable(Screen.CHAT) {
+          ChatScreen(messageRepository, userid1, userid2, navigationActions)
+        }
       }
       navigation(startDestination = Screen.MAP, route = Route.MAP) {
         composable(Screen.MAP) {

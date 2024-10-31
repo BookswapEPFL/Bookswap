@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -137,6 +138,7 @@ fun MapScreen(
             onMapClick = { mutableStateSelectedUser = null },
             modifier = Modifier.fillMaxSize().padding(pd).testTag("mapGoogleMap"),
             cameraPositionState = cameraPositionState,
+            uiSettings = MapUiSettings(zoomControlsEnabled = false),
         ) {
           filteredUsers
               .filter { !it.longitude.isNaN() && !it.latitude.isNaN() && it.listBook.isNotEmpty() }
@@ -164,7 +166,7 @@ fun MapScreen(
                     Modifier.offset {
                       IntOffset(screenPos.x.roundToInt(), screenPos.y.roundToInt())
                     },
-                user = user)
+                userBooks = bookFilter.filterBooks(user.listBook))
           }
         }
         // Draggable Bottom List
@@ -195,7 +197,7 @@ const val SECONDARY_TEXT_FONT_SP = 16
  *   window.
  */
 @Composable
-private fun CustomInfoWindow(modifier: Modifier = Modifier, user: TempUser) {
+private fun CustomInfoWindow(modifier: Modifier = Modifier, userBooks: List<DataBook>) {
   Card(
       modifier =
           modifier
@@ -218,7 +220,7 @@ private fun CustomInfoWindow(modifier: Modifier = Modifier, user: TempUser) {
               0.dp, CARD_CORNER_RADIUS.dp, CARD_CORNER_RADIUS.dp, CARD_CORNER_RADIUS.dp)) {
         Spacer(modifier.height(CARD_CORNER_RADIUS.dp))
         LazyColumn(modifier = Modifier.fillMaxWidth().testTag("mapBoxMarkerList")) {
-          itemsIndexed(user.listBook) { index, book ->
+          itemsIndexed(userBooks) { index, book ->
             Column(
                 modifier =
                     Modifier.padding(horizontal = PADDING_HORIZONTAL_DP.dp)
@@ -235,7 +237,7 @@ private fun CustomInfoWindow(modifier: Modifier = Modifier, user: TempUser) {
                       fontSize = SECONDARY_TEXT_FONT_SP.sp,
                       modifier = Modifier.testTag("mapBoxMarkerListBoxAuthor"))
                 }
-            if (index < user.listBook.size - 1)
+            if (index < userBooks.size - 1)
                 HorizontalDivider(
                     modifier =
                         Modifier.fillMaxWidth()
@@ -329,6 +331,20 @@ private fun DraggableMenu(listAllBooks: List<DataBook>) {
               thickness = DIVIDER_THICKNESS_DP.dp,
               color = ColorVariable.Accent)
           LazyColumn(userScrollEnabled = true, modifier = Modifier.fillMaxHeight()) {
+              if (listAllBooks.isEmpty()) {
+                  item {
+                      Text(
+                          text = "No books found",
+                          color = ColorVariable.Accent,
+                          fontSize = PRIMARY_TEXT_FONT_SP.sp,
+                          textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                          modifier =
+                          Modifier.padding(PADDING_HORIZONTAL_DP.dp)
+                              .fillMaxWidth()
+                              .align(Alignment.CenterHorizontally)
+                              .testTag("mapDraggableMenuNoBook"))
+                  }
+              } else {
             itemsIndexed(listAllBooks) { index, book ->
               Spacer(modifier = Modifier.height(PADDING_VERTICAL_DP.dp))
               Row(
@@ -355,57 +371,61 @@ private fun DraggableMenu(listAllBooks: List<DataBook>) {
                               )
                         }
 
-                    // Column for text content
-                    Column(
-                        modifier =
-                            Modifier.padding(vertical = PADDING_VERTICAL_DP.dp)
-                                .width(WIDTH_TITLE_BOX_DP.dp)
-                                .testTag("mapDraggableMenuBookBoxMiddle")) {
-                          Text(
-                              text = book.title,
-                              color = ColorVariable.Accent,
-                              fontSize = PRIMARY_TEXT_FONT_SP.sp,
+                          // Column for text content
+                          Column(
                               modifier =
-                                  Modifier.padding(bottom = PADDING_VERTICAL_DP.dp)
+                                  Modifier.padding(vertical = PADDING_VERTICAL_DP.dp)
                                       .width(WIDTH_TITLE_BOX_DP.dp)
-                                      .testTag("mapDraggableMenuBookBoxTitle"))
-                          Text(
-                              text = book.author ?: "",
-                              color = ColorVariable.AccentSecondary,
-                              fontSize = SECONDARY_TEXT_FONT_SP.sp,
-                              modifier =
-                                  Modifier.width(WIDTH_TITLE_BOX_DP.dp)
-                                      .testTag("mapDraggableMenuBookBoxAuthor"))
-                        }
-                    Column(
-                        modifier = Modifier.fillMaxWidth().testTag("mapDraggableMenuBookRight")) {
-                          Row(
-                              modifier =
-                                  Modifier.fillMaxWidth()
-                                      .height(STAR_HEIGHT_DP.dp)
-                                      .testTag("mapDraggableMenuBookBoxRating")) {
-                                // leave all stars empty if no rating
-                                DisplayStarReview(book.rating ?: 0)
+                                      .testTag("mapDraggableMenuBookBoxMiddle")) {
+                                Text(
+                                    text = book.title,
+                                    color = ColorVariable.Accent,
+                                    fontSize = PRIMARY_TEXT_FONT_SP.sp,
+                                    modifier =
+                                        Modifier.padding(bottom = PADDING_VERTICAL_DP.dp)
+                                            .width(WIDTH_TITLE_BOX_DP.dp)
+                                            .testTag("mapDraggableMenuBookBoxTitle"))
+                                Text(
+                                    text = book.author ?: "",
+                                    color = ColorVariable.AccentSecondary,
+                                    fontSize = SECONDARY_TEXT_FONT_SP.sp,
+                                    modifier =
+                                        Modifier.width(WIDTH_TITLE_BOX_DP.dp)
+                                            .testTag("mapDraggableMenuBookBoxAuthor"))
                               }
-                          // text for the tags of the book, will be added at a later date
-                          // It isn't decided how we will handle the tag for the books
-                          Text(
-                              text = book.genres.joinToString(separator = ", ") { it.Genre },
+                          Column(
                               modifier =
-                                  Modifier.fillMaxWidth().testTag("mapDraggableMenuBookBoxTag"),
-                              fontSize = SECONDARY_TEXT_FONT_SP.sp,
-                              color = ColorVariable.AccentSecondary)
+                                  Modifier.fillMaxWidth().testTag("mapDraggableMenuBookRight")) {
+                                Row(
+                                    modifier =
+                                        Modifier.fillMaxWidth()
+                                            .height(STAR_HEIGHT_DP.dp)
+                                            .testTag("mapDraggableMenuBookBoxRating")) {
+                                      // leave all stars empty if no rating
+                                      DisplayStarReview(book.rating ?: 0)
+                                    }
+                                // text for the tags of the book, will be added at a later date
+                                // It isn't decided how we will handle the tag for the books
+                                Text(
+                                    text = book.genres.joinToString(separator = ", ") { it.Genre },
+                                    modifier =
+                                        Modifier.fillMaxWidth()
+                                            .testTag("mapDraggableMenuBookBoxTag"),
+                                    fontSize = SECONDARY_TEXT_FONT_SP.sp,
+                                    color = ColorVariable.AccentSecondary)
+                              }
                         }
-                  }
 
-              // Divider below each item
-              HorizontalDivider(
-                  modifier = Modifier.fillMaxWidth().testTag("mapDraggableMenuBookBoxDivider"),
-                  thickness = DIVIDER_THICKNESS_DP.dp,
-                  color = ColorVariable.Accent)
+                    // Divider below each item
+                    HorizontalDivider(
+                        modifier =
+                            Modifier.fillMaxWidth().testTag("mapDraggableMenuBookBoxDivider"),
+                        thickness = DIVIDER_THICKNESS_DP.dp,
+                        color = ColorVariable.Accent)
+                  }
+                }
+              }
             }
-          }
-        }
       }
 }
 

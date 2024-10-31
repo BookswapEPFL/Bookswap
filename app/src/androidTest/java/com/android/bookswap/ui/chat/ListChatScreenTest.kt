@@ -21,6 +21,7 @@ class ListChatScreenTest {
 
   @get:Rule val composeTestRule = createComposeRule()
   private lateinit var placeHolderData: List<MessageBox>
+  private lateinit var placeHolderDataEmpty: List<MessageBox>
 
   @Before
   fun setUp() {
@@ -31,6 +32,7 @@ class ListChatScreenTest {
               "Test message $it test for the feature of ellipsis in the message",
               "01.01.24")
         }
+    placeHolderDataEmpty = emptyList()
   }
 
   @Test
@@ -43,8 +45,8 @@ class ListChatScreenTest {
     composeTestRule.onNodeWithTag("chat_messageScreenTitle").assertIsDisplayed()
     composeTestRule.onNodeWithTag("profileIconButton").assertIsDisplayed()
     composeTestRule.onNodeWithContentDescription("Profile Icon").assertIsDisplayed()
-    // composeTestRule.onNodeWithTag("chat_messageList").assertIsDisplayed()
-    /* Need to put the navbar here */
+    composeTestRule.onNodeWithTag("chat_messageList").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("bottomNavigationMenu").assertIsDisplayed()
 
     composeTestRule.onNodeWithTag("chat_messageScreenTitle").onChild().assertTextEquals("Messages")
   }
@@ -54,18 +56,16 @@ class ListChatScreenTest {
     composeTestRule.setContent {
       val navController = rememberNavController()
       val navigationActions = NavigationActions(navController)
-      ListChatScreen(placeHolderData, navigationActions)
+      ListChatScreen(placeHolderDataEmpty, navigationActions)
     }
     composeTestRule.onNodeWithTag("chat_messageScreenTitle").assertIsDisplayed()
     composeTestRule.onNodeWithTag("profileIconButton").assertIsDisplayed()
     composeTestRule.onNodeWithContentDescription("Profile Icon").assertIsDisplayed()
-    // composeTestRule.onNodeWithTag("chat_messageList").assertIsDisplayed()
-
-    /* Need to put the navbar here */
+    composeTestRule.onNodeWithTag("chat_messageList").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("bottomNavigationMenu").assertIsDisplayed()
 
     composeTestRule.onNodeWithTag("chat_messageScreenTitle").onChild().assertTextEquals("Messages")
-    // composeTestRule.onNodeWithTag("chat_messageList").onChild().assertTextEquals("No messages
-    // yet")
+    composeTestRule.onNodeWithTag("chat_messageList").onChild().assertTextEquals("No messages yet")
   }
 
   @Test
