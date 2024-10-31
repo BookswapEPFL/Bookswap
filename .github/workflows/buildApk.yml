@@ -39,7 +39,6 @@ jobs:
 
       - name: Build Apk
         run: |
-          ls -l ./app/keyStore.jks # Confirm the keystore file is present before building
           ./gradlew assembleRelease # Build the release version
       - name: Move files
         run: |
