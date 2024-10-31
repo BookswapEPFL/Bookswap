@@ -14,9 +14,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
-import com.android.bookswap.data.BookGenres
-import com.android.bookswap.data.BookLanguages
-import com.android.bookswap.data.DataBook
+import com.android.bookswap.data.DataUser
 import com.android.bookswap.data.source.network.BooksFirestoreRepository
 import com.android.bookswap.data.source.network.MessageFirestoreSource
 import com.android.bookswap.model.chat.MessageBox
@@ -30,7 +28,6 @@ import com.android.bookswap.ui.chat.ChatScreen
 import com.android.bookswap.ui.chat.ListChatScreen
 import com.android.bookswap.ui.map.FilterMapScreen
 import com.android.bookswap.ui.map.MapScreen
-import com.android.bookswap.ui.map.TempUser
 import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.navigation.Route
 import com.android.bookswap.ui.navigation.Screen
@@ -95,7 +92,8 @@ class MainActivity : ComponentActivity() {
       }
       navigation(startDestination = Screen.MAP, route = Route.MAP) {
         composable(Screen.MAP) {
-          MapScreen(user, navigationActions = navigationActions, bookFilter = bookFilter)
+          MapScreen(
+              user, navigationActions = navigationActions, bookFilter = bookFilter, bookRepository)
         }
         composable(Screen.FILTER) { FilterMapScreen(navigationActions, bookFilter) }
       }
@@ -114,39 +112,9 @@ class MainActivity : ComponentActivity() {
 // Need to be removed in the future.
 val user =
     listOf(
-        TempUser(
-            latitude = 0.0,
-            longitude = 0.0,
-            listBook =
+        DataUser(
+            bookList =
                 listOf(
-                    DataBook(
-                        uuid = UUID.randomUUID(),
-                        title = "Book 1",
-                        author = "Author 1",
-                        description = "Description of Book 1",
-                        rating = 5,
-                        photo = null,
-                        language = BookLanguages.ENGLISH,
-                        isbn = null,
-                        genres = listOf(BookGenres.FANTASY)),
-                    DataBook(
-                        uuid = UUID.randomUUID(),
-                        title = "Book 2",
-                        author = "Author 2",
-                        description = "Description of Book 2",
-                        rating = 4,
-                        photo = null,
-                        language = BookLanguages.FRENCH,
-                        isbn = null,
-                        genres = listOf(BookGenres.FICTION)),
-                    DataBook(
-                        uuid = UUID.randomUUID(),
-                        title = "Book 3",
-                        author = "Author 3",
-                        description = "Description of Book 3",
-                        rating = null,
-                        photo = null,
-                        language = BookLanguages.GERMAN,
-                        isbn = null,
-                        genres = listOf(BookGenres.SCIENCEFICTION, BookGenres.AUTOBIOGRAPHY)),
-                )))
+                    UUID(12345678L, 87654321L),
+                    UUID(-848484, 848484),
+                    UUID(763879565731911, 5074118859109511))))

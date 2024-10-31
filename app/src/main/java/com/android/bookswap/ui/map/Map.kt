@@ -42,6 +42,8 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.bookswap.data.DataBook
+import com.android.bookswap.data.DataUser
+import com.android.bookswap.data.repository.BooksRepository
 import com.android.bookswap.model.map.BookFilter
 import com.android.bookswap.ui.navigation.BottomNavigationMenu
 import com.android.bookswap.ui.navigation.List_Navigation_Bar_Destinations
@@ -63,39 +65,56 @@ const val INIT_ZOOM = 10F
  * This screen renders a GoogleMap that shows books locations as markers. Upon clicking a marker, it
  * displays a custom info window with the list of books at this location.
  *
- * @param listUser List of users [TempUser] to display on the map, each containing their location
- *   (latitude, longitude) and a list of books they own (listBook). This argument will later be
- *   deleted as the code should in the future use a class to get the user from the database.
- * @param selectedUser An optional user [TempUser] to be initially selected and focused on the map.
- *   This user’s info window will be shown if not null.
+ * @param listUser List of users [DataUser] to display on the map, will be replaced by a model that
+ *   retrieves the users from the database.
  * @param navigationActions An instance of [NavigationActions] to handle navigation actions.
  * @param bookFilter An instance of [BookFilter] to filter the books displayed on the map.
+ * @param booksRepository An instance of [BooksRepository] to retrieve the books from the database.
+ * @param selectedUser An optional user, it will display the infoWindow related to this user. This
+ *   user’s info window will be shown if it is bigger or equal to 0.
  */
 @Composable
 fun MapScreen(
-    listUser: List<TempUser>,
-    selectedUser: TempUser? = null,
+    listUser: List<DataUser>,
     navigationActions: NavigationActions,
-    bookFilter: BookFilter
+    bookFilter: BookFilter,
+    booksRepository: BooksRepository,
+    selectedUser: Int = -1
 ) {
 
   val cameraPositionState = rememberCameraPositionState {
-    position = CameraPosition.fromLatLngZoom(LatLng(0.0, 0.0), INIT_ZOOM) // Initial camera position
+    position = CameraPosition.fromLatLngZoom(LatLng(0.0, 0.0), INIT_ZOOM)
   }
 
   var mutableStateSelectedUser by remember { mutableStateOf(selectedUser) }
   var markerScreenPosition by remember { mutableStateOf<Offset?>(null) }
-  val listAllBooks = listUser.flatMap { it.listBook }
+  val userBooksList = remember { mutableStateListOf<UserBooksWithLocation>() }
+
+  // Fetch books
+  LaunchedEffect(Unit) {
+    booksRepository.getBook(
+        OnSucess = { books ->
+          listUser.forEach { user ->
+            userBooksList.add(
+                UserBooksWithLocation(
+                    user.longitude,
+                    user.latitude,
+                    books.filter { book -> book.uuid in user.bookList }))
+          }
+        },
+        onFailure = {})
+  }
+
+  val listAllBooks = userBooksList.flatMap { it.books }
 
   // Filter the books based on the selected filters
   val genresFilter by bookFilter.genresFilter.collectAsState()
   val languagesFilter by bookFilter.languagesFilter.collectAsState()
 
   val filteredBooks =
-      remember(genresFilter, languagesFilter) { bookFilter.filterBooks(listAllBooks) }
+      remember(genresFilter, languagesFilter, listAllBooks) { bookFilter.filterBooks(listAllBooks) }
 
-  val filteredUsers =
-      listUser.filter { user -> user.listBook.any { book -> filteredBooks.contains(book) } }
+  val filteredUsers = userBooksList.filter { it.books.any { book -> filteredBooks.contains(book) } }
 
   // compute the position of the marker on the screen given the camera position and the marker's
   // position on the map
@@ -107,20 +126,24 @@ fun MapScreen(
     }
   }
 
-  if (mutableStateSelectedUser != null) {
+  if (mutableStateSelectedUser >= 0 && mutableStateSelectedUser < filteredUsers.size) {
     computePositionOfMarker(
         cameraPositionState,
-        LatLng(mutableStateSelectedUser!!.latitude, mutableStateSelectedUser!!.longitude))
+        LatLng(
+            filteredUsers[mutableStateSelectedUser].latitude,
+            filteredUsers[mutableStateSelectedUser].longitude))
   }
 
   val coroutineScope = rememberCoroutineScope()
 
   // Recalculate marker screen position during camera movement
   LaunchedEffect(cameraPositionState.position) {
-    if (mutableStateSelectedUser != null) {
+    if (mutableStateSelectedUser >= 0 && mutableStateSelectedUser < filteredUsers.size) {
       computePositionOfMarker(
           cameraPositionState,
-          LatLng(mutableStateSelectedUser!!.latitude, mutableStateSelectedUser!!.longitude))
+          LatLng(
+              filteredUsers[mutableStateSelectedUser].latitude,
+              filteredUsers[mutableStateSelectedUser].longitude))
     }
   }
 
@@ -134,19 +157,19 @@ fun MapScreen(
       },
       content = { pd ->
         GoogleMap(
-            onMapClick = { mutableStateSelectedUser = null },
+            onMapClick = { mutableStateSelectedUser = -1 },
             modifier = Modifier.fillMaxSize().padding(pd).testTag("mapGoogleMap"),
             cameraPositionState = cameraPositionState,
         ) {
           filteredUsers
-              .filter { !it.longitude.isNaN() && !it.latitude.isNaN() && it.listBook.isNotEmpty() }
-              .forEach { item ->
+              .filter { !it.longitude.isNaN() && !it.latitude.isNaN() && it.books.isNotEmpty() }
+              .forEachIndexed { index, item ->
                 val markerState = MarkerState(position = LatLng(item.latitude, item.longitude))
 
                 Marker(
                     state = markerState,
                     onClick = {
-                      mutableStateSelectedUser = item
+                      mutableStateSelectedUser = index
                       coroutineScope.launch {
                         computePositionOfMarker(cameraPositionState, markerState.position)
                       }
@@ -158,13 +181,15 @@ fun MapScreen(
 
         // Custom info window linked to the marker
         markerScreenPosition?.let { screenPos ->
-          mutableStateSelectedUser?.let { user ->
+          if (mutableStateSelectedUser >= 0 &&
+              mutableStateSelectedUser < filteredUsers.size &&
+              userBooksList[mutableStateSelectedUser].books.isNotEmpty()) {
             CustomInfoWindow(
                 modifier =
                     Modifier.offset {
                       IntOffset(screenPos.x.roundToInt(), screenPos.y.roundToInt())
                     },
-                user = user)
+                user = filteredUsers[mutableStateSelectedUser])
           }
         }
         // Draggable Bottom List
@@ -195,7 +220,7 @@ const val SECONDARY_TEXT_FONT_SP = 16
  *   window.
  */
 @Composable
-private fun CustomInfoWindow(modifier: Modifier = Modifier, user: TempUser) {
+private fun CustomInfoWindow(modifier: Modifier = Modifier, user: UserBooksWithLocation) {
   Card(
       modifier =
           modifier
@@ -218,7 +243,7 @@ private fun CustomInfoWindow(modifier: Modifier = Modifier, user: TempUser) {
               0.dp, CARD_CORNER_RADIUS.dp, CARD_CORNER_RADIUS.dp, CARD_CORNER_RADIUS.dp)) {
         Spacer(modifier.height(CARD_CORNER_RADIUS.dp))
         LazyColumn(modifier = Modifier.fillMaxWidth().testTag("mapBoxMarkerList")) {
-          itemsIndexed(user.listBook) { index, book ->
+          itemsIndexed(user.books) { index, book ->
             Column(
                 modifier =
                     Modifier.padding(horizontal = PADDING_HORIZONTAL_DP.dp)
@@ -235,7 +260,7 @@ private fun CustomInfoWindow(modifier: Modifier = Modifier, user: TempUser) {
                       fontSize = SECONDARY_TEXT_FONT_SP.sp,
                       modifier = Modifier.testTag("mapBoxMarkerListBoxAuthor"))
                 }
-            if (index < user.listBook.size - 1)
+            if (index < user.books.size - 1)
                 HorizontalDivider(
                     modifier =
                         Modifier.fillMaxWidth()
@@ -450,5 +475,8 @@ private fun DisplayStarReview(rating: Int) {
   }
 }
 
-// need to be removed when user dataclass will be created
-data class TempUser(val latitude: Double, val longitude: Double, val listBook: List<DataBook>)
+data class UserBooksWithLocation(
+    val longitude: Double,
+    val latitude: Double,
+    val books: List<DataBook>
+)
