@@ -55,3 +55,8 @@ jobs:
           keyPassword: ${{ secrets.ANDROID_KEY_PASSWORD }}
       - name: Upload Release Build to Artifacts
         uses: actions/upload-artifact@v3
+        with:
+          name: apk-signed.apk
+          path: $ANDROID_SIGNED_FILE
+          if-no-files-found: error
+          overwrite: true
