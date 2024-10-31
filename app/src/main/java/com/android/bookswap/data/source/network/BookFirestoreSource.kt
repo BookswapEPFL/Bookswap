@@ -81,13 +81,15 @@ class BooksFirestoreRepository(private val db: FirebaseFirestore) : BooksReposit
   // If any required field is missing, returns null to avoid incomplete objects
   fun documentToBooks(document: DocumentSnapshot): DataBook? {
     return try {
-      val title = document.getString("Title") ?: return null
-      val author = document.getString("Author") ?: return null
-      val description = document.getString("Description") ?: return null
-      val rating = document.getString("Rating") ?: return null
-      val photo = document.getString("Photo") ?: return null
-      val isbn = document.getString("ISBN") ?: return null
-      val languageBook = BookLanguages.valueOf(document.getString("Language") ?: return null)
+      val mostSignificantBits = document.getLong("uuid.mostSignificantBits") ?: return null
+      val leastSignificantBits = document.getLong("uuid.leastSignificantBits") ?: return null
+      val title = document.getString("title") ?: "return null"
+      val author = document.getString("author")
+      val description = document.getString("description")
+      val rating = document.getLong("rating")
+      val photo = document.getString("photo")
+      val isbn = document.getString("isbn")
+      val languageBook = BookLanguages.valueOf(document.getString("language") ?: return null)
       val genres = document.get("genres") as? List<String> ?: emptyList()
       val bookGenres =
           genres.mapNotNull { genre ->
@@ -98,11 +100,11 @@ class BooksFirestoreRepository(private val db: FirebaseFirestore) : BooksReposit
             }
           }
       DataBook(
-          UUID.randomUUID(),
+          UUID(mostSignificantBits, leastSignificantBits),
           title,
           author,
           description,
-          rating.toInt(),
+          rating?.toInt(),
           photo,
           languageBook,
           isbn,
