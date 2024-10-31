@@ -36,7 +36,7 @@ class ChatViewModel(private val messageRepository: MessageRepository) : ViewMode
    * Loads messages for the current `otherUserId`. Fetches messages asynchronously from the
    * repository and updates `_messages`.
    */
-  private fun loadMessages() {
+  fun loadMessages() {
     viewModelScope.launch {
       messageRepository.fetchMessagesForUser(otherUserId) { result ->
         if (result.isSuccess) {
@@ -106,7 +106,9 @@ class ChatViewModel(private val messageRepository: MessageRepository) : ViewMode
     listenerRegistration?.remove()
     listenerRegistration = null
   }
-
+ fun givemessagerepo(): MessageRepository {
+    return messageRepository
+  }
   /**
    * Sends a new message and adds it to `_messages` if successful.
    *

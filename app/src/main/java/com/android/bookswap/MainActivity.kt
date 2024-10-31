@@ -14,16 +14,22 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
+import com.android.bookswap.data.BookGenres
 import com.android.bookswap.data.BookLanguages
 import com.android.bookswap.data.DataBook
 import com.android.bookswap.data.source.network.BooksFirestoreRepository
 import com.android.bookswap.data.source.network.MessageFirestoreSource
 import com.android.bookswap.model.chat.ChatViewModel
+import com.android.bookswap.model.chat.MessageBox
+import com.android.bookswap.model.map.BookFilter
 import com.android.bookswap.resources.C
 import com.android.bookswap.ui.authentication.SignInScreen
+import com.android.bookswap.ui.books.add.AddISBNScreen
 import com.android.bookswap.ui.books.add.AddToBookScreen
+import com.android.bookswap.ui.books.add.BookAdditionChoiceScreen
 import com.android.bookswap.ui.chat.ChatScreen
 import com.android.bookswap.ui.chat.ListChatScreen
+import com.android.bookswap.ui.map.FilterMapScreen
 import com.android.bookswap.ui.map.MapScreen
 import com.android.bookswap.ui.map.TempUser
 import com.android.bookswap.ui.navigation.NavigationActions
@@ -44,39 +50,67 @@ class MainActivity : ComponentActivity() {
         Surface(
             modifier = Modifier.fillMaxSize().semantics { testTag = C.Tag.main_screen_container },
             color = MaterialTheme.colorScheme.background) {
-              BookSwapApp()
+              BookSwapApp(
+                  MessageFirestoreSource(Firebase.firestore),
+                  BooksFirestoreRepository(Firebase.firestore),
+                  startDestination = Route.AUTH)
             }
       }
     }
   }
 
   @Composable
-  fun BookSwapApp() {
+  fun BookSwapApp(
+      messageRepository: MessageFirestoreSource,
+      bookRepository: BooksFirestoreRepository,
+      startDestination: String = Route.AUTH
+  ) {
     val navController = rememberNavController()
     val navigationActions = NavigationActions(navController)
+    val bookFilter = BookFilter()
     val bookfire = BooksFirestoreRepository(Firebase.firestore)
-    val chatViewModel = ChatViewModel(MessageFirestoreSource(Firebase.firestore))
-    NavHost(navController = navController, startDestination = Route.AUTH) {
+    val chatViewModel = ChatViewModel(messageRepository)
+    val placeHolder =
+        listOf(
+            MessageBox(
+                contactName = "user124",
+                message = "Welcome message for user124",
+                date = "01.01.24")) +
+            List(6) {
+              MessageBox(
+                  contactName = "Contact ${it + 1}",
+                  message = "Test message $it test for the feature of ellipsis in the message",
+                  date = "01.01.24")
+            }
+
+    val userid1 = "user123"
+    val userid2 = "user124"
+
+    NavHost(navController = navController, startDestination = startDestination) {
       navigation(startDestination = Screen.AUTH, route = Route.AUTH) {
-        composable(Screen.AUTH) { SignInScreen(navigationActions) }
+        composable(Screen.AUTH) { SignInScreen(navigationActions) } // *Todo*/}
       }
       navigation(startDestination = Screen.CHATLIST, route = Route.CHAT) {
         composable(Screen.CHATLIST) {
-          ListChatScreen(navController = navController, viewModel = chatViewModel)
+          ListChatScreen(
+              navController = navController, placeHolder, chatViewModel, navigationActions)
         }
         composable("chatScreen/{userId}") { backStackEntry ->
           val userId = backStackEntry.arguments?.getString("userId")
-          userId?.let { ChatScreen(userId, viewModel = chatViewModel) }
+          userId?.let { ChatScreen(userid1, chatViewModel, navigationActions) }
         }
       }
       navigation(startDestination = Screen.MAP, route = Route.MAP) {
-        composable(Screen.MAP) { MapScreen(user) }
+        composable(Screen.MAP) {
+          MapScreen(user, navigationActions = navigationActions, bookFilter = bookFilter)
+        }
+        composable(Screen.FILTER) { FilterMapScreen(navigationActions, bookFilter) }
       }
       navigation(startDestination = Screen.NEWBOOK, route = Route.NEWBOOK) {
-        composable(Screen.NEWBOOK) { AddToBookScreen(bookfire) }
-        composable(Screen.ADD_BOOK_MANUALLY) { /*Todo*/}
+        composable(Screen.NEWBOOK) { BookAdditionChoiceScreen(navigationActions) }
+        composable(Screen.ADD_BOOK_MANUALLY) { AddToBookScreen(bookRepository, navigationActions) }
         composable(Screen.ADD_BOOK_SCAN) { /*Todo*/}
-        composable(Screen.ADD_BOOK_ISBN) { /*Todo*/}
+        composable(Screen.ADD_BOOK_ISBN) { AddISBNScreen(navigationActions, bookRepository) }
       }
     }
   }
@@ -100,7 +134,8 @@ val user =
                         rating = 5,
                         photo = null,
                         language = BookLanguages.ENGLISH,
-                        isbn = null),
+                        isbn = null,
+                        genres = listOf(BookGenres.FANTASY)),
                     DataBook(
                         uuid = UUID.randomUUID(),
                         title = "Book 2",
@@ -109,7 +144,8 @@ val user =
                         rating = 4,
                         photo = null,
                         language = BookLanguages.FRENCH,
-                        isbn = null),
+                        isbn = null,
+                        genres = listOf(BookGenres.FICTION)),
                     DataBook(
                         uuid = UUID.randomUUID(),
                         title = "Book 3",
@@ -118,4 +154,6 @@ val user =
                         rating = null,
                         photo = null,
                         language = BookLanguages.GERMAN,
-                        isbn = null))))
+                        isbn = null,
+                        genres = listOf(BookGenres.SCIENCEFICTION, BookGenres.AUTOBIOGRAPHY)),
+                )))

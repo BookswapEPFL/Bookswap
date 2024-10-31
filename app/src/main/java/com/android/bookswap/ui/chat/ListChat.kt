@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -38,6 +37,9 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.android.bookswap.model.chat.ChatViewModel
 import com.android.bookswap.model.chat.MessageBox
+import com.android.bookswap.ui.navigation.BottomNavigationMenu
+import com.android.bookswap.ui.navigation.List_Navigation_Bar_Destinations
+import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.profile.ProfileIcon
 import com.android.bookswap.ui.theme.ColorVariable
 
@@ -47,7 +49,8 @@ import com.android.bookswap.ui.theme.ColorVariable
 fun ListChatScreen(
     navController: NavController,
     placeHolderData: List<MessageBox> = emptyList(),
-    viewModel: ChatViewModel
+    viewModel: ChatViewModel,
+    navigationActions: NavigationActions
 ) {
   Scaffold(
       topBar = {
@@ -105,8 +108,10 @@ fun ListChatScreen(
             }
       },
       bottomBar = {
-        // To Modify with the navbar
-        BottomAppBar(modifier = Modifier.background(color = ColorVariable.BackGround)) {}
+        BottomNavigationMenu(
+            onTabSelect = { destination -> navigationActions.navigateTo(destination) },
+            tabList = List_Navigation_Bar_Destinations,
+            selectedItem = navigationActions.currentRoute())
       })
 }
 
