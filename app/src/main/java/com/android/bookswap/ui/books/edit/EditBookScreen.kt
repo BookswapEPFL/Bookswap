@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
@@ -32,6 +33,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
@@ -47,6 +49,7 @@ private val SCREEN_PADDING = 16.dp
 private val ELEMENT_SPACING = 8.dp
 private val DESCRIPTION_FIELD_HEIGHT = 100.dp
 private val BUTTON_SPACER_HEIGHT = 16.dp
+private const val COLUMN_WIDTH_RATIO = 0.9f // Column width as 90% of screen width
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -56,6 +59,9 @@ fun EditBookScreen(
     book: DataBook
 ) {
 
+  val configuration = LocalConfiguration.current
+  val screenWidth = configuration.screenWidthDp.dp
+  val columnMaxWidth = screenWidth * COLUMN_WIDTH_RATIO
   /*val book =
       booksRepository.selectedBook.collectAsState().value
           ?: return Text(text = "No Book selected. Should not happen", color = Color.Red)
@@ -98,7 +104,9 @@ fun EditBookScreen(
                 Modifier.fillMaxSize()
                     .padding(paddingValues)
                     .padding(SCREEN_PADDING)
+                    .widthIn(max = columnMaxWidth)
                     .background(ColorVariable.BackGround),
+            // .align(Alignment.CenterHorizontally)
             verticalArrangement = Arrangement.spacedBy(ELEMENT_SPACING)) {
               // Title Edit Field
               OutlinedTextField(
