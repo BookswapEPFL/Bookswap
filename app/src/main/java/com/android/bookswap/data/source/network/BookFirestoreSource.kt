@@ -10,10 +10,10 @@ import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
+import java.util.UUID
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import java.util.UUID
 
 // A class that implements the BooksRepository interface using Firebase Firestore as the data source
 class BooksFirestoreRepository(private val db: FirebaseFirestore) : BooksRepository {
@@ -21,15 +21,16 @@ class BooksFirestoreRepository(private val db: FirebaseFirestore) : BooksReposit
   // Name of the Firestore collection that stores books
   private val collectionBooks = "Books"
 
-    private val books_ = MutableStateFlow<List<DataBook>>(emptyList())
-    val books: StateFlow<List<DataBook>> = books_.asStateFlow()
+  private val books_ = MutableStateFlow<List<DataBook>>(emptyList())
+  val books: StateFlow<List<DataBook>> = books_.asStateFlow()
 
-    // Selected todo, i.e the todo for the detail view
-    private val selectedBook_ = MutableStateFlow<DataBook?>(null)
-    open val selectedBook: StateFlow<DataBook?> = selectedBook_.asStateFlow()
-    // Use this code in editBookScreen and modify the editBookScreen structure if needed when incorporating in the app navigation
+  // Selected todo, i.e the todo for the detail view
+  private val selectedBook_ = MutableStateFlow<DataBook?>(null)
+  open val selectedBook: StateFlow<DataBook?> = selectedBook_.asStateFlow()
+  // Use this code in editBookScreen and modify the editBookScreen structure if needed when
+  // incorporating in the app navigation
 
-    // Initializes the repository by adding an auth state listener to Firebase Authentication
+  // Initializes the repository by adding an auth state listener to Firebase Authentication
   // If the user is authenticated, it triggers the OnSuccess callback
   override fun init(OnSucess: () -> Unit) {
     Firebase.auth.addAuthStateListener {
@@ -60,28 +61,29 @@ class BooksFirestoreRepository(private val db: FirebaseFirestore) : BooksReposit
   // New verification and Log have been added to help debuging
   // Calls OnSuccess if the operation is successful, otherwise onFailure with the exception
   override fun addBook(dataBook: DataBook, OnSucess: () -> Unit, onFailure: (Exception) -> Unit) {
-      // Check if essential fields are non-null before attempting to save
-      if (dataBook.title.isBlank() || dataBook.author.isNullOrBlank() || dataBook.isbn.isNullOrBlank()) {
-          val exception = IllegalArgumentException("Missing required book fields.")
-          Log.e("BooksFirestoreRepository", "Failed to add book: ${exception.message}")
-          onFailure(exception)
-          return
-      }
+    // Check if essential fields are non-null before attempting to save
+    if (dataBook.title.isBlank() ||
+        dataBook.author.isNullOrBlank() ||
+        dataBook.isbn.isNullOrBlank()) {
+      val exception = IllegalArgumentException("Missing required book fields.")
+      Log.e("BooksFirestoreRepository", "Failed to add book: ${exception.message}")
+      onFailure(exception)
+      return
+    }
 
-      Log.d("BooksFirestoreRepository", "Attempting to add book: ${dataBook.title}")
+    Log.d("BooksFirestoreRepository", "Attempting to add book: ${dataBook.title}")
 
-      // Attempt to add book to Firestore
-      performFirestoreOperation(
-          db.collection(collectionBooks).document(dataBook.uuid.toString()).set(dataBook),
-          {
-              Log.d("BooksFirestoreRepository", "Book added successfully: ${dataBook.title}")
-              OnSucess()
-          },
-          { e ->
-              Log.e("BooksFirestoreRepository", "Failed to add book: ${e.message}", e)
-              onFailure(e)
-          }
-      )
+    // Attempt to add book to Firestore
+    performFirestoreOperation(
+        db.collection(collectionBooks).document(dataBook.uuid.toString()).set(dataBook),
+        {
+          Log.d("BooksFirestoreRepository", "Book added successfully: ${dataBook.title}")
+          OnSucess()
+        },
+        { e ->
+          Log.e("BooksFirestoreRepository", "Failed to add book: ${e.message}", e)
+          onFailure(e)
+        })
   }
   // Updates an existing book in Firestore by replacing the document with the same uuid
   // Uses performFirestoreOperation to handle success and failure
