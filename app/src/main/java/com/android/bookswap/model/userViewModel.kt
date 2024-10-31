@@ -27,10 +27,20 @@ open class UserViewModel(var email: String) : ViewModel() {
       latitude: Double = dataUser.latitude,
       longitude: Double = dataUser.longitude,
       picURL: String = dataUser.profilePictureUrl,
-      bookList : List<UUID> = dataUser.bookList
+      bookList: List<UUID> = dataUser.bookList
   ) {
     updateUser(
-        DataUser(greeting, firstName, lastName, email, phone, latitude, longitude, picURL, uid, bookList))
+        DataUser(
+            greeting,
+            firstName,
+            lastName,
+            email,
+            phone,
+            latitude,
+            longitude,
+            picURL,
+            uid,
+            bookList))
   }
 
   fun updateUser(newDataUser: DataUser) {
