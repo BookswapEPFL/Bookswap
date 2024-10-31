@@ -14,10 +14,10 @@ import com.android.bookswap.data.DataBook
 import com.android.bookswap.ui.books.BookProfileScreen
 import com.android.bookswap.ui.navigation.NavigationActions
 import java.util.UUID
+import io.mockk.mockk
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.Mockito.mock
 
 class BookProfileScreenTest {
 
@@ -39,7 +39,7 @@ class BookProfileScreenTest {
 
   @Before
   fun setUp() {
-    mockNavController = mock(NavigationActions::class.java)
+    mockNavController = mockk()
   }
 
   @Test
