@@ -254,7 +254,7 @@ class MapScreenTest {
     }
     composeTestRule.onNodeWithTag("mapBoxMarkerListBox").assertIsDisplayed()
     composeTestRule.onAllNodesWithTag("mapBoxMarkerListBox").assertCountEquals(1)
-    composeTestRule.onNodeWithTag("mapBoxMarkerListBoxTitle").assertTextContains("Book 3")
+    composeTestRule.onNodeWithTag("mapBoxMarkerListBoxTitle").assertTextContains("Book 1")
   }
 
   @Test
