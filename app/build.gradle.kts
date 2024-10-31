@@ -37,16 +37,6 @@ android {
         manifestPlaceholders["MAPS_API_KEY"] = mapsApiKey
     }
 
-    // Signing configuration for release builds
-    signingConfigs {
-        create("release") { // Use 'create' method to define the signing configuration
-            storeFile = file("keyStore.jks") // Reference the keystore file
-            storePassword = System.getenv("RELEASE_KEYSTORE_PASSWORD") // Read from GitHub Secrets
-            keyAlias = System.getenv("RELEASE_KEYSTORE_ALIAS") // Read from GitHub Secrets
-            keyPassword = System.getenv("RELEASE_KEY_PASSWORD") // Read from GitHub Secrets
-        }
-    }
-
     buildTypes {
         release {
             if (System.getenv("CI") != null || System.getenv("GITHUB_ACTIONS") != null) {
