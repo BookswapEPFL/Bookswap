@@ -17,12 +17,23 @@ import androidx.compose.runtime.mutableStateOf
 class DefaultGeolocation: IGeolocation {
     override val latitude = mutableStateOf(0.0)
     override val longitude = mutableStateOf(0.0)
+    private val isRunning = mutableStateOf(false)
 
     override fun startLocationUpdates() {
+        isRunning.value = true
         Log.d("DefaultGeolocation", "Using default geolocation start")
     }
 
     override fun stopLocationUpdates() {
+        isRunning.value = false
         Log.d("DefaultGeolocation", "Using default geolocation stop")
+    }
+    fun moveLocation(latitude: Double, longitude: Double) {
+        if (isRunning.value) {
+        this.latitude.value = latitude
+        this.longitude.value = longitude}
+        else{
+            Log.d("DefaultGeolocation", "Location updates are not running")
+        }
     }
 }

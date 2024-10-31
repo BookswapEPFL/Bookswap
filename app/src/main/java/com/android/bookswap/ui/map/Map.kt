@@ -38,6 +38,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.SemanticsPropertyKey
+import androidx.compose.ui.semantics.SemanticsPropertyReceiver
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -50,6 +53,7 @@ import com.android.bookswap.ui.navigation.List_Navigation_Bar_Destinations
 import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.navigation.Screen
 import com.android.bookswap.ui.theme.ColorVariable
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.*
@@ -58,6 +62,9 @@ import kotlin.math.roundToInt
 import kotlinx.coroutines.launch
 
 const val INIT_ZOOM = 10F
+
+val CameraPositionKey = SemanticsPropertyKey<CameraPositionState>("CameraPosition")
+var SemanticsPropertyReceiver.cameraPosition by CameraPositionKey
 
 /**
  * Composable function to display a map with user locations and associated book information.
@@ -156,9 +163,17 @@ fun MapScreen(
       content = { pd ->
         GoogleMap(
             onMapClick = { mutableStateSelectedUser = null },
-            modifier = Modifier.fillMaxSize().padding(pd).testTag("mapGoogleMap"),
+            modifier = Modifier.fillMaxSize().padding(pd).testTag("mapGoogleMap").semantics { cameraPosition = cameraPositionState },
             cameraPositionState = cameraPositionState,
         ) {
+            // Marker for user's current location
+            if (!latitude.isNaN() && !longitude.isNaN()) {
+                Marker(
+                    state = MarkerState(position = LatLng(latitude, longitude)),
+                    title = "Your Location",
+                    icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)
+                )
+            }
           filteredUsers
               .filter { !it.longitude.isNaN() && !it.latitude.isNaN() && it.listBook.isNotEmpty() }
               .forEach { item ->
