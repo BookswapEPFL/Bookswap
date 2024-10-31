@@ -3,7 +3,6 @@ package com.android.bookswap.ui.books.edit
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -110,7 +109,7 @@ fun EditBookScreen(
             // .align(Alignment.CenterHorizontally)
             verticalArrangement = Arrangement.spacedBy(ELEMENT_SPACING)) {
               // Title Edit Field
-            item {
+              item {
                 OutlinedTextField(
                     value = title,
                     onValueChange = { title = it },
@@ -118,51 +117,49 @@ fun EditBookScreen(
                     placeholder = { Text("Enter the book title") },
                     modifier = Modifier.fillMaxWidth().testTag("inputBookTitle"),
                     colors =
-                    TextFieldDefaults.outlinedTextFieldColors(
-                        containerColor = ColorVariable.Secondary,
-                        focusedBorderColor = Color.Black,
-                        unfocusedBorderColor = Color.Black
-                    )
-                )
-            }
+                        TextFieldDefaults.outlinedTextFieldColors(
+                            containerColor = ColorVariable.Secondary,
+                            focusedBorderColor = Color.Black,
+                            unfocusedBorderColor = Color.Black))
+              }
 
-            item{
-              // Genre Dropdown Edit Field
-              ExposedDropdownMenuBox(
-                  expanded = expanded,
-                  onExpandedChange = { expanded = !expanded },
-                  modifier = Modifier.fillMaxWidth().testTag("GenreDropdown")) {
-                    OutlinedTextField(
-                        value = selectedGenre?.Genre ?: "Select Genre",
-                        onValueChange = {},
-                        label = { Text("Genre") },
-                        readOnly = true,
-                        trailingIcon = {
-                          ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
-                        },
-                        modifier = Modifier.menuAnchor().testTag("SelectedGenre"),
-                        colors =
-                            TextFieldDefaults.outlinedTextFieldColors(
-                                containerColor = ColorVariable.Secondary,
-                                focusedBorderColor = Color.Black,
-                                unfocusedBorderColor = Color.Black))
-                    ExposedDropdownMenu(
-                        expanded = expanded, onDismissRequest = { expanded = false }) {
-                          BookGenres.values().forEach { genre ->
-                            DropdownMenuItem(
-                                text = { Text(text = genre.Genre) },
-                                modifier = Modifier.testTag("GenreDropdownItem_${genre.Genre}"),
-                                onClick = {
-                                  selectedGenre = genre
-                                  genres = listOf(genre) // Update genres list with selected genre
-                                  expanded = false
-                                })
+              item {
+                // Genre Dropdown Edit Field
+                ExposedDropdownMenuBox(
+                    expanded = expanded,
+                    onExpandedChange = { expanded = !expanded },
+                    modifier = Modifier.fillMaxWidth().testTag("GenreDropdown")) {
+                      OutlinedTextField(
+                          value = selectedGenre?.Genre ?: "Select Genre",
+                          onValueChange = {},
+                          label = { Text("Genre") },
+                          readOnly = true,
+                          trailingIcon = {
+                            ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+                          },
+                          modifier = Modifier.menuAnchor().testTag("SelectedGenre"),
+                          colors =
+                              TextFieldDefaults.outlinedTextFieldColors(
+                                  containerColor = ColorVariable.Secondary,
+                                  focusedBorderColor = Color.Black,
+                                  unfocusedBorderColor = Color.Black))
+                      ExposedDropdownMenu(
+                          expanded = expanded, onDismissRequest = { expanded = false }) {
+                            BookGenres.values().forEach { genre ->
+                              DropdownMenuItem(
+                                  text = { Text(text = genre.Genre) },
+                                  modifier = Modifier.testTag("GenreDropdownItem_${genre.Genre}"),
+                                  onClick = {
+                                    selectedGenre = genre
+                                    genres = listOf(genre) // Update genres list with selected genre
+                                    expanded = false
+                                  })
+                            }
                           }
-                        }
-                  }
-            }
+                    }
+              }
 
-            item {
+              item {
                 // Author Edit Field
                 OutlinedTextField(
                     value = author,
@@ -171,15 +168,13 @@ fun EditBookScreen(
                     placeholder = { Text("Enter the author's name") },
                     modifier = Modifier.fillMaxWidth().testTag("inputBookAuthor"),
                     colors =
-                    TextFieldDefaults.outlinedTextFieldColors(
-                        containerColor = ColorVariable.Secondary,
-                        focusedBorderColor = Color.Black,
-                        unfocusedBorderColor = Color.Black
-                    )
-                )
-            }
+                        TextFieldDefaults.outlinedTextFieldColors(
+                            containerColor = ColorVariable.Secondary,
+                            focusedBorderColor = Color.Black,
+                            unfocusedBorderColor = Color.Black))
+              }
 
-            item {
+              item {
                 // Description Edit Field
                 OutlinedTextField(
                     value = description,
@@ -187,19 +182,17 @@ fun EditBookScreen(
                     label = { Text("Description") },
                     placeholder = { Text("Provide a description of the book") },
                     modifier =
-                    Modifier.fillMaxWidth()
-                        .height(DESCRIPTION_FIELD_HEIGHT)
-                        .testTag("inputBookDescription"),
+                        Modifier.fillMaxWidth()
+                            .height(DESCRIPTION_FIELD_HEIGHT)
+                            .testTag("inputBookDescription"),
                     colors =
-                    TextFieldDefaults.outlinedTextFieldColors(
-                        containerColor = ColorVariable.Secondary,
-                        focusedBorderColor = Color.Black,
-                        unfocusedBorderColor = Color.Black
-                    )
-                )
-            }
+                        TextFieldDefaults.outlinedTextFieldColors(
+                            containerColor = ColorVariable.Secondary,
+                            focusedBorderColor = Color.Black,
+                            unfocusedBorderColor = Color.Black))
+              }
 
-            item {
+              item {
                 // Rating Edit Field
                 OutlinedTextField(
                     value = rating,
@@ -208,13 +201,11 @@ fun EditBookScreen(
                     placeholder = { Text("Rate the book (e.g. 4.5)") },
                     modifier = Modifier.fillMaxWidth().testTag("inputBookRating"),
                     colors =
-                    TextFieldDefaults.outlinedTextFieldColors(
-                        containerColor = ColorVariable.Secondary,
-                        focusedBorderColor = Color.Black,
-                        unfocusedBorderColor = Color.Black
-                    )
-                )
-            }
+                        TextFieldDefaults.outlinedTextFieldColors(
+                            containerColor = ColorVariable.Secondary,
+                            focusedBorderColor = Color.Black,
+                            unfocusedBorderColor = Color.Black))
+              }
               // ISBN Edit Field
               /*OutlinedTextField(
                   value = isbn,
@@ -224,7 +215,7 @@ fun EditBookScreen(
                   modifier = Modifier.fillMaxWidth().testTag("inputBookISBN")
               )*/
               // Remove for now but could be added later
-            item {
+              item {
                 // Photo Edit Field
                 OutlinedTextField(
                     value = photo,
@@ -233,15 +224,13 @@ fun EditBookScreen(
                     placeholder = { Text("Enter a photo of the books") },
                     modifier = Modifier.testTag("inputBookPhoto").testTag("inputBookPhoto"),
                     colors =
-                    TextFieldDefaults.outlinedTextFieldColors(
-                        containerColor = ColorVariable.Secondary,
-                        focusedBorderColor = Color.Black,
-                        unfocusedBorderColor = Color.Black
-                    )
-                )
-            }
+                        TextFieldDefaults.outlinedTextFieldColors(
+                            containerColor = ColorVariable.Secondary,
+                            focusedBorderColor = Color.Black,
+                            unfocusedBorderColor = Color.Black))
+              }
 
-            item {
+              item {
                 // Language Edit Field
                 OutlinedTextField(
                     value = language,
@@ -250,92 +239,82 @@ fun EditBookScreen(
                     placeholder = { Text("In which language are the book") },
                     modifier = Modifier.testTag("inputBookLanguage").testTag("inputBookLanguage"),
                     colors =
-                    TextFieldDefaults.outlinedTextFieldColors(
-                        containerColor = ColorVariable.Secondary,
-                        focusedBorderColor = Color.Black,
-                        unfocusedBorderColor = Color.Black
-                    )
-                )
-            }
-            item {
-                Spacer(modifier = Modifier.height(BUTTON_SPACER_HEIGHT))
-            }
+                        TextFieldDefaults.outlinedTextFieldColors(
+                            containerColor = ColorVariable.Secondary,
+                            focusedBorderColor = Color.Black,
+                            unfocusedBorderColor = Color.Black))
+              }
+              item { Spacer(modifier = Modifier.height(BUTTON_SPACER_HEIGHT)) }
 
-            item {
+              item {
                 Button(
                     onClick = {
-                        try {
-                            if (title.isBlank())
-                                throw IllegalArgumentException("Title cannot be null or blank")
-                            if (author.isBlank())
-                                throw IllegalArgumentException("Author cannot be null or blank")
-                            if (description.isBlank())
-                                throw IllegalArgumentException("Description cannot be null or blank")
-                            if (rating.isBlank())
-                                throw IllegalArgumentException("Rating cannot be null or blank")
-                            if (photo.isBlank())
-                                throw IllegalArgumentException("Photo cannot be null or blank")
-                            if (language.isBlank())
-                                throw IllegalArgumentException("Language cannot be null or blank")
-                            if (book.isbn.isNullOrBlank())
-                                throw IllegalArgumentException("ISBN cannot be null or blank")
-                            if (genres.isEmpty()) throw IllegalArgumentException("Genres cannot be empty")
+                      try {
+                        if (title.isBlank())
+                            throw IllegalArgumentException("Title cannot be null or blank")
+                        if (author.isBlank())
+                            throw IllegalArgumentException("Author cannot be null or blank")
+                        if (description.isBlank())
+                            throw IllegalArgumentException("Description cannot be null or blank")
+                        if (rating.isBlank())
+                            throw IllegalArgumentException("Rating cannot be null or blank")
+                        if (photo.isBlank())
+                            throw IllegalArgumentException("Photo cannot be null or blank")
+                        if (language.isBlank())
+                            throw IllegalArgumentException("Language cannot be null or blank")
+                        if (book.isbn.isNullOrBlank())
+                            throw IllegalArgumentException("ISBN cannot be null or blank")
+                        if (genres.isEmpty())
+                            throw IllegalArgumentException("Genres cannot be empty")
 
-                            val updatedBook =
-                                createDataBook(
-                                    context = context,
-                                    uuid = book.uuid,
-                                    title = title,
-                                    author = author,
-                                    description = description,
-                                    ratingStr = rating,
-                                    photo = photo,
-                                    bookLanguageStr = language,
-                                    isbn = book.isbn,
-                                    genres = genres
-                                )
+                        val updatedBook =
+                            createDataBook(
+                                context = context,
+                                uuid = book.uuid,
+                                title = title,
+                                author = author,
+                                description = description,
+                                ratingStr = rating,
+                                photo = photo,
+                                bookLanguageStr = language,
+                                isbn = book.isbn,
+                                genres = genres)
 
-                            booksRepository.updateBook(
-                                updatedBook!!,
-                                OnSucess = { navigationActions.goBack() },
-                                onFailure = {
-                                    Toast.makeText(
-                                        context,
-                                        "Failed to update book.",
-                                        Toast.LENGTH_SHORT
-                                    )
-                                        .show()
-                                })
-                        } catch (e: Exception) {
-                            Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_SHORT)
-                                .show()
-                        }
+                        booksRepository.updateBook(
+                            updatedBook!!,
+                            OnSucess = { navigationActions.goBack() },
+                            onFailure = {
+                              Toast.makeText(context, "Failed to update book.", Toast.LENGTH_SHORT)
+                                  .show()
+                            })
+                      } catch (e: Exception) {
+                        Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
+                      }
                     },
                     modifier = Modifier.fillMaxWidth().testTag("bookSave").testTag("bookDelete"),
                     enabled = title.isNotBlank(),
-                    colors = ButtonDefaults.buttonColors(containerColor = ColorVariable.Primary)
-                ) {
-                    Text("Save", color = Color.White)
-                }
-            }
+                    colors = ButtonDefaults.buttonColors(containerColor = ColorVariable.Primary)) {
+                      Text("Save", color = Color.White)
+                    }
+              }
 
-            item {
-              Button(
-                  onClick = {
-                    booksRepository.deleteBooks(
-                        book.uuid.toString(),
-                        book,
-                        OnSucess = { navigationActions.goBack() },
-                        onFailure = {
-                          Toast.makeText(context, "Failed to delete book.", Toast.LENGTH_SHORT)
-                              .show()
-                        })
-                  },
-                  modifier = Modifier.fillMaxWidth().testTag("bookDelete"),
-                  colors = ButtonDefaults.buttonColors(containerColor = ColorVariable.Primary)) {
-                    Text("Delete", color = Color.White)
-                  }
+              item {
+                Button(
+                    onClick = {
+                      booksRepository.deleteBooks(
+                          book.uuid.toString(),
+                          book,
+                          OnSucess = { navigationActions.goBack() },
+                          onFailure = {
+                            Toast.makeText(context, "Failed to delete book.", Toast.LENGTH_SHORT)
+                                .show()
+                          })
+                    },
+                    modifier = Modifier.fillMaxWidth().testTag("bookDelete"),
+                    colors = ButtonDefaults.buttonColors(containerColor = ColorVariable.Primary)) {
+                      Text("Delete", color = Color.White)
+                    }
+              }
             }
-        }
       })
 }
