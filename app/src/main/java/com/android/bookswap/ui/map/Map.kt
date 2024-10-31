@@ -99,8 +99,9 @@ fun MapScreen(
     }
     LaunchedEffect(latitude, longitude) {
         if (!latitude.isNaN() && !longitude.isNaN()) {
+            val currentZoom = cameraPositionState.position.zoom
             cameraPositionState.position = CameraPosition.fromLatLngZoom(
-                LatLng(latitude, longitude), 12f
+                LatLng(latitude, longitude), currentZoom
             )
         }
     }
