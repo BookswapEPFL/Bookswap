@@ -96,15 +96,17 @@ fun MapScreen(
     // Start location updates
     LaunchedEffect(Unit) {
         geolocation.startLocationUpdates()
+        cameraPositionState.position = CameraPosition.fromLatLngZoom(
+            LatLng(latitude, longitude), INIT_ZOOM)
     }
-    LaunchedEffect(latitude, longitude) {
+    /*LaunchedEffect(latitude, longitude) {
         if (!latitude.isNaN() && !longitude.isNaN()) {
             val currentZoom = cameraPositionState.position.zoom
             cameraPositionState.position = CameraPosition.fromLatLngZoom(
                 LatLng(latitude, longitude), currentZoom
             )
         }
-    }
+    }*/
     // Stop location updates when the screen is disposed
     DisposableEffect(Unit) {
         onDispose {
