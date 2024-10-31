@@ -43,6 +43,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.bookswap.data.DataBook
 import com.android.bookswap.model.map.BookFilter
+import com.android.bookswap.model.map.DefaultGeolocation
+import com.android.bookswap.model.map.IGeolocation
 import com.android.bookswap.ui.navigation.BottomNavigationMenu
 import com.android.bookswap.ui.navigation.List_Navigation_Bar_Destinations
 import com.android.bookswap.ui.navigation.NavigationActions
@@ -70,18 +72,37 @@ const val INIT_ZOOM = 10F
  *   This user’s info window will be shown if not null.
  * @param navigationActions An instance of [NavigationActions] to handle navigation actions.
  * @param bookFilter An instance of [BookFilter] to filter the books displayed on the map.
+ * @param geolocation An instance of [IGeolocation] to get the user's current location.
  */
 @Composable
 fun MapScreen(
     listUser: List<TempUser>,
     selectedUser: TempUser? = null,
     navigationActions: NavigationActions,
-    bookFilter: BookFilter
+    bookFilter: BookFilter,
+    geolocation: IGeolocation = DefaultGeolocation(),
 ) {
-
-  val cameraPositionState = rememberCameraPositionState {
-    position = CameraPosition.fromLatLngZoom(LatLng(0.0, 0.0), INIT_ZOOM) // Initial camera position
-  }
+    val cameraPositionState = rememberCameraPositionState()
+  // Get the user's current location
+    val latitude by remember { geolocation.latitude }
+    val longitude by remember { geolocation.longitude }
+    // Start location updates
+    LaunchedEffect(Unit) {
+        geolocation.startLocationUpdates()
+    }
+    LaunchedEffect(latitude, longitude) {
+        if (!latitude.isNaN() && !longitude.isNaN()) {
+            cameraPositionState.position = CameraPosition.fromLatLngZoom(
+                LatLng(latitude, longitude), 12f
+            )
+        }
+    }
+    // Stop location updates when the screen is disposed
+    DisposableEffect(Unit) {
+        onDispose {
+            geolocation.stopLocationUpdates()
+        }
+    }
 
   var mutableStateSelectedUser by remember { mutableStateOf(selectedUser) }
   var markerScreenPosition by remember { mutableStateOf<Offset?>(null) }
