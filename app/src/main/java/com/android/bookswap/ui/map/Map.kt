@@ -114,7 +114,10 @@ fun MapScreen(
   val filteredBooks =
       remember(genresFilter, languagesFilter, listAllBooks) { bookFilter.filterBooks(listAllBooks) }
 
-  val filteredUsers = userBooksList.filter { it.books.any { book -> filteredBooks.contains(book) } }
+  val filteredUsers =
+      userBooksList.map {
+        it.copy(books = it.books.filter { book -> filteredBooks.contains(book) })
+      }
 
   // compute the position of the marker on the screen given the camera position and the marker's
   // position on the map
@@ -184,7 +187,7 @@ fun MapScreen(
         markerScreenPosition?.let { screenPos ->
           if (mutableStateSelectedUser >= 0 &&
               mutableStateSelectedUser < filteredUsers.size &&
-              userBooksList[mutableStateSelectedUser].books.isNotEmpty()) {
+              filteredUsers[mutableStateSelectedUser].books.isNotEmpty()) {
             CustomInfoWindow(
                 modifier =
                     Modifier.offset {
