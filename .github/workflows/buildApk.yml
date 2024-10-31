@@ -57,6 +57,6 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: apk-signed.apk
-          path: ${{ ANDROID_SIGNED_FILE }}
+          path: ${{ env.ANDROID_SIGNED_FILE }}
           if-no-files-found: error
           overwrite: true
