@@ -22,6 +22,9 @@ import com.android.bookswap.data.source.network.MessageFirestoreSource
 import com.android.bookswap.model.chat.MessageBox
 import com.android.bookswap.model.chat.PermissionHandler
 import com.android.bookswap.model.map.BookFilter
+import com.android.bookswap.model.map.DefaultGeolocation
+import com.android.bookswap.model.map.Geolocation
+import com.android.bookswap.model.map.IGeolocation
 import com.android.bookswap.resources.C
 import com.android.bookswap.ui.authentication.SignInScreen
 import com.android.bookswap.ui.books.add.AddISBNScreen
@@ -57,13 +60,16 @@ class MainActivity : ComponentActivity() {
     val messageRepository = MessageFirestoreSource(db)
     val bookRepository = BooksFirestoreRepository(db)
 
+    // Initialize the geolocation
+    val geolocation = Geolocation(this)
+
     setContent {
       BookSwapAppTheme {
         // A surface container using the 'background' color from the theme
         Surface(
             modifier = Modifier.fillMaxSize().semantics { testTag = C.Tag.main_screen_container },
             color = MaterialTheme.colorScheme.background) {
-              BookSwapApp(messageRepository, bookRepository)
+              BookSwapApp(messageRepository, bookRepository, geolocation = geolocation)
             }
       }
     }
@@ -73,7 +79,8 @@ class MainActivity : ComponentActivity() {
   fun BookSwapApp(
       messageRepository: MessageFirestoreSource,
       bookRepository: BooksFirestoreRepository,
-      startDestination: String = Route.AUTH
+      startDestination: String = Route.AUTH,
+      geolocation: IGeolocation = DefaultGeolocation()
   ) {
     val navController = rememberNavController()
     val navigationActions = NavigationActions(navController)
@@ -103,7 +110,11 @@ class MainActivity : ComponentActivity() {
       }
       navigation(startDestination = Screen.MAP, route = Route.MAP) {
         composable(Screen.MAP) {
-          MapScreen(user, navigationActions = navigationActions, bookFilter = bookFilter)
+          MapScreen(
+              user,
+              navigationActions = navigationActions,
+              bookFilter = bookFilter,
+              geolocation = geolocation)
         }
         composable(Screen.FILTER) { FilterMapScreen(navigationActions, bookFilter) }
       }
