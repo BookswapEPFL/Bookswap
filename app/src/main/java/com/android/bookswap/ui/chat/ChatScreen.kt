@@ -75,7 +75,14 @@ fun ChatScreen(
     while (true) {
       messageRepository.getMessages { result ->
         if (result.isSuccess) {
-          messages = result.getOrThrow().sortedBy { it.timestamp }
+          messages =
+              result
+                  .getOrThrow()
+                  .filter {
+                    (it.senderId == currentUserId && it.receiverId == otherUserId) ||
+                        (it.senderId == otherUserId && it.receiverId == currentUserId)
+                  }
+                  .sortedBy { it.timestamp }
           Log.d("ChatScreen", "Fetched messages: $messages")
         } else {
           Log.e("ChatScreen", "Failed to fetch messages: ${result.exceptionOrNull()?.message}")

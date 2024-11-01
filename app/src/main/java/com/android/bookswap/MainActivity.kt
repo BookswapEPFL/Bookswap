@@ -39,9 +39,7 @@ import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.navigation.Route
 import com.android.bookswap.ui.navigation.Screen
 import com.android.bookswap.ui.theme.BookSwapAppTheme
-import com.google.firebase.Firebase
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.firestore
 import java.util.UUID
 
 class MainActivity : ComponentActivity() {
@@ -85,18 +83,19 @@ class MainActivity : ComponentActivity() {
     val navController = rememberNavController()
     val navigationActions = NavigationActions(navController)
     val bookFilter = BookFilter()
-    val bookfire = BooksFirestoreRepository(Firebase.firestore)
 
     val placeHolder =
-        List(12) {
-          MessageBox(
-              "Contact ${it + 1}",
-              "Test message $it test for the feature of ellipsis in the message",
-              "01.01.24")
-        }
-
-    val userid1 = "user123"
-    val userid2 = "user124"
+        listOf(
+            MessageBox(
+                contactName = "user124",
+                message = "Welcome message for user124",
+                date = "01.01.24")) +
+            List(6) {
+              MessageBox(
+                  contactName = "Contact ${it + 1}",
+                  message = "Test message $it test for the feature of ellipsis in the message",
+                  date = "01.01.24")
+            }
 
     NavHost(navController = navController, startDestination = startDestination) {
       navigation(startDestination = Screen.AUTH, route = Route.AUTH) {
@@ -104,8 +103,10 @@ class MainActivity : ComponentActivity() {
       }
       navigation(startDestination = Screen.CHATLIST, route = Route.CHAT) {
         composable(Screen.CHATLIST) { ListChatScreen(placeHolder, navigationActions) }
-        composable(Screen.CHAT) {
-          ChatScreen(messageRepository, userid1, userid2, navigationActions)
+        composable("${Screen.CHAT}/{user1}/{user2}") { backStackEntry ->
+          val user1 = backStackEntry.arguments?.getString("user1") ?: ""
+          val user2 = backStackEntry.arguments?.getString("user2") ?: ""
+          ChatScreen(messageRepository, user1, user2, navigationActions)
         }
       }
       navigation(startDestination = Screen.MAP, route = Route.MAP) {
