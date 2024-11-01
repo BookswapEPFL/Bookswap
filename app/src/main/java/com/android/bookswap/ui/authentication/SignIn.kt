@@ -64,7 +64,7 @@ fun SignInScreen(navigationActions: NavigationActions) { // Add this when naviga
   val token = stringResource(R.string.default_web_client_id)
 
   Scaffold(
-      modifier = Modifier.fillMaxSize(),
+      modifier = Modifier.fillMaxSize().testTag("SignInScreen"),
       containerColor = ColorVariable.BackGround, // Set the background color
       content = { padding ->
         Column(

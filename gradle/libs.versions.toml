@@ -41,10 +41,10 @@ playServicesMaps = "19.0.0"
 espressoIntents = "3.6.1"
 navigationCompose = "2.8.2"
 volley = "1.2.1" # HTTP request
-json = "20240303" #Json parsing
+json = "20240303"
+firebaseMessagingKtx = "24.0.2" #Json parsing
 mapsCompose = "4.3.3"
 mapsComposeUtils = "4.3.0"
-firebaseMessagingKtx = "24.0.2"
 
 byteBuddy= "1.15.4"
 
@@ -101,11 +101,12 @@ androidx-navigation-compose = { group = "androidx.navigation", name = "navigatio
 androidx-espresso-intents = { group = "androidx.test.espresso", name = "espresso-intents", version.ref = "espressoIntents" }
 volley = { module = "com.android.volley:volley", version.ref = "volley" }
 json = { module = "org.json:json", version.ref = "json" }
+firebase-messaging-ktx = { group = "com.google.firebase", name = "firebase-messaging-ktx", version.ref = "firebaseMessagingKtx" }
 
 maps-compose = { module = "com.google.maps.android:maps-compose", version.ref = "mapsCompose" }
 maps-compose-utils = { module = "com.google.maps.android:maps-compose-utils", version.ref = "mapsComposeUtils" }
-firebase-messaging-ktx = { group = "com.google.firebase", name = "firebase-messaging-ktx", version.ref = "firebaseMessagingKtx" }
-byteBuddy = { module = "net.bytebuddy:byte-buddy", version.ref = "byteBuddy" }
+
+
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
