@@ -6,6 +6,7 @@ import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
 import com.android.bookswap.data.BookGenres
 import com.android.bookswap.data.BookLanguages
 import com.android.bookswap.data.DataBook
@@ -74,26 +75,16 @@ class EditBookScreenTest {
   }
 
   @Test
-  fun displayEditSaveComponent() {
-    composeTestRule.setContent { EditBookScreen(booksRepository, navigationActions, sampleBook) }
-    composeTestRule.onNodeWithTag("bookSave").assertIsDisplayed()
-  }
-
-  @Test
   fun displayEditSaveValueComponent() {
     composeTestRule.setContent { EditBookScreen(booksRepository, navigationActions, sampleBook) }
+    composeTestRule.onNodeWithTag("bookSave").performScrollTo().assertIsDisplayed()
     composeTestRule.onNodeWithTag("bookSave").assertTextEquals("Save")
-  }
-
-  @Test
-  fun displayEdiDeleteComponent() {
-    composeTestRule.setContent { EditBookScreen(booksRepository, navigationActions, sampleBook) }
-    composeTestRule.onNodeWithTag("bookDelete").assertIsDisplayed()
   }
 
   @Test
   fun displayEditDeleteValueComponent() {
     composeTestRule.setContent { EditBookScreen(booksRepository, navigationActions, sampleBook) }
+    composeTestRule.onNodeWithTag("bookDelete").performScrollTo().assertIsDisplayed()
     composeTestRule.onNodeWithTag("bookDelete").assertTextEquals("Delete")
   }
 
