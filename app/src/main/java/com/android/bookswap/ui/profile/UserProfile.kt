@@ -30,7 +30,6 @@ import androidx.compose.ui.unit.dp
 import com.android.bookswap.model.UserViewModel
 import com.android.bookswap.ui.components.ButtonComponent
 import com.android.bookswap.ui.theme.*
-import com.android.bookswap.user
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
