@@ -19,7 +19,6 @@ import com.android.bookswap.data.BookLanguages
 import com.android.bookswap.data.DataBook
 import com.android.bookswap.data.source.network.BooksFirestoreRepository
 import com.android.bookswap.data.source.network.MessageFirestoreSource
-import com.android.bookswap.model.chat.ChatViewModel
 import com.android.bookswap.model.chat.MessageBox
 import com.android.bookswap.model.map.BookFilter
 import com.android.bookswap.resources.C
@@ -36,13 +35,19 @@ import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.navigation.Route
 import com.android.bookswap.ui.navigation.Screen
 import com.android.bookswap.ui.theme.BookSwapAppTheme
-import com.google.firebase.Firebase
-import com.google.firebase.firestore.firestore
+import com.google.firebase.firestore.FirebaseFirestore
 import java.util.UUID
 
 class MainActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
+
+    // Initialize Firebase Firestore
+    val db = FirebaseFirestore.getInstance()
+
+    // Create the MessageFirestoreSource object
+    val messageRepository = MessageFirestoreSource(db)
+    val bookRepository = BooksFirestoreRepository(db)
 
     setContent {
       BookSwapAppTheme {
@@ -50,10 +55,7 @@ class MainActivity : ComponentActivity() {
         Surface(
             modifier = Modifier.fillMaxSize().semantics { testTag = C.Tag.main_screen_container },
             color = MaterialTheme.colorScheme.background) {
-              BookSwapApp(
-                  MessageFirestoreSource(Firebase.firestore),
-                  BooksFirestoreRepository(Firebase.firestore),
-                  startDestination = Route.AUTH)
+              BookSwapApp(messageRepository, bookRepository)
             }
       }
     }
@@ -68,8 +70,7 @@ class MainActivity : ComponentActivity() {
     val navController = rememberNavController()
     val navigationActions = NavigationActions(navController)
     val bookFilter = BookFilter()
-    val bookfire = BooksFirestoreRepository(Firebase.firestore)
-    val chatViewModel = ChatViewModel(messageRepository)
+
     val placeHolder =
         listOf(
             MessageBox(
@@ -83,77 +84,74 @@ class MainActivity : ComponentActivity() {
                   date = "01.01.24")
             }
 
-    val userid1 = "user123"
-    val userid2 = "user124"
-
     NavHost(navController = navController, startDestination = startDestination) {
       navigation(startDestination = Screen.AUTH, route = Route.AUTH) {
-        composable(Screen.AUTH) { SignInScreen(navigationActions) } // *Todo*/}
+        composable(Screen.AUTH) { SignInScreen(navigationActions) }
       }
       navigation(startDestination = Screen.CHATLIST, route = Route.CHAT) {
-        composable(Screen.CHATLIST) {
-          ListChatScreen(
-              navController = navController, placeHolder, chatViewModel, navigationActions)
+        composable(Screen.CHATLIST) { ListChatScreen(placeHolder, navigationActions) }
+        composable("${Screen.CHAT}/{user1}/{user2}") { backStackEntry ->
+          val user1 = backStackEntry.arguments?.getString("user1") ?: ""
+          val user2 = backStackEntry.arguments?.getString("user2") ?: ""
+          ChatScreen(messageRepository, user1, user2, navigationActions)
         }
-        composable("chatScreen/{userId}") { backStackEntry ->
-          val userId = backStackEntry.arguments?.getString("userId")
-          userId?.let { ChatScreen(userid1, chatViewModel, navigationActions) }
+        navigation(startDestination = Screen.MAP, route = Route.MAP) {
+          composable(Screen.MAP) {
+            MapScreen(user, navigationActions = navigationActions, bookFilter = bookFilter)
+          }
+          composable(Screen.FILTER) { FilterMapScreen(navigationActions, bookFilter) }
         }
-      }
-      navigation(startDestination = Screen.MAP, route = Route.MAP) {
-        composable(Screen.MAP) {
-          MapScreen(user, navigationActions = navigationActions, bookFilter = bookFilter)
+        navigation(startDestination = Screen.NEWBOOK, route = Route.NEWBOOK) {
+          composable(Screen.NEWBOOK) { BookAdditionChoiceScreen(navigationActions) }
+          composable(Screen.ADD_BOOK_MANUALLY) {
+            AddToBookScreen(bookRepository, navigationActions)
+          }
+          composable(Screen.ADD_BOOK_SCAN) { /*Todo*/}
+          composable(Screen.ADD_BOOK_ISBN) { AddISBNScreen(navigationActions, bookRepository) }
         }
-        composable(Screen.FILTER) { FilterMapScreen(navigationActions, bookFilter) }
-      }
-      navigation(startDestination = Screen.NEWBOOK, route = Route.NEWBOOK) {
-        composable(Screen.NEWBOOK) { BookAdditionChoiceScreen(navigationActions) }
-        composable(Screen.ADD_BOOK_MANUALLY) { AddToBookScreen(bookRepository, navigationActions) }
-        composable(Screen.ADD_BOOK_SCAN) { /*Todo*/}
-        composable(Screen.ADD_BOOK_ISBN) { AddISBNScreen(navigationActions, bookRepository) }
       }
     }
   }
-}
 
-// Temporary user list for the map as it is not yet linked to the database.
-// Better to see how the map screen should look like at the end.
-// Need to be removed in the future.
-val user =
-    listOf(
-        TempUser(
-            latitude = 0.0,
-            longitude = 0.0,
-            listBook =
-                listOf(
-                    DataBook(
-                        uuid = UUID.randomUUID(),
-                        title = "Book 1",
-                        author = "Author 1",
-                        description = "Description of Book 1",
-                        rating = 5,
-                        photo = null,
-                        language = BookLanguages.ENGLISH,
-                        isbn = null,
-                        genres = listOf(BookGenres.FANTASY)),
-                    DataBook(
-                        uuid = UUID.randomUUID(),
-                        title = "Book 2",
-                        author = "Author 2",
-                        description = "Description of Book 2",
-                        rating = 4,
-                        photo = null,
-                        language = BookLanguages.FRENCH,
-                        isbn = null,
-                        genres = listOf(BookGenres.FICTION)),
-                    DataBook(
-                        uuid = UUID.randomUUID(),
-                        title = "Book 3",
-                        author = "Author 3",
-                        description = "Description of Book 3",
-                        rating = null,
-                        photo = null,
-                        language = BookLanguages.GERMAN,
-                        isbn = null,
-                        genres = listOf(BookGenres.SCIENCEFICTION, BookGenres.AUTOBIOGRAPHY)),
-                )))
+  // Temporary user list for the map as it is not yet linked to the database.
+  // Better to see how the map screen should look like at the end.
+  // Need to be removed in the future.
+  val user =
+      listOf(
+          TempUser(
+              latitude = 0.0,
+              longitude = 0.0,
+              listBook =
+                  listOf(
+                      DataBook(
+                          uuid = UUID.randomUUID(),
+                          title = "Book 1",
+                          author = "Author 1",
+                          description = "Description of Book 1",
+                          rating = 5,
+                          photo = null,
+                          language = BookLanguages.ENGLISH,
+                          isbn = null,
+                          genres = listOf(BookGenres.FANTASY)),
+                      DataBook(
+                          uuid = UUID.randomUUID(),
+                          title = "Book 2",
+                          author = "Author 2",
+                          description = "Description of Book 2",
+                          rating = 4,
+                          photo = null,
+                          language = BookLanguages.FRENCH,
+                          isbn = null,
+                          genres = listOf(BookGenres.FICTION)),
+                      DataBook(
+                          uuid = UUID.randomUUID(),
+                          title = "Book 3",
+                          author = "Author 3",
+                          description = "Description of Book 3",
+                          rating = null,
+                          photo = null,
+                          language = BookLanguages.GERMAN,
+                          isbn = null,
+                          genres = listOf(BookGenres.SCIENCEFICTION, BookGenres.AUTOBIOGRAPHY)),
+                  )))
+}

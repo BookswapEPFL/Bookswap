@@ -48,13 +48,10 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import com.android.bookswap.data.DataMessage
-import com.android.bookswap.data.source.network.MessageFirestoreSource
-import com.android.bookswap.model.chat.ChatViewModel
+import com.android.bookswap.data.repository.MessageRepository
 import com.android.bookswap.ui.components.BackButtonComponent
 import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.theme.ColorVariable
-import com.google.firebase.Firebase
-import com.google.firebase.firestore.firestore
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -63,8 +60,9 @@ import kotlinx.coroutines.delay
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChatScreen(
+    messageRepository: MessageRepository,
     currentUserId: String, // To identify the current user for aligning messages
-    viewModel: ChatViewModel,
+    otherUserId: String,
     navController: NavigationActions
 ) {
   val context = LocalContext.current
@@ -72,32 +70,33 @@ fun ChatScreen(
   var newMessageText by remember { mutableStateOf(TextFieldValue("")) }
   var selectedMessage by remember { mutableStateOf<DataMessage?>(null) }
   var updateActive by remember { mutableStateOf(false) }
-  // var listenerRegistration: ListenerRegistration?
-  LaunchedEffect(Unit) {
-      while (true) {
-          viewModel.givemessagerepo().getMessages { result ->
-              if (result.isSuccess) {
-                  messages = result.getOrThrow()
-                      .filter {
-                          (it.senderId == currentUserId && it.receiverId ==viewModel.getOtherUserId()) ||
-                                  (it.senderId == viewModel.getOtherUserId() && it.receiverId == currentUserId)
-                      }
-                      .sortedBy { it.timestamp }
-                  Log.d("ChatScreen", "Fetched messages: $messages")
-              } else {
-                  Log.e("ChatScreen", "Failed to fetch messages: ${result.exceptionOrNull()?.message}")
-              }
-          }
-          delay(2000) // Delay for 2 seconds
-      }
-  }
 
+  LaunchedEffect(Unit) {
+    while (true) {
+      messageRepository.getMessages { result ->
+        if (result.isSuccess) {
+          messages =
+              result
+                  .getOrThrow()
+                  .filter {
+                    (it.senderId == currentUserId && it.receiverId == otherUserId) ||
+                        (it.senderId == otherUserId && it.receiverId == currentUserId)
+                  }
+                  .sortedBy { it.timestamp }
+          Log.d("ChatScreen", "Fetched messages: $messages")
+        } else {
+          Log.e("ChatScreen", "Failed to fetch messages: ${result.exceptionOrNull()?.message}")
+        }
+      }
+      delay(2000) // Delay for 2 seconds
+    }
+  }
   Box(modifier = Modifier.fillMaxSize().background(ColorVariable.BackGround)) {
     Column(modifier = Modifier.fillMaxSize()) {
       TopAppBar(
           title = {
             Text(
-                text = viewModel.getOtherUserId(),
+                text = otherUserId,
                 style = MaterialTheme.typography.titleMedium,
                 color = ColorVariable.Accent,
                 modifier =
@@ -129,6 +128,7 @@ fun ChatScreen(
                     onLongPress = { selectedMessage = message })
               }
             }
+
         // Message input field and send button
         Row(
             modifier =
@@ -145,63 +145,63 @@ fun ChatScreen(
                           .padding(8.dp)
                           .testTag("message_input_field"),
               )
-            Button(
-                onClick = {
+              Button(
+                  onClick = {
                     if (updateActive) {
-                        // Update the message
-                        viewModel.givemessagerepo().updateMessage(
-                            selectedMessage!!.copy(text = newMessageText.text),
-                            { result: Result<Unit> ->
-                                if (result.isSuccess) {
-                                    Log.d("ChatScreen", "Message updated successfully")
-                                    selectedMessage = null
-                                    newMessageText = TextFieldValue("")
-                                    updateActive = false
-                                } else {
-                                    Log.e(
-                                        "ChatScreen",
-                                        "Failed to update message: ${result.exceptionOrNull()?.message}")
-                                    selectedMessage = null
-                                    newMessageText = TextFieldValue("")
-                                    updateActive = false
-                                }
-                            },
-                            context)
-                    } else {
-                        // Send a new message
-                        val messageId = viewModel.givemessagerepo().getNewUid()
-                        val newMessage =
-                            DataMessage(
-                                id = messageId,
-                                text = newMessageText.text,
-                                senderId = currentUserId,
-                                receiverId = viewModel.getOtherUserId(), // Ensure receiverId is set here
-                                timestamp = System.currentTimeMillis())
-                        // Send the message
-                        viewModel.givemessagerepo().sendMessage(
-                            message = newMessage,
-                        ) { result ->
+                      // Update the message
+                      messageRepository.updateMessage(
+                          selectedMessage!!.copy(text = newMessageText.text),
+                          { result: Result<Unit> ->
                             if (result.isSuccess) {
-                                newMessageText = TextFieldValue("")
+                              Log.d("ChatScreen", "Message updated successfully")
+                              selectedMessage = null
+                              newMessageText = TextFieldValue("")
+                              updateActive = false
                             } else {
-                                Toast.makeText(context, "Message could not be sent.", Toast.LENGTH_LONG)
-                                    .show()
-                                Log.e(
-                                    "MessageView",
-                                    "Failed to send message: ${result.exceptionOrNull()?.message}")
+                              Log.e(
+                                  "ChatScreen",
+                                  "Failed to update message: ${result.exceptionOrNull()?.message}")
+                              selectedMessage = null
+                              newMessageText = TextFieldValue("")
+                              updateActive = false
                             }
+                          },
+                          context)
+                    } else {
+                      // Send a new message
+                      val messageId = messageRepository.getNewUid()
+                      val newMessage =
+                          DataMessage(
+                              id = messageId,
+                              text = newMessageText.text,
+                              senderId = currentUserId,
+                              receiverId = otherUserId, // Ensure receiverId is set here
+                              timestamp = System.currentTimeMillis())
+                      // Send the message
+                      messageRepository.sendMessage(
+                          message = newMessage,
+                      ) { result ->
+                        if (result.isSuccess) {
+                          newMessageText = TextFieldValue("")
+                        } else {
+                          Toast.makeText(context, "Message could not be sent.", Toast.LENGTH_LONG)
+                              .show()
+                          Log.e(
+                              "MessageView",
+                              "Failed to send message: ${result.exceptionOrNull()?.message}")
                         }
+                      }
                     }
-                },
-                colors =
-                ButtonColors(
-                    ColorVariable.Secondary,
-                    ColorVariable.Accent,
-                    ColorVariable.Secondary,
-                    ColorVariable.Accent),
-                modifier = Modifier.padding(horizontal = 8.dp).testTag("send_button")) {
-                Text(if (updateActive) "Update" else "Send")
-            }
+                  },
+                  colors =
+                      ButtonColors(
+                          ColorVariable.Secondary,
+                          ColorVariable.Accent,
+                          ColorVariable.Secondary,
+                          ColorVariable.Accent),
+                  modifier = Modifier.padding(horizontal = 8.dp).testTag("send_button")) {
+                    Text(if (updateActive) "Update" else "Send")
+                  }
             }
       }
     }
@@ -238,7 +238,7 @@ fun ChatScreen(
                         onClick = {
                           // Handle delete
                           selectedMessage?.let { message ->
-                            viewModel.givemessagerepo().deleteMessage(
+                            messageRepository.deleteMessage(
                                 message.id,
                                 { result ->
                                   if (result.isSuccess) {
@@ -309,7 +309,7 @@ fun MessageItem(message: DataMessage, currentUserId: String, onLongPress: () -> 
                 Modifier.padding(8.dp)
                     .widthIn(max = (LocalConfiguration.current.screenWidthDp.dp * 2 / 3))
                     .border(1.dp, ColorVariable.Accent, shape)
-                    .combinedClickable (onClick = {}, onLongClick = { onLongPress() })
+                    .combinedClickable(onClick = {}, onLongClick = { onLongPress() })
                     .testTag("message_item ${message.id}")) {
               Column(modifier = Modifier.padding(16.dp)) {
                 Text(
