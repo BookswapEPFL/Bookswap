@@ -2,11 +2,18 @@ package com.android.bookswap.model
 
 import androidx.lifecycle.ViewModel
 import com.android.bookswap.data.DataUser
+import com.android.bookswap.data.repository.UsersRepository
+import com.android.bookswap.data.source.network.UserFirestoreSource
+import com.google.firebase.firestore.FirebaseFirestore
 
-open class UserViewModel(var email: String) : ViewModel() {
-  var uid = "ERROR_UUID"
-  private var dataUser = DataUser(email = email)
+open class UserViewModel(
+    var uuid: String = "ERROR_UUID",
+    repository: UsersRepository = UserFirestoreSource(FirebaseFirestore.getInstance())
+) : ViewModel() {
+  private var dataUser = DataUser(uuid)
   private var isLoaded = false
+  var isStored = false
+  private val userRepository: UsersRepository = repository
 
   open fun getUser(force: Boolean = false): DataUser {
     if (!isLoaded || force) {
@@ -15,7 +22,15 @@ open class UserViewModel(var email: String) : ViewModel() {
     return dataUser
   }
 
-  private fun fetchUser() {}
+  private fun fetchUser() {
+    userRepository.getUser(uuid) { result ->
+      result.onSuccess {
+        dataUser = it
+        isLoaded = true
+        isStored = true
+      }
+    }
+  }
 
   fun updateUser(
       greeting: String = dataUser.greeting,
@@ -28,11 +43,15 @@ open class UserViewModel(var email: String) : ViewModel() {
       picURL: String = dataUser.profilePictureUrl
   ) {
     updateUser(
-        DataUser(greeting, firstName, lastName, email, phone, latitude, longitude, picURL, uid))
+        DataUser(greeting, firstName, lastName, email, phone, latitude, longitude, picURL, uuid))
   }
 
   fun updateUser(newDataUser: DataUser) {
     this.dataUser = newDataUser
-    this.uid = newDataUser.userId
+    this.uuid = newDataUser.userId
+    isLoaded = true
+    userRepository.updateUser(dataUser) { result ->
+      result.fold({ isStored = true }, { isStored = false })
+    }
   }
 }
