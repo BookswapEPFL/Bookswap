@@ -1,6 +1,5 @@
 package com.android.bookswap.data.source.network
 
-import android.util.Log
 import com.android.bookswap.data.BookGenres
 import com.android.bookswap.data.BookLanguages
 import com.android.bookswap.data.DataBook
