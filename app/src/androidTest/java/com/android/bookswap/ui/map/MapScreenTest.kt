@@ -4,6 +4,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
+import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
@@ -37,7 +38,7 @@ class MapScreenTest {
                           photo = "url_to_photo_1",
                           language = BookLanguages.ENGLISH,
                           isbn = "123-456-789",
-                          genres = listOf(BookGenres.FICTION, BookGenres.NONFICTION)),
+                          genres = listOf(BookGenres.FICTION, BookGenres.HORROR)),
                       DataBook(
                           uuid = UUID.randomUUID(),
                           title = "Book 2",
@@ -47,21 +48,30 @@ class MapScreenTest {
                           photo = "url_to_photo_2",
                           language = BookLanguages.FRENCH,
                           isbn = "234-567-890",
-                          genres = listOf(BookGenres.FICTION)),
-                      DataBook(
-                          uuid = UUID.randomUUID(),
-                          title = "Book 3",
-                          author = "Author 3",
-                          description = "Description of Book 3",
-                          rating = 3,
-                          photo = "url_to_photo_3",
-                          language = BookLanguages.GERMAN,
-                          isbn = "345-678-901",
-                          genres = listOf(BookGenres.HORROR)))))
+                          genres = listOf(BookGenres.FICTION)))))
 
   private val userWithoutBooks =
       listOf(TempUser(latitude = 1.0, longitude = 1.0, listBook = emptyList()))
   @get:Rule val composeTestRule = createComposeRule()
+
+  private val longListUser =
+      listOf(
+          TempUser(
+              latitude = 0.0,
+              longitude = 0.0,
+              listBook =
+                  List(20) {
+                    DataBook(
+                        uuid = UUID.randomUUID(),
+                        title = "Book 1",
+                        author = "Author 1",
+                        description = "Description of Book 1",
+                        rating = 5,
+                        photo = "url_to_photo_1",
+                        language = BookLanguages.ENGLISH,
+                        isbn = "123-456-789",
+                        genres = listOf(BookGenres.FICTION, BookGenres.NONFICTION))
+                  }))
 
   @Test
   fun displayAllComponents() {
@@ -74,25 +84,26 @@ class MapScreenTest {
     composeTestRule.onNodeWithTag("mapGoogleMap").assertIsDisplayed()
     composeTestRule.onNodeWithTag("mapBoxMarker").assertIsDisplayed()
     composeTestRule.onNodeWithTag("mapBoxMarkerList").assertIsDisplayed()
-    composeTestRule.onAllNodesWithTag("mapBoxMarkerListBox").assertCountEquals(3)
-    composeTestRule.onAllNodesWithTag("mapBoxMarkerListBoxTitle").assertCountEquals(3)
-    composeTestRule.onAllNodesWithTag("mapBoxMarkerListBoxAuthor").assertCountEquals(3)
-    composeTestRule.onAllNodesWithTag("mapBoxMarkerListDivider").assertCountEquals(2)
+    composeTestRule.onAllNodesWithTag("mapBoxMarkerListBox").assertCountEquals(2)
+    composeTestRule.onAllNodesWithTag("mapBoxMarkerListBoxTitle").assertCountEquals(2)
+    composeTestRule.onAllNodesWithTag("mapBoxMarkerListBoxAuthor").assertCountEquals(2)
+    composeTestRule.onAllNodesWithTag("mapBoxMarkerListDivider").assertCountEquals(1)
 
     // components of Draggable Menu
     composeTestRule.onNodeWithTag("mapDraggableMenu").assertIsDisplayed()
     composeTestRule.onNodeWithTag("mapDraggableMenuStructure").assertIsDisplayed()
     composeTestRule.onNodeWithTag("mapDraggableMenuHandle").assertIsDisplayed()
     composeTestRule.onNodeWithTag("mapDraggableMenuHandleDivider").assertIsDisplayed()
-    composeTestRule.onAllNodesWithTag("mapDraggableMenuBookBox").assertCountEquals(3)
-    composeTestRule.onAllNodesWithTag("mapDraggableMenuBookBoxImage").assertCountEquals(3)
-    composeTestRule.onAllNodesWithTag("mapDraggableMenuBookBoxTitle").assertCountEquals(3)
-    composeTestRule.onAllNodesWithTag("mapDraggableMenuBookBoxAuthor").assertCountEquals(3)
-    composeTestRule.onAllNodesWithTag("mapDraggableMenuBookBoxRating").assertCountEquals(3)
-    composeTestRule.onAllNodesWithTag("mapDraggableMenuBookBoxStar").assertCountEquals(12)
-    composeTestRule.onAllNodesWithTag("mapDraggableMenuBookBoxEmptyStar").assertCountEquals(3)
-    composeTestRule.onAllNodesWithTag("mapDraggableMenuBookBoxTag").assertCountEquals(3)
-    composeTestRule.onAllNodesWithTag("mapDraggableMenuBookBoxDivider").assertCountEquals(3)
+    composeTestRule.onNodeWithTag("mapDraggableMenuBookBox0").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("mapDraggableMenuBookBox1").assertIsDisplayed()
+    composeTestRule.onAllNodesWithTag("mapDraggableMenuBookBoxImage").assertCountEquals(2)
+    composeTestRule.onAllNodesWithTag("mapDraggableMenuBookBoxTitle").assertCountEquals(2)
+    composeTestRule.onAllNodesWithTag("mapDraggableMenuBookBoxAuthor").assertCountEquals(2)
+    composeTestRule.onAllNodesWithTag("mapDraggableMenuBookBoxRating").assertCountEquals(2)
+    composeTestRule.onAllNodesWithTag("mapDraggableMenuBookBoxStar").assertCountEquals(9)
+    composeTestRule.onAllNodesWithTag("mapDraggableMenuBookBoxEmptyStar").assertCountEquals(1)
+    composeTestRule.onAllNodesWithTag("mapDraggableMenuBookBoxTag").assertCountEquals(2)
+    composeTestRule.onAllNodesWithTag("mapDraggableMenuBookBoxDivider").assertCountEquals(2)
   }
 
   @Test
@@ -117,7 +128,7 @@ class MapScreenTest {
     }
 
     composeTestRule.onNodeWithTag("mapDraggableMenu").assertIsDisplayed()
-    composeTestRule.onAllNodesWithTag("mapDraggableMenuBookBox").assertCountEquals(0) // No books
+    composeTestRule.onNodeWithTag("mapDraggableMenuBookBox0").assertIsNotDisplayed() // No books
   }
 
   @Test
@@ -143,7 +154,7 @@ class MapScreenTest {
 
     // Assert that the marker info window is displayed, but without book entries
     composeTestRule.onNodeWithTag("mapDraggableMenu").assertIsDisplayed()
-    composeTestRule.onAllNodesWithTag("mapDraggableMenuBookBox").assertCountEquals(0) // No books
+    composeTestRule.onNodeWithTag("mapDraggableMenuBookBox0").assertIsNotDisplayed() // No books
   }
 
   @Test
@@ -206,7 +217,59 @@ class MapScreenTest {
       val navigationActions = NavigationActions(navController)
       MapScreen(user, user[0], navigationActions, bookFilter)
     }
-    composeTestRule.onNodeWithTag("mapDraggableMenuBookBox").assertIsDisplayed()
-    composeTestRule.onAllNodesWithTag("mapDraggableMenuBookBox").assertCountEquals(1)
+    composeTestRule.onNodeWithTag("mapDraggableMenuBookBox0").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("mapDraggableMenuBookBox1").assertIsNotDisplayed()
+  }
+
+  @Test
+  fun draggableMenuListIsScrollable() {
+    composeTestRule.setContent {
+      val navController = rememberNavController()
+      val navigationActions = NavigationActions(navController)
+      // Passing multiple books to ensure list needs scrolling
+      MapScreen(longListUser, longListUser[0], navigationActions, BookFilter())
+    }
+
+    // Assert initial state: Only first item(s) are visible
+    composeTestRule.onNodeWithTag("mapDraggableMenuBookBox0").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("mapDraggableMenuBookBox19").assertIsNotDisplayed()
+    // Perform scroll gesture on LazyColumn
+    composeTestRule.onNodeWithTag("mapDraggableMenuStructure").performTouchInput {
+      for (i in 1..19) {
+        swipeUp()
+      }
+    }
+    composeTestRule.onNodeWithTag("mapDraggableMenuBookBox0").assertIsNotDisplayed()
+    composeTestRule.onNodeWithTag("mapDraggableMenuBookBox19").assertIsDisplayed()
+  }
+
+  @Test
+  fun listMarkerBookChangedWhenFilterApplied() {
+    val bookFilter = BookFilter()
+    bookFilter.setGenres(listOf("Horror"))
+    composeTestRule.setContent {
+      val navController = rememberNavController()
+      val navigationActions = NavigationActions(navController)
+      MapScreen(user, user[0], navigationActions, bookFilter)
+    }
+    composeTestRule.onNodeWithTag("mapBoxMarkerListBox").assertIsDisplayed()
+    composeTestRule.onAllNodesWithTag("mapBoxMarkerListBox").assertCountEquals(1)
+    composeTestRule.onNodeWithTag("mapBoxMarkerListBoxTitle").assertTextContains("Book 1")
+  }
+
+  @Test
+  fun noBooksTextDisplayedWhenNoBooksFound() {
+    val bookFilter = BookFilter()
+    bookFilter.setGenres(listOf("Dystopian"))
+    composeTestRule.setContent {
+      val navController = rememberNavController()
+      val navigationActions = NavigationActions(navController)
+      MapScreen(user, user[0], navigationActions, bookFilter)
+    }
+    composeTestRule
+        .onNodeWithTag("mapDraggableMenuNoBook")
+        .assertIsDisplayed()
+        .assertTextContains("No books found")
+    composeTestRule.onNodeWithTag("mapDraggableMenuBookBox").assertIsNotDisplayed()
   }
 }
