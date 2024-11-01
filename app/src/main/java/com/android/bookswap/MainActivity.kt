@@ -22,6 +22,9 @@ import com.android.bookswap.data.source.network.MessageFirestoreSource
 import com.android.bookswap.model.chat.MessageBox
 import com.android.bookswap.model.chat.PermissionHandler
 import com.android.bookswap.model.map.BookFilter
+import com.android.bookswap.model.map.DefaultGeolocation
+import com.android.bookswap.model.map.Geolocation
+import com.android.bookswap.model.map.IGeolocation
 import com.android.bookswap.resources.C
 import com.android.bookswap.ui.authentication.SignInScreen
 import com.android.bookswap.ui.books.add.AddISBNScreen
@@ -55,13 +58,16 @@ class MainActivity : ComponentActivity() {
     val messageRepository = MessageFirestoreSource(db)
     val bookRepository = BooksFirestoreRepository(db)
 
+    // Initialize the geolocation
+    val geolocation = Geolocation(this)
+
     setContent {
       BookSwapAppTheme {
         // A surface container using the 'background' color from the theme
         Surface(
             modifier = Modifier.fillMaxSize().semantics { testTag = C.Tag.main_screen_container },
             color = MaterialTheme.colorScheme.background) {
-              BookSwapApp(messageRepository, bookRepository)
+              BookSwapApp(messageRepository, bookRepository, geolocation = geolocation)
             }
       }
     }
@@ -71,7 +77,8 @@ class MainActivity : ComponentActivity() {
   fun BookSwapApp(
       messageRepository: MessageFirestoreSource,
       bookRepository: BooksFirestoreRepository,
-      startDestination: String = Route.AUTH
+      startDestination: String = Route.AUTH,
+      geolocation: IGeolocation = DefaultGeolocation()
   ) {
     val navController = rememberNavController()
     val navigationActions = NavigationActions(navController)
@@ -101,23 +108,26 @@ class MainActivity : ComponentActivity() {
           val user2 = backStackEntry.arguments?.getString("user2") ?: ""
           ChatScreen(messageRepository, user1, user2, navigationActions)
         }
-        navigation(startDestination = Screen.MAP, route = Route.MAP) {
-          composable(Screen.MAP) {
-            MapScreen(user, navigationActions = navigationActions, bookFilter = bookFilter)
-          }
-          composable(Screen.FILTER) { FilterMapScreen(navigationActions, bookFilter) }
+      }
+      navigation(startDestination = Screen.MAP, route = Route.MAP) {
+        composable(Screen.MAP) {
+          MapScreen(
+              user,
+              navigationActions = navigationActions,
+              bookFilter = bookFilter,
+              geolocation = geolocation)
         }
-        navigation(startDestination = Screen.NEWBOOK, route = Route.NEWBOOK) {
-          composable(Screen.NEWBOOK) { BookAdditionChoiceScreen(navigationActions) }
-          composable(Screen.ADD_BOOK_MANUALLY) {
-            AddToBookScreen(bookRepository, navigationActions)
-          }
-          composable(Screen.ADD_BOOK_SCAN) { /*Todo*/}
-          composable(Screen.ADD_BOOK_ISBN) { AddISBNScreen(navigationActions, bookRepository) }
-        }
+        composable(Screen.FILTER) { FilterMapScreen(navigationActions, bookFilter) }
+      }
+      navigation(startDestination = Screen.NEWBOOK, route = Route.NEWBOOK) {
+        composable(Screen.NEWBOOK) { BookAdditionChoiceScreen(navigationActions) }
+        composable(Screen.ADD_BOOK_MANUALLY) { AddToBookScreen(bookRepository, navigationActions) }
+        composable(Screen.ADD_BOOK_SCAN) { /*Todo*/}
+        composable(Screen.ADD_BOOK_ISBN) { AddISBNScreen(navigationActions, bookRepository) }
       }
     }
   }
+}
 
   // Temporary user list for the map as it is not yet linked to the database.
   // Better to see how the map screen should look like at the end.
@@ -160,4 +170,4 @@ class MainActivity : ComponentActivity() {
                           isbn = null,
                           genres = listOf(BookGenres.SCIENCEFICTION, BookGenres.AUTOBIOGRAPHY)),
                   )))
-}
+
