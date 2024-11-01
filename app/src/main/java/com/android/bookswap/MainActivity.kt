@@ -66,7 +66,6 @@ class MainActivity : ComponentActivity() {
               BookSwapApp(
                   messageRepository,
                   bookRepository,
-                  startDestination = Route.MAP,
                   geolocation = geolocation)
             }
       }
