@@ -20,6 +20,7 @@ import com.android.bookswap.data.DataBook
 import com.android.bookswap.data.source.network.BooksFirestoreRepository
 import com.android.bookswap.data.source.network.MessageFirestoreSource
 import com.android.bookswap.model.chat.MessageBox
+import com.android.bookswap.model.chat.PermissionHandler
 import com.android.bookswap.model.map.BookFilter
 import com.android.bookswap.resources.C
 import com.android.bookswap.ui.authentication.SignInScreen
@@ -39,8 +40,13 @@ import com.google.firebase.firestore.FirebaseFirestore
 import java.util.UUID
 
 class MainActivity : ComponentActivity() {
+
+  private lateinit var permissionHandler: PermissionHandler
+
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
+    // permissionHandler = PermissionHandler(this)
+    // permissionHandler.askNotificationPermission()
 
     // Initialize Firebase Firestore
     val db = FirebaseFirestore.getInstance()

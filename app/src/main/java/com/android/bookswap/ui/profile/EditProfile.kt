@@ -19,18 +19,13 @@ import com.android.bookswap.data.DataUser
 import com.android.bookswap.ui.theme.BookSwapAppTheme
 
 @Composable
-fun EditProfileDialog(
-    onDismiss: () -> Unit,
-    onSave: (DataUser) -> Unit,
-    dataUser: DataUser,
-    modifier: Modifier = Modifier
-) {
+fun EditProfileDialog(onDismiss: () -> Unit, onSave: (DataUser) -> Unit, dataUser: DataUser) {
 
-  var _email = remember { mutableStateOf<String>(dataUser.email) }
-  var _phone = remember { mutableStateOf<String>(dataUser.phoneNumber) }
-  var _greeting = remember { mutableStateOf<String>(dataUser.greeting) }
-  var _firstName = remember { mutableStateOf<String>(dataUser.firstName) }
-  var _lastName = remember { mutableStateOf<String>(dataUser.lastName) }
+  val _email = remember { mutableStateOf<String>(dataUser.email) }
+  val _phone = remember { mutableStateOf<String>(dataUser.phoneNumber) }
+  val _greeting = remember { mutableStateOf<String>(dataUser.greeting) }
+  val _firstName = remember { mutableStateOf<String>(dataUser.firstName) }
+  val _lastName = remember { mutableStateOf<String>(dataUser.lastName) }
 
   BookSwapAppTheme {
     Dialog({ onDismiss() }, DialogProperties(true, true)) {
