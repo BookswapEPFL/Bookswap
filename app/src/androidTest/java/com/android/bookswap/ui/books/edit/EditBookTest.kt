@@ -47,23 +47,90 @@ class EditBookScreenTest {
   }
 
   @Test
-  fun displayAllComponents() {
+  fun displayEditScreenComponent() {
     composeTestRule.setContent { EditBookScreen(booksRepository, navigationActions, sampleBook) }
 
     composeTestRule.onNodeWithTag("editBookScreen").assertIsDisplayed()
+  }
+
+  @Test
+  fun displayEditTitleComponent() {
+    composeTestRule.setContent { EditBookScreen(booksRepository, navigationActions, sampleBook) }
+
     composeTestRule.onNodeWithTag("editBookTitle").assertIsDisplayed()
+  }
+
+  @Test
+  fun displayEditTitleValueComponent() {
+    composeTestRule.setContent { EditBookScreen(booksRepository, navigationActions, sampleBook) }
+
     composeTestRule.onNodeWithTag("editBookTitle").assertTextEquals("Edit your Book")
+  }
+
+  @Test
+  fun displayEditButtonComponent() {
+    composeTestRule.setContent { EditBookScreen(booksRepository, navigationActions, sampleBook) }
     composeTestRule.onNodeWithTag("goBackButton").assertIsDisplayed()
+  }
+
+  @Test
+  fun displayEditSaveComponent() {
+    composeTestRule.setContent { EditBookScreen(booksRepository, navigationActions, sampleBook) }
     composeTestRule.onNodeWithTag("bookSave").assertIsDisplayed()
+  }
+
+  @Test
+  fun displayEditSaveValueComponent() {
+    composeTestRule.setContent { EditBookScreen(booksRepository, navigationActions, sampleBook) }
     composeTestRule.onNodeWithTag("bookSave").assertTextEquals("Save")
+  }
+
+  @Test
+  fun displayEdiDeleteComponent() {
+    composeTestRule.setContent { EditBookScreen(booksRepository, navigationActions, sampleBook) }
     composeTestRule.onNodeWithTag("bookDelete").assertIsDisplayed()
+  }
+
+  @Test
+  fun displayEditDeleteValueComponent() {
+    composeTestRule.setContent { EditBookScreen(booksRepository, navigationActions, sampleBook) }
     composeTestRule.onNodeWithTag("bookDelete").assertTextEquals("Delete")
+  }
+
+  @Test
+  fun displayEditBookTitleComponent() {
+    composeTestRule.setContent { EditBookScreen(booksRepository, navigationActions, sampleBook) }
 
     composeTestRule.onNodeWithTag("inputBookTitle").assertIsDisplayed()
+  }
+
+  @Test
+  fun displayEditBookAuthorComponent() {
+    composeTestRule.setContent { EditBookScreen(booksRepository, navigationActions, sampleBook) }
     composeTestRule.onNodeWithTag("inputBookAuthor").assertIsDisplayed()
+  }
+
+  @Test
+  fun displayEditBookDescriptionComponent() {
+    composeTestRule.setContent { EditBookScreen(booksRepository, navigationActions, sampleBook) }
     composeTestRule.onNodeWithTag("inputBookDescription").assertIsDisplayed()
+  }
+
+  @Test
+  fun displayEditBookRatingComponent() {
+    composeTestRule.setContent { EditBookScreen(booksRepository, navigationActions, sampleBook) }
     composeTestRule.onNodeWithTag("inputBookRating").assertIsDisplayed()
+  }
+
+  @Test
+  fun displayEditBookPhotoComponent() {
+    composeTestRule.setContent { EditBookScreen(booksRepository, navigationActions, sampleBook) }
     composeTestRule.onNodeWithTag("inputBookPhoto").assertIsDisplayed()
+  }
+
+  @Test
+  fun displayEditBookLanguageComponent() {
+    composeTestRule.setContent { EditBookScreen(booksRepository, navigationActions, sampleBook) }
     composeTestRule.onNodeWithTag("inputBookLanguage").assertIsDisplayed()
   }
 

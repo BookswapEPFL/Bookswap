@@ -89,12 +89,12 @@ class BooksFirestoreRepository(private val db: FirebaseFirestore) : BooksReposit
   // Uses performFirestoreOperation to handle success and failure
   override fun updateBook(
       dataBook: DataBook,
-      OnSucess: () -> Unit,
+      onSucess: () -> Unit,
       onFailure: (Exception) -> Unit
   ) {
     performFirestoreOperation(
         db.collection(collectionBooks).document(dataBook.uuid.toString()).set(dataBook),
-        OnSucess,
+        onSucess,
         onFailure)
   }
   // Deletes a book from Firestore by its title

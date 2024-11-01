@@ -222,7 +222,7 @@ fun EditBookScreen(
                     onValueChange = { photo = it },
                     label = { Text("Photo ") },
                     placeholder = { Text("Enter a photo of the books") },
-                    modifier = Modifier.testTag("inputBookPhoto").testTag("inputBookPhoto"),
+                    modifier = Modifier.testTag("inputBookPhoto"),
                     colors =
                         TextFieldDefaults.outlinedTextFieldColors(
                             containerColor = ColorVariable.Secondary,
@@ -237,7 +237,7 @@ fun EditBookScreen(
                     onValueChange = { language = it },
                     label = { Text("Language ") },
                     placeholder = { Text("In which language are the book") },
-                    modifier = Modifier.testTag("inputBookLanguage").testTag("inputBookLanguage"),
+                    modifier = Modifier.testTag("inputBookLanguage"),
                     colors =
                         TextFieldDefaults.outlinedTextFieldColors(
                             containerColor = ColorVariable.Secondary,
@@ -282,7 +282,7 @@ fun EditBookScreen(
 
                         booksRepository.updateBook(
                             updatedBook!!,
-                            OnSucess = { navigationActions.goBack() },
+                            onSucess = { navigationActions.goBack() },
                             onFailure = {
                               Toast.makeText(context, "Failed to update book.", Toast.LENGTH_SHORT)
                                   .show()
@@ -291,7 +291,7 @@ fun EditBookScreen(
                         Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
                       }
                     },
-                    modifier = Modifier.fillMaxWidth().testTag("bookSave").testTag("bookDelete"),
+                    modifier = Modifier.fillMaxWidth().testTag("bookSave"),
                     enabled = title.isNotBlank(),
                     colors = ButtonDefaults.buttonColors(containerColor = ColorVariable.Primary)) {
                       Text("Save", color = Color.White)
