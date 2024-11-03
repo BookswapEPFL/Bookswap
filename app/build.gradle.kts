@@ -15,6 +15,9 @@ android {
     namespace = "com.android.bookswap"
     compileSdk = 34
 
+    buildFeatures {
+        buildConfig = true
+    }
     // Load the API key from local.properties
     val localProperties = Properties()
     val localPropertiesFile = rootProject.file("local.properties")
@@ -23,6 +26,7 @@ android {
     }
 
     val mapsApiKey: String = localProperties.getProperty("MAPS_API_KEY") ?: ""
+    val openAiApiKey: String = localProperties.getProperty("OPENAI_API_KEY") ?: ""
 
     defaultConfig {
         applicationId = "com.android.bookswap"
@@ -36,6 +40,8 @@ android {
             useSupportLibrary = true
         }
         manifestPlaceholders["MAPS_API_KEY"] = mapsApiKey
+        manifestPlaceholders["OPENAI_API_KEY"] = openAiApiKey
+        buildConfigField("String", "OPENAI_API_KEY", localProperties.getProperty("OPENAI_API_KEY"))
     }
 
     buildTypes {
@@ -207,6 +213,8 @@ dependencies {
     testImplementation(libs.robolectric)
 
     implementation(libs.volley) //HTTP request
+    implementation(libs.okhttp)
+
     implementation(libs.json) //JSON parser
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("androidx.vectordrawable:vectordrawable:1.1.0")
