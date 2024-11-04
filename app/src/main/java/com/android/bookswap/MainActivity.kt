@@ -83,7 +83,6 @@ class MainActivity : ComponentActivity() {
     val navController = rememberNavController()
     val navigationActions = NavigationActions(navController)
     val bookFilter = BookFilter()
-
     val placeHolder =
         listOf(
             MessageBox(
