@@ -40,7 +40,7 @@ android {
         }
         manifestPlaceholders["MAPS_API_KEY"] = mapsApiKey
         manifestPlaceholders["OPENAI_API_KEY"] = openAiApiKey
-        buildConfigField("String", "OPENAI_API_KEY", localProperties.getProperty("OPENAI_API_KEY"))
+        buildConfigField("String", "OPENAI_API_KEY", openAiApiKey)
     }
 
     buildTypes {
