@@ -16,10 +16,13 @@ import com.android.bookswap.data.BookGenres
 import com.android.bookswap.data.BookLanguages
 import com.android.bookswap.data.DataBook
 import com.android.bookswap.data.DataUser
-import com.android.bookswap.data.repository.BooksRepository
+import com.android.bookswap.data.source.network.BooksFirestoreRepository
 import com.android.bookswap.model.map.BookFilter
 import com.android.bookswap.ui.navigation.NavigationActions
+import io.mockk.every
+import io.mockk.mockk
 import java.util.UUID
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
@@ -67,12 +70,24 @@ class MapScreenTest {
   private val userWithoutBooks = listOf(DataUser(bookList = emptyList()))
   @get:Rule val composeTestRule = createComposeRule()
 
+  private lateinit var mockBookRepository: BooksFirestoreRepository
+
+  @Before
+  fun setup() {
+    mockBookRepository = mockk()
+
+    every { mockBookRepository.getBook(any(), any()) } answers
+        {
+          firstArg<(List<DataBook>) -> Unit>().invoke(books)
+        }
+  }
+
   @Test
   fun displayAllComponents() {
     composeTestRule.setContent {
       val navController = rememberNavController()
       val navigationActions = NavigationActions(navController)
-      MapScreen(user, navigationActions, BookFilter(), MockBooksRepository(), 0)
+      MapScreen(user, navigationActions, BookFilter(), mockBookRepository, 0)
     }
     composeTestRule.onNodeWithTag("mapScreen").assertIsDisplayed()
     composeTestRule.onNodeWithTag("mapGoogleMap").assertIsDisplayed()
@@ -105,7 +120,7 @@ class MapScreenTest {
     composeTestRule.setContent {
       val navController = rememberNavController()
       val navigationActions = NavigationActions(navController)
-      MapScreen(userWithoutBooks, navigationActions, BookFilter(), MockBooksRepository(), 0)
+      MapScreen(userWithoutBooks, navigationActions, BookFilter(), mockBookRepository, 0)
     }
 
     composeTestRule.onNodeWithTag("mapBoxMarker").assertIsNotDisplayed()
@@ -117,7 +132,7 @@ class MapScreenTest {
     composeTestRule.setContent {
       val navController = rememberNavController()
       val navigationActions = NavigationActions(navController)
-      MapScreen(userWithoutBooks, navigationActions, BookFilter(), MockBooksRepository())
+      MapScreen(userWithoutBooks, navigationActions, BookFilter(), mockBookRepository)
     }
 
     composeTestRule.onNodeWithTag("mapDraggableMenu").assertIsDisplayed()
@@ -129,7 +144,7 @@ class MapScreenTest {
     composeTestRule.setContent {
       val navController = rememberNavController()
       val navigationActions = NavigationActions(navController)
-      MapScreen(listOf(), navigationActions, BookFilter(), MockBooksRepository())
+      MapScreen(listOf(), navigationActions, BookFilter(), mockBookRepository)
     }
 
     // Assert that the map is displayed but no marker and info window is shown
@@ -142,7 +157,7 @@ class MapScreenTest {
     composeTestRule.setContent {
       val navController = rememberNavController()
       val navigationActions = NavigationActions(navController)
-      MapScreen(userWithoutBooks, navigationActions, BookFilter(), MockBooksRepository())
+      MapScreen(userWithoutBooks, navigationActions, BookFilter(), mockBookRepository)
     }
 
     // Assert that the marker info window is displayed, but without book entries
@@ -155,7 +170,7 @@ class MapScreenTest {
     composeTestRule.setContent {
       val navController = rememberNavController()
       val navigationActions = NavigationActions(navController)
-      MapScreen(user, navigationActions, BookFilter(), MockBooksRepository())
+      MapScreen(user, navigationActions, BookFilter(), mockBookRepository)
     }
 
     // Assert that no info window is displayed when no user is selected
@@ -168,7 +183,7 @@ class MapScreenTest {
     composeTestRule.setContent {
       val navController = rememberNavController()
       val navigationActions = NavigationActions(navController)
-      MapScreen(user, navigationActions, BookFilter(), MockBooksRepository(), 0)
+      MapScreen(user, navigationActions, BookFilter(), mockBookRepository, 0)
     }
 
     // Ensure the DraggableMenu is initially displayed
@@ -196,7 +211,7 @@ class MapScreenTest {
     composeTestRule.setContent {
       val navController = rememberNavController()
       val navigationActions = NavigationActions(navController)
-      MapScreen(user, navigationActions, BookFilter(), MockBooksRepository(), 0)
+      MapScreen(user, navigationActions, BookFilter(), mockBookRepository, 0)
     }
     composeTestRule.onNodeWithTag("filterButton").assertIsDisplayed()
   }
@@ -208,7 +223,7 @@ class MapScreenTest {
     composeTestRule.setContent {
       val navController = rememberNavController()
       val navigationActions = NavigationActions(navController)
-      MapScreen(user, navigationActions, bookFilter, MockBooksRepository(), 0)
+      MapScreen(user, navigationActions, bookFilter, mockBookRepository, 0)
     }
     composeTestRule.onNodeWithTag("mapDraggableMenuBookBox0").assertIsDisplayed()
     composeTestRule.onNodeWithTag("mapDraggableMenuBookBox1").assertIsNotDisplayed()
@@ -220,7 +235,7 @@ class MapScreenTest {
       val navController = rememberNavController()
       val navigationActions = NavigationActions(navController)
       // Passing multiple books to ensure list needs scrolling
-      MapScreen(userLongListOnly, navigationActions, BookFilter(), MockBooksRepository(), 0)
+      MapScreen(userLongListOnly, navigationActions, BookFilter(), mockBookRepository, 0)
     }
 
     // Assert initial state: Only first item(s) are visible
@@ -243,7 +258,7 @@ class MapScreenTest {
     composeTestRule.setContent {
       val navController = rememberNavController()
       val navigationActions = NavigationActions(navController)
-      MapScreen(user, navigationActions, bookFilter, MockBooksRepository(), 0)
+      MapScreen(user, navigationActions, bookFilter, mockBookRepository, 0)
     }
     composeTestRule.onNodeWithTag("mapBoxMarkerListBox").assertIsDisplayed()
     composeTestRule.onAllNodesWithTag("mapBoxMarkerListBox").assertCountEquals(1)
@@ -257,75 +272,12 @@ class MapScreenTest {
     composeTestRule.setContent {
       val navController = rememberNavController()
       val navigationActions = NavigationActions(navController)
-      MapScreen(user, navigationActions, bookFilter, MockBooksRepository(), 0)
+      MapScreen(user, navigationActions, bookFilter, mockBookRepository, 0)
     }
     composeTestRule
         .onNodeWithTag("mapDraggableMenuNoBook")
         .assertIsDisplayed()
         .assertTextContains("No books found")
     composeTestRule.onNodeWithTag("mapDraggableMenuBookBox").assertIsNotDisplayed()
-  }
-
-  class MockBooksRepository : BooksRepository {
-    private var isBookAdded = false
-    private var isBookFetched = false
-    private var isBookUpdated = false
-    private var isBookDeleted = false
-    private var shouldFail = false
-
-    override fun init(OnSucess: () -> Unit) {
-      if (!shouldFail) {
-        OnSucess()
-      }
-    }
-
-    override fun getNewUid(): UUID {
-      return UUID.randomUUID()
-    }
-
-    override fun getBook(OnSucess: (List<DataBook>) -> Unit, onFailure: (Exception) -> Unit) {
-      if (!shouldFail) {
-        isBookFetched = true
-        OnSucess(books)
-      } else {
-        onFailure(Exception("Failed to fetch books"))
-      }
-    }
-
-    override fun addBook(dataBook: DataBook, OnSucess: () -> Unit, onFailure: (Exception) -> Unit) {
-      if (!shouldFail) {
-        isBookAdded = true
-        OnSucess()
-      } else {
-        onFailure(Exception("Failed to add book"))
-      }
-    }
-
-    override fun updateBook(
-        dataBook: DataBook,
-        OnSucess: () -> Unit,
-        onFailure: (Exception) -> Unit
-    ) {
-      if (!shouldFail) {
-        isBookUpdated = true
-        OnSucess()
-      } else {
-        onFailure(Exception("Failed to update book"))
-      }
-    }
-
-    override fun deleteBooks(
-        id: String,
-        dataBook: DataBook,
-        OnSucess: () -> Unit,
-        onFailure: (Exception) -> Unit
-    ) {
-      if (!shouldFail) {
-        isBookDeleted = true
-        OnSucess()
-      } else {
-        onFailure(Exception("Failed to delete book"))
-      }
-    }
   }
 }
