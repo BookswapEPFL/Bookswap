@@ -96,7 +96,8 @@ fun ListChatScreen(
               } else {
                 items(placeHolderData.size) { message ->
                   MessageBoxDisplay(placeHolderData[message]) {
-                    navigationActions.navigateTo(Screen.CHAT)
+                    navigationActions.navigateTo(
+                        Screen.CHAT, "user123", placeHolderData[message].contactName)
                   }
                   MessageDivider()
                 }

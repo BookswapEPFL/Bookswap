@@ -19,7 +19,11 @@ import com.android.bookswap.data.repository.BooksRepository
 import com.android.bookswap.data.source.network.BooksFirestoreRepository
 import com.android.bookswap.data.source.network.MessageFirestoreSource
 import com.android.bookswap.model.chat.MessageBox
+import com.android.bookswap.model.chat.PermissionHandler
 import com.android.bookswap.model.map.BookFilter
+import com.android.bookswap.model.map.DefaultGeolocation
+import com.android.bookswap.model.map.Geolocation
+import com.android.bookswap.model.map.IGeolocation
 import com.android.bookswap.resources.C
 import com.android.bookswap.ui.authentication.SignInScreen
 import com.android.bookswap.ui.books.add.AddISBNScreen
@@ -39,8 +43,13 @@ import com.google.firebase.firestore.firestore
 import java.util.UUID
 
 class MainActivity : ComponentActivity() {
+
+  private lateinit var permissionHandler: PermissionHandler
+
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
+    // permissionHandler = PermissionHandler(this)
+    // permissionHandler.askNotificationPermission()
 
     // Initialize Firebase Firestore
     val db = FirebaseFirestore.getInstance()
@@ -49,13 +58,16 @@ class MainActivity : ComponentActivity() {
     val messageRepository = MessageFirestoreSource(db)
     val bookRepository = BooksFirestoreRepository(db)
 
+    // Initialize the geolocation
+    val geolocation = Geolocation(this)
+
     setContent {
       BookSwapAppTheme {
         // A surface container using the 'background' color from the theme
         Surface(
             modifier = Modifier.fillMaxSize().semantics { testTag = C.Tag.main_screen_container },
             color = MaterialTheme.colorScheme.background) {
-              BookSwapApp(messageRepository, bookRepository)
+              BookSwapApp(messageRepository, bookRepository, geolocation = geolocation)
             }
       }
     }
@@ -64,24 +76,26 @@ class MainActivity : ComponentActivity() {
   @Composable
   fun BookSwapApp(
       messageRepository: MessageFirestoreSource,
-      bookRepository: BooksRepository,
-      startDestination: String = Route.MAP
+      bookRepository: BooksFirestoreRepository,
+      startDestination: String = Route.AUTH,
+      geolocation: IGeolocation = DefaultGeolocation()
   ) {
     val navController = rememberNavController()
     val navigationActions = NavigationActions(navController)
     val bookFilter = BookFilter()
-    val bookfire = BooksFirestoreRepository(Firebase.firestore)
 
     val placeHolder =
-        List(12) {
-          MessageBox(
-              "Contact ${it + 1}",
-              "Test message $it test for the feature of ellipsis in the message",
-              "01.01.24")
-        }
-
-    val userid1 = "user123"
-    val userid2 = "user124"
+        listOf(
+            MessageBox(
+                contactName = "user124",
+                message = "Welcome message for user124",
+                date = "01.01.24")) +
+            List(6) {
+              MessageBox(
+                  contactName = "Contact ${it + 1}",
+                  message = "Test message $it test for the feature of ellipsis in the message",
+                  date = "01.01.24")
+            }
 
     NavHost(navController = navController, startDestination = startDestination) {
       navigation(startDestination = Screen.AUTH, route = Route.AUTH) {
@@ -89,14 +103,15 @@ class MainActivity : ComponentActivity() {
       }
       navigation(startDestination = Screen.CHATLIST, route = Route.CHAT) {
         composable(Screen.CHATLIST) { ListChatScreen(placeHolder, navigationActions) }
-        composable(Screen.CHAT) {
-          ChatScreen(messageRepository, userid1, userid2, navigationActions)
+        composable("${Screen.CHAT}/{user1}/{user2}") { backStackEntry ->
+          val user1 = backStackEntry.arguments?.getString("user1") ?: ""
+          val user2 = backStackEntry.arguments?.getString("user2") ?: ""
+          ChatScreen(messageRepository, user1, user2, navigationActions)
         }
       }
       navigation(startDestination = Screen.MAP, route = Route.MAP) {
         composable(Screen.MAP) {
-          MapScreen(
-              user, navigationActions = navigationActions, bookFilter = bookFilter, bookRepository)
+          MapScreen(user, navigationActions = navigationActions, bookFilter = bookFilter, bookRepository, geolocation = geolocation)
         }
         composable(Screen.FILTER) { FilterMapScreen(navigationActions, bookFilter) }
       }

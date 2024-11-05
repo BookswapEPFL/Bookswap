@@ -22,8 +22,7 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class LoginTest : TestCase() {
   @get:Rule val composeTestRule = createComposeRule()
-  // The IntentsTestRule is not reliable.
-
+  // The IntentsTestRule may not reliable.
   @Before
   fun setUp() {
     Intents.init()

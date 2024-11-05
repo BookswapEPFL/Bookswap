@@ -1,3 +1,4 @@
+
 import java.io.FileInputStream
 import java.util.Properties
 
@@ -37,21 +38,9 @@ android {
         manifestPlaceholders["MAPS_API_KEY"] = mapsApiKey
     }
 
-    // Signing configuration for release builds
-    signingConfigs {
-        create("release") { // Use 'create' method to define the signing configuration
-            storeFile = file("keyStore.jks") // Reference the keystore file
-            storePassword = System.getenv("RELEASE_KEYSTORE_PASSWORD") // Read from GitHub Secrets
-            keyAlias = System.getenv("RELEASE_KEYSTORE_ALIAS") // Read from GitHub Secrets
-            keyPassword = System.getenv("RELEASE_KEY_PASSWORD") // Read from GitHub Secrets
-        }
-    }
-
     buildTypes {
         release {
-            if (System.getenv("CI") != null || System.getenv("GITHUB_ACTIONS") != null) {
-                signingConfig = signingConfigs.getByName("release") // Reference the signing config
-            }
+            signingConfig = null
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
@@ -142,6 +131,7 @@ fun DependencyHandlerScope.globalTestImplementation(dep: Any) {
 }
 
 dependencies {
+    implementation("com.google.firebase:firebase-messaging:23.0.0")
     implementation(platform("com.google.firebase:firebase-bom:33.4.0"))
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.firebase:firebase-analytics")
@@ -205,14 +195,23 @@ dependencies {
     globalTestImplementation(libs.kaspresso.compose)
 
 
+
     testImplementation(libs.mockito.core)
     testImplementation(libs.mockito.inline)
     testImplementation(libs.mockito.kotlin)
+    androidTestImplementation(libs.mockito.android)
+    androidTestImplementation(libs.mockito.kotlin)
+
+
     // ----------       Robolectric     ------------
     testImplementation(libs.robolectric)
 
     implementation(libs.volley) //HTTP request
     implementation(libs.json) //JSON parser
+    implementation("androidx.appcompat:appcompat:1.6.1")
+    implementation("androidx.vectordrawable:vectordrawable:1.1.0")
+
+
 }
 
 tasks.withType<Test> {
@@ -257,6 +256,6 @@ tasks.register("jacocoTestReport", JacocoReport::class) {
         val newContent = reportFile.readText().replace("<line[^>]+nr=\"65535\"[^>]*>".toRegex(), "")
         reportFile.writeText(newContent)
 
-        logger.quiet("Wrote summarized jacoco test coverage report xml to $reportFile.absolutePath}")
+        logger.quiet("Wrote summarized jacoco test coverage report xml to ${reportFile.absolutePath}")
     }
 }

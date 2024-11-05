@@ -30,12 +30,12 @@ const val BACKGROUND_LOCATION_PERMISSION_REQUEST_CODE = 2
  * This class requires appropriate location permissions to function, including both foreground and
  * optionally background location access.
  */
-class Geolocation(private val activity: Activity) {
+class Geolocation(private val activity: Activity) : IGeolocation {
   private val fusedLocationClient: FusedLocationProviderClient =
       LocationServices.getFusedLocationProviderClient(activity)
   val isRunning = mutableStateOf(false)
-  val latitude = mutableDoubleStateOf(Double.NaN)
-  val longitude = mutableDoubleStateOf(Double.NaN)
+  override val latitude = mutableDoubleStateOf(Double.NaN)
+  override val longitude = mutableDoubleStateOf(Double.NaN)
 
   /** Location request settings */
   private val locationRequest: LocationRequest =
@@ -89,7 +89,7 @@ class Geolocation(private val activity: Activity) {
 
   /** Start location updates */
   @SuppressLint("MissingPermission")
-  fun startLocationUpdates() {
+  override fun startLocationUpdates() {
     if (!isRunning.value) {
       if (hasLocationPermissions()) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && !hasBackgroundPermissions()) {
@@ -111,7 +111,7 @@ class Geolocation(private val activity: Activity) {
   }
 
   /** Stop location updates */
-  fun stopLocationUpdates() {
+  override fun stopLocationUpdates() {
     fusedLocationClient.removeLocationUpdates(locationCallback)
     isRunning.value = false
   }

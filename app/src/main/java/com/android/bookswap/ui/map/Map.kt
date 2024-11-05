@@ -37,6 +37,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.SemanticsPropertyKey
+import androidx.compose.ui.semantics.SemanticsPropertyReceiver
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -44,12 +47,15 @@ import com.android.bookswap.data.DataBook
 import com.android.bookswap.data.DataUser
 import com.android.bookswap.data.repository.BooksRepository
 import com.android.bookswap.model.map.BookFilter
+import com.android.bookswap.model.map.DefaultGeolocation
+import com.android.bookswap.model.map.IGeolocation
 import com.android.bookswap.ui.navigation.BOTTOM_NAV_HEIGHT
 import com.android.bookswap.ui.navigation.BottomNavigationMenu
 import com.android.bookswap.ui.navigation.List_Navigation_Bar_Destinations
 import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.navigation.Screen
 import com.android.bookswap.ui.theme.ColorVariable
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.*
@@ -58,6 +64,9 @@ import kotlin.math.roundToInt
 import kotlinx.coroutines.launch
 
 const val INIT_ZOOM = 10F
+
+val CameraPositionKey = SemanticsPropertyKey<CameraPositionState>("CameraPosition")
+var SemanticsPropertyReceiver.cameraPosition by CameraPositionKey
 
 /**
  * Composable function to display a map with user locations and associated book information.
@@ -72,6 +81,7 @@ const val INIT_ZOOM = 10F
  * @param booksRepository An instance of [BooksRepository] to retrieve the books from the database.
  * @param selectedUser An optional user, it will display the infoWindow related to this user. This
  *   user’s info window will be shown if it is bigger or equal to 0.
+ * @param geolocation An instance of [IGeolocation] to get the user's current location.
  */
 @Composable
 fun MapScreen(
@@ -79,12 +89,21 @@ fun MapScreen(
     navigationActions: NavigationActions,
     bookFilter: BookFilter,
     booksRepository: BooksRepository,
-    selectedUser: Int = -1
+    selectedUser: Int = -1,
+    geolocation: IGeolocation = DefaultGeolocation()
 ) {
-
-  val cameraPositionState = rememberCameraPositionState {
-    position = CameraPosition.fromLatLngZoom(LatLng(0.0, 0.0), INIT_ZOOM)
+  val cameraPositionState = rememberCameraPositionState()
+  // Get the user's current location
+  val latitude by remember { geolocation.latitude }
+  val longitude by remember { geolocation.longitude }
+  // Start location updates
+  LaunchedEffect(Unit) {
+    geolocation.startLocationUpdates()
+    cameraPositionState.position =
+        CameraPosition.fromLatLngZoom(LatLng(latitude, longitude), INIT_ZOOM)
   }
+  // Stop location updates when the screen is disposed
+  DisposableEffect(Unit) { onDispose { geolocation.stopLocationUpdates() } }
 
   var mutableStateSelectedUser by remember { mutableStateOf(selectedUser) }
   var markerScreenPosition by remember { mutableStateOf<Offset?>(null) }
@@ -161,10 +180,19 @@ fun MapScreen(
       content = { pd ->
         GoogleMap(
             onMapClick = { mutableStateSelectedUser = -1 },
-            modifier = Modifier.fillMaxSize().padding(pd).testTag("mapGoogleMap"),
+            modifier = Modifier.fillMaxSize().padding(pd).testTag("mapGoogleMap").semantics {
+                cameraPosition = cameraPositionState
+            },
             cameraPositionState = cameraPositionState,
             uiSettings = MapUiSettings(zoomControlsEnabled = false),
         ) {
+          // Marker for user's current location
+          if (!latitude.isNaN() && !longitude.isNaN()) {
+            Marker(
+                state = MarkerState(position = LatLng(latitude, longitude)),
+                title = "Your Location",
+                icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE))
+          }
           filteredUsers
               .filter { !it.longitude.isNaN() && !it.latitude.isNaN() && it.books.isNotEmpty() }
               .forEachIndexed { index, item ->
