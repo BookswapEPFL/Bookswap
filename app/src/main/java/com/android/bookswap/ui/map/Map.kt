@@ -180,9 +180,10 @@ fun MapScreen(
       content = { pd ->
         GoogleMap(
             onMapClick = { mutableStateSelectedUser = -1 },
-            modifier = Modifier.fillMaxSize().padding(pd).testTag("mapGoogleMap").semantics {
-                cameraPosition = cameraPositionState
-            },
+            modifier =
+                Modifier.fillMaxSize().padding(pd).testTag("mapGoogleMap").semantics {
+                  cameraPosition = cameraPositionState
+                },
             cameraPositionState = cameraPositionState,
             uiSettings = MapUiSettings(zoomControlsEnabled = false),
         ) {

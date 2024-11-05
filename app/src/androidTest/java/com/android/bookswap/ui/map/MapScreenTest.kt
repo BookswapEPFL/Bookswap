@@ -21,12 +21,12 @@ import com.android.bookswap.data.source.network.BooksFirestoreRepository
 import com.android.bookswap.model.map.BookFilter
 import com.android.bookswap.model.map.DefaultGeolocation
 import com.android.bookswap.ui.navigation.NavigationActions
+import com.google.maps.android.compose.CameraPositionState
 import io.mockk.every
 import io.mockk.mockk
-import com.google.maps.android.compose.CameraPositionState
 import java.util.UUID
-import org.junit.Before
 import junit.framework.TestCase.assertEquals
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
@@ -289,11 +289,11 @@ class MapScreenTest {
   @Test
   fun mapHasGeoLocation() {
     val geolocation = DefaultGeolocation()
-      composeTestRule.setContent {
-          val navController = rememberNavController()
-          val navigationActions = NavigationActions(navController)
-          MapScreen(user, navigationActions, BookFilter(), mockBookRepository, 0)
-      }
+    composeTestRule.setContent {
+      val navController = rememberNavController()
+      val navigationActions = NavigationActions(navController)
+      MapScreen(user, navigationActions, BookFilter(), mockBookRepository, 0)
+    }
     val node1 = composeTestRule.onNodeWithTag("mapGoogleMap").fetchSemanticsNode()
     val cameraPositionState: CameraPositionState? = node1.config.getOrNull(CameraPositionKey)
 

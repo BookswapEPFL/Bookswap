@@ -15,7 +15,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
 import com.android.bookswap.data.DataUser
-import com.android.bookswap.data.repository.BooksRepository
 import com.android.bookswap.data.source.network.BooksFirestoreRepository
 import com.android.bookswap.data.source.network.MessageFirestoreSource
 import com.android.bookswap.model.chat.MessageBox
@@ -37,9 +36,7 @@ import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.navigation.Route
 import com.android.bookswap.ui.navigation.Screen
 import com.android.bookswap.ui.theme.BookSwapAppTheme
-import com.google.firebase.Firebase
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.firestore
 import java.util.UUID
 
 class MainActivity : ComponentActivity() {
@@ -111,7 +108,12 @@ class MainActivity : ComponentActivity() {
       }
       navigation(startDestination = Screen.MAP, route = Route.MAP) {
         composable(Screen.MAP) {
-          MapScreen(user, navigationActions = navigationActions, bookFilter = bookFilter, bookRepository, geolocation = geolocation)
+          MapScreen(
+              user,
+              navigationActions = navigationActions,
+              bookFilter = bookFilter,
+              bookRepository,
+              geolocation = geolocation)
         }
         composable(Screen.FILTER) { FilterMapScreen(navigationActions, bookFilter) }
       }

@@ -2,10 +2,10 @@ package com.android.bookswap.model
 
 import androidx.lifecycle.ViewModel
 import com.android.bookswap.data.DataUser
-import java.util.UUID
 import com.android.bookswap.data.repository.UsersRepository
 import com.android.bookswap.data.source.network.UserFirestoreSource
 import com.google.firebase.firestore.FirebaseFirestore
+import java.util.UUID
 
 open class UserViewModel(
     var uuid: String = "ERROR_UUID",
