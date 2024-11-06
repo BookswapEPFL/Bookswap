@@ -1,6 +1,5 @@
 package com.android.bookswap.ui.components
 
-import android.content.res.Configuration
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
@@ -11,9 +10,7 @@ import androidx.compose.foundation.interaction.InteractionSource
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -24,14 +21,12 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
@@ -44,10 +39,8 @@ import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.android.bookswap.ui.theme.BookSwapAppTheme
 
 @Composable
 fun FieldComponent(
@@ -153,7 +146,6 @@ fun FieldComponent(
                                             } else {
                                               value.text.isEmpty()
                                             },
-                                        interactionSource = m_interactionSource,
                                         colors = colors)
                                     .value,
                                 RoundedCornerShape(100))
@@ -171,7 +163,6 @@ fun FieldComponent(
                                             } else {
                                               value.text.isEmpty()
                                             },
-                                        interactionSource = m_interactionSource,
                                         colors = colors)
                                     .value,
                                 RoundedCornerShape(100)),
@@ -205,7 +196,27 @@ fun FieldComponent(
     interactionSource: MutableInteractionSource? = null,
     cursorBrush: Brush = SolidColor(Color.Black)
 ) {
-  val colors = OutlinedTextFieldDefaults.colors()
+  FieldComponent(
+      value = TextFieldValue(value),
+      onValueChange = { tfv: TextFieldValue -> onValueChange(tfv.text) },
+      modifier = modifier,
+      enabled = enabled,
+      readOnly = readOnly,
+      textStyle = textStyle,
+      label = label,
+      placeholder = placeholder,
+      isError = isError,
+      keyboardOptions = keyboardOptions,
+      keyboardActions = keyboardActions,
+      singleLine = singleLine,
+      maxLines = maxLines,
+      minLines = minLines,
+      visualTransformation = visualTransformation,
+      onTextLayout = onTextLayout,
+      interactionSource = interactionSource,
+      cursorBrush = cursorBrush)
+
+  /*val colors = OutlinedTextFieldDefaults.colors()
   val m_interactionSource = interactionSource ?: remember { MutableInteractionSource() }
   val textColor =
       textStyle.color.takeOrElse { textColor(enabled, isError, m_interactionSource, colors).value }
@@ -295,7 +306,7 @@ fun FieldComponent(
               contentPadding =
                   PaddingValues(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 16.dp))
         })
-  }
+  }*/
 }
 
 @Composable
@@ -325,7 +336,6 @@ internal fun backgroundColor(
     enabled: Boolean,
     isError: Boolean,
     isEmpty: Boolean,
-    interactionSource: InteractionSource,
     colors: TextFieldColors
 ): State<Color> {
   val targetValue =
@@ -383,6 +393,7 @@ internal fun indicatorColor(
   }
 }
 
+/*
 @Preview(
     uiMode = Configuration.UI_MODE_NIGHT_NO,
     showBackground = true,
@@ -455,3 +466,4 @@ fun FieldComponentPreview() {
     }
   }
 }
+// */
