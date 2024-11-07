@@ -13,12 +13,11 @@ import java.util.UUID
 const val COLLECTION_PATH = "messages"
 
 class MessageFirestoreSource(private val db: FirebaseFirestore) : MessageRepository {
-    override fun getNewUUID(): UUID {
-        return UUID.randomUUID()
-    }
+  override fun getNewUUID(): UUID {
+    return UUID.randomUUID()
+  }
 
-
-    override fun init(callback: (Result<Unit>) -> Unit) {
+  override fun init(callback: (Result<Unit>) -> Unit) {
     try {
       callback(Result.success(Unit))
     } catch (e: Exception) {
@@ -52,14 +51,16 @@ class MessageFirestoreSource(private val db: FirebaseFirestore) : MessageReposit
             "receiverId" to message.receiverId,
             "timestamp" to message.timestamp)
 
-    db.collection(COLLECTION_PATH).document(message.uuid.toString()).set(messageMap).addOnCompleteListener {
-        result ->
-      if (result.isSuccessful) {
-        callback(Result.success(Unit))
-      } else {
-        callback(Result.failure(result.exception ?: Exception("Unknown error sending message")))
-      }
-    }
+    db.collection(COLLECTION_PATH)
+        .document(message.uuid.toString())
+        .set(messageMap)
+        .addOnCompleteListener { result ->
+          if (result.isSuccessful) {
+            callback(Result.success(Unit))
+          } else {
+            callback(Result.failure(result.exception ?: Exception("Unknown error sending message")))
+          }
+        }
   }
 
   override fun deleteMessage(
@@ -70,23 +71,26 @@ class MessageFirestoreSource(private val db: FirebaseFirestore) : MessageReposit
     val fifteenMinutesInMillis = 15 * 60 * 1000
     val currentTime = System.currentTimeMillis()
 
-    db.collection(COLLECTION_PATH).document(messageUUID.toString()).get().addOnCompleteListener { task ->
+    db.collection(COLLECTION_PATH).document(messageUUID.toString()).get().addOnCompleteListener {
+        task ->
       if (task.isSuccessful) {
         val document = task.result
         if (document != null && document.exists()) {
           val existingMessage = documentToMessage(document).getOrNull()
           if (existingMessage != null) {
             if (currentTime - existingMessage.timestamp <= fifteenMinutesInMillis) {
-              db.collection(COLLECTION_PATH).document(messageUUID.toString()).delete().addOnCompleteListener {
-                  deleteTask ->
-                if (deleteTask.isSuccessful) {
-                  callback(Result.success(Unit))
-                } else {
-                  callback(
-                      Result.failure(
-                          deleteTask.exception ?: Exception("Unknown error deleting message")))
-                }
-              }
+              db.collection(COLLECTION_PATH)
+                  .document(messageUUID.toString())
+                  .delete()
+                  .addOnCompleteListener { deleteTask ->
+                    if (deleteTask.isSuccessful) {
+                      callback(Result.success(Unit))
+                    } else {
+                      callback(
+                          Result.failure(
+                              deleteTask.exception ?: Exception("Unknown error deleting message")))
+                    }
+                  }
             } else {
               Toast.makeText(
                       context,
@@ -151,7 +155,8 @@ class MessageFirestoreSource(private val db: FirebaseFirestore) : MessageReposit
     val fifteenMinutesInMillis = 15 * 60 * 1000
     val currentTime = System.currentTimeMillis()
 
-    db.collection(COLLECTION_PATH).document(message.uuid.toString()).get().addOnCompleteListener { task ->
+    db.collection(COLLECTION_PATH).document(message.uuid.toString()).get().addOnCompleteListener {
+        task ->
       if (task.isSuccessful) {
         val document = task.result
         if (document != null && document.exists()) {

@@ -16,6 +16,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreSettings
 import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.firestore.WriteBatch
+import java.util.UUID
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -27,7 +28,6 @@ import org.mockito.Mockito.`when`
 import org.mockito.MockitoAnnotations
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.Shadows.shadowOf
-import java.util.UUID
 
 @RunWith(RobolectricTestRunner::class)
 class DataMessageFirestoreSourceTest {
@@ -142,7 +142,8 @@ class DataMessageFirestoreSourceTest {
             "receiverId" to testMessage.receiverId,
             "timestamp" to testMessage.timestamp)
     `when`(mockFirestore.collection(COLLECTION_PATH)).thenReturn(mockCollectionReference)
-    `when`(mockCollectionReference.document(testMessage.uuid.toString())).thenReturn(mockDocumentReference)
+    `when`(mockCollectionReference.document(testMessage.uuid.toString()))
+        .thenReturn(mockDocumentReference)
     `when`(mockDocumentReference.set(messageMap)).thenReturn(Tasks.forResult(null))
 
     messageFirestoreSource.sendMessage(testMessage) { result -> assert(result.isSuccess) }
@@ -161,7 +162,8 @@ class DataMessageFirestoreSourceTest {
             "receiverId" to testMessage.receiverId,
             "timestamp" to testMessage.timestamp)
     `when`(mockFirestore.collection(COLLECTION_PATH)).thenReturn(mockCollectionReference)
-    `when`(mockCollectionReference.document(testMessage.uuid.toString())).thenReturn(mockDocumentReference)
+    `when`(mockCollectionReference.document(testMessage.uuid.toString()))
+        .thenReturn(mockDocumentReference)
     `when`(mockDocumentReference.set(messageMap)).thenReturn(Tasks.forException(exception))
 
     messageFirestoreSource.sendMessage(testMessage) { result ->
@@ -178,7 +180,8 @@ class DataMessageFirestoreSourceTest {
         testMessage.copy(timestamp = System.currentTimeMillis() - (fifteenMinutesInMillis - 1000))
 
     `when`(mockFirestore.collection(COLLECTION_PATH)).thenReturn(mockCollectionReference)
-    `when`(mockCollectionReference.document(recentMessage.uuid.toString())).thenReturn(mockDocumentReference)
+    `when`(mockCollectionReference.document(recentMessage.uuid.toString()))
+        .thenReturn(mockDocumentReference)
     `when`(mockDocumentReference.get()).thenReturn(Tasks.forResult(mockDocumentSnapshot))
     `when`(mockDocumentSnapshot.exists()).thenReturn(true) // Ensure document exists
     `when`(mockDocumentSnapshot.getString("uuid")).thenReturn(recentMessage.uuid.toString())
@@ -199,7 +202,8 @@ class DataMessageFirestoreSourceTest {
   @Test
   fun deleteMessage_failsWhenMessageNotFound() {
     `when`(mockFirestore.collection(COLLECTION_PATH)).thenReturn(mockCollectionReference)
-    `when`(mockCollectionReference.document(testMessage.uuid.toString())).thenReturn(mockDocumentReference)
+    `when`(mockCollectionReference.document(testMessage.uuid.toString()))
+        .thenReturn(mockDocumentReference)
     `when`(mockDocumentReference.get()).thenReturn(Tasks.forResult(mockDocumentSnapshot))
     `when`(mockDocumentSnapshot.exists()).thenReturn(false) // Message does not exist
 
@@ -220,7 +224,8 @@ class DataMessageFirestoreSourceTest {
                 System.currentTimeMillis() -
                     (15 * 60 * 1000 + 1000)) // Sent more than 15 minutes ago
     `when`(mockFirestore.collection(COLLECTION_PATH)).thenReturn(mockCollectionReference)
-    `when`(mockCollectionReference.document(oldMessage.uuid.toString())).thenReturn(mockDocumentReference)
+    `when`(mockCollectionReference.document(oldMessage.uuid.toString()))
+        .thenReturn(mockDocumentReference)
     `when`(mockDocumentReference.get()).thenReturn(Tasks.forResult(mockDocumentSnapshot))
     `when`(mockDocumentSnapshot.exists()).thenReturn(true)
     `when`(mockDocumentSnapshot.getString("uuid")).thenReturn(oldMessage.uuid.toString())
@@ -244,7 +249,8 @@ class DataMessageFirestoreSourceTest {
   fun deleteMessage_failsOnFirestoreRetrievalError() {
     val exception = RuntimeException("Firestore retrieval error")
     `when`(mockFirestore.collection(COLLECTION_PATH)).thenReturn(mockCollectionReference)
-    `when`(mockCollectionReference.document(testMessage.uuid.toString())).thenReturn(mockDocumentReference)
+    `when`(mockCollectionReference.document(testMessage.uuid.toString()))
+        .thenReturn(mockDocumentReference)
     `when`(mockDocumentReference.get()).thenReturn(Tasks.forException(exception))
 
     messageFirestoreSource.deleteMessage(
@@ -264,7 +270,8 @@ class DataMessageFirestoreSourceTest {
             timestamp =
                 System.currentTimeMillis() - (15 * 60 * 1000 - 1000)) // Sent within 15 minutes
     `when`(mockFirestore.collection(COLLECTION_PATH)).thenReturn(mockCollectionReference)
-    `when`(mockCollectionReference.document(recentMessage.uuid.toString())).thenReturn(mockDocumentReference)
+    `when`(mockCollectionReference.document(recentMessage.uuid.toString()))
+        .thenReturn(mockDocumentReference)
     `when`(mockDocumentReference.get()).thenReturn(Tasks.forResult(mockDocumentSnapshot))
     `when`(mockDocumentSnapshot.exists()).thenReturn(true)
     `when`(mockDocumentSnapshot.getString("uuid")).thenReturn(recentMessage.uuid.toString())
@@ -286,7 +293,8 @@ class DataMessageFirestoreSourceTest {
   @Test
   fun deleteMessage_failsWhenConversionFails() {
     `when`(mockFirestore.collection(COLLECTION_PATH)).thenReturn(mockCollectionReference)
-    `when`(mockCollectionReference.document(testMessage.uuid.toString())).thenReturn(mockDocumentReference)
+    `when`(mockCollectionReference.document(testMessage.uuid.toString()))
+        .thenReturn(mockDocumentReference)
     `when`(mockDocumentReference.get()).thenReturn(Tasks.forResult(mockDocumentSnapshot))
     `when`(mockDocumentSnapshot.exists()).thenReturn(true)
     `when`(mockDocumentSnapshot.getString("uuid"))
@@ -395,7 +403,8 @@ class DataMessageFirestoreSourceTest {
   @Test
   fun updateMessage_failsWhenMessageNotFound() {
     `when`(mockFirestore.collection(COLLECTION_PATH)).thenReturn(mockCollectionReference)
-    `when`(mockCollectionReference.document(testMessage.uuid.toString())).thenReturn(mockDocumentReference)
+    `when`(mockCollectionReference.document(testMessage.uuid.toString()))
+        .thenReturn(mockDocumentReference)
     `when`(mockDocumentReference.get()).thenReturn(Tasks.forResult(mockDocumentSnapshot))
     `when`(mockDocumentSnapshot.exists()).thenReturn(false)
 
@@ -416,7 +425,8 @@ class DataMessageFirestoreSourceTest {
                 System.currentTimeMillis() -
                     (15 * 60 * 1000 + 1000)) // Sent more than 15 minutes ago
     `when`(mockFirestore.collection(COLLECTION_PATH)).thenReturn(mockCollectionReference)
-    `when`(mockCollectionReference.document(oldMessage.uuid.toString())).thenReturn(mockDocumentReference)
+    `when`(mockCollectionReference.document(oldMessage.uuid.toString()))
+        .thenReturn(mockDocumentReference)
     `when`(mockDocumentReference.get()).thenReturn(Tasks.forResult(mockDocumentSnapshot))
     `when`(mockDocumentSnapshot.exists()).thenReturn(true)
     `when`(mockDocumentSnapshot.getString("uuid")).thenReturn(oldMessage.uuid.toString())
@@ -440,7 +450,8 @@ class DataMessageFirestoreSourceTest {
   fun updateMessage_failsOnFirestoreRetrievalError() {
     val exception = RuntimeException("Firestore retrieval error")
     `when`(mockFirestore.collection(COLLECTION_PATH)).thenReturn(mockCollectionReference)
-    `when`(mockCollectionReference.document(testMessage.uuid.toString())).thenReturn(mockDocumentReference)
+    `when`(mockCollectionReference.document(testMessage.uuid.toString()))
+        .thenReturn(mockDocumentReference)
     `when`(mockDocumentReference.get()).thenReturn(Tasks.forException(exception))
 
     messageFirestoreSource.updateMessage(
@@ -461,7 +472,8 @@ class DataMessageFirestoreSourceTest {
     val messageMap = mapOf("text" to updatedText, "timestamp" to System.currentTimeMillis())
 
     `when`(mockFirestore.collection(COLLECTION_PATH)).thenReturn(mockCollectionReference)
-    `when`(mockCollectionReference.document(recentMessage.uuid.toString())).thenReturn(mockDocumentReference)
+    `when`(mockCollectionReference.document(recentMessage.uuid.toString()))
+        .thenReturn(mockDocumentReference)
     `when`(mockDocumentReference.get()).thenReturn(Tasks.forResult(mockDocumentSnapshot))
     `when`(mockDocumentSnapshot.exists()).thenReturn(true)
     `when`(mockDocumentSnapshot.getString("uuid")).thenReturn(recentMessage.uuid.toString())
@@ -483,7 +495,8 @@ class DataMessageFirestoreSourceTest {
   @Test
   fun updateMessage_failsWhenConversionFails() {
     `when`(mockFirestore.collection(COLLECTION_PATH)).thenReturn(mockCollectionReference)
-    `when`(mockCollectionReference.document(testMessage.uuid.toString())).thenReturn(mockDocumentReference)
+    `when`(mockCollectionReference.document(testMessage.uuid.toString()))
+        .thenReturn(mockDocumentReference)
     `when`(mockDocumentReference.get()).thenReturn(Tasks.forResult(mockDocumentSnapshot))
     `when`(mockDocumentSnapshot.exists()).thenReturn(true)
     `when`(mockDocumentSnapshot.getString("uuid")).thenReturn(null)
@@ -499,7 +512,7 @@ class DataMessageFirestoreSourceTest {
 
   @Test
   fun documentToMessage_returnsDataMessageOnSuccess() {
-      val definedUUID = UUID.randomUUID()
+    val definedUUID = UUID.randomUUID()
     `when`(mockDocumentSnapshot.getString("uuid")).thenReturn(definedUUID.toString())
     `when`(mockDocumentSnapshot.getString("text")).thenReturn("Test message")
     `when`(mockDocumentSnapshot.getString("senderId")).thenReturn("sender1")

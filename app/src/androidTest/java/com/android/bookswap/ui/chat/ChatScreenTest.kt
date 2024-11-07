@@ -23,10 +23,10 @@ import io.mockk.mockk
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import java.util.UUID
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import java.util.UUID
 
 class ChatScreenTest {
 
