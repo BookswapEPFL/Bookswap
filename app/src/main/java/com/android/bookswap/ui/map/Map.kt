@@ -1,6 +1,5 @@
 package com.android.bookswap.ui.map
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -109,10 +108,9 @@ fun MapScreen(
   var mutableStateSelectedUser by remember { mutableStateOf(selectedUser) }
   var markerScreenPosition by remember { mutableStateOf<Offset?>(null) }
 
-    val filteredBooks = bookManager.filteredBooks.collectAsState()
+  val filteredBooks = bookManager.filteredBooks.collectAsState()
 
-    val filteredUsers = bookManager.filteredUsers.collectAsState()
-
+  val filteredUsers = bookManager.filteredUsers.collectAsState()
 
   // compute the position of the marker on the screen given the camera position and the marker's
   // position on the map

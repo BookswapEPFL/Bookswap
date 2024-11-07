@@ -17,90 +17,77 @@ import com.android.bookswap.data.BookGenres
 import com.android.bookswap.data.BookLanguages
 import com.android.bookswap.data.DataBook
 import com.android.bookswap.data.DataUser
-import com.android.bookswap.data.source.network.BooksFirestoreRepository
-import com.android.bookswap.model.map.BookFilter
 import com.android.bookswap.model.map.BookManager
 import com.android.bookswap.model.map.DefaultGeolocation
 import com.android.bookswap.ui.navigation.NavigationActions
 import com.google.maps.android.compose.CameraPositionState
 import io.mockk.every
-import io.mockk.just
 import io.mockk.mockk
-import io.mockk.mockkConstructor
-import io.mockk.runs
 import java.util.UUID
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
 class MapScreenTest {
   private val longListBook =
-    List(20) {
-      DataBook(
-        uuid = UUID(2000, 2000),
-        title = "Book 1",
-        author = "Author 1",
-        description = "Description of Book 1",
-        rating = 5,
-        photo = "url_to_photo_1",
-        language = BookLanguages.ENGLISH,
-        isbn = "123-456-789",
-        genres = listOf(BookGenres.FICTION, BookGenres.NONFICTION))
-    }
+      List(20) {
+        DataBook(
+            uuid = UUID(2000, 2000),
+            title = "Book 1",
+            author = "Author 1",
+            description = "Description of Book 1",
+            rating = 5,
+            photo = "url_to_photo_1",
+            language = BookLanguages.ENGLISH,
+            isbn = "123-456-789",
+            genres = listOf(BookGenres.FICTION, BookGenres.NONFICTION))
+      }
 
   private val books =
-    listOf(
-      DataBook(
-        uuid = UUID(1000, 1000),
-        title = "Book 1",
-        author = "Author 1",
-        description = "Description of Book 1",
-        rating = 5,
-        photo = "url_to_photo_1",
-        language = BookLanguages.ENGLISH,
-        isbn = "123-456-789",
-        genres = listOf(BookGenres.FICTION, BookGenres.HORROR)),
-      DataBook(
-        uuid = UUID(2000, 1000),
-        title = "Book 2",
-        author = "Author 2",
-        description = "Description of Book 2",
-        rating = 4,
-        photo = "url_to_photo_2",
-        language = BookLanguages.FRENCH,
-        isbn = "234-567-890",
-        genres = listOf(BookGenres.FICTION)))
+      listOf(
+          DataBook(
+              uuid = UUID(1000, 1000),
+              title = "Book 1",
+              author = "Author 1",
+              description = "Description of Book 1",
+              rating = 5,
+              photo = "url_to_photo_1",
+              language = BookLanguages.ENGLISH,
+              isbn = "123-456-789",
+              genres = listOf(BookGenres.FICTION, BookGenres.HORROR)),
+          DataBook(
+              uuid = UUID(2000, 1000),
+              title = "Book 2",
+              author = "Author 2",
+              description = "Description of Book 2",
+              rating = 4,
+              photo = "url_to_photo_2",
+              language = BookLanguages.FRENCH,
+              isbn = "234-567-890",
+              genres = listOf(BookGenres.FICTION)))
   private val user = listOf(DataUser(bookList = listOf(UUID(1000, 1000), UUID(2000, 1000))))
   private val userLongList = listOf(DataUser(bookList = listOf(UUID(2000, 2000))))
 
-  private val userBooksWithLocationList = listOf(UserBooksWithLocation(user[0].longitude, user[0].latitude, books))
-  private val userBooksWithLocationLongList = listOf(UserBooksWithLocation(userLongList[0].longitude, userLongList[0].latitude, longListBook))
+  private val userBooksWithLocationList =
+      listOf(UserBooksWithLocation(user[0].longitude, user[0].latitude, books))
+  private val userBooksWithLocationLongList =
+      listOf(
+          UserBooksWithLocation(userLongList[0].longitude, userLongList[0].latitude, longListBook))
 
-  private val userWithoutBooks = listOf(UserBooksWithLocation(0.0,0.0,emptyList()))
+  private val userWithoutBooks = listOf(UserBooksWithLocation(0.0, 0.0, emptyList()))
   @get:Rule val composeTestRule = createComposeRule()
 
-  private lateinit var mockBookRepository: BooksFirestoreRepository
   private lateinit var mockBookManager: BookManager
 
   @Before
   fun setup() {
-    mockBookRepository = mockk()
-    every { mockBookRepository.getBook(any(), any()) } just runs
-
     mockBookManager = mockk()
 
-    // Mock the behavior of filteredBooks and filteredUsers for the mocked instance
-    every {
-      mockBookManager.filteredBooks
-    } returns MutableStateFlow(books)
+    every { mockBookManager.filteredBooks } returns MutableStateFlow(books)
 
-    every {
-      mockBookManager.filteredUsers
-    } returns MutableStateFlow(userBooksWithLocationList)
-
+    every { mockBookManager.filteredUsers } returns MutableStateFlow(userBooksWithLocationList)
   }
 
   @Test
@@ -181,9 +168,9 @@ class MapScreenTest {
     composeTestRule.onNodeWithTag("mapDraggableMenu").assertIsDisplayed()
     composeTestRule.onNodeWithTag("mapDraggableMenuBookBox0").assertIsNotDisplayed()
     composeTestRule
-      .onNodeWithTag("mapDraggableMenuNoBook")
-      .assertIsDisplayed()
-      .assertTextContains("No books found")
+        .onNodeWithTag("mapDraggableMenuNoBook")
+        .assertIsDisplayed()
+        .assertTextContains("No books found")
   }
 
   @Test
@@ -226,12 +213,14 @@ class MapScreenTest {
     composeTestRule.onNodeWithTag("mapDraggableMenu").assertIsDisplayed()
   }
 
-
   @Test
   fun draggableMenuListIsScrollable() {
 
     every { mockBookManager.filteredBooks } answers { MutableStateFlow(longListBook) }
-    every { mockBookManager.filteredUsers } answers { MutableStateFlow(userBooksWithLocationLongList) }
+    every { mockBookManager.filteredUsers } answers
+        {
+          MutableStateFlow(userBooksWithLocationLongList)
+        }
     composeTestRule.setContent {
       val navController = rememberNavController()
       val navigationActions = NavigationActions(navController)

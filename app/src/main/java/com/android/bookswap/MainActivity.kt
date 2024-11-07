@@ -81,7 +81,7 @@ class MainActivity : ComponentActivity() {
     val navController = rememberNavController()
     val navigationActions = NavigationActions(navController)
     val bookFilter = BookFilter()
-      val bookManager = BookManager(geolocation, bookRepository, user, bookFilter)
+    val bookManager = BookManager(geolocation, bookRepository, user, bookFilter)
 
     val placeHolder =
         listOf(
@@ -110,10 +110,7 @@ class MainActivity : ComponentActivity() {
       }
       navigation(startDestination = Screen.MAP, route = Route.MAP) {
         composable(Screen.MAP) {
-          MapScreen(
-              bookManager,
-              navigationActions = navigationActions,
-              geolocation = geolocation)
+          MapScreen(bookManager, navigationActions = navigationActions, geolocation = geolocation)
         }
         composable(Screen.FILTER) { FilterMapScreen(navigationActions, bookFilter) }
       }
@@ -132,21 +129,9 @@ class MainActivity : ComponentActivity() {
 // Need to be removed in the future.
 val user =
     listOf(
-        DataUser(
-            longitude = 0.04,
-            latitude = 0.04,
-            bookList =
-                listOf(
-                    UUID(12345678L, 87654321L))),
-        DataUser(
-            longitude = -0.08,
-            latitude = -0.08,
-            bookList =
-            listOf(
-                UUID(-848484, 848484))),
+        DataUser(longitude = 0.04, latitude = 0.04, bookList = listOf(UUID(12345678L, 87654321L))),
+        DataUser(longitude = -0.08, latitude = -0.08, bookList = listOf(UUID(-848484, 848484))),
         DataUser(
             longitude = 0.0,
             latitude = 0.0,
-            bookList =
-            listOf(
-                UUID(763879565731911, 5074118859109511))))
+            bookList = listOf(UUID(763879565731911, 5074118859109511))))
