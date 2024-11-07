@@ -46,7 +46,6 @@ import com.android.bookswap.ui.theme.ColorVariable
 /** Constants * */
 private val SCREEN_PADDING = 16.dp
 private val ELEMENT_SPACING = 8.dp
-// private val DESCRIPTION_FIELD_HEIGHT = 100.dp
 private val BUTTON_SPACER_HEIGHT = 16.dp
 private const val COLUMN_WIDTH_RATIO = 0.9f // Column width as 90% of screen width
 
@@ -106,7 +105,6 @@ fun EditBookScreen(
                     .widthIn(max = columnMaxWidth)
                     .background(ColorVariable.BackGround)
                     .testTag("editBookScreenColumn"),
-            // .align(Alignment.CenterHorizontally)
             verticalArrangement = Arrangement.spacedBy(ELEMENT_SPACING)) {
               // Title Edit Field
               item {
@@ -182,7 +180,6 @@ fun EditBookScreen(
                     label = { Text("Description") },
                     placeholder = { Text("Provide a description of the book") },
                     modifier = Modifier.fillMaxWidth().testTag("inputBookDescription"),
-                    // .height(DESCRIPTION_FIELD_HEIGHT)
                     colors =
                         TextFieldDefaults.outlinedTextFieldColors(
                             containerColor = ColorVariable.Secondary,
@@ -213,6 +210,7 @@ fun EditBookScreen(
                   modifier = Modifier.fillMaxWidth().testTag("inputBookISBN")
               )*/
               // Remove for now but could be added later
+
               item {
                 // Photo Edit Field
                 OutlinedTextField(
@@ -302,7 +300,7 @@ fun EditBookScreen(
                       booksRepository.deleteBooks(
                           book.uuid.toString(),
                           book,
-                          OnSucess = { navigationActions.goBack() },
+                          onSucess = { navigationActions.goBack() },
                           onFailure = {
                             Toast.makeText(context, "Failed to delete book.", Toast.LENGTH_SHORT)
                                 .show()

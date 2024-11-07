@@ -102,12 +102,12 @@ class BooksFirestoreRepository(private val db: FirebaseFirestore) : BooksReposit
   override fun deleteBooks(
       id: String,
       dataBook: DataBook,
-      OnSucess: () -> Unit,
+      onSucess: () -> Unit,
       onFailure: (Exception) -> Unit
   ) {
     performFirestoreOperation(
         db.collection(collectionBooks).document(dataBook.uuid.toString()).delete(),
-        OnSucess,
+        onSucess,
         onFailure)
   }
   // Maps a Firestore document to a DataBook object
