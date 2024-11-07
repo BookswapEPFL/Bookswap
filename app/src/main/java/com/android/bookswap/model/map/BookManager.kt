@@ -32,10 +32,14 @@ class BookManager(
   val filteredUsers: StateFlow<List<UserBooksWithLocation>> = _filteredUsers.asStateFlow()
 
   private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
-  private val timer = Timer()
 
   init {
-    timer.schedule(0, REFRESH_TIME_PERIOD) { fetchBooksFromRepository() }
+      scope.launch {
+          while (true){
+              fetchBooksFromRepository()
+              delay(REFRESH_TIME_PERIOD)
+          }
+      }
     computeDistanceOfUsers()
     combineFlowsAndFilterBooks()
   }
