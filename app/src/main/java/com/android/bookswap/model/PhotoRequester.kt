@@ -14,6 +14,8 @@ import androidx.core.content.FileProvider
 import com.android.bookswap.BuildConfig
 import java.io.File
 
+const val IMAGE_TYPE = ".jpg"
+const val IMAGE_PREFIX = "temp_image_"
 /**
  * Easy code abstraction allowing the user to open their photo app and take a photo of their choice
  * and then confirm it. Please call [Init] (Composable) in your UI (doesn't matter where)
@@ -71,16 +73,14 @@ class PhotoRequester(
   /** Generate a Uri for temporary file storage in the app cache. */
   private fun getTempUri(): Uri {
     val tempFile =
-        File.createTempFile(
-            "temp_image_file_", /* prefix */
-            ".jpg", /* suffix */
-            context.cacheDir /* cache directory */)
+        File.createTempFile(IMAGE_PREFIX, IMAGE_TYPE, context.cacheDir /* cache directory */)
 
     // Create sandboxed url for this temp file - needed for the camera API
     val uri =
         FileProvider.getUriForFile(
             context,
-            "${BuildConfig.APPLICATION_ID}.provider", /* needs to match the provider information in the manifest */
+            "${BuildConfig.APPLICATION_ID}.provider", // matches the provider information in the
+                                                      // manifest
             tempFile)
 
     return uri

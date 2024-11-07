@@ -60,7 +60,7 @@ android {
 
     buildFeatures {
         compose = true
-        buildConfig = true
+        buildConfig = true //Generate a com.android.bookswap.BuildConfig file
     }
 
     composeOptions {
