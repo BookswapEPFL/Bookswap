@@ -17,10 +17,6 @@ data class ChatGPTMessage(
 
 data class ChatGPTRequest(val model: String, val messages: List<ChatGPTMessage>)
 
-data class ChatGPTChoice(val message: ChatGPTMessage)
-
-data class ChatGPTResponse(val choices: List<ChatGPTChoice>)
-
 /**
  * Service to interact with the OpenAI ChatGPT API.
  *

@@ -209,8 +209,6 @@ dependencies {
     globalTestImplementation(libs.kaspresso)
     globalTestImplementation(libs.kaspresso.compose)
 
-
-
     testImplementation(libs.mockito.core)
     testImplementation(libs.mockito.inline)
     testImplementation(libs.mockito.kotlin)
@@ -224,6 +222,8 @@ dependencies {
     implementation(libs.volley) //HTTP request
     implementation(libs.okhttp)
 
+    implementation("org.apache.httpcomponents:httpclient:4.5.14")
+    implementation("org.apache.httpcomponents:httpcore:4.4.13")
     implementation(libs.json) //JSON parser
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("androidx.vectordrawable:vectordrawable:1.1.0")
