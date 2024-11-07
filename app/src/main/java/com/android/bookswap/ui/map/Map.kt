@@ -1,5 +1,6 @@
 package com.android.bookswap.ui.map
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -47,6 +48,7 @@ import com.android.bookswap.data.DataBook
 import com.android.bookswap.data.DataUser
 import com.android.bookswap.data.repository.BooksRepository
 import com.android.bookswap.model.map.BookFilter
+import com.android.bookswap.model.map.BookManager
 import com.android.bookswap.model.map.DefaultGeolocation
 import com.android.bookswap.model.map.IGeolocation
 import com.android.bookswap.ui.navigation.BOTTOM_NAV_HEIGHT
@@ -95,49 +97,28 @@ fun MapScreen(
 ) {
   val cameraPositionState = rememberCameraPositionState()
   // Get the user's current location
-  val latitude by remember { geolocation.latitude }
-  val longitude by remember { geolocation.longitude }
+  val latitude = geolocation.latitude.collectAsState()
+  val longitude = geolocation.longitude.collectAsState()
   // Start location updates
   LaunchedEffect(Unit) {
     geolocation.startLocationUpdates()
     cameraPositionState.position =
-        CameraPosition.fromLatLngZoom(LatLng(latitude, longitude), INIT_ZOOM)
+        CameraPosition.fromLatLngZoom(LatLng(latitude.value, longitude.value), INIT_ZOOM)
   }
   // Stop location updates when the screen is disposed
   DisposableEffect(Unit) { onDispose { geolocation.stopLocationUpdates() } }
 
   var mutableStateSelectedUser by remember { mutableStateOf(selectedUser) }
   var markerScreenPosition by remember { mutableStateOf<Offset?>(null) }
-  val userBooksList = remember { mutableStateListOf<UserBooksWithLocation>() }
 
-  // Fetch books
-  LaunchedEffect(Unit) {
-    booksRepository.getBook(
-        OnSucess = { books ->
-          listUser.forEach { user ->
-            userBooksList.add(
-                UserBooksWithLocation(
-                    user.longitude,
-                    user.latitude,
-                    books.filter { book -> book.uuid in user.bookList }))
-          }
-        },
-        onFailure = {})
-  }
+    val bookManager = remember {
+        BookManager(geolocation, booksRepository, listUser, bookFilter)
+    }
 
-  val listAllBooks = userBooksList.flatMap { it.books }
+    val filteredBooks = bookManager.filteredBooks.collectAsState()
 
-  // Filter the books based on the selected filters
-  val genresFilter by bookFilter.genresFilter.collectAsState()
-  val languagesFilter by bookFilter.languagesFilter.collectAsState()
+    val filteredUsers = bookManager.filteredUsers.collectAsState()
 
-  val filteredBooks =
-      remember(genresFilter, languagesFilter, listAllBooks) { bookFilter.filterBooks(listAllBooks) }
-
-  val filteredUsers =
-      userBooksList.map {
-        it.copy(books = it.books.filter { book -> filteredBooks.contains(book) })
-      }
 
   // compute the position of the marker on the screen given the camera position and the marker's
   // position on the map
@@ -149,24 +130,24 @@ fun MapScreen(
     }
   }
 
-  if (mutableStateSelectedUser >= 0 && mutableStateSelectedUser < filteredUsers.size) {
+  if (mutableStateSelectedUser >= 0 && mutableStateSelectedUser < filteredUsers.value.size) {
     computePositionOfMarker(
         cameraPositionState,
         LatLng(
-            filteredUsers[mutableStateSelectedUser].latitude,
-            filteredUsers[mutableStateSelectedUser].longitude))
+            filteredUsers.value[mutableStateSelectedUser].latitude,
+            filteredUsers.value[mutableStateSelectedUser].longitude))
   }
 
   val coroutineScope = rememberCoroutineScope()
 
   // Recalculate marker screen position during camera movement
   LaunchedEffect(cameraPositionState.position) {
-    if (mutableStateSelectedUser >= 0 && mutableStateSelectedUser < filteredUsers.size) {
+    if (mutableStateSelectedUser >= 0 && mutableStateSelectedUser < filteredUsers.value.size) {
       computePositionOfMarker(
           cameraPositionState,
           LatLng(
-              filteredUsers[mutableStateSelectedUser].latitude,
-              filteredUsers[mutableStateSelectedUser].longitude))
+              filteredUsers.value[mutableStateSelectedUser].latitude,
+              filteredUsers.value[mutableStateSelectedUser].longitude))
     }
   }
 
@@ -189,13 +170,13 @@ fun MapScreen(
             uiSettings = MapUiSettings(zoomControlsEnabled = false),
         ) {
           // Marker for user's current location
-          if (!latitude.isNaN() && !longitude.isNaN()) {
+          if (!latitude.value.isNaN() && !longitude.value.isNaN()) {
             Marker(
-                state = MarkerState(position = LatLng(latitude, longitude)),
+                state = MarkerState(position = LatLng(latitude.value, longitude.value)),
                 title = "Your Location",
                 icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE))
           }
-          filteredUsers
+          filteredUsers.value
               .filter { !it.longitude.isNaN() && !it.latitude.isNaN() && it.books.isNotEmpty() }
               .forEachIndexed { index, item ->
                 val markerState = MarkerState(position = LatLng(item.latitude, item.longitude))
@@ -216,18 +197,18 @@ fun MapScreen(
         // Custom info window linked to the marker
         markerScreenPosition?.let { screenPos ->
           if (mutableStateSelectedUser >= 0 &&
-              mutableStateSelectedUser < filteredUsers.size &&
-              filteredUsers[mutableStateSelectedUser].books.isNotEmpty()) {
+              mutableStateSelectedUser < filteredUsers.value.size &&
+              filteredUsers.value[mutableStateSelectedUser].books.isNotEmpty()) {
             CustomInfoWindow(
                 modifier =
                     Modifier.offset {
                       IntOffset(screenPos.x.roundToInt(), screenPos.y.roundToInt())
                     },
-                userBooks = filteredUsers[mutableStateSelectedUser].books)
+                userBooks = filteredUsers.value[mutableStateSelectedUser].books)
           }
         }
         // Draggable Bottom List
-        DraggableMenu(filteredBooks)
+        DraggableMenu(filteredBooks.value)
       })
 }
 
