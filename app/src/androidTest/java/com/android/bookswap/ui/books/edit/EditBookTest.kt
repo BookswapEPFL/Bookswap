@@ -89,7 +89,10 @@ class EditBookScreenTest {
   @Test
   fun displayEditDeleteValueComponent() {
     composeTestRule.setContent { EditBookScreen(booksRepository, navigationActions, sampleBook) }
-    composeTestRule.onNodeWithTag("bookDelete").performScrollTo().assertIsDisplayed()
+    composeTestRule
+      .onNodeWithTag("editBookScreenColumn")
+      .performScrollToNode(hasTestTag("bookDelete"))
+    composeTestRule.onNodeWithTag("bookDelete").assertIsDisplayed()
     composeTestRule.onNodeWithTag("bookDelete").assertTextEquals("Delete")
   }
 
