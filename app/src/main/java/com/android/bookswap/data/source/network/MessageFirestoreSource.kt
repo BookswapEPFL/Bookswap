@@ -47,8 +47,8 @@ class MessageFirestoreSource(private val db: FirebaseFirestore) : MessageReposit
         mapOf(
             "uuid" to message.uuid,
             "text" to message.text,
-            "senderId" to message.senderId,
-            "receiverId" to message.receiverId,
+            "senderId" to message.senderUUID,
+            "receiverId" to message.receiverUUID,
             "timestamp" to message.timestamp)
 
     db.collection(COLLECTION_PATH)
@@ -203,13 +203,13 @@ class MessageFirestoreSource(private val db: FirebaseFirestore) : MessageReposit
   }
 
   override fun addMessagesListener(
-      otherUserId: String,
-      currentUserId: String,
+      otherUserUUID: UUID,
+      currentUserUUID: UUID,
       callback: (Result<List<DataMessage>>) -> Unit
   ): ListenerRegistration {
     return db.collection("messages")
-        .whereIn("senderId", listOf(currentUserId, otherUserId))
-        .whereIn("receiverId", listOf(currentUserId, otherUserId))
+        .whereIn("senderId", listOf(currentUserUUID, otherUserUUID))
+        .whereIn("receiverId", listOf(currentUserUUID, otherUserUUID))
         .whereNotEqualTo("senderId", "receiverId")
         .addSnapshotListener { snapshot, e ->
           if (e != null) {

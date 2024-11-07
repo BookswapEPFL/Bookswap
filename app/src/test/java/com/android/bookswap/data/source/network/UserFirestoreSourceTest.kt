@@ -74,7 +74,7 @@ class UserFirestoreSourceTest {
   fun getUsers() {
     // Arrange
     `when`(mockQuerySnapshot.documents).thenReturn(listOf(mockDocumentSnapshot))
-    `when`(mockDocumentSnapshot.getString("UUID")).thenReturn(testUser.userId)
+    `when`(mockDocumentSnapshot.getString("UUID")).thenReturn(testUser.userUUID)
     `when`(mockDocumentSnapshot.getString("Greeting")).thenReturn(testUser.greeting)
     `when`(mockDocumentSnapshot.getString("Firstname")).thenReturn(testUser.firstName)
     `when`(mockDocumentSnapshot.getString("Lastname")).thenReturn(testUser.lastName)
@@ -106,7 +106,7 @@ class UserFirestoreSourceTest {
     `when`(mockCollectionReference.whereEqualTo(eq("UUID"), ArgumentMatchers.anyString()))
         .thenReturn(mockQuery)
     `when`(mockQuery.get()).thenReturn(Tasks.forResult(mockQuerySnapshot))
-    `when`(mockDocumentSnapshot.getString("UUID")).thenReturn(testUser.userId)
+    `when`(mockDocumentSnapshot.getString("UUID")).thenReturn(testUser.userUUID)
     `when`(mockDocumentSnapshot.getString("Greeting")).thenReturn(testUser.greeting)
     `when`(mockDocumentSnapshot.getString("Firstname")).thenReturn(testUser.firstName)
     `when`(mockDocumentSnapshot.getString("Lastname")).thenReturn(testUser.lastName)
@@ -164,7 +164,7 @@ class UserFirestoreSourceTest {
     doAnswer { Tasks.forResult(null) }.`when`(mockDocumentReference).delete()
 
     // Act
-    userFirestoreSource.deleteUser(testUser.userId) { result ->
+    userFirestoreSource.deleteUser(testUser.userUUID) { result ->
       result.fold({ assert(true) }, { fail("Should not fail!") })
     }
 
@@ -175,7 +175,7 @@ class UserFirestoreSourceTest {
   @Test
   fun documentToUser_validDoc() {
     // Arrange
-    `when`(mockDocumentSnapshot.getString("UUID")).thenReturn(testUser.userId)
+    `when`(mockDocumentSnapshot.getString("UUID")).thenReturn(testUser.userUUID)
     `when`(mockDocumentSnapshot.getString("Greeting")).thenReturn(testUser.greeting)
     `when`(mockDocumentSnapshot.getString("Firstname")).thenReturn(testUser.firstName)
     `when`(mockDocumentSnapshot.getString("Lastname")).thenReturn(testUser.lastName)
@@ -196,7 +196,7 @@ class UserFirestoreSourceTest {
   @Test
   fun documentToUser_invalidDoc() {
     // Arrange
-    `when`(mockDocumentSnapshot.getString("UUID")).thenReturn(testUser.userId)
+    `when`(mockDocumentSnapshot.getString("UUID")).thenReturn(testUser.userUUID)
     `when`(mockDocumentSnapshot.getString("Greeting")).thenReturn(null)
     `when`(mockDocumentSnapshot.getString("Firstname")).thenReturn(testUser.firstName)
     `when`(mockDocumentSnapshot.getString("Lastname")).thenReturn(testUser.lastName)

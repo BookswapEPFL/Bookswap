@@ -1,7 +1,6 @@
 package com.android.bookswap.ui.profile
 
 import androidx.compose.ui.test.ExperimentalTestApi
-import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.android.bookswap.data.DataUser
@@ -175,11 +174,11 @@ class MockUserRepo : UsersRepository {
   }
 
   override fun addUser(dataUser: DataUser, callback: (Result<Unit>) -> Unit) {
-    mockUserList.put(dataUser.userId, dataUser)
+    mockUserList.put(dataUser.userUUID, dataUser)
   }
 
   override fun updateUser(dataUser: DataUser, callback: (Result<Unit>) -> Unit) {
-    mockUserList.put(dataUser.userId, dataUser)
+    mockUserList.put(dataUser.userUUID, dataUser)
   }
 
   override fun deleteUser(uuid: String, callback: (Result<Unit>) -> Unit) {

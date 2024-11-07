@@ -47,8 +47,8 @@ class DataMessageFirestoreSourceTest {
       DataMessage(
           uuid = UUID.randomUUID(),
           text = "Test message",
-          senderId = "sender_id",
-          receiverId = "receiver_id",
+          senderUUID = "sender_id",
+          receiverUUID = "receiver_id",
           timestamp = System.currentTimeMillis())
 
   @Before
@@ -92,8 +92,8 @@ class DataMessageFirestoreSourceTest {
     `when`(mockCollectionReference.get()).thenReturn(Tasks.forResult(mockQuerySnapshot))
     `when`(mockDocumentSnapshot.getString("uuid")).thenReturn(expectedMessage.uuid.toString())
     `when`(mockDocumentSnapshot.getString("text")).thenReturn(expectedMessage.text)
-    `when`(mockDocumentSnapshot.getString("senderId")).thenReturn(expectedMessage.senderId)
-    `when`(mockDocumentSnapshot.getString("receiverId")).thenReturn(expectedMessage.receiverId)
+    `when`(mockDocumentSnapshot.getString("senderId")).thenReturn(expectedMessage.senderUUID)
+    `when`(mockDocumentSnapshot.getString("receiverId")).thenReturn(expectedMessage.receiverUUID)
     `when`(mockDocumentSnapshot.getLong("timestamp")).thenReturn(expectedMessage.timestamp)
 
     // Act
@@ -138,8 +138,8 @@ class DataMessageFirestoreSourceTest {
         mapOf(
             "uuid" to testMessage.uuid,
             "text" to testMessage.text,
-            "senderId" to testMessage.senderId,
-            "receiverId" to testMessage.receiverId,
+            "senderId" to testMessage.senderUUID,
+            "receiverId" to testMessage.receiverUUID,
             "timestamp" to testMessage.timestamp)
     `when`(mockFirestore.collection(COLLECTION_PATH)).thenReturn(mockCollectionReference)
     `when`(mockCollectionReference.document(testMessage.uuid.toString()))
@@ -158,8 +158,8 @@ class DataMessageFirestoreSourceTest {
         mapOf(
             "uuid" to testMessage.uuid,
             "text" to testMessage.text,
-            "senderId" to testMessage.senderId,
-            "receiverId" to testMessage.receiverId,
+            "senderId" to testMessage.senderUUID,
+            "receiverId" to testMessage.receiverUUID,
             "timestamp" to testMessage.timestamp)
     `when`(mockFirestore.collection(COLLECTION_PATH)).thenReturn(mockCollectionReference)
     `when`(mockCollectionReference.document(testMessage.uuid.toString()))
@@ -186,8 +186,8 @@ class DataMessageFirestoreSourceTest {
     `when`(mockDocumentSnapshot.exists()).thenReturn(true) // Ensure document exists
     `when`(mockDocumentSnapshot.getString("uuid")).thenReturn(recentMessage.uuid.toString())
     `when`(mockDocumentSnapshot.getString("text")).thenReturn(recentMessage.text)
-    `when`(mockDocumentSnapshot.getString("senderId")).thenReturn(recentMessage.senderId)
-    `when`(mockDocumentSnapshot.getString("receiverId")).thenReturn(recentMessage.receiverId)
+    `when`(mockDocumentSnapshot.getString("senderId")).thenReturn(recentMessage.senderUUID)
+    `when`(mockDocumentSnapshot.getString("receiverId")).thenReturn(recentMessage.receiverUUID)
     `when`(mockDocumentSnapshot.getLong("timestamp")).thenReturn(recentMessage.timestamp)
     `when`(mockDocumentReference.delete()).thenReturn(Tasks.forResult(null))
 
@@ -230,8 +230,8 @@ class DataMessageFirestoreSourceTest {
     `when`(mockDocumentSnapshot.exists()).thenReturn(true)
     `when`(mockDocumentSnapshot.getString("uuid")).thenReturn(oldMessage.uuid.toString())
     `when`(mockDocumentSnapshot.getString("text")).thenReturn(oldMessage.text)
-    `when`(mockDocumentSnapshot.getString("senderId")).thenReturn(oldMessage.senderId)
-    `when`(mockDocumentSnapshot.getString("receiverId")).thenReturn(oldMessage.receiverId)
+    `when`(mockDocumentSnapshot.getString("senderId")).thenReturn(oldMessage.senderUUID)
+    `when`(mockDocumentSnapshot.getString("receiverId")).thenReturn(oldMessage.receiverUUID)
     `when`(mockDocumentSnapshot.getLong("timestamp")).thenReturn(oldMessage.timestamp)
 
     messageFirestoreSource.deleteMessage(
@@ -276,8 +276,8 @@ class DataMessageFirestoreSourceTest {
     `when`(mockDocumentSnapshot.exists()).thenReturn(true)
     `when`(mockDocumentSnapshot.getString("uuid")).thenReturn(recentMessage.uuid.toString())
     `when`(mockDocumentSnapshot.getString("text")).thenReturn(recentMessage.text)
-    `when`(mockDocumentSnapshot.getString("senderId")).thenReturn(recentMessage.senderId)
-    `when`(mockDocumentSnapshot.getString("receiverId")).thenReturn(recentMessage.receiverId)
+    `when`(mockDocumentSnapshot.getString("senderId")).thenReturn(recentMessage.senderUUID)
+    `when`(mockDocumentSnapshot.getString("receiverId")).thenReturn(recentMessage.receiverUUID)
     `when`(mockDocumentSnapshot.getLong("timestamp")).thenReturn(recentMessage.timestamp)
     `when`(mockDocumentReference.delete()).thenReturn(Tasks.forException(exception))
 
@@ -431,8 +431,8 @@ class DataMessageFirestoreSourceTest {
     `when`(mockDocumentSnapshot.exists()).thenReturn(true)
     `when`(mockDocumentSnapshot.getString("uuid")).thenReturn(oldMessage.uuid.toString())
     `when`(mockDocumentSnapshot.getString("text")).thenReturn(oldMessage.text)
-    `when`(mockDocumentSnapshot.getString("senderId")).thenReturn(oldMessage.senderId)
-    `when`(mockDocumentSnapshot.getString("receiverId")).thenReturn(oldMessage.receiverId)
+    `when`(mockDocumentSnapshot.getString("senderId")).thenReturn(oldMessage.senderUUID)
+    `when`(mockDocumentSnapshot.getString("receiverId")).thenReturn(oldMessage.receiverUUID)
     `when`(mockDocumentSnapshot.getLong("timestamp")).thenReturn(oldMessage.timestamp)
 
     messageFirestoreSource.updateMessage(
@@ -478,8 +478,8 @@ class DataMessageFirestoreSourceTest {
     `when`(mockDocumentSnapshot.exists()).thenReturn(true)
     `when`(mockDocumentSnapshot.getString("uuid")).thenReturn(recentMessage.uuid.toString())
     `when`(mockDocumentSnapshot.getString("text")).thenReturn(recentMessage.text)
-    `when`(mockDocumentSnapshot.getString("senderId")).thenReturn(recentMessage.senderId)
-    `when`(mockDocumentSnapshot.getString("receiverId")).thenReturn(recentMessage.receiverId)
+    `when`(mockDocumentSnapshot.getString("senderId")).thenReturn(recentMessage.senderUUID)
+    `when`(mockDocumentSnapshot.getString("receiverId")).thenReturn(recentMessage.receiverUUID)
     `when`(mockDocumentSnapshot.getLong("timestamp")).thenReturn(recentMessage.timestamp)
     `when`(mockDocumentReference.update(messageMap)).thenReturn(Tasks.forException(exception))
 
@@ -526,8 +526,8 @@ class DataMessageFirestoreSourceTest {
     assert(message != null)
     assert(message?.uuid == definedUUID)
     assert(message?.text == "Test message")
-    assert(message?.senderId == "sender1")
-    assert(message?.receiverId == "receiver1")
+    assert(message?.senderUUID == "sender1")
+    assert(message?.receiverUUID == "receiver1")
     assert(message?.timestamp == 1634567890L)
   }
 

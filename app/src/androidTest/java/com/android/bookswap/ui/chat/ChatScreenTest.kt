@@ -33,8 +33,8 @@ class ChatScreenTest {
   @get:Rule val composeTestRule = createComposeRule()
   private lateinit var placeHolderData: List<DataMessage>
   private lateinit var mockMessageRepository: MessageRepository
-  private val currentUserId = "current-user-id"
-  private val otherUserId = "other-user-id"
+  private val currentUserUUID = UUID.randomUUID()
+  private val otherUserUUID = UUID.randomUUID()
   private lateinit var mockNavigationActions: NavigationActions
 
   @Before
@@ -44,8 +44,8 @@ class ChatScreenTest {
         List(6) {
           DataMessage(
               uuid = UUID.randomUUID(),
-              senderId = "current-user-id",
-              receiverId = "other-user-id",
+              senderUUID = currentUserUUID,
+              receiverUUID = otherUserUUID,
               text = "Test message $it",
               timestamp = it.toLong())
         }
@@ -74,8 +74,8 @@ class ChatScreenTest {
     composeTestRule.setContent {
       ChatScreen(
           messageRepository = mockMessageRepository,
-          currentUserId = currentUserId,
-          otherUserId = otherUserId,
+          currentUserUUID = currentUserUUID,
+          otherUserUUID = otherUserUUID,
           mockNavigationActions)
     }
     composeTestRule.onNodeWithTag("message_input_field").assertIsDisplayed()
@@ -90,8 +90,8 @@ class ChatScreenTest {
     composeTestRule.setContent {
       ChatScreen(
           messageRepository = mockMessageRepository,
-          currentUserId = currentUserId,
-          otherUserId = otherUserId,
+          currentUserUUID = currentUserUUID,
+          otherUserUUID = otherUserUUID,
           mockNavigationActions)
     }
     composeTestRule.onNodeWithTag("message_input_field").assertIsDisplayed()
@@ -126,8 +126,8 @@ class ChatScreenTest {
     composeTestRule.setContent {
       ChatScreen(
           messageRepository = mockMessageRepository,
-          currentUserId = currentUserId,
-          otherUserId = otherUserId,
+          currentUserUUID = currentUserUUID,
+          otherUserUUID = otherUserUUID,
           mockNavigationActions)
     }
     composeTestRule.onNodeWithTag("send_button").assertHasClickAction()
@@ -138,8 +138,8 @@ class ChatScreenTest {
     composeTestRule.setContent {
       ChatScreen(
           messageRepository = mockMessageRepository,
-          currentUserId = currentUserId,
-          otherUserId = otherUserId,
+          currentUserUUID = currentUserUUID,
+          otherUserUUID = otherUserUUID,
           mockNavigationActions)
     }
     val testInput = "Hello, World!"
@@ -155,8 +155,8 @@ class ChatScreenTest {
     composeTestRule.setContent {
       ChatScreen(
           messageRepository = mockMessageRepository,
-          currentUserId = currentUserId,
-          otherUserId = otherUserId,
+          currentUserUUID = currentUserUUID,
+          otherUserUUID = otherUserUUID,
           mockNavigationActions)
     }
 
@@ -169,8 +169,8 @@ class ChatScreenTest {
     val sentMessage = mockMessageRepository.messages.find { it.uuid == testMessageId }
     assert(sentMessage != null) { "Message was not sent" }
     assert(sentMessage?.text == testInput) { "Message text does not match" }
-    assert(sentMessage?.senderId == currentUserId) { "Sender ID does not match" }
-    assert(sentMessage?.receiverId == otherUserId) { "Receiver ID does not match" }
+    assert(sentMessage?.senderUUID == currentUserUUID) { "Sender UUID does not match" }
+    assert(sentMessage?.receiverUUID == otherUserUUID) { "Receiver UUID does not match" }
   }
 
   @Test
@@ -178,14 +178,14 @@ class ChatScreenTest {
     composeTestRule.setContent {
       ChatScreen(
           messageRepository = mockMessageRepository,
-          currentUserId = currentUserId,
-          otherUserId = otherUserId,
+          currentUserUUID = currentUserUUID,
+          otherUserUUID = otherUserUUID,
           mockNavigationActions)
     }
 
     composeTestRule.onNodeWithTag("chatTopAppBar").assertIsDisplayed()
     composeTestRule.onNodeWithTag("chatName").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("chatName").assertTextEquals(otherUserId)
+    composeTestRule.onNodeWithTag("chatName").assertTextEquals(otherUserUUID.toString() )
     composeTestRule.onNodeWithTag("profileIcon", useUnmergedTree = true).assertIsDisplayed()
   }
 
@@ -194,8 +194,8 @@ class ChatScreenTest {
     composeTestRule.setContent {
       ChatScreen(
           messageRepository = mockMessageRepository,
-          currentUserId = currentUserId,
-          otherUserId = otherUserId,
+          currentUserUUID = currentUserUUID,
+          otherUserUUID = otherUserUUID,
           navController = mockNavigationActions)
     }
 
@@ -234,8 +234,8 @@ class ChatScreenTest {
     composeTestRule.setContent {
       ChatScreen(
           messageRepository = mockMessageRepository,
-          currentUserId = currentUserId,
-          otherUserId = otherUserId,
+          currentUserUUID = currentUserUUID,
+          otherUserUUID = otherUserUUID,
           mockNavigationActions)
     }
 
@@ -278,8 +278,8 @@ class ChatScreenTest {
     composeTestRule.setContent {
       ChatScreen(
           messageRepository = mockMessageRepository,
-          currentUserId = currentUserId,
-          otherUserId = otherUserId,
+          currentUserUUID = currentUserUUID,
+          otherUserUUID = otherUserUUID,
           navController = mockNavigationActions)
     }
 
@@ -345,8 +345,8 @@ class ChatScreenTest {
     composeTestRule.setContent {
       ChatScreen(
           messageRepository = mockMessageRepository,
-          currentUserId = currentUserId,
-          otherUserId = otherUserId,
+          currentUserUUID = currentUserUUID,
+          otherUserUUID = otherUserUUID,
           mockNavigationActions)
     }
 
@@ -395,12 +395,12 @@ class ChatScreenTest {
     }
 
     override fun deleteAllMessages(
-        user1Id: String,
-        user2Id: String,
+        user1UUID: UUID,
+        user2UUID: UUID,
         callback: (Result<Unit>) -> Unit
     ) {
-      messages.removeIf { it.senderId == user1Id && it.receiverId == user2Id }
-      messages.removeIf { it.senderId == user2Id && it.receiverId == user1Id }
+      messages.removeIf { it.senderUUID == user1UUID && it.receiverUUID == user2UUID }
+      messages.removeIf { it.senderUUID == user2UUID && it.receiverUUID == user1UUID }
       callback(Result.success(Unit))
     }
 
@@ -419,12 +419,12 @@ class ChatScreenTest {
     }
 
     override fun addMessagesListener(
-        otherUserId: String,
-        currentUserId: String,
+        otherUserUUID: UUID,
+        currentUserUUID: UUID,
         callback: (Result<List<DataMessage>>) -> Unit
     ): ListenerRegistration {
-      requireNotNull(otherUserId) { "otherUserId must not be null" }
-      requireNotNull(currentUserId) { "currentUserId must not be null" }
+      requireNotNull(otherUserUUID) { "otherUserId must not be null" }
+      requireNotNull(currentUserUUID) { "currentUserId must not be null" }
 
       callback(Result.success(messages)) // Or whatever logic you'd like to simulate
       return mockk()

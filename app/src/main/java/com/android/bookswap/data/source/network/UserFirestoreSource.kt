@@ -51,7 +51,7 @@ class UserFirestoreSource(private val db: FirebaseFirestore) : UsersRepository {
   /** Adds a new user to the Firestore collection */
   override fun addUser(dataUser: DataUser, callback: (Result<Unit>) -> Unit) {
     performFirestoreOperation(
-        db.collection(COLLECTION_NAME).document(dataUser.userId).set(dataUser),
+        db.collection(COLLECTION_NAME).document(dataUser.userUUID).set(dataUser),
         callback,
     )
   }
@@ -61,7 +61,7 @@ class UserFirestoreSource(private val db: FirebaseFirestore) : UsersRepository {
    */
   override fun updateUser(dataUser: DataUser, callback: (Result<Unit>) -> Unit) {
     performFirestoreOperation(
-        db.collection(COLLECTION_NAME).document(dataUser.userId).set(dataUser), callback)
+        db.collection(COLLECTION_NAME).document(dataUser.userUUID).set(dataUser), callback)
   }
 
   /**

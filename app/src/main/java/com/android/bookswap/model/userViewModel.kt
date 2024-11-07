@@ -60,7 +60,7 @@ open class UserViewModel(
 
   fun updateUser(newDataUser: DataUser) {
     this.dataUser = newDataUser
-    this.uuid = newDataUser.userId
+    this.uuid = newDataUser.userUUID
     isLoaded = true
     userRepository.updateUser(dataUser) { result ->
       result.fold({ isStored = true }, { isStored = false })

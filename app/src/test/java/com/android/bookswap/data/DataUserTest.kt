@@ -27,7 +27,7 @@ class DataUserTest {
     assertEquals(0.0, u1.latitude, 0.000001)
     assertEquals(0.0, u1.longitude, 0.000001)
     assertEquals("", u1.profilePictureUrl)
-    assertEquals("", u1.userId)
+    assertEquals("", u1.userUUID)
   }
 
   @Test
@@ -52,7 +52,7 @@ class DataUserTest {
     assertEquals(1.0, u1.latitude, 0.000001)
     assertEquals(7.0, u1.longitude, 0.000001)
     assertEquals("dummyPic.png", u1.profilePictureUrl)
-    assertEquals("usr_01_jd", u1.userId)
+    assertEquals("usr_01_jd", u1.userUUID)
   }
 
   @Test
@@ -79,7 +79,7 @@ class DataUserTest {
     assertEquals(1.0, u1.latitude, 0.000001)
     assertEquals(7.0, u1.longitude, 0.000001)
     assertEquals("dummyPic.png", u1.profilePictureUrl)
-    assertEquals("usr_01_jd", u1.userId)
+    assertEquals("usr_01_jd", u1.userUUID)
 
     assert(userVM.isStored)
   }
@@ -108,7 +108,7 @@ class DataUserTest {
     assertEquals(1.0, u1.latitude, 0.000001)
     assertEquals(7.0, u1.longitude, 0.000001)
     assertEquals("dummyPic.png", u1.profilePictureUrl)
-    assertEquals("usr_04_jd", u1.userId)
+    assertEquals("usr_04_jd", u1.userUUID)
 
     assert(!userVM.isStored)
   }
@@ -137,7 +137,7 @@ class DataUserTest {
     assertEquals(1.0, u1.latitude, 0.000001)
     assertEquals(7.0, u1.longitude, 0.000001)
     assertEquals("dummyPic.png", u1.profilePictureUrl)
-    assertEquals("usr_01_jd", u1.userId)
+    assertEquals("usr_01_jd", u1.userUUID)
 
     userVM.updateUser(greeting = "Mr.")
     u1 = userVM.getUser(true)
@@ -151,7 +151,7 @@ class DataUserTest {
     assertEquals(1.0, u1.latitude, 0.000001)
     assertEquals(7.0, u1.longitude, 0.000001)
     assertEquals("dummyPic.png", u1.profilePictureUrl)
-    assertEquals("usr_01_jd", u1.userId)
+    assertEquals("usr_01_jd", u1.userUUID)
   }
 
   @Test
@@ -178,7 +178,7 @@ class DataUserTest {
     assertEquals(1.0, u1.latitude, 0.000001)
     assertEquals(7.0, u1.longitude, 0.000001)
     assertEquals("dummyPic.png", u1.profilePictureUrl)
-    assertEquals("usr_01_jd", u1.userId)
+    assertEquals("usr_01_jd", u1.userUUID)
 
     userVM.updateUser(firstName = "Joe")
     u1 = userVM.getUser(true)
@@ -192,7 +192,7 @@ class DataUserTest {
     assertEquals(1.0, u1.latitude, 0.000001)
     assertEquals(7.0, u1.longitude, 0.000001)
     assertEquals("dummyPic.png", u1.profilePictureUrl)
-    assertEquals("usr_01_jd", u1.userId)
+    assertEquals("usr_01_jd", u1.userUUID)
   }
 
   @Test
@@ -219,7 +219,7 @@ class DataUserTest {
     assertEquals(1.0, u1.latitude, 0.000001)
     assertEquals(7.0, u1.longitude, 0.000001)
     assertEquals("dummyPic.png", u1.profilePictureUrl)
-    assertEquals("usr_01_jd", u1.userId)
+    assertEquals("usr_01_jd", u1.userUUID)
 
     userVM.updateUser(lastName = "Douse")
     u1 = userVM.getUser(true)
@@ -233,7 +233,7 @@ class DataUserTest {
     assertEquals(1.0, u1.latitude, 0.000001)
     assertEquals(7.0, u1.longitude, 0.000001)
     assertEquals("dummyPic.png", u1.profilePictureUrl)
-    assertEquals("usr_01_jd", u1.userId)
+    assertEquals("usr_01_jd", u1.userUUID)
   }
 
   @Test
@@ -260,7 +260,7 @@ class DataUserTest {
     assertEquals(1.0, u1.latitude, 0.000001)
     assertEquals(7.0, u1.longitude, 0.000001)
     assertEquals("dummyPic.png", u1.profilePictureUrl)
-    assertEquals("usr_01_jd", u1.userId)
+    assertEquals("usr_01_jd", u1.userUUID)
 
     userVM.updateUser(email = "john.doe@example.swiss")
     u1 = userVM.getUser(true)
@@ -274,7 +274,7 @@ class DataUserTest {
     assertEquals(1.0, u1.latitude, 0.000001)
     assertEquals(7.0, u1.longitude, 0.000001)
     assertEquals("dummyPic.png", u1.profilePictureUrl)
-    assertEquals("usr_01_jd", u1.userId)
+    assertEquals("usr_01_jd", u1.userUUID)
   }
 
   @Test
@@ -301,7 +301,7 @@ class DataUserTest {
     assertEquals(1.0, u1.latitude, 0.000001)
     assertEquals(7.0, u1.longitude, 0.000001)
     assertEquals("dummyPic.png", u1.profilePictureUrl)
-    assertEquals("usr_01_jd", u1.userId)
+    assertEquals("usr_01_jd", u1.userUUID)
 
     userVM.updateUser(phone = "+41234567890")
     u1 = userVM.getUser(true)
@@ -315,7 +315,7 @@ class DataUserTest {
     assertEquals(1.0, u1.latitude, 0.000001)
     assertEquals(7.0, u1.longitude, 0.000001)
     assertEquals("dummyPic.png", u1.profilePictureUrl)
-    assertEquals("usr_01_jd", u1.userId)
+    assertEquals("usr_01_jd", u1.userUUID)
   }
 
   @Test
@@ -342,7 +342,7 @@ class DataUserTest {
     assertEquals(1.0, u1.latitude, 0.000001)
     assertEquals(7.0, u1.longitude, 0.000001)
     assertEquals("dummyPic.png", u1.profilePictureUrl)
-    assertEquals("usr_01_jd", u1.userId)
+    assertEquals("usr_01_jd", u1.userUUID)
 
     userVM.updateUser(latitude = 2.7)
     u1 = userVM.getUser(true)
@@ -356,7 +356,7 @@ class DataUserTest {
     assertEquals(2.7, u1.latitude, 0.000001)
     assertEquals(7.0, u1.longitude, 0.000001)
     assertEquals("dummyPic.png", u1.profilePictureUrl)
-    assertEquals("usr_01_jd", u1.userId)
+    assertEquals("usr_01_jd", u1.userUUID)
   }
 
   @Test
@@ -383,7 +383,7 @@ class DataUserTest {
     assertEquals(1.0, u1.latitude, 0.000001)
     assertEquals(7.0, u1.longitude, 0.000001)
     assertEquals("dummyPic.png", u1.profilePictureUrl)
-    assertEquals("usr_01_jd", u1.userId)
+    assertEquals("usr_01_jd", u1.userUUID)
 
     userVM.updateUser(longitude = 6.3)
     u1 = userVM.getUser(true)
@@ -397,7 +397,7 @@ class DataUserTest {
     assertNotEquals(7.0, u1.longitude)
     assertEquals(6.3, u1.longitude, 0.000001)
     assertEquals("dummyPic.png", u1.profilePictureUrl)
-    assertEquals("usr_01_jd", u1.userId)
+    assertEquals("usr_01_jd", u1.userUUID)
   }
 
   @Test
@@ -424,7 +424,7 @@ class DataUserTest {
     assertEquals(1.0, u1.latitude, 0.000001)
     assertEquals(7.0, u1.longitude, 0.000001)
     assertEquals("dummyPic.png", u1.profilePictureUrl)
-    assertEquals("usr_01_jd", u1.userId)
+    assertEquals("usr_01_jd", u1.userUUID)
 
     userVM.updateUser(picURL = "pl4c3h0ld3rP1c.jpg")
     u1 = userVM.getUser(true)
@@ -438,7 +438,7 @@ class DataUserTest {
     assertEquals(7.0, u1.longitude, 0.000001)
     assertNotEquals("dummyPic.png", u1.profilePictureUrl)
     assertEquals("pl4c3h0ld3rP1c.jpg", u1.profilePictureUrl)
-    assertEquals("usr_01_jd", u1.userId)
+    assertEquals("usr_01_jd", u1.userUUID)
   }
 
   @Test
@@ -502,14 +502,14 @@ class MockUserRepo : UsersRepository {
   }
 
   override fun addUser(dataUser: DataUser, callback: (Result<Unit>) -> Unit) {
-    mockUserList.put(dataUser.userId, dataUser)
+    mockUserList.put(dataUser.userUUID, dataUser)
   }
 
   override fun updateUser(dataUser: DataUser, callback: (Result<Unit>) -> Unit) {
-    getUser(dataUser.userId) { result ->
+    getUser(dataUser.userUUID) { result ->
       result.fold(
           {
-            mockUserList.put(dataUser.userId, dataUser)
+            mockUserList.put(dataUser.userUUID, dataUser)
             callback(Result.success(Unit))
           },
           { callback(Result.failure(it)) })
