@@ -7,7 +7,6 @@ import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
-import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performScrollToNode
 import com.android.bookswap.data.BookGenres
 import com.android.bookswap.data.BookLanguages
@@ -90,8 +89,8 @@ class EditBookScreenTest {
   fun displayEditDeleteValueComponent() {
     composeTestRule.setContent { EditBookScreen(booksRepository, navigationActions, sampleBook) }
     composeTestRule
-      .onNodeWithTag("editBookScreenColumn")
-      .performScrollToNode(hasTestTag("bookDelete"))
+        .onNodeWithTag("editBookScreenColumn")
+        .performScrollToNode(hasTestTag("bookDelete"))
     composeTestRule.onNodeWithTag("bookDelete").assertIsDisplayed()
     composeTestRule.onNodeWithTag("bookDelete").assertTextEquals("Delete")
   }
