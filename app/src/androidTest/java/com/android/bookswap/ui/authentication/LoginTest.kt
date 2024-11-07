@@ -3,14 +3,15 @@ package com.android.bookswap.ui.authentication
 import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextEquals
-import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
+import androidx.navigation.compose.rememberNavController
 import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.intent.Intents.intended
 import androidx.test.espresso.intent.matcher.IntentMatchers.toPackage
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.android.bookswap.MainActivity
+import com.android.bookswap.ui.navigation.NavigationActions
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
 import org.junit.After
 import org.junit.Before
@@ -20,8 +21,7 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class LoginTest : TestCase() {
-  @get:Rule val composeTestRule = createAndroidComposeRule<MainActivity>()
-
+  @get:Rule val composeTestRule = createComposeRule()
   // The IntentsTestRule may not reliable.
   @Before
   fun setUp() {
@@ -36,6 +36,11 @@ class LoginTest : TestCase() {
 
   @Test
   fun titleAndButtonAreCorrectlyDisplayed() {
+    composeTestRule.setContent {
+      val navController = rememberNavController()
+      val navigationActions = NavigationActions(navController)
+      SignInScreen(navigationActions)
+    }
     composeTestRule.onNodeWithTag("login_loginTitle1").assertIsDisplayed()
     composeTestRule.onNodeWithTag("login_loginTitle1").assertTextEquals("Welcome to")
     composeTestRule.onNodeWithTag("login_loginTitle2").assertIsDisplayed()
@@ -47,6 +52,11 @@ class LoginTest : TestCase() {
 
   @Test
   fun googleSignInReturnsValidActivityResult() {
+    composeTestRule.setContent {
+      val navController = rememberNavController()
+      val navigationActions = NavigationActions(navController)
+      SignInScreen(navigationActions)
+    }
     composeTestRule.onNodeWithTag("loginButton").performClick()
     composeTestRule.waitForIdle()
     // assert that an Intent resolving to Google Mobile Services has been sent (for sign-in)

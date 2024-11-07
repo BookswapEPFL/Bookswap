@@ -65,14 +65,17 @@ class BooksFirestoreRepositoryTest {
   @Test
   fun getbook_callsFirestoreGet() {
     // Arrange
-    `when`(mockQuerySnapshot.documents).thenReturn(listOf(mockDocumentSnapshot))
-    `when`(mockDocumentSnapshot.getString("Title")).thenReturn(testBook.title)
-    `when`(mockDocumentSnapshot.getString("Author")).thenReturn(testBook.author)
-    `when`(mockDocumentSnapshot.getString("Description")).thenReturn(testBook.description)
-    `when`(mockDocumentSnapshot.getString("Rating")).thenReturn(testBook.rating.toString())
-    `when`(mockDocumentSnapshot.getString("Photo")).thenReturn(testBook.photo)
-    `when`(mockDocumentSnapshot.getString("Language")).thenReturn(testBook.language.name)
-    `when`(mockDocumentSnapshot.getString("ISBN")).thenReturn(testBook.isbn)
+    `when`(mockDocumentSnapshot.getString("title")).thenReturn(testBook.title)
+    `when`(mockDocumentSnapshot.getString("author")).thenReturn(testBook.author)
+    `when`(mockDocumentSnapshot.getString("description")).thenReturn(testBook.description)
+    `when`(mockDocumentSnapshot.getLong("rating")).thenReturn(testBook.rating?.toLong())
+    `when`(mockDocumentSnapshot.getString("photo")).thenReturn(testBook.photo)
+    `when`(mockDocumentSnapshot.getString("language")).thenReturn(testBook.language.name)
+    `when`(mockDocumentSnapshot.getString("isbn")).thenReturn(testBook.isbn)
+    `when`(mockDocumentSnapshot.getLong("uuid.mostSignificantBits"))
+        .thenReturn(testBook.uuid.mostSignificantBits)
+    `when`(mockDocumentSnapshot.getLong("uuid.leastSignificantBits"))
+        .thenReturn(testBook.uuid.leastSignificantBits)
 
     // Act
     booksFirestorerRepository.getBook(
@@ -138,13 +141,17 @@ class BooksFirestoreRepositoryTest {
   @Test
   fun documenttoBooks_returnsDataBook_whenDocumentIsValid() {
     // Arrange
-    `when`(mockDocumentSnapshot.getString("Title")).thenReturn(testBook.title)
-    `when`(mockDocumentSnapshot.getString("Author")).thenReturn(testBook.author)
-    `when`(mockDocumentSnapshot.getString("Description")).thenReturn(testBook.description)
-    `when`(mockDocumentSnapshot.getString("Rating")).thenReturn(testBook.rating.toString())
-    `when`(mockDocumentSnapshot.getString("Photo")).thenReturn(testBook.photo)
-    `when`(mockDocumentSnapshot.getString("Language")).thenReturn(testBook.language.name)
-    `when`(mockDocumentSnapshot.getString("ISBN")).thenReturn(testBook.isbn)
+    `when`(mockDocumentSnapshot.getString("title")).thenReturn(testBook.title)
+    `when`(mockDocumentSnapshot.getString("author")).thenReturn(testBook.author)
+    `when`(mockDocumentSnapshot.getString("description")).thenReturn(testBook.description)
+    `when`(mockDocumentSnapshot.getLong("rating")).thenReturn(testBook.rating?.toLong())
+    `when`(mockDocumentSnapshot.getString("photo")).thenReturn(testBook.photo)
+    `when`(mockDocumentSnapshot.getString("language")).thenReturn(testBook.language.name)
+    `when`(mockDocumentSnapshot.getString("isbn")).thenReturn(testBook.isbn)
+    `when`(mockDocumentSnapshot.getLong("uuid.mostSignificantBits"))
+        .thenReturn(testBook.uuid.mostSignificantBits)
+    `when`(mockDocumentSnapshot.getLong("uuid.leastSignificantBits"))
+        .thenReturn(testBook.uuid.leastSignificantBits)
 
     // Act
     val result = booksFirestorerRepository.documentToBooks(mockDocumentSnapshot)
@@ -153,19 +160,28 @@ class BooksFirestoreRepositoryTest {
     assert(result != null)
     assert(result?.title == testBook.title)
     assert(result?.author == testBook.author)
+    assert(result?.description == testBook.description)
+    assert(result?.rating == testBook.rating)
+    assert(result?.photo == testBook.photo)
+    assert(result?.language?.name == testBook.language.name)
+    assert(result?.isbn == testBook.isbn)
+    assert(result?.uuid == testBook.uuid)
   }
 
   @Test
   fun documenttoBooks_returnsNull_whenRequiredFieldIsMissing() {
     // Arrange - Missing "Title"
-    `when`(mockDocumentSnapshot.getString("Title")).thenReturn(null)
-    `when`(mockDocumentSnapshot.getString("Author")).thenReturn(testBook.author)
-    `when`(mockDocumentSnapshot.getString("Description")).thenReturn(testBook.description)
-    `when`(mockDocumentSnapshot.getString("Rating")).thenReturn(testBook.rating.toString())
-    `when`(mockDocumentSnapshot.getString("Photo")).thenReturn(testBook.photo)
-    `when`(mockDocumentSnapshot.getString("Language")).thenReturn(testBook.language.name)
-    `when`(mockDocumentSnapshot.getString("ISBN")).thenReturn(testBook.isbn)
-
+    `when`(mockDocumentSnapshot.getString("title")).thenReturn(null)
+    `when`(mockDocumentSnapshot.getString("author")).thenReturn(testBook.author)
+    `when`(mockDocumentSnapshot.getString("description")).thenReturn(testBook.description)
+    `when`(mockDocumentSnapshot.getLong("rating")).thenReturn(testBook.rating?.toLong())
+    `when`(mockDocumentSnapshot.getString("photo")).thenReturn(testBook.photo)
+    `when`(mockDocumentSnapshot.getString("language")).thenReturn(testBook.language.name)
+    `when`(mockDocumentSnapshot.getString("isbn")).thenReturn(testBook.isbn)
+    `when`(mockDocumentSnapshot.getLong("uuid.mostSignificantBits"))
+        .thenReturn(testBook.uuid.mostSignificantBits)
+    `when`(mockDocumentSnapshot.getLong("uuid.leastSignificantBits"))
+        .thenReturn(testBook.uuid.leastSignificantBits)
     // Act
     val result = booksFirestorerRepository.documentToBooks(mockDocumentSnapshot)
 
@@ -176,13 +192,17 @@ class BooksFirestoreRepositoryTest {
   @Test
   fun documenttoBooks_returnsNull_whenLanguageIsInvalid() {
     // Arrange - Invalid language value
-    `when`(mockDocumentSnapshot.getString("Title")).thenReturn(testBook.title)
-    `when`(mockDocumentSnapshot.getString("Author")).thenReturn(testBook.author)
-    `when`(mockDocumentSnapshot.getString("Description")).thenReturn(testBook.description)
-    `when`(mockDocumentSnapshot.getString("Rating")).thenReturn(testBook.rating.toString())
-    `when`(mockDocumentSnapshot.getString("Photo")).thenReturn(testBook.photo)
-    `when`(mockDocumentSnapshot.getString("Language")).thenReturn("INVALID_LANGUAGE")
-    `when`(mockDocumentSnapshot.getString("ISBN")).thenReturn(testBook.isbn)
+    `when`(mockDocumentSnapshot.getString("title")).thenReturn(testBook.title)
+    `when`(mockDocumentSnapshot.getString("author")).thenReturn(testBook.author)
+    `when`(mockDocumentSnapshot.getString("description")).thenReturn(testBook.description)
+    `when`(mockDocumentSnapshot.getLong("rating")).thenReturn(testBook.rating?.toLong())
+    `when`(mockDocumentSnapshot.getString("photo")).thenReturn(testBook.photo)
+    `when`(mockDocumentSnapshot.getString("language")).thenReturn("INVALID_LANGUAGE")
+    `when`(mockDocumentSnapshot.getString("isbn")).thenReturn(testBook.isbn)
+    `when`(mockDocumentSnapshot.getLong("uuid.mostSignificantBits"))
+        .thenReturn(testBook.uuid.mostSignificantBits)
+    `when`(mockDocumentSnapshot.getLong("uuid.leastSignificantBits"))
+        .thenReturn(testBook.uuid.leastSignificantBits)
 
     // Act
     val result = booksFirestorerRepository.documentToBooks(mockDocumentSnapshot)
