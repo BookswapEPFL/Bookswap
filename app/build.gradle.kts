@@ -25,7 +25,7 @@ android {
     }
 
     val mapsApiKey: String = localProperties.getProperty("MAPS_API_KEY") ?: ""
-    val openAiApiKey: String = localProperties.getProperty("OPENAI_API_KEY") ?: ""
+
 
     defaultConfig {
         applicationId = "com.android.bookswap"
@@ -38,9 +38,10 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+        val openAiApiKey: String = localProperties.getProperty("OPENAI_API_KEY") ?: "\" placeHolder \" "
         manifestPlaceholders["MAPS_API_KEY"] = mapsApiKey
         manifestPlaceholders["OPENAI_API_KEY"] = openAiApiKey
-        buildConfigField("String", "OPENAI_API_KEY", openAiApiKey)
+        buildConfigField("String", "OPENAI_API_KEY",  openAiApiKey)
     }
 
     buildTypes {
