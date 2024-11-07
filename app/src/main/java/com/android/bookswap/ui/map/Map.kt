@@ -88,10 +88,8 @@ var SemanticsPropertyReceiver.cameraPosition by CameraPositionKey
  */
 @Composable
 fun MapScreen(
-    listUser: List<DataUser>,
+    bookManager: BookManager,
     navigationActions: NavigationActions,
-    bookFilter: BookFilter,
-    booksRepository: BooksRepository,
     selectedUser: Int = NO_USER_SELECTED,
     geolocation: IGeolocation = DefaultGeolocation()
 ) {
@@ -110,10 +108,6 @@ fun MapScreen(
 
   var mutableStateSelectedUser by remember { mutableStateOf(selectedUser) }
   var markerScreenPosition by remember { mutableStateOf<Offset?>(null) }
-
-    val bookManager = remember {
-        BookManager(geolocation, booksRepository, listUser, bookFilter)
-    }
 
     val filteredBooks = bookManager.filteredBooks.collectAsState()
 
