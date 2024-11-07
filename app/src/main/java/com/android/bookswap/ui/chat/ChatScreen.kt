@@ -3,9 +3,12 @@ package com.android.bookswap.ui.chat
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -35,18 +38,23 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
+import com.android.bookswap.R
 import com.android.bookswap.data.DataMessage
 import com.android.bookswap.data.repository.MessageRepository
 import com.android.bookswap.ui.components.BackButtonComponent
@@ -119,7 +127,7 @@ fun ChatScreen(
       Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.SpaceBetween) {
         // Message list
         LazyColumn(
-            modifier = Modifier.weight(1f).padding(8.dp),
+            modifier = Modifier.weight(1f).padding(8.dp).testTag("column"),
             verticalArrangement = Arrangement.Bottom) {
               items(messages) { message ->
                 MessageItem(
@@ -286,6 +294,11 @@ fun MessageItem(message: DataMessage, currentUserId: String, onLongPress: () -> 
             bottomStart = 5.dp,
             bottomEnd = cornerRadius)
       }
+  var showPopup by remember { mutableStateOf(false) }
+  var scale by remember { mutableFloatStateOf(1f) }
+  var offsetX by remember { mutableFloatStateOf(0f) }
+  var offsetY by remember { mutableFloatStateOf(0f) }
+
   Row(
       modifier = Modifier.fillMaxWidth(),
       horizontalArrangement = if (isCurrentUser) Arrangement.End else Arrangement.Start) {
@@ -309,13 +322,22 @@ fun MessageItem(message: DataMessage, currentUserId: String, onLongPress: () -> 
                 Modifier.padding(8.dp)
                     .widthIn(max = (LocalConfiguration.current.screenWidthDp.dp * 2 / 3))
                     .border(1.dp, ColorVariable.Accent, shape)
-                    .combinedClickable(onClick = {}, onLongClick = { onLongPress() })
+                    .combinedClickable(
+                        onClick = { if (message.id == "101") showPopup = true },
+                        onLongClick = { onLongPress() })
                     .testTag("message_item ${message.id}")) {
               Column(modifier = Modifier.padding(16.dp)) {
-                Text(
-                    text = message.text,
-                    modifier = Modifier.testTag("message_text ${message.id}"),
-                    color = ColorVariable.Accent)
+                if (message.id == "101") {
+                  Image(
+                      painter = painterResource(id = R.drawable.the_hobbit_cover),
+                      contentDescription = "Message Image",
+                      modifier = Modifier.testTag("hobbit"))
+                } else {
+                  Text(
+                      text = message.text,
+                      modifier = Modifier.testTag("message_text ${message.id}"),
+                      color = ColorVariable.Accent)
+                }
                 Text(
                     text = formatTimestamp(message.timestamp),
                     color = ColorVariable.AccentSecondary,
@@ -325,6 +347,58 @@ fun MessageItem(message: DataMessage, currentUserId: String, onLongPress: () -> 
               }
             }
       }
+
+  if (showPopup) {
+    Popup(
+        alignment = Alignment.Center,
+        onDismissRequest = {
+          showPopup = false
+          scale = 1f
+          offsetX = 0f
+          offsetY = 0f
+        }) {
+          Box(
+              modifier =
+                  Modifier.fillMaxSize()
+                      .background(Color.Black.copy(alpha = 0.8f))
+                      .clickable {
+                        showPopup = false
+                        scale = 1f
+                        offsetX = 0f
+                        offsetY = 0f
+                      }
+                      .padding(16.dp)) {
+                Box(
+                    modifier =
+                        Modifier.align(Alignment.Center)
+                            .size(300.dp * scale)
+                            .graphicsLayer(
+                                scaleX = scale,
+                                scaleY = scale,
+                                translationX = offsetX,
+                                translationY = offsetY)) {
+                      Image(
+                          painter = painterResource(id = R.drawable.the_hobbit_cover),
+                          contentDescription = "Enlarged Image",
+                          modifier =
+                              Modifier.size(300.dp * scale)
+                                  .pointerInput(Unit) {
+                                    detectTransformGestures { _, pan, zoom, _ ->
+                                      scale *= zoom
+                                      offsetX += pan.x
+                                      offsetY += pan.y
+                                    }
+                                  }
+                                  .graphicsLayer(
+                                      scaleX = scale,
+                                      scaleY = scale,
+                                      translationX = offsetX,
+                                      translationY = offsetY)
+                                  .testTag("HobbitBig"))
+                    }
+              }
+        }
+  }
 }
 
 fun formatTimestamp(timestamp: Long): String {
