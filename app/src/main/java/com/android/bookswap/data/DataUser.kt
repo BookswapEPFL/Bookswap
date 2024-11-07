@@ -1,5 +1,7 @@
 package com.android.bookswap.data
 
+import java.util.UUID
+
 data class DataUser(
     var greeting: String = "",
     var firstName: String = "",
@@ -9,7 +11,8 @@ data class DataUser(
     var latitude: Double = 0.0,
     var longitude: Double = 0.0,
     var profilePictureUrl: String = "",
-    var userId: String = ""
+    var userId: String = "",
+    var bookList: List<UUID> = emptyList()
 ) {
 
   fun printFullname(): String {
