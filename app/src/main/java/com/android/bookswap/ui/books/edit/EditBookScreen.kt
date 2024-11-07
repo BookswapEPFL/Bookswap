@@ -4,7 +4,6 @@ import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -101,11 +100,12 @@ fun EditBookScreen(
       content = { paddingValues ->
         LazyColumn(
             modifier =
-                Modifier.fillMaxSize()
+                Modifier.fillMaxWidth()
                     .padding(paddingValues)
                     .padding(SCREEN_PADDING)
                     .widthIn(max = columnMaxWidth)
-                    .background(ColorVariable.BackGround),
+                    .background(ColorVariable.BackGround)
+                    .testTag("editBookScreenColumn"),
             // .align(Alignment.CenterHorizontally)
             verticalArrangement = Arrangement.spacedBy(ELEMENT_SPACING)) {
               // Title Edit Field
