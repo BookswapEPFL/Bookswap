@@ -5,6 +5,7 @@ import com.android.bookswap.data.DataUser
 import com.android.bookswap.data.repository.UsersRepository
 import com.android.bookswap.data.source.network.UserFirestoreSource
 import com.google.firebase.firestore.FirebaseFirestore
+import java.util.UUID
 
 open class UserViewModel(
     var uuid: String = "ERROR_UUID",
@@ -40,10 +41,21 @@ open class UserViewModel(
       phone: String = dataUser.phoneNumber,
       latitude: Double = dataUser.latitude,
       longitude: Double = dataUser.longitude,
-      picURL: String = dataUser.profilePictureUrl
+      picURL: String = dataUser.profilePictureUrl,
+      bookList: List<UUID> = dataUser.bookList
   ) {
     updateUser(
-        DataUser(greeting, firstName, lastName, email, phone, latitude, longitude, picURL, uuid))
+        DataUser(
+            greeting,
+            firstName,
+            lastName,
+            email,
+            phone,
+            latitude,
+            longitude,
+            picURL,
+            uuid,
+            bookList))
   }
 
   fun updateUser(newDataUser: DataUser) {
