@@ -30,7 +30,7 @@ class MessageFirestoreSource(private val db: FirebaseFirestore) : MessageReposit
     db.collection(COLLECTION_PATH).get().addOnCompleteListener { task ->
       if (task.isSuccessful) {
         val documents = task.result?.documents
-        if (documents != null && documents.isNotEmpty()) {
+        if (!documents.isNullOrEmpty()) {
           val messages = documents.mapNotNull { documentToMessage(it).getOrNull() }
           callback(Result.success(messages))
         } else {
