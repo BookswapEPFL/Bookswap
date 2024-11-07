@@ -15,6 +15,7 @@ import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
+import kotlinx.coroutines.flow.MutableStateFlow
 
 const val REQUEST_LOCATION_PERMISSION = 1
 const val BACKGROUND_LOCATION_PERMISSION_REQUEST_CODE = 2
@@ -34,8 +35,8 @@ class Geolocation(private val activity: Activity) : IGeolocation {
   private val fusedLocationClient: FusedLocationProviderClient =
       LocationServices.getFusedLocationProviderClient(activity)
   val isRunning = mutableStateOf(false)
-  override val latitude = mutableDoubleStateOf(Double.NaN)
-  override val longitude = mutableDoubleStateOf(Double.NaN)
+  override val latitude = MutableStateFlow(Double.NaN)
+  override val longitude = MutableStateFlow(Double.NaN)
 
   /** Location request settings */
   private val locationRequest: LocationRequest =
@@ -50,8 +51,8 @@ class Geolocation(private val activity: Activity) : IGeolocation {
         override fun onLocationResult(p0: LocationResult) {
           p0.lastLocation.let { location ->
             // Handle the updated location here
-            latitude.doubleValue = location.latitude
-            longitude.doubleValue = location.longitude
+            latitude.value = location.latitude
+            longitude.value = location.longitude
             // You can save this location or notify other parts of your app
           }
         }
