@@ -40,7 +40,7 @@ class BooksFirestoreRepository(private val db: FirebaseFirestore) : BooksReposit
     }
   }
   // Generates and returns a new unique document ID for a book in Firestore
-  override fun getNewUid(): UUID {
+  override fun getNewUUID(): UUID {
     return UUID.randomUUID()
   }
   // Fetches the list of books from the Firestore collection

@@ -171,7 +171,7 @@ class AddToBookTest {
       }
     }
 
-    override fun getNewUid(): UUID {
+    override fun getNewUUID(): UUID {
       return UUID.randomUUID()
     }
 

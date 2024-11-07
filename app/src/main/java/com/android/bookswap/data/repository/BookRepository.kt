@@ -10,10 +10,10 @@ interface BooksRepository {
   // This default implementation does nothing, but subclasses can override it.
   fun init(OnSucess: () -> Unit)
 
-  // Function to generate and return a new unique identifier (UID) for a book.
+  // Function to generate and return a new unique identifier (UUID) for a book.
   // This default implementation returns an empty string, but it should be overridden to generate
-  // actual UIDs.
-  fun getNewUid(): UUID
+  // actual UUIDs.
+  fun getNewUUID(): UUID
 
   // Function to fetch a list of books from the repository.
   // Parameters:
