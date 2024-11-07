@@ -1,7 +1,9 @@
 package com.android.bookswap.data
 
+import java.util.UUID
+
 data class DataMessage(
-    val id: String = "",
+    val uuid: UUID = UUID.randomUUID(),
     val text: String = "",
     val senderId: String = "",
     val receiverId: String = "",

@@ -8,16 +8,17 @@ import com.android.bookswap.data.repository.MessageRepository
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
+import java.util.UUID
 
 const val COLLECTION_PATH = "messages"
 
 class MessageFirestoreSource(private val db: FirebaseFirestore) : MessageRepository {
+    override fun getNewUUID(): UUID {
+        return UUID.randomUUID()
+    }
 
-  override fun getNewUid(): String {
-    return db.collection(COLLECTION_PATH).document().id
-  }
 
-  override fun init(callback: (Result<Unit>) -> Unit) {
+    override fun init(callback: (Result<Unit>) -> Unit) {
     try {
       callback(Result.success(Unit))
     } catch (e: Exception) {
@@ -45,13 +46,13 @@ class MessageFirestoreSource(private val db: FirebaseFirestore) : MessageReposit
   override fun sendMessage(message: DataMessage, callback: (Result<Unit>) -> Unit) {
     val messageMap =
         mapOf(
-            "id" to message.id,
+            "uuid" to message.uuid,
             "text" to message.text,
             "senderId" to message.senderId,
             "receiverId" to message.receiverId,
             "timestamp" to message.timestamp)
 
-    db.collection(COLLECTION_PATH).document(message.id).set(messageMap).addOnCompleteListener {
+    db.collection(COLLECTION_PATH).document(message.uuid.toString()).set(messageMap).addOnCompleteListener {
         result ->
       if (result.isSuccessful) {
         callback(Result.success(Unit))
@@ -62,21 +63,21 @@ class MessageFirestoreSource(private val db: FirebaseFirestore) : MessageReposit
   }
 
   override fun deleteMessage(
-      messageId: String,
+      messageUUID: UUID,
       callback: (Result<Unit>) -> Unit,
       context: Context
   ) {
     val fifteenMinutesInMillis = 15 * 60 * 1000
     val currentTime = System.currentTimeMillis()
 
-    db.collection(COLLECTION_PATH).document(messageId).get().addOnCompleteListener { task ->
+    db.collection(COLLECTION_PATH).document(messageUUID.toString()).get().addOnCompleteListener { task ->
       if (task.isSuccessful) {
         val document = task.result
         if (document != null && document.exists()) {
           val existingMessage = documentToMessage(document).getOrNull()
           if (existingMessage != null) {
             if (currentTime - existingMessage.timestamp <= fifteenMinutesInMillis) {
-              db.collection(COLLECTION_PATH).document(messageId).delete().addOnCompleteListener {
+              db.collection(COLLECTION_PATH).document(messageUUID.toString()).delete().addOnCompleteListener {
                   deleteTask ->
                 if (deleteTask.isSuccessful) {
                   callback(Result.success(Unit))
@@ -150,7 +151,7 @@ class MessageFirestoreSource(private val db: FirebaseFirestore) : MessageReposit
     val fifteenMinutesInMillis = 15 * 60 * 1000
     val currentTime = System.currentTimeMillis()
 
-    db.collection(COLLECTION_PATH).document(message.id).get().addOnCompleteListener { task ->
+    db.collection(COLLECTION_PATH).document(message.uuid.toString()).get().addOnCompleteListener { task ->
       if (task.isSuccessful) {
         val document = task.result
         if (document != null && document.exists()) {
@@ -163,7 +164,7 @@ class MessageFirestoreSource(private val db: FirebaseFirestore) : MessageReposit
                       "timestamp" to currentTime // Update the timestamp to the current time
                       )
               db.collection(COLLECTION_PATH)
-                  .document(message.id)
+                  .document(message.uuid.toString())
                   .update(messageMap)
                   .addOnCompleteListener { updateTask ->
                     if (updateTask.isSuccessful) {
@@ -234,12 +235,12 @@ class MessageFirestoreSource(private val db: FirebaseFirestore) : MessageReposit
 
 fun documentToMessage(document: DocumentSnapshot): Result<DataMessage> {
   return try {
-    val id = document.getString("id")!!
+    val uuid = UUID.fromString(document.getString("uuid")!!)
     val text = document.getString("text")!!
     val senderId = document.getString("senderId")!!
     val receiverId = document.getString("receiverId")!!
     val timestamp = document.getLong("timestamp")!!
-    Result.success(DataMessage(id, text, senderId, receiverId, timestamp))
+    Result.success(DataMessage(uuid, text, senderId, receiverId, timestamp))
   } catch (e: Exception) {
     Log.e("MessageSource", "Error converting document to Message: ${e.message}")
     Result.failure(e)

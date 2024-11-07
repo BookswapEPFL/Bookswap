@@ -3,11 +3,12 @@ package com.android.bookswap.data.repository
 import android.content.Context
 import com.android.bookswap.data.DataMessage
 import com.google.firebase.firestore.ListenerRegistration
+import java.util.UUID
 
 interface MessageRepository {
 
   /** Generates a new unique id for a message */
-  fun getNewUid(): String
+  fun getNewUUID(): UUID
 
   /**
    * Initialize the repository
@@ -38,11 +39,11 @@ interface MessageRepository {
   /**
    * Delete a message from the repository
    *
-   * @param message message to be deleted
+   * @param messageUUID UUID of message to be deleted
    * @param callback callback function that receives Result.success() when operation succeed of
    *   Result.failure(exception) if error
    */
-  fun deleteMessage(messageId: String, callback: (Result<Unit>) -> Unit, context: Context)
+  fun deleteMessage(messageUUID: UUID, callback: (Result<Unit>) -> Unit, context: Context)
 
   /**
    * Delete all messages of this chat from the repository
@@ -61,7 +62,7 @@ interface MessageRepository {
    * @param callback callback function that receives Result.success() when operation succeed of
    *   Result.failure(exception) if error
    */
-  fun updateMessage(messageId: DataMessage, callback: (Result<Unit>) -> Unit, context: Context)
+  fun updateMessage(message: DataMessage, callback: (Result<Unit>) -> Unit, context: Context)
 
   /**
    * Add a listener to the repository to get messages in real-time
