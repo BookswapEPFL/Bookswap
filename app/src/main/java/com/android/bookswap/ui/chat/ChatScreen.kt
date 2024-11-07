@@ -169,10 +169,10 @@ fun ChatScreen(
                           context)
                     } else {
                       // Send a new message
-                      val messageId = messageRepository.getNewUid()
+                      val messageId = messageRepository.getNewUUID()
                       val newMessage =
                           DataMessage(
-                              id = messageId,
+                              uuid = messageId,
                               text = newMessageText.text,
                               senderId = currentUserId,
                               receiverId = otherUserId, // Ensure receiverId is set here
@@ -239,7 +239,7 @@ fun ChatScreen(
                           // Handle delete
                           selectedMessage?.let { message ->
                             messageRepository.deleteMessage(
-                                message.id,
+                                message.uuid,
                                 { result ->
                                   if (result.isSuccess) {
                                     Log.d("ChatScreen", "Message deleted successfully")
@@ -310,18 +310,18 @@ fun MessageItem(message: DataMessage, currentUserId: String, onLongPress: () -> 
                     .widthIn(max = (LocalConfiguration.current.screenWidthDp.dp * 2 / 3))
                     .border(1.dp, ColorVariable.Accent, shape)
                     .combinedClickable(onClick = {}, onLongClick = { onLongPress() })
-                    .testTag("message_item ${message.id}")) {
+                    .testTag("message_item ${message.uuid}")) {
               Column(modifier = Modifier.padding(16.dp)) {
                 Text(
                     text = message.text,
-                    modifier = Modifier.testTag("message_text ${message.id}"),
+                    modifier = Modifier.testTag("message_text ${message.uuid}"),
                     color = ColorVariable.Accent)
                 Text(
                     text = formatTimestamp(message.timestamp),
                     color = ColorVariable.AccentSecondary,
                     style = MaterialTheme.typography.bodySmall,
                     modifier =
-                        Modifier.align(Alignment.End).testTag("message_timestamp ${message.id}"))
+                        Modifier.align(Alignment.End).testTag("message_timestamp ${message.uuid}"))
               }
             }
       }
