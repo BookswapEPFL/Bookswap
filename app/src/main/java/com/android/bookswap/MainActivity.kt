@@ -133,8 +133,20 @@ class MainActivity : ComponentActivity() {
 val user =
     listOf(
         DataUser(
+            longitude = 0.04,
+            latitude = 0.04,
             bookList =
                 listOf(
-                    UUID(12345678L, 87654321L),
-                    UUID(-848484, 848484),
-                    UUID(763879565731911, 5074118859109511))))
+                    UUID(12345678L, 87654321L))),
+        DataUser(
+            longitude = -0.08,
+            latitude = -0.08,
+            bookList =
+            listOf(
+                UUID(-848484, 848484))),
+        DataUser(
+            longitude = 0.0,
+            latitude = 0.0,
+            bookList =
+            listOf(
+                UUID(763879565731911, 5074118859109511))))
