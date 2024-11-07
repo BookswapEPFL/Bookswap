@@ -64,6 +64,7 @@ import kotlin.math.roundToInt
 import kotlinx.coroutines.launch
 
 const val INIT_ZOOM = 10F
+const val NO_USER_SELECTED = -1
 
 val CameraPositionKey = SemanticsPropertyKey<CameraPositionState>("CameraPosition")
 var SemanticsPropertyReceiver.cameraPosition by CameraPositionKey
@@ -89,7 +90,7 @@ fun MapScreen(
     navigationActions: NavigationActions,
     bookFilter: BookFilter,
     booksRepository: BooksRepository,
-    selectedUser: Int = -1,
+    selectedUser: Int = NO_USER_SELECTED,
     geolocation: IGeolocation = DefaultGeolocation()
 ) {
   val cameraPositionState = rememberCameraPositionState()
@@ -179,7 +180,7 @@ fun MapScreen(
       },
       content = { pd ->
         GoogleMap(
-            onMapClick = { mutableStateSelectedUser = -1 },
+            onMapClick = { mutableStateSelectedUser = NO_USER_SELECTED },
             modifier =
                 Modifier.fillMaxSize().padding(pd).testTag("mapGoogleMap").semantics {
                   cameraPosition = cameraPositionState
