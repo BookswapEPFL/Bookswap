@@ -4,6 +4,11 @@ import com.android.bookswap.R
 import com.android.bookswap.data.source.api.ApiService
 import org.json.JSONObject
 
+/**
+ * Class to send an image URL to ChatGPT API and parse the response for book information.
+ *
+ * @param apiService The API service to send the request
+ */
 class ImageToDataSource(private val apiService: ApiService) {
   // The specific prompt for the image analysis
   private val PROMPT = R.string.prompt
