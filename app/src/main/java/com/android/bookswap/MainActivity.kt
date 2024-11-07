@@ -14,14 +14,15 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
-import com.android.bookswap.data.BookGenres
-import com.android.bookswap.data.BookLanguages
-import com.android.bookswap.data.DataBook
+import com.android.bookswap.data.DataUser
 import com.android.bookswap.data.source.network.BooksFirestoreRepository
 import com.android.bookswap.data.source.network.MessageFirestoreSource
 import com.android.bookswap.model.chat.MessageBox
 import com.android.bookswap.model.chat.PermissionHandler
 import com.android.bookswap.model.map.BookFilter
+import com.android.bookswap.model.map.DefaultGeolocation
+import com.android.bookswap.model.map.Geolocation
+import com.android.bookswap.model.map.IGeolocation
 import com.android.bookswap.resources.C
 import com.android.bookswap.ui.authentication.SignInScreen
 import com.android.bookswap.ui.books.add.AddISBNScreen
@@ -31,14 +32,11 @@ import com.android.bookswap.ui.chat.ChatScreen
 import com.android.bookswap.ui.chat.ListChatScreen
 import com.android.bookswap.ui.map.FilterMapScreen
 import com.android.bookswap.ui.map.MapScreen
-import com.android.bookswap.ui.map.TempUser
 import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.navigation.Route
 import com.android.bookswap.ui.navigation.Screen
 import com.android.bookswap.ui.theme.BookSwapAppTheme
-import com.google.firebase.Firebase
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.firestore
 import java.util.UUID
 
 class MainActivity : ComponentActivity() {
@@ -57,13 +55,16 @@ class MainActivity : ComponentActivity() {
     val messageRepository = MessageFirestoreSource(db)
     val bookRepository = BooksFirestoreRepository(db)
 
+    // Initialize the geolocation
+    val geolocation = Geolocation(this)
+
     setContent {
       BookSwapAppTheme {
         // A surface container using the 'background' color from the theme
         Surface(
             modifier = Modifier.fillMaxSize().semantics { testTag = C.Tag.main_screen_container },
             color = MaterialTheme.colorScheme.background) {
-              BookSwapApp(messageRepository, bookRepository)
+              BookSwapApp(messageRepository, bookRepository, geolocation = geolocation)
             }
       }
     }
@@ -73,23 +74,25 @@ class MainActivity : ComponentActivity() {
   fun BookSwapApp(
       messageRepository: MessageFirestoreSource,
       bookRepository: BooksFirestoreRepository,
-      startDestination: String = Route.AUTH
+      startDestination: String = Route.AUTH,
+      geolocation: IGeolocation = DefaultGeolocation()
   ) {
     val navController = rememberNavController()
     val navigationActions = NavigationActions(navController)
     val bookFilter = BookFilter()
-    val bookfire = BooksFirestoreRepository(Firebase.firestore)
 
     val placeHolder =
-        List(12) {
-          MessageBox(
-              "Contact ${it + 1}",
-              "Test message $it test for the feature of ellipsis in the message",
-              "01.01.24")
-        }
-
-    val userid1 = "user123"
-    val userid2 = "user124"
+        listOf(
+            MessageBox(
+                contactName = "user124",
+                message = "Welcome message for user124",
+                date = "01.01.24")) +
+            List(6) {
+              MessageBox(
+                  contactName = "Contact ${it + 1}",
+                  message = "Test message $it test for the feature of ellipsis in the message",
+                  date = "01.01.24")
+            }
 
     NavHost(navController = navController, startDestination = startDestination) {
       navigation(startDestination = Screen.AUTH, route = Route.AUTH) {
@@ -97,13 +100,20 @@ class MainActivity : ComponentActivity() {
       }
       navigation(startDestination = Screen.CHATLIST, route = Route.CHAT) {
         composable(Screen.CHATLIST) { ListChatScreen(placeHolder, navigationActions) }
-        composable(Screen.CHAT) {
-          ChatScreen(messageRepository, userid1, userid2, navigationActions)
+        composable("${Screen.CHAT}/{user1}/{user2}") { backStackEntry ->
+          val user1 = backStackEntry.arguments?.getString("user1") ?: ""
+          val user2 = backStackEntry.arguments?.getString("user2") ?: ""
+          ChatScreen(messageRepository, user1, user2, navigationActions)
         }
       }
       navigation(startDestination = Screen.MAP, route = Route.MAP) {
         composable(Screen.MAP) {
-          MapScreen(user, navigationActions = navigationActions, bookFilter = bookFilter)
+          MapScreen(
+              user,
+              navigationActions = navigationActions,
+              bookFilter = bookFilter,
+              bookRepository,
+              geolocation = geolocation)
         }
         composable(Screen.FILTER) { FilterMapScreen(navigationActions, bookFilter) }
       }
@@ -122,39 +132,9 @@ class MainActivity : ComponentActivity() {
 // Need to be removed in the future.
 val user =
     listOf(
-        TempUser(
-            latitude = 0.0,
-            longitude = 0.0,
-            listBook =
+        DataUser(
+            bookList =
                 listOf(
-                    DataBook(
-                        uuid = UUID.randomUUID(),
-                        title = "Book 1",
-                        author = "Author 1",
-                        description = "Description of Book 1",
-                        rating = 5,
-                        photo = null,
-                        language = BookLanguages.ENGLISH,
-                        isbn = null,
-                        genres = listOf(BookGenres.FANTASY)),
-                    DataBook(
-                        uuid = UUID.randomUUID(),
-                        title = "Book 2",
-                        author = "Author 2",
-                        description = "Description of Book 2",
-                        rating = 4,
-                        photo = null,
-                        language = BookLanguages.FRENCH,
-                        isbn = null,
-                        genres = listOf(BookGenres.FICTION)),
-                    DataBook(
-                        uuid = UUID.randomUUID(),
-                        title = "Book 3",
-                        author = "Author 3",
-                        description = "Description of Book 3",
-                        rating = null,
-                        photo = null,
-                        language = BookLanguages.GERMAN,
-                        isbn = null,
-                        genres = listOf(BookGenres.SCIENCEFICTION, BookGenres.AUTOBIOGRAPHY)),
-                )))
+                    UUID(12345678L, 87654321L),
+                    UUID(-848484, 848484),
+                    UUID(763879565731911, 5074118859109511))))

@@ -8,6 +8,10 @@ import com.android.bookswap.data.source.network.BooksFirestoreRepository
 import com.android.bookswap.data.source.network.MessageFirestoreSource
 import com.android.bookswap.ui.navigation.Route
 import com.google.firebase.firestore.FirebaseFirestore
+import io.mockk.every
+import io.mockk.just
+import io.mockk.mockk
+import io.mockk.runs
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -15,15 +19,18 @@ import org.junit.Test
 class NavigationBarEndToEnd {
   @get:Rule val composeTestRule = createComposeRule()
 
+  private lateinit var mockBookRepository: BooksFirestoreRepository
+
   @Before
   fun setUp() {
+    mockBookRepository = mockk()
+    every { mockBookRepository.getBook(any(), any()) } just runs
 
     composeTestRule.setContent {
       val db = FirebaseFirestore.getInstance()
 
       val messageRepository = MessageFirestoreSource(db)
-      val bookRepository = BooksFirestoreRepository(db)
-      MainActivity().BookSwapApp(messageRepository, bookRepository, Route.MAP)
+      MainActivity().BookSwapApp(messageRepository, mockBookRepository, Route.MAP)
     }
   }
 
