@@ -23,13 +23,13 @@ data class ChatGPTRequest(val model: String, val messages: List<ChatGPTMessage>)
  * @param context the context from where the request is made
  * @param mode true for production mode, false for testing mode
  */
-class ChatGPTApiService(context: Context, mode: Boolean = true) {
+class ChatGPTApiService(context: Context, mode: Boolean = true) : ApiService {
   private val requestQueue: RequestQueue = Volley.newRequestQueue(context)
   private val apiKey = if (mode) BuildConfig.OPENAI_API_KEY else ""
   private val apiUrl = "https://api.openai.com/v1/chat/completions"
 
   // Send a chat request to the OpenAI API
-  fun sendChatRequest(
+  override fun sendChatRequest(
       userMessages: List<String>,
       onSuccess: (String) -> Unit,
       onError: (String) -> Unit
