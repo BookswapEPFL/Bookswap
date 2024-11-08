@@ -140,17 +140,4 @@ class PhotoFirestoreSourceTest {
     // Assert
     assert(result == null) // Should return null due to missing "base64"
   }
-
-  /*@Test
-  fun bitmapToBase64_and_base64ToBitmap_roundTrip() {
-      // Arrange
-      val originalBitmap: Bitmap = BitmapFactory.decodeResource(ApplicationProvider.getApplicationContext().resources, android.R.drawable.star_big_on)
-
-      // Act
-      val base64String = photoFirestoreRepository.bitmapToBase64(originalBitmap)
-      val convertedBitmap = photoFirestoreRepository.base64ToBitmap(base64String)
-
-      // Assert
-      assert(originalBitmap.sameAs(convertedBitmap))
-  }*/
 }
