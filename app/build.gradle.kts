@@ -1,4 +1,3 @@
-
 import java.io.FileInputStream
 import java.util.Properties
 
@@ -15,6 +14,9 @@ android {
     namespace = "com.android.bookswap"
     compileSdk = 34
 
+    buildFeatures {
+        buildConfig = true
+    }
     // Load the API key from local.properties
     val localProperties = Properties()
     val localPropertiesFile = rootProject.file("local.properties")
@@ -23,6 +25,7 @@ android {
     }
 
     val mapsApiKey: String = localProperties.getProperty("MAPS_API_KEY") ?: ""
+
 
     defaultConfig {
         applicationId = "com.android.bookswap"
@@ -35,7 +38,10 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+        val openAiApiKey: String = localProperties.getProperty("OPENAI_API_KEY") ?: "\" placeHolder \" "
         manifestPlaceholders["MAPS_API_KEY"] = mapsApiKey
+        manifestPlaceholders["OPENAI_API_KEY"] = openAiApiKey
+        buildConfigField("String", "OPENAI_API_KEY",  openAiApiKey)
     }
 
     buildTypes {
@@ -60,6 +66,7 @@ android {
 
     buildFeatures {
         compose = true
+        buildConfig = true //Generate a com.android.bookswap.BuildConfig file
     }
 
     composeOptions {
@@ -80,6 +87,7 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
             merges += "META-INF/LICENSE.md"
             merges += "META-INF/LICENSE-notice.md"
+            excludes += "META-INF/DEPENDENCIES"
         }
     }
 
@@ -116,11 +124,20 @@ sonar {
         property("sonar.organization", "bookswapepfl")
         property("sonar.host.url", "https://sonarcloud.io")
         // Comma-separated paths to the various directories containing the *.xml JUnit report files. Each path may be absolute or relative to the project base directory.
-        property("sonar.junit.reportPaths", "${project.layout.buildDirectory.get()}/test-results/testDebugunitTest/")
+        property(
+            "sonar.junit.reportPaths",
+            "${project.layout.buildDirectory.get()}/test-results/testDebugunitTest/"
+        )
         // Paths to xml files with Android Lint issues. If the main flavor is changed, this file will have to be changed too.
-        property("sonar.androidLint.reportPaths", "${project.layout.buildDirectory.get()}/reports/lint-results-debug.xml")
+        property(
+            "sonar.androidLint.reportPaths",
+            "${project.layout.buildDirectory.get()}/reports/lint-results-debug.xml"
+        )
         // Paths to JaCoCo XML coverage report files.
-        property("sonar.coverage.jacoco.xmlReportPaths", "${project.layout.buildDirectory.get()}/reports/jacoco/jacocoTestReport/jacocoTestReport.xml")
+        property(
+            "sonar.coverage.jacoco.xmlReportPaths",
+            "${project.layout.buildDirectory.get()}/reports/jacoco/jacocoTestReport/jacocoTestReport.xml"
+        )
     }
 }
 
@@ -136,6 +153,7 @@ dependencies {
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.firebase:firebase-analytics")
     implementation(libs.google.play.services.location)
+    implementation("io.coil-kt:coil-compose:2.1.0")
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.firebase.database.ktx)
@@ -194,8 +212,6 @@ dependencies {
     globalTestImplementation(libs.kaspresso)
     globalTestImplementation(libs.kaspresso.compose)
 
-
-
     testImplementation(libs.mockito.core)
     testImplementation(libs.mockito.inline)
     testImplementation(libs.mockito.kotlin)
@@ -207,6 +223,10 @@ dependencies {
     testImplementation(libs.robolectric)
 
     implementation(libs.volley) //HTTP request
+    implementation(libs.okhttp)
+
+    implementation("org.apache.httpcomponents:httpclient:4.5.14")
+    implementation("org.apache.httpcomponents:httpcore:4.4.13")
     implementation(libs.json) //JSON parser
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("androidx.vectordrawable:vectordrawable:1.1.0")

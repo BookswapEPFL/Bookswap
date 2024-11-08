@@ -3,9 +3,12 @@ package com.android.bookswap.ui.chat
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -35,18 +38,23 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
+import com.android.bookswap.R
 import com.android.bookswap.data.DataMessage
 import com.android.bookswap.data.repository.MessageRepository
 import com.android.bookswap.ui.components.BackButtonComponent
@@ -70,6 +78,9 @@ fun ChatScreen(
   var newMessageText by remember { mutableStateOf(TextFieldValue("")) }
   var selectedMessage by remember { mutableStateOf<DataMessage?>(null) }
   var updateActive by remember { mutableStateOf(false) }
+  val padding8 = 8.dp
+  val padding24 = 24.dp
+  val padding36 = 36.dp
 
   LaunchedEffect(Unit) {
     while (true) {
@@ -102,7 +113,7 @@ fun ChatScreen(
                 modifier =
                     Modifier.testTag("chatName")
                         .align(Alignment.CenterHorizontally)
-                        .padding(start = 24.dp))
+                        .padding(start = padding24))
           },
           navigationIcon = { BackButtonComponent(navController) },
           actions = {
@@ -110,7 +121,7 @@ fun ChatScreen(
               Icon(
                   imageVector = Icons.Default.Person,
                   contentDescription = "Profile",
-                  modifier = Modifier.testTag("profileIcon").size(36.dp),
+                  modifier = Modifier.testTag("profileIcon").size(padding36),
                   tint = ColorVariable.Accent)
             }
           },
@@ -119,7 +130,7 @@ fun ChatScreen(
       Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.SpaceBetween) {
         // Message list
         LazyColumn(
-            modifier = Modifier.weight(1f).padding(8.dp),
+            modifier = Modifier.weight(1f).padding(padding8).testTag("column"),
             verticalArrangement = Arrangement.Bottom) {
               items(messages) { message ->
                 MessageItem(
@@ -132,17 +143,17 @@ fun ChatScreen(
         // Message input field and send button
         Row(
             modifier =
-                Modifier.fillMaxWidth().padding(top = 8.dp).background(ColorVariable.Primary),
+                Modifier.fillMaxWidth().padding(top = padding8).background(ColorVariable.Primary),
             verticalAlignment = Alignment.CenterVertically) {
               BasicTextField(
                   value = newMessageText,
                   onValueChange = { newMessageText = it },
                   modifier =
                       Modifier.weight(1f)
-                          .padding(8.dp)
+                          .padding(padding8)
                           .background(ColorVariable.Secondary, MaterialTheme.shapes.small)
                           .border(1.dp, ColorVariable.Accent, MaterialTheme.shapes.small)
-                          .padding(8.dp)
+                          .padding(padding8)
                           .testTag("message_input_field"),
               )
               Button(
@@ -199,7 +210,7 @@ fun ChatScreen(
                           ColorVariable.Accent,
                           ColorVariable.Secondary,
                           ColorVariable.Accent),
-                  modifier = Modifier.padding(horizontal = 8.dp).testTag("send_button")) {
+                  modifier = Modifier.padding(horizontal = padding8).testTag("send_button")) {
                     Text(if (updateActive) "Update" else "Send")
                   }
             }
@@ -218,7 +229,7 @@ fun ChatScreen(
                   modifier =
                       Modifier.background(ColorVariable.Primary, shape = RoundedCornerShape(8.dp))
                           .border(2.dp, ColorVariable.Accent, shape = RoundedCornerShape(8.dp))
-                          .padding(8.dp),
+                          .padding(padding8),
                   verticalArrangement = Arrangement.Center,
                   horizontalAlignment = Alignment.CenterHorizontally) {
                     Button(
@@ -230,7 +241,7 @@ fun ChatScreen(
                         modifier =
                             Modifier.background(
                                     ColorVariable.Primary, shape = RoundedCornerShape(50))
-                                .padding(8.dp)
+                                .padding(padding8)
                                 .testTag("editButton")) {
                           Text("Edit")
                         }
@@ -256,7 +267,7 @@ fun ChatScreen(
                         modifier =
                             Modifier.background(
                                     ColorVariable.Primary, shape = RoundedCornerShape(50))
-                                .padding(8.dp)
+                                .padding(padding8)
                                 .testTag("deleteButton")) {
                           Text("Delete")
                         }
@@ -272,6 +283,9 @@ fun ChatScreen(
 fun MessageItem(message: DataMessage, currentUserId: String, onLongPress: () -> Unit) {
   val isCurrentUser = message.senderId == currentUserId
   val cornerRadius = 25.dp
+  val padding8 = 8.dp
+  val padding16 = 16.dp
+  val imagePopUp = 300.dp
   val shape =
       if (isCurrentUser) {
         RoundedCornerShape(
@@ -286,6 +300,11 @@ fun MessageItem(message: DataMessage, currentUserId: String, onLongPress: () -> 
             bottomStart = 5.dp,
             bottomEnd = cornerRadius)
       }
+  var showPopup by remember { mutableStateOf(false) }
+  var scale by remember { mutableFloatStateOf(1f) }
+  var offsetX by remember { mutableFloatStateOf(0f) }
+  var offsetY by remember { mutableFloatStateOf(0f) }
+
   Row(
       modifier = Modifier.fillMaxWidth(),
       horizontalArrangement = if (isCurrentUser) Arrangement.End else Arrangement.Start) {
@@ -306,16 +325,25 @@ fun MessageItem(message: DataMessage, currentUserId: String, onLongPress: () -> 
                 },
             shape = shape,
             modifier =
-                Modifier.padding(8.dp)
+                Modifier.padding(padding8)
                     .widthIn(max = (LocalConfiguration.current.screenWidthDp.dp * 2 / 3))
                     .border(1.dp, ColorVariable.Accent, shape)
-                    .combinedClickable(onClick = {}, onLongClick = { onLongPress() })
+                    .combinedClickable(
+                        onClick = { if (message.id == "101") showPopup = true },
+                        onLongClick = { onLongPress() })
                     .testTag("message_item ${message.id}")) {
               Column(modifier = Modifier.padding(16.dp)) {
-                Text(
-                    text = message.text,
-                    modifier = Modifier.testTag("message_text ${message.id}"),
-                    color = ColorVariable.Accent)
+                if (message.id == "101") {
+                  Image(
+                      painter = painterResource(id = R.drawable.the_hobbit_cover),
+                      contentDescription = "Message Image",
+                      modifier = Modifier.testTag("hobbit"))
+                } else {
+                  Text(
+                      text = message.text,
+                      modifier = Modifier.testTag("message_text ${message.id}"),
+                      color = ColorVariable.Accent)
+                }
                 Text(
                     text = formatTimestamp(message.timestamp),
                     color = ColorVariable.AccentSecondary,
@@ -325,6 +353,54 @@ fun MessageItem(message: DataMessage, currentUserId: String, onLongPress: () -> 
               }
             }
       }
+
+  if (showPopup) {
+    Popup(
+        alignment = Alignment.Center,
+        onDismissRequest = {
+          showPopup = false
+          scale = 1f
+          offsetX = 0f
+          offsetY = 0f
+        }) {
+          Box(
+              modifier =
+                  Modifier.fillMaxSize()
+                      .background(Color.Black.copy(alpha = 0.8f))
+                      .clickable {
+                        showPopup = false
+                        scale = 1f
+                        offsetX = 0f
+                        offsetY = 0f
+                      }
+                      .padding(padding16)) {
+                Box(
+                    modifier =
+                        Modifier.align(Alignment.Center)
+                            .size(imagePopUp * scale)
+                            .graphicsLayer(
+                                scaleX = scale,
+                                scaleY = scale,
+                                translationX = offsetX,
+                                translationY = offsetY)) {
+                      Image(
+                          painter = painterResource(id = R.drawable.the_hobbit_cover),
+                          contentDescription = "Enlarged Image",
+                          modifier =
+                              Modifier.size(imagePopUp * scale)
+                                  .pointerInput(Unit) {
+                                    detectTransformGestures { _, pan, zoom, _ -> scale *= zoom }
+                                  }
+                                  .graphicsLayer(
+                                      scaleX = scale,
+                                      scaleY = scale,
+                                      translationX = offsetX,
+                                      translationY = offsetY)
+                                  .testTag("HobbitBig"))
+                    }
+              }
+        }
+  }
 }
 
 fun formatTimestamp(timestamp: Long): String {
