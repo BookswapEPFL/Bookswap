@@ -47,8 +47,8 @@ class DataMessageFirestoreSourceTest {
       DataMessage(
           uuid = UUID.randomUUID(),
           text = "Test message",
-          senderUUID = "sender_id",
-          receiverUUID = "receiver_id",
+          senderUUID = UUID.randomUUID(),
+          receiverUUID = UUID.randomUUID(),
           timestamp = System.currentTimeMillis())
 
   @Before
@@ -92,8 +92,10 @@ class DataMessageFirestoreSourceTest {
     `when`(mockCollectionReference.get()).thenReturn(Tasks.forResult(mockQuerySnapshot))
     `when`(mockDocumentSnapshot.getString("uuid")).thenReturn(expectedMessage.uuid.toString())
     `when`(mockDocumentSnapshot.getString("text")).thenReturn(expectedMessage.text)
-    `when`(mockDocumentSnapshot.getString("senderId")).thenReturn(expectedMessage.senderUUID)
-    `when`(mockDocumentSnapshot.getString("receiverId")).thenReturn(expectedMessage.receiverUUID)
+    `when`(mockDocumentSnapshot.getString("senderUUID"))
+        .thenReturn(expectedMessage.senderUUID.toString())
+    `when`(mockDocumentSnapshot.getString("receiverUUID"))
+        .thenReturn(expectedMessage.receiverUUID.toString())
     `when`(mockDocumentSnapshot.getLong("timestamp")).thenReturn(expectedMessage.timestamp)
 
     // Act
@@ -186,8 +188,10 @@ class DataMessageFirestoreSourceTest {
     `when`(mockDocumentSnapshot.exists()).thenReturn(true) // Ensure document exists
     `when`(mockDocumentSnapshot.getString("uuid")).thenReturn(recentMessage.uuid.toString())
     `when`(mockDocumentSnapshot.getString("text")).thenReturn(recentMessage.text)
-    `when`(mockDocumentSnapshot.getString("senderId")).thenReturn(recentMessage.senderUUID)
-    `when`(mockDocumentSnapshot.getString("receiverId")).thenReturn(recentMessage.receiverUUID)
+    `when`(mockDocumentSnapshot.getString("senderUUID"))
+        .thenReturn(recentMessage.senderUUID.toString())
+    `when`(mockDocumentSnapshot.getString("receiverUUID"))
+        .thenReturn(recentMessage.receiverUUID.toString())
     `when`(mockDocumentSnapshot.getLong("timestamp")).thenReturn(recentMessage.timestamp)
     `when`(mockDocumentReference.delete()).thenReturn(Tasks.forResult(null))
 
@@ -230,8 +234,10 @@ class DataMessageFirestoreSourceTest {
     `when`(mockDocumentSnapshot.exists()).thenReturn(true)
     `when`(mockDocumentSnapshot.getString("uuid")).thenReturn(oldMessage.uuid.toString())
     `when`(mockDocumentSnapshot.getString("text")).thenReturn(oldMessage.text)
-    `when`(mockDocumentSnapshot.getString("senderId")).thenReturn(oldMessage.senderUUID)
-    `when`(mockDocumentSnapshot.getString("receiverId")).thenReturn(oldMessage.receiverUUID)
+    `when`(mockDocumentSnapshot.getString("senderUUID"))
+        .thenReturn(oldMessage.senderUUID.toString())
+    `when`(mockDocumentSnapshot.getString("receiverUUID"))
+        .thenReturn(oldMessage.receiverUUID.toString())
     `when`(mockDocumentSnapshot.getLong("timestamp")).thenReturn(oldMessage.timestamp)
 
     messageFirestoreSource.deleteMessage(
@@ -276,8 +282,10 @@ class DataMessageFirestoreSourceTest {
     `when`(mockDocumentSnapshot.exists()).thenReturn(true)
     `when`(mockDocumentSnapshot.getString("uuid")).thenReturn(recentMessage.uuid.toString())
     `when`(mockDocumentSnapshot.getString("text")).thenReturn(recentMessage.text)
-    `when`(mockDocumentSnapshot.getString("senderId")).thenReturn(recentMessage.senderUUID)
-    `when`(mockDocumentSnapshot.getString("receiverId")).thenReturn(recentMessage.receiverUUID)
+    `when`(mockDocumentSnapshot.getString("senderUUID"))
+        .thenReturn(recentMessage.senderUUID.toString())
+    `when`(mockDocumentSnapshot.getString("receiverUUID"))
+        .thenReturn(recentMessage.receiverUUID.toString())
     `when`(mockDocumentSnapshot.getLong("timestamp")).thenReturn(recentMessage.timestamp)
     `when`(mockDocumentReference.delete()).thenReturn(Tasks.forException(exception))
 
@@ -316,11 +324,16 @@ class DataMessageFirestoreSourceTest {
     val mockBatch = mock(WriteBatch::class.java)
 
     `when`(mockFirestore.collection(COLLECTION_PATH)).thenReturn(mockCollectionReference)
-    `when`(mockCollectionReference.whereIn("senderId", listOf("user1", "user2")))
+    `when`(
+            mockCollectionReference.whereIn(
+                "senderUUID", listOf(testMessage.senderUUID, testMessage.receiverUUID)))
         .thenReturn(mockCollectionReference)
-    `when`(mockCollectionReference.whereIn("receiverId", listOf("user1", "user2")))
+
+    `when`(
+            mockCollectionReference.whereIn(
+                "receiverUUID", listOf(testMessage.senderUUID, testMessage.receiverUUID)))
         .thenReturn(mockCollectionReference)
-    `when`(mockCollectionReference.whereNotEqualTo("senderId", "receiverId"))
+    `when`(mockCollectionReference.whereNotEqualTo("senderUUID", "receiverUUID"))
         .thenReturn(mockCollectionReference)
     `when`(mockCollectionReference.get()).thenReturn(Tasks.forResult(mockQuerySnapshot))
     `when`(mockQuerySnapshot.documents).thenReturn(documents)
@@ -329,7 +342,8 @@ class DataMessageFirestoreSourceTest {
     documents.forEach { `when`(mockBatch.delete(it.reference)).thenReturn(mockBatch) }
     `when`(mockBatch.commit()).thenReturn(Tasks.forResult(null))
 
-    messageFirestoreSource.deleteAllMessages("user1", "user2") { result ->
+    messageFirestoreSource.deleteAllMessages(testMessage.senderUUID, testMessage.receiverUUID) {
+        result ->
       assert(result.isSuccess)
     }
 
@@ -341,16 +355,21 @@ class DataMessageFirestoreSourceTest {
   @Test
   fun deleteAllMessages_returnsSuccessWhenNoMessagesToDelete() {
     `when`(mockFirestore.collection(COLLECTION_PATH)).thenReturn(mockCollectionReference)
-    `when`(mockCollectionReference.whereIn("senderId", listOf("user1", "user2")))
+    `when`(
+            mockCollectionReference.whereIn(
+                "senderUUID", listOf(testMessage.senderUUID, testMessage.receiverUUID)))
         .thenReturn(mockCollectionReference)
-    `when`(mockCollectionReference.whereIn("receiverId", listOf("user1", "user2")))
+    `when`(
+            mockCollectionReference.whereIn(
+                "receiverUUID", listOf(testMessage.senderUUID, testMessage.receiverUUID)))
         .thenReturn(mockCollectionReference)
-    `when`(mockCollectionReference.whereNotEqualTo("senderId", "receiverId"))
+    `when`(mockCollectionReference.whereNotEqualTo("senderUUID", "receiverUUID"))
         .thenReturn(mockCollectionReference)
     `when`(mockCollectionReference.get()).thenReturn(Tasks.forResult(mockQuerySnapshot))
     `when`(mockQuerySnapshot.documents).thenReturn(emptyList()) // No messages found
 
-    messageFirestoreSource.deleteAllMessages("user1", "user2") { result ->
+    messageFirestoreSource.deleteAllMessages(testMessage.senderUUID, testMessage.receiverUUID) {
+        result ->
       assert(result.isSuccess)
     }
   }
@@ -359,15 +378,20 @@ class DataMessageFirestoreSourceTest {
   fun deleteAllMessages_failsWhenFirestoreRetrievalError() {
     val exception = RuntimeException("Firestore retrieval error")
     `when`(mockFirestore.collection(COLLECTION_PATH)).thenReturn(mockCollectionReference)
-    `when`(mockCollectionReference.whereIn("senderId", listOf("user1", "user2")))
+    `when`(
+            mockCollectionReference.whereIn(
+                "senderUUID", listOf(testMessage.senderUUID, testMessage.receiverUUID)))
         .thenReturn(mockCollectionReference)
-    `when`(mockCollectionReference.whereIn("receiverId", listOf("user1", "user2")))
+    `when`(
+            mockCollectionReference.whereIn(
+                "receiverUUID", listOf(testMessage.senderUUID, testMessage.receiverUUID)))
         .thenReturn(mockCollectionReference)
-    `when`(mockCollectionReference.whereNotEqualTo("senderId", "receiverId"))
+    `when`(mockCollectionReference.whereNotEqualTo("senderUUID", "receiverUUID"))
         .thenReturn(mockCollectionReference)
     `when`(mockCollectionReference.get()).thenReturn(Tasks.forException(exception))
 
-    messageFirestoreSource.deleteAllMessages("user1", "user2") { result ->
+    messageFirestoreSource.deleteAllMessages(testMessage.senderUUID, testMessage.receiverUUID) {
+        result ->
       assert(result.isFailure)
       assert(result.exceptionOrNull() == exception)
     }
@@ -380,11 +404,15 @@ class DataMessageFirestoreSourceTest {
     val mockBatch = mock(WriteBatch::class.java)
 
     `when`(mockFirestore.collection(COLLECTION_PATH)).thenReturn(mockCollectionReference)
-    `when`(mockCollectionReference.whereIn("senderId", listOf("user1", "user2")))
+    `when`(
+            mockCollectionReference.whereIn(
+                "senderUUID", listOf(testMessage.senderUUID, testMessage.receiverUUID)))
         .thenReturn(mockCollectionReference)
-    `when`(mockCollectionReference.whereIn("receiverId", listOf("user1", "user2")))
+    `when`(
+            mockCollectionReference.whereIn(
+                "receiverUUID", listOf(testMessage.senderUUID, testMessage.receiverUUID)))
         .thenReturn(mockCollectionReference)
-    `when`(mockCollectionReference.whereNotEqualTo("senderId", "receiverId"))
+    `when`(mockCollectionReference.whereNotEqualTo("senderUUID", "receiverUUID"))
         .thenReturn(mockCollectionReference)
     `when`(mockCollectionReference.get()).thenReturn(Tasks.forResult(mockQuerySnapshot))
     `when`(mockQuerySnapshot.documents).thenReturn(documents)
@@ -393,7 +421,8 @@ class DataMessageFirestoreSourceTest {
     documents.forEach { `when`(mockBatch.delete(it.reference)).thenReturn(mockBatch) }
     `when`(mockBatch.commit()).thenReturn(Tasks.forException(exception))
 
-    messageFirestoreSource.deleteAllMessages("user1", "user2") { result ->
+    messageFirestoreSource.deleteAllMessages(testMessage.senderUUID, testMessage.receiverUUID) {
+        result ->
       assert(result.isFailure)
       assert(result.exceptionOrNull() == exception)
     }
@@ -431,8 +460,10 @@ class DataMessageFirestoreSourceTest {
     `when`(mockDocumentSnapshot.exists()).thenReturn(true)
     `when`(mockDocumentSnapshot.getString("uuid")).thenReturn(oldMessage.uuid.toString())
     `when`(mockDocumentSnapshot.getString("text")).thenReturn(oldMessage.text)
-    `when`(mockDocumentSnapshot.getString("senderId")).thenReturn(oldMessage.senderUUID)
-    `when`(mockDocumentSnapshot.getString("receiverId")).thenReturn(oldMessage.receiverUUID)
+    `when`(mockDocumentSnapshot.getString("senderUUID"))
+        .thenReturn(oldMessage.senderUUID.toString())
+    `when`(mockDocumentSnapshot.getString("receiverUUID"))
+        .thenReturn(oldMessage.receiverUUID.toString())
     `when`(mockDocumentSnapshot.getLong("timestamp")).thenReturn(oldMessage.timestamp)
 
     messageFirestoreSource.updateMessage(
@@ -478,8 +509,10 @@ class DataMessageFirestoreSourceTest {
     `when`(mockDocumentSnapshot.exists()).thenReturn(true)
     `when`(mockDocumentSnapshot.getString("uuid")).thenReturn(recentMessage.uuid.toString())
     `when`(mockDocumentSnapshot.getString("text")).thenReturn(recentMessage.text)
-    `when`(mockDocumentSnapshot.getString("senderId")).thenReturn(recentMessage.senderUUID)
-    `when`(mockDocumentSnapshot.getString("receiverId")).thenReturn(recentMessage.receiverUUID)
+    `when`(mockDocumentSnapshot.getString("senderUUID"))
+        .thenReturn(recentMessage.senderUUID.toString())
+    `when`(mockDocumentSnapshot.getString("receiverUUID"))
+        .thenReturn(recentMessage.receiverUUID.toString())
     `when`(mockDocumentSnapshot.getLong("timestamp")).thenReturn(recentMessage.timestamp)
     `when`(mockDocumentReference.update(messageMap)).thenReturn(Tasks.forException(exception))
 
@@ -515,8 +548,10 @@ class DataMessageFirestoreSourceTest {
     val definedUUID = UUID.randomUUID()
     `when`(mockDocumentSnapshot.getString("uuid")).thenReturn(definedUUID.toString())
     `when`(mockDocumentSnapshot.getString("text")).thenReturn("Test message")
-    `when`(mockDocumentSnapshot.getString("senderId")).thenReturn("sender1")
-    `when`(mockDocumentSnapshot.getString("receiverId")).thenReturn("receiver1")
+    `when`(mockDocumentSnapshot.getString("senderUUID"))
+        .thenReturn(testMessage.senderUUID.toString())
+    `when`(mockDocumentSnapshot.getString("receiverUUID"))
+        .thenReturn(testMessage.receiverUUID.toString())
     `when`(mockDocumentSnapshot.getLong("timestamp")).thenReturn(1634567890L)
 
     val result = documentToMessage(mockDocumentSnapshot)
@@ -526,8 +561,8 @@ class DataMessageFirestoreSourceTest {
     assert(message != null)
     assert(message?.uuid == definedUUID)
     assert(message?.text == "Test message")
-    assert(message?.senderUUID == "sender1")
-    assert(message?.receiverUUID == "receiver1")
+    assert(message?.senderUUID == testMessage.senderUUID)
+    assert(message?.receiverUUID == testMessage.receiverUUID)
     assert(message?.timestamp == 1634567890L)
   }
 

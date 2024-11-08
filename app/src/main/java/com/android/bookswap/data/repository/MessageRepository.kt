@@ -73,8 +73,8 @@ interface MessageRepository {
    * @return ListenerRegistration object that can be used to remove the listener
    */
   fun addMessagesListener(
-    otherUserUUID: UUID,
-    currentUserUUID: UUID,
-    callback: (Result<List<DataMessage>>) -> Unit
+      otherUserUUID: UUID,
+      currentUserUUID: UUID,
+      callback: (Result<List<DataMessage>>) -> Unit
   ): ListenerRegistration
 }

@@ -114,14 +114,14 @@ class MessageFirestoreSource(private val db: FirebaseFirestore) : MessageReposit
   }
 
   override fun deleteAllMessages(
-      user1Id: String,
-      user2Id: String,
+      user1UUID: UUID,
+      user2UUID: UUID,
       callback: (Result<Unit>) -> Unit
   ) {
     db.collection(COLLECTION_PATH)
-        .whereIn("senderId", listOf(user1Id, user2Id))
-        .whereIn("receiverId", listOf(user1Id, user2Id))
-        .whereNotEqualTo("senderId", "receiverId")
+        .whereIn("senderUUID", listOf(user1UUID, user2UUID))
+        .whereIn("receiverUUID", listOf(user1UUID, user2UUID))
+        .whereNotEqualTo("senderUUID", "receiverUUID")
         .get()
         .addOnCompleteListener { task ->
           if (task.isSuccessful) {
@@ -242,10 +242,10 @@ fun documentToMessage(document: DocumentSnapshot): Result<DataMessage> {
   return try {
     val uuid = UUID.fromString(document.getString("uuid")!!)
     val text = document.getString("text")!!
-    val senderId = document.getString("senderId")!!
-    val receiverId = document.getString("receiverId")!!
+    val senderUUID = UUID.fromString(document.getString("senderUUID")!!)
+    val receiverUUID = UUID.fromString(document.getString("receiverUUID")!!)
     val timestamp = document.getLong("timestamp")!!
-    Result.success(DataMessage(uuid, text, senderId, receiverId, timestamp))
+    Result.success(DataMessage(uuid, text, senderUUID, receiverUUID, timestamp))
   } catch (e: Exception) {
     Log.e("MessageSource", "Error converting document to Message: ${e.message}")
     Result.failure(e)

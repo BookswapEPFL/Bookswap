@@ -8,7 +8,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import java.util.UUID
 
 open class UserViewModel(
-    var uuid: String = "ERROR_UUID",
+    var uuid: UUID,
     repository: UsersRepository = UserFirestoreSource(FirebaseFirestore.getInstance())
 ) : ViewModel() {
   private var dataUser = DataUser(uuid)
@@ -46,6 +46,7 @@ open class UserViewModel(
   ) {
     updateUser(
         DataUser(
+            uuid,
             greeting,
             firstName,
             lastName,
@@ -54,7 +55,6 @@ open class UserViewModel(
             latitude,
             longitude,
             picURL,
-            uuid,
             bookList))
   }
 

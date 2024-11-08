@@ -185,7 +185,7 @@ class ChatScreenTest {
 
     composeTestRule.onNodeWithTag("chatTopAppBar").assertIsDisplayed()
     composeTestRule.onNodeWithTag("chatName").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("chatName").assertTextEquals(otherUserUUID.toString() )
+    composeTestRule.onNodeWithTag("chatName").assertTextEquals(otherUserUUID.toString())
     composeTestRule.onNodeWithTag("profileIcon", useUnmergedTree = true).assertIsDisplayed()
   }
 
