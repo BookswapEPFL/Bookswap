@@ -8,4 +8,5 @@ data class DataPhoto(
     val timestamp: Long,
     val userId: String,
     val bookId: String,
-    val uri: Uri? = null,)
+    val uri: Uri? = null,
+)
