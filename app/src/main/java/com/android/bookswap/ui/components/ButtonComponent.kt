@@ -39,12 +39,6 @@ fun ButtonComponent(
 ) {
   val colors = ButtonDefaults.outlinedButtonColors()
   val contentPadding = PaddingValues(8.dp, 8.dp)
-  val textPadding =
-      PaddingValues(
-          12.dp,
-          contentPadding.calculateTopPadding(),
-          12.dp,
-          contentPadding.calculateBottomPadding())
   val shape = CircleShape
   val containerColor =
       if (enabled) {
@@ -79,55 +73,6 @@ fun ButtonComponent(
                   horizontalArrangement = Arrangement.Center,
                   verticalAlignment = Alignment.CenterVertically,
                   content = content)
-            }
-      }
-}
-
-@Composable
-fun IconButtonComponent(
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    enabled: Boolean = true,
-    border: BorderStroke? = null,
-    tint: Color = LocalContentColor.current,
-    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
-    content: @Composable() (() -> Unit)
-) {
-  val colors = IconButtonDefaults.iconButtonColors() // ButtonDefaults.outlinedButtonColors()
-
-  val shape = CircleShape
-  val containerColor =
-      if (enabled) {
-        colors.containerColor
-      } else {
-        colors.disabledContainerColor
-      }
-  val contentColor =
-      if (enabled) {
-        tint
-      } else {
-        tint.copy(colors.disabledContentColor.alpha)
-      }
-
-  Surface(
-      onClick = onClick,
-      modifier =
-          modifier.minimumInteractiveComponentSize().clip(shape).semantics { role = Role.Button },
-      enabled = enabled,
-      shape = shape,
-      color = containerColor,
-      contentColor = contentColor,
-      border = border,
-      interactionSource = interactionSource) {
-        val mergedStyle = LocalTextStyle.current.merge(MaterialTheme.typography.labelLarge)
-        CompositionLocalProvider(
-            LocalContentColor provides contentColor, LocalTextStyle provides mergedStyle) {
-              Row(
-                  Modifier.defaultMinSize(
-                      minWidth = ButtonDefaults.MinHeight, minHeight = ButtonDefaults.MinHeight),
-                  horizontalArrangement = Arrangement.Center,
-                  verticalAlignment = Alignment.CenterVertically,
-                  content = { content() })
             }
       }
 }
