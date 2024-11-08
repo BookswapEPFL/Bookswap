@@ -1,35 +1,23 @@
 package com.android.bookswap.ui.theme
 
 import androidx.compose.material3.Typography
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.sp
 
 // Set of Material typography styles to start with
-val Typography =
+val BookSwapTypography =
     Typography(
-        bodyLarge =
-            TextStyle(
-                fontFamily = FontFamily.Default,
-                fontWeight = FontWeight.Normal,
-                fontSize = 16.sp,
-                lineHeight = 24.sp,
-                letterSpacing = 0.5.sp)
-        /* Other default text styles to override
-        titleLarge = TextStyle(
-            fontFamily = FontFamily.Default,
-            fontWeight = FontWeight.Normal,
-            fontSize = 22.sp,
-            lineHeight = 28.sp,
-            letterSpacing = 0.sp
-        ),
-        labelSmall = TextStyle(
-            fontFamily = FontFamily.Default,
-            fontWeight = FontWeight.Medium,
-            fontSize = 11.sp,
-            lineHeight = 16.sp,
-            letterSpacing = 0.5.sp
-        )
-        */
-        )
+        displayLarge = Typography().displayLarge.copy(),
+        displayMedium = Typography().displayMedium.copy(),
+        displaySmall = Typography().displaySmall.copy(),
+        headlineLarge = Typography().headlineLarge.copy(),
+        headlineMedium = Typography().headlineMedium.copy(),
+        headlineSmall = Typography().headlineSmall.copy(),
+        titleLarge = Typography().titleLarge.copy(),
+        titleMedium = Typography().titleMedium.copy(),
+        titleSmall = Typography().titleSmall.copy(),
+        bodyLarge = Typography().bodyLarge.copy(),
+        bodyMedium = Typography().bodyMedium.copy(),
+        bodySmall = Typography().bodySmall.copy(),
+        labelLarge = Typography().labelLarge.copy(),
+        labelMedium = Typography().labelMedium.copy(),
+        labelSmall = Typography().labelSmall.copy(),
+    )
