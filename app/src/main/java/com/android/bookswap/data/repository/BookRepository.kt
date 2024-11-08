@@ -32,22 +32,22 @@ interface BooksRepository {
   // Function to update an existing book in the repository.
   // Parameters:
   // - dataBook: The book data to be updated.
-  // - OnSucess: A callback function that receives the updated list of books when the operation
+  // - onSuccess: A callback function that receives the updated list of books when the operation
   // succeeds.
   // - onFailure: A callback function that receives an exception if the operation fails.
-  fun updateBook(dataBook: DataBook, OnSucess: () -> Unit, onFailure: (Exception) -> Unit)
+  fun updateBook(dataBook: DataBook, onSuccess: () -> Unit, onFailure: (Exception) -> Unit)
 
   // Function to delete a book from the repository.
   // Parameters:
-  // - id: The unique identifier of the book to be deleted.
-  // - dataBook: The book data to be deleted (can also just use the ID).
-  // - OnSucess: A callback function that receives the updated list of books when the operation
+  // - uuid: The unique identifier of the book to be deleted.
+  // - dataBook: The book data to be deleted (can also just use the uuid).
+  // - onSuccess: A callback function that receives the updated list of books when the operation
   // succeeds.
   // - onFailure: A callback function that receives an exception if the operation fails.
   fun deleteBooks(
-      id: String,
+      uuid: UUID,
       dataBook: DataBook,
-      OnSucess: () -> Unit,
+      onSuccess: () -> Unit,
       onFailure: (Exception) -> Unit
   )
 }

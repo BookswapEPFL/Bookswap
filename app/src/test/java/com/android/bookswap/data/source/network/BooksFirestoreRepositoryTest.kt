@@ -11,7 +11,6 @@ import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.firestore.util.Assert.fail
-import java.util.UUID
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -22,6 +21,7 @@ import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.verify
 import org.robolectric.RobolectricTestRunner
+import java.util.UUID
 
 @RunWith(RobolectricTestRunner::class)
 class BooksFirestoreRepositoryTest {
@@ -96,7 +96,7 @@ class BooksFirestoreRepositoryTest {
     doAnswer { Tasks.forResult(null) }.`when`(mockDocumentReference).delete()
 
     // Act
-    booksFirestorerRepository.deleteBooks(testBook.isbn!!, testBook, {}, {})
+    booksFirestorerRepository.deleteBooks(testBook.uuid, testBook, {}, {})
 
     // Assert
     verify(mockDocumentReference).delete()

@@ -278,7 +278,7 @@ fun EditBookScreen(
 
                         booksRepository.updateBook(
                             updatedBook!!,
-                            onSucess = { navigationActions.goBack() },
+                            onSuccess = { navigationActions.goBack() },
                             onFailure = {
                               Toast.makeText(context, "Failed to update book.", Toast.LENGTH_SHORT)
                                   .show()
@@ -298,9 +298,9 @@ fun EditBookScreen(
                 Button(
                     onClick = {
                       booksRepository.deleteBooks(
-                          book.uuid.toString(),
+                          book.uuid,
                           book,
-                          onSucess = { navigationActions.goBack() },
+                          onSuccess = { navigationActions.goBack() },
                           onFailure = {
                             Toast.makeText(context, "Failed to delete book.", Toast.LENGTH_SHORT)
                                 .show()
