@@ -12,15 +12,37 @@ import com.google.firebase.firestore.FirebaseFirestore
 import java.io.ByteArrayOutputStream
 import java.util.UUID
 
+/** Constants : */
+/** Name of the Firestore collection that stores users */
 const val PHOTO_COLLECTION_PATH = "photos"
+/** Quality of the compressed image */
+const val COMPRESSION_QUALITY = 70
+/** Offset for the byte array */
+const val OFFSET = 0
 
+/**
+ * A class that implements the PhotoRepository interface using Firebase Firestore as the data
+ * source.
+ *
+ * @property db The Firestore database instance.
+ */
 class PhotoFirestoreSource(private val db: FirebaseFirestore) : PhotoRepository {
 
-  // Generates and returns a new unique ID for a photo in Firestore
+  /**
+   * Generates and returns a new unique ID for a photo in Firestore.
+   *
+   * @return A new UUID.
+   */
   override fun getNewUid(): UUID {
     return UUID.randomUUID()
   }
 
+  /**
+   * Initializes the PhotoFirestoreSource.
+   *
+   * @param callback A callback function that receives Result.success(Unit) on success or
+   *   Result.failure(exception) on failure.
+   */
   override fun init(callback: (Result<Unit>) -> Unit) {
     try {
       callback(Result.success(Unit))
@@ -30,7 +52,13 @@ class PhotoFirestoreSource(private val db: FirebaseFirestore) : PhotoRepository 
     }
   }
 
-  // Fetches a specific photo from Firestore by UUID
+  /**
+   * Fetches a specific photo from Firestore by UUID.
+   *
+   * @param uid The UUID of the photo to fetch.
+   * @param onSuccess Callback function that receives the DataPhoto object on success.
+   * @param onFailure Callback function that receives an Exception on failure.
+   */
   override fun getPhoto(uid: UUID, onSuccess: (DataPhoto) -> Unit, onFailure: (Exception) -> Unit) {
     db.collection(PHOTO_COLLECTION_PATH).document(uid.toString()).get().addOnCompleteListener { task
       ->
@@ -48,20 +76,38 @@ class PhotoFirestoreSource(private val db: FirebaseFirestore) : PhotoRepository 
   }
 
   // Maybe not in the repository (I think it should be in the viewmodel)
+  /**
+   * Converts a Bitmap object to a Base64 encoded string.
+   *
+   * @param bitmap The Bitmap object to convert.
+   * @return The Base64 encoded string representation of the bitmap.
+   */
   override fun bitmapToBase64(bitmap: Bitmap): String {
     val baos = ByteArrayOutputStream()
-    bitmap.compress(Bitmap.CompressFormat.JPEG, 70, baos)
+    bitmap.compress(Bitmap.CompressFormat.JPEG, COMPRESSION_QUALITY, baos)
     val byteArray = baos.toByteArray()
     return Base64.encodeToString(byteArray, Base64.DEFAULT)
   }
 
   // Same, maybe not in the repository (I think it should be in the viewmodel)
+  /**
+   * Converts a Base64 encoded string to a Bitmap object.
+   *
+   * @param base64 The Base64 encoded string to convert.
+   * @return The Bitmap object representation of the Base64 string.
+   */
   override fun base64ToBitmap(base64: String): Bitmap {
     val byteArray = Base64.decode(base64, Base64.DEFAULT)
-    return BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
+    return BitmapFactory.decodeByteArray(byteArray, OFFSET, byteArray.size)
   }
 
-  // Uploads a photo to Firestore
+  /**
+   * Uploads a photo to Firestore.
+   *
+   * @param dataPhoto The DataPhoto object to be added to Firestore.
+   * @param onSuccess Callback function that is called when the photo is successfully added.
+   * @param onFailure Callback function that is called when there is an error adding the photo.
+   */
   override fun addPhoto(
       dataPhoto: DataPhoto,
       onSuccess: () -> Unit,
@@ -81,11 +127,15 @@ class PhotoFirestoreSource(private val db: FirebaseFirestore) : PhotoRepository 
         })
   }
 
-  // Converts a Firestore document to a DataPhoto object
+  /**
+   * Converts a Firestore document to a DataPhoto object.
+   *
+   * @param document The Firestore document to convert.
+   * @return The DataPhoto object if conversion is successful, otherwise null.
+   */
   fun documentToPhoto(document: DocumentSnapshot): DataPhoto? {
     return try {
-      val uid =
-          document.getString("uid") ?: return null // UUID.fromString(document.getString("uid"))
+      val uid = document.getString("uid") ?: return null
       val url = document.getString("url") ?: ""
       val timestamp = document.getLong("timestamp") ?: System.currentTimeMillis()
       val base64 = document.getString("base64") ?: return null
@@ -97,7 +147,14 @@ class PhotoFirestoreSource(private val db: FirebaseFirestore) : PhotoRepository 
     }
   }
 
-  // Helper function to perform Firestore operations (add, update, delete)
+  /**
+   * Helper function to perform Firestore operations (add, update, delete). Executes the provided
+   * Firestore task and triggers success or failure callbacks.
+   *
+   * @param task The Firestore task to execute.
+   * @param onSuccess Callback function that is called when the task is successful.
+   * @param onFailure Callback function that is called when the task fails.
+   */
   private fun performFirestoreOperation(
       task: Task<Void>,
       onSuccess: () -> Unit,
