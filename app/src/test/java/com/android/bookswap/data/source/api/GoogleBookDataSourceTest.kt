@@ -98,7 +98,7 @@ class GoogleBookDataSourceTest {
             author = "Daniel Keyes",
             description = "Example desc",
             rating = null,
-            photo = "image2",
+            photo = null,
             language = BookLanguages.ENGLISH,
             isbn = "9780435123437")
 
