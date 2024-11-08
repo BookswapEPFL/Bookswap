@@ -12,16 +12,6 @@ import com.google.firebase.firestore.FirebaseFirestore
 import java.io.ByteArrayOutputStream
 import java.util.UUID
 
-// eden gives bitmap but he also has the uri (we do all the operation convert store to database)
-// then when Jaime need a picture as he has added it to message tape, with the uid
-// he should be able to get the picture with good format (jpeg or png
-
-// matias form the viewmodel calls my method to convert from bitmap to base64
-// matias calls my method to upload the image to firestore
-// matias calls my method from the viewmodel to get the image from firestore
-// then he calls my method to convert from base64 to bitmap
-// and return it to the view from Jaime in the jpeg or png format
-
 const val PHOTO_COLLECTION_PATH = "photos"
 
 class PhotoFirestoreSource(private val db: FirebaseFirestore) : PhotoRepository {
