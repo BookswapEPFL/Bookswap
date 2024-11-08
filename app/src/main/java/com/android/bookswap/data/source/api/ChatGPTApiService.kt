@@ -1,6 +1,7 @@
 package com.android.bookswap.data.source.api
 
 import android.content.Context
+import android.util.Log
 import com.android.bookswap.BuildConfig
 import com.android.volley.Request
 import com.android.volley.RequestQueue
@@ -69,10 +70,12 @@ class ChatGPTApiService(context: Context, mode: Boolean = true) : ApiService {
 
                     onSuccess(messageContent)
                   } catch (e: Exception) {
+                    Log.e("ChatGPTApiService", "Error: ${e.localizedMessage}")
                     onError("Parsing error: ${e.localizedMessage}")
                   }
                 },
                 Response.ErrorListener { error ->
+                  Log.e("ChatGPTApiService", "Error: ${error.localizedMessage}")
                   onError("Request error: ${error.localizedMessage}")
                 }) {
           // Add the API key and content type to the request headers
