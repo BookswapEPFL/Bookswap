@@ -68,7 +68,7 @@ class PhotoFirestoreSource(private val db: FirebaseFirestore) : PhotoRepository 
     //Maybe not in the repository (I think it should be in the viewmodel)
     override fun bitmapToBase64(bitmap: Bitmap): String {
         val baos = ByteArrayOutputStream()
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos)
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 70, baos)
         val byteArray = baos.toByteArray()
         return Base64.encodeToString(byteArray, Base64.DEFAULT)
     }
@@ -106,7 +106,7 @@ class PhotoFirestoreSource(private val db: FirebaseFirestore) : PhotoRepository 
     // Converts a Firestore document to a DataPhoto object
     fun documentToPhoto(document: DocumentSnapshot): DataPhoto? {
         return try {
-            val uid = UUID.fromString(document.getString("uid"))
+            val uid = document.getString("uid") ?: return  null //UUID.fromString(document.getString("uid"))
             val url = document.getString("url") ?: ""
             val timestamp = document.getLong("timestamp") ?: System.currentTimeMillis()
             val base64 = document.getString("base64") ?: return null
