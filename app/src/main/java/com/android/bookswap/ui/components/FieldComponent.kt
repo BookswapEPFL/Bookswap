@@ -17,7 +17,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
@@ -37,7 +36,6 @@ import androidx.compose.ui.graphics.takeOrElse
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -56,11 +54,11 @@ fun FieldComponent(
       label = { Text(labelText) })
 }
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FieldComponent(
-    value: TextFieldValue,
-    onValueChange: (TextFieldValue) -> Unit,
+    value: String,
+    onValueChange: (String) -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     readOnly: Boolean = false,
@@ -113,7 +111,7 @@ fun FieldComponent(
         decorationBox =
             @Composable {
               OutlinedTextFieldDefaults.DecorationBox(
-                  value = value.text,
+                  value = value,
                   innerTextField = it,
                   enabled = enabled,
                   singleLine = singleLine,
@@ -144,7 +142,7 @@ fun FieldComponent(
                                                 .value) {
                                               false
                                             } else {
-                                              value.text.isEmpty()
+                                              value.isEmpty()
                                             },
                                         colors = colors)
                                     .value,
@@ -161,7 +159,7 @@ fun FieldComponent(
                                                 .value) {
                                               true
                                             } else {
-                                              value.text.isEmpty()
+                                              value.isEmpty()
                                             },
                                         colors = colors)
                                     .value,
@@ -172,141 +170,6 @@ fun FieldComponent(
                       PaddingValues(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 16.dp))
             })
   }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun FieldComponent(
-    value: String,
-    onValueChange: (String) -> Unit,
-    modifier: Modifier = Modifier,
-    enabled: Boolean = true,
-    readOnly: Boolean = false,
-    textStyle: TextStyle = LocalTextStyle.current,
-    label: @Composable() (() -> Unit)? = null,
-    placeholder: @Composable() (() -> Unit)? = null,
-    isError: Boolean = false,
-    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
-    keyboardActions: KeyboardActions = KeyboardActions.Default,
-    singleLine: Boolean = false,
-    maxLines: Int = if (singleLine) 1 else Int.MAX_VALUE,
-    minLines: Int = 1,
-    visualTransformation: VisualTransformation = VisualTransformation.None,
-    onTextLayout: (TextLayoutResult) -> Unit = {},
-    interactionSource: MutableInteractionSource? = null,
-    cursorBrush: Brush = SolidColor(Color.Black)
-) {
-  FieldComponent(
-      value = TextFieldValue(value),
-      onValueChange = { tfv: TextFieldValue -> onValueChange(tfv.text) },
-      modifier = modifier,
-      enabled = enabled,
-      readOnly = readOnly,
-      textStyle = textStyle,
-      label = label,
-      placeholder = placeholder,
-      isError = isError,
-      keyboardOptions = keyboardOptions,
-      keyboardActions = keyboardActions,
-      singleLine = singleLine,
-      maxLines = maxLines,
-      minLines = minLines,
-      visualTransformation = visualTransformation,
-      onTextLayout = onTextLayout,
-      interactionSource = interactionSource,
-      cursorBrush = cursorBrush)
-
-  /*val colors = OutlinedTextFieldDefaults.colors()
-  val m_interactionSource = interactionSource ?: remember { MutableInteractionSource() }
-  val textColor =
-      textStyle.color.takeOrElse { textColor(enabled, isError, m_interactionSource, colors).value }
-  val mergedTextStyle = textStyle.merge(TextStyle(color = textColor))
-  Box() {
-    BasicTextField(
-        value = value,
-        onValueChange = onValueChange,
-        modifier =
-            if (label != null) {
-              modifier
-                  .defaultMinSize(280.dp, 56.dp)
-                  // Merge semantics at the beginning of the modifier chain to ensure padding is
-                  // considered part of the text field.
-                  .semantics(mergeDescendants = true) {}
-                  .padding(top = 8.dp)
-            } else {
-              modifier
-            },
-        enabled,
-        readOnly,
-        mergedTextStyle,
-        keyboardOptions,
-        keyboardActions,
-        singleLine,
-        maxLines,
-        minLines,
-        visualTransformation,
-        onTextLayout,
-        interactionSource = m_interactionSource,
-        cursorBrush = cursorBrush,
-        decorationBox = {
-          OutlinedTextFieldDefaults.DecorationBox(
-              value = value,
-              innerTextField = it,
-              enabled = enabled,
-              singleLine = singleLine,
-              visualTransformation = visualTransformation,
-              interactionSource = m_interactionSource,
-              isError = isError,
-              label = label,
-              placeholder = placeholder,
-              container = {
-                Box(
-                    Modifier.border(
-                            animateBorderStrokeAsState(
-                                    enabled = enabled,
-                                    isError = isError,
-                                    interactionSource = m_interactionSource,
-                                    colors = colors,
-                                    focusedBorderThickness = 2.dp,
-                                    unfocusedBorderThickness = 1.dp)
-                                .value,
-                            RoundedCornerShape(100))
-                        .background(
-                            backgroundColor(
-                                    enabled = enabled,
-                                    isError = isError,
-                                    isEmpty =
-                                        if (m_interactionSource.collectIsFocusedAsState().value) {
-                                          false
-                                        } else {
-                                          value.isEmpty()
-                                        },
-                                    interactionSource = m_interactionSource,
-                                    colors = colors)
-                                .value,
-                            RoundedCornerShape(100))
-                        .padding(8.dp)
-                        .padding(top = 0.dp)
-                        .background(
-                            backgroundColor(
-                                    enabled = enabled,
-                                    isError = isError,
-                                    isEmpty =
-                                        if (m_interactionSource.collectIsFocusedAsState().value) {
-                                          true
-                                        } else {
-                                          value.isEmpty()
-                                        },
-                                    interactionSource = m_interactionSource,
-                                    colors = colors)
-                                .value,
-                            RoundedCornerShape(100)),
-                )
-              },
-              contentPadding =
-                  PaddingValues(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 16.dp))
-        })
-  }*/
 }
 
 @Composable
@@ -394,33 +257,34 @@ internal fun indicatorColor(
 }
 
 /*
-@Preview(
-    uiMode = Configuration.UI_MODE_NIGHT_NO,
+@androidx.compose.ui.tooling.preview.Preview(
+    uiMode = android.content.res.Configuration.UI_MODE_NIGHT_NO,
     showBackground = true,
     name = "LightMode",
     widthDp = 672,
 )
-@Preview(
-    uiMode = Configuration.UI_MODE_NIGHT_YES,
+@androidx.compose.ui.tooling.preview.Preview(
+    uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES,
     showBackground = true,
     name = "DarkMode",
     widthDp = 672,
 )
 @Composable
 fun FieldComponentPreview() {
-  val txtValue1 = remember { mutableStateOf("FExample TextStr") }
-  val txtValue2 = remember { mutableStateOf("OExample TextStr") }
-  val txtValue3 = remember { mutableStateOf("FExample TextStr") }
-  val txtValue4 = remember { mutableStateOf(TextFieldValue("OExample TextTFV")) }
-  val txtValue5 = remember { mutableStateOf(TextFieldValue("FExample TextTFV")) }
-  val txtValue6 = remember { mutableStateOf(TextFieldValue("")) }
+  val txtValue1 = remember { androidx.compose.runtime.mutableStateOf("FExample TextStr") }
+  val txtValue2 = remember { androidx.compose.runtime.mutableStateOf("OExample TextStr") }
+  val txtValue3 = remember { androidx.compose.runtime.mutableStateOf("FExample TextStr") }
+  val txtValue4 = remember { androidx.compose.runtime.mutableStateOf("OExample TextTFV") }
+  val txtValue5 = remember { androidx.compose.runtime.mutableStateOf("FExample TextTFV") }
+  val txtValue6 = remember { androidx.compose.runtime.mutableStateOf("") }
   val labelText = "Example Label"
   val label: @Composable() (String) -> Unit = { Text(labelText + it) }
 
-  BookSwapAppTheme(false) {
+  com.android.bookswap.ui.theme.BookSwapAppTheme(false) {
     Box(modifier = Modifier.padding(4.dp)) {
-      Row(Modifier.padding(4.dp)) {
-        Column(Modifier.padding(16.dp)) {
+	  androidx.compose.foundation.layout.Row(Modifier.padding(4.dp)) {
+		androidx.compose.foundation.layout.Column(Modifier.padding(16.dp)) {
+		  FieldComponent("1", "2", Modifier)
           FieldComponent(
               value = txtValue1.value,
               { txtValue1.value = it },
@@ -429,7 +293,7 @@ fun FieldComponentPreview() {
               true,
               label = { label("Str1") },
           )
-          OutlinedTextField(
+		  androidx.compose.material3.OutlinedTextField(
               value = txtValue2.value,
               { txtValue2.value = it },
               modifier = Modifier.padding(8.dp, 4.dp),
@@ -443,8 +307,8 @@ fun FieldComponentPreview() {
               label = { label("Str3") },
               isError = true)
         }
-        Column(Modifier.padding(16.dp)) {
-          OutlinedTextField(
+		androidx.compose.foundation.layout.Column(Modifier.padding(16.dp)) {
+		  androidx.compose.material3.OutlinedTextField(
               value = txtValue4.value,
               { txtValue4.value = it },
               modifier = Modifier.padding(8.dp, 4.dp),
