@@ -80,7 +80,7 @@ class PhotoRequester(
         FileProvider.getUriForFile(
             context,
             "${BuildConfig.APPLICATION_ID}.provider", // matches the provider information in the
-                                                      // manifest
+            // manifest
             tempFile)
 
     return uri
