@@ -8,12 +8,10 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
-import androidx.navigation.compose.rememberNavController
 import com.android.bookswap.data.BookGenres
 import com.android.bookswap.data.BookLanguages
 import com.android.bookswap.data.DataBook
 import com.android.bookswap.data.repository.BooksRepository
-import com.android.bookswap.ui.navigation.NavigationActions
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkStatic
@@ -38,22 +36,14 @@ class AddToBookTest {
 
   @Test
   fun testSaveButtonDisabledInitially() {
-    composeTestRule.setContent {
-      val navController = rememberNavController()
-      val navigationActions = NavigationActions(navController)
-      AddToBookScreen(MockBooksRepository(), navigationActions)
-    }
+    composeTestRule.setContent { AddToBookScreen(MockBooksRepository()) }
     // Check if the Save button is initially disabled
     composeTestRule.onNodeWithText("Save").assertIsNotEnabled()
   }
 
   @Test
   fun testSaveButtonEnabledWhenRequiredFieldsAreFilled() {
-    composeTestRule.setContent {
-      val navController = rememberNavController()
-      val navigationActions = NavigationActions(navController)
-      AddToBookScreen(MockBooksRepository(), navigationActions)
-    }
+    composeTestRule.setContent { AddToBookScreen(MockBooksRepository()) }
     // Fill in the Title and ISBN fields
     composeTestRule.onNodeWithText("Title").performTextInput("My Book Title")
     composeTestRule.onNodeWithText("ISBN").performTextInput("1234567890")
@@ -144,11 +134,7 @@ class AddToBookTest {
 
   @Test
   fun testSaveButtonDisabledWhenTitleIsEmpty() {
-    composeTestRule.setContent {
-      val navController = rememberNavController()
-      val navigationActions = NavigationActions(navController)
-      AddToBookScreen(MockBooksRepository(), navigationActions)
-    }
+    composeTestRule.setContent { AddToBookScreen(MockBooksRepository()) }
     // Fill in the ISBN field but leave the Title field empty
     composeTestRule.onNodeWithText("ISBN").performTextInput("1234567890")
 

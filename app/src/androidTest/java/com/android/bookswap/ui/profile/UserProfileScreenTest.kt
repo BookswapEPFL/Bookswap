@@ -1,13 +1,17 @@
 package com.android.bookswap.ui.profile
 
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.navigation.compose.rememberNavController
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.android.bookswap.data.DataUser
 import com.android.bookswap.data.repository.UsersRepository
 import com.android.bookswap.model.UserViewModel
 import com.android.bookswap.screen.UserProfileScreen
+import com.android.bookswap.ui.components.TopAppBarComponent
+import com.android.bookswap.ui.navigation.NavigationActions
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
 import io.github.kakaocup.compose.node.element.ComposeScreen
 import org.junit.Before
@@ -41,7 +45,11 @@ class UserProfileScreenTest : TestCase() {
             "dummyPic.png",
             "dummyUUID0000"))
 
-    composeTestRule.setContent { UserProfile(userVM = userVM) }
+    composeTestRule.setContent {
+      val navController = rememberNavController()
+      val navigationActions = NavigationActions(navController)
+      UserProfile(userVM = userVM, { TopAppBarComponent(Modifier, navigationActions, "Messages") })
+    }
   }
 
   @Test
@@ -49,10 +57,7 @@ class UserProfileScreenTest : TestCase() {
     run(testName = "assertContent") {
       step("Start User Profile Screen") {
         ComposeScreen.onComposeScreen<UserProfileScreen>(composeTestRule) {
-          titleTxt {
-            assertIsDisplayed()
-            assertTextEquals("Your Profile")
-          }
+          titleTxt { assertIsDisplayed() }
           fullNameTxt {
             assertIsDisplayed()
             assertTextEquals("M. John Doe")
@@ -84,10 +89,6 @@ class UserProfileScreenTest : TestCase() {
     run(testName = "assertEditAction") {
       ComposeScreen.onComposeScreen<UserProfileScreen>(composeTestRule) {
         step("Start User Profile Screen") {
-          titleTxt {
-            assertIsDisplayed()
-            assertTextEquals("Your Profile")
-          }
           fullNameTxt {
             assertIsDisplayed()
             assertTextEquals("M. John Doe")

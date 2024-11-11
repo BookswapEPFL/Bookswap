@@ -10,7 +10,7 @@ class UserProfileScreen(semanticsProvider: SemanticsNodeInteractionsProvider) :
         semanticsProvider = semanticsProvider,
         viewBuilderAction = { hasTestTag("profileScreenContainer") }) {
 
-  val titleTxt: KNode = child { hasTestTag("profileTitleTxt") }
+  val titleTxt: KNode = child { hasTestTag("TopAppBar_Title") }
   val fullNameTxt: KNode = child { hasTestTag("fullNameTxt") }
   val emailTxt: KNode = child { hasTestTag("emailTxt") }
   val phoneNumberTxt: KNode = child { hasTestTag("phoneNumberTxt") }
