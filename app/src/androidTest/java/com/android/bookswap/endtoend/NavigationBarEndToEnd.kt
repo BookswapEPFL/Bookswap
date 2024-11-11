@@ -31,7 +31,7 @@ class NavigationBarEndToEnd {
       val db = FirebaseFirestore.getInstance()
 
       val messageRepository = MessageFirestoreSource(db)
-	  val userRepository = UserFirestoreSource(db)
+      val userRepository = UserFirestoreSource(db)
       MainActivity().BookSwapApp(messageRepository, mockBookRepository, userRepository, Route.MAP)
     }
   }
