@@ -50,8 +50,6 @@ import com.android.bookswap.model.map.BookFilter
 import com.android.bookswap.model.map.DefaultGeolocation
 import com.android.bookswap.model.map.IGeolocation
 import com.android.bookswap.ui.navigation.BOTTOM_NAV_HEIGHT
-import com.android.bookswap.ui.navigation.BottomNavigationMenu
-import com.android.bookswap.ui.navigation.List_Navigation_Bar_Destinations
 import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.navigation.Screen
 import com.android.bookswap.ui.theme.ColorVariable
@@ -91,7 +89,9 @@ fun MapScreen(
     bookFilter: BookFilter,
     booksRepository: BooksRepository,
     selectedUser: Int = NO_USER_SELECTED,
-    geolocation: IGeolocation = DefaultGeolocation()
+    geolocation: IGeolocation = DefaultGeolocation(),
+    topAppBar: @Composable () -> Unit = {},
+    bottomAppBar: @Composable () -> Unit = {},
 ) {
   val cameraPositionState = rememberCameraPositionState()
   // Get the user's current location
@@ -172,12 +172,8 @@ fun MapScreen(
 
   Scaffold(
       modifier = Modifier.testTag("mapScreen"),
-      bottomBar = {
-        BottomNavigationMenu(
-            onTabSelect = { destination -> navigationActions.navigateTo(destination) },
-            tabList = List_Navigation_Bar_Destinations,
-            selectedItem = navigationActions.currentRoute())
-      },
+      topBar = topAppBar,
+      bottomBar = bottomAppBar,
       content = { pd ->
         GoogleMap(
             onMapClick = { mutableStateSelectedUser = NO_USER_SELECTED },
