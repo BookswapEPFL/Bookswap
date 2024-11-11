@@ -76,14 +76,15 @@ class PhotoFirestoreSourceTest {
     // Act
     PhotoFirestoreSource.getPhoto(
         testPhoto.uuid,
-        onSuccess = { photo ->
+        callback = { result ->
+          assert(result.isSuccess)
+          val photo = result.getOrThrow()
           // Assert that the fetched photo matches the expected values
           assert(photo.uuid == testPhoto.uuid)
           assert(photo.url == testPhoto.url)
           assert(photo.timestamp == testPhoto.timestamp)
           assert(photo.base64 == testPhoto.base64)
-        },
-        onFailure = { throw AssertionError("Should not fail") })
+        })
 
     // Verify Firestore collection was called
     verify(mockCollectionReference).document(testPhoto.uuid.toString())
@@ -97,12 +98,10 @@ class PhotoFirestoreSourceTest {
     // Act
     PhotoFirestoreSource.addPhoto(
         testPhoto,
-        onSuccess = {
+        callback = { result ->
           // Assert success callback
-          assert(true)
-        },
-        onFailure = { throw AssertionError("Should not fail") })
-
+          assert(result.isSuccess)
+        })
     // Verify Firestore set operation
     verify(mockDocumentReference).set(testPhoto)
   }

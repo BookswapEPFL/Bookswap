@@ -6,7 +6,7 @@ import java.util.UUID
 
 interface PhotoRepository {
   /** Generates a new unique id for a message */
-  fun getNewUid(): UUID
+  fun getNewUUID(): UUID
 
   /**
    * Initialize the repository
@@ -19,11 +19,11 @@ interface PhotoRepository {
   /**
    * Fetches a specific photo from Firestore by UUID
    *
-   * @param uid the UUID of the photo to fetch
+   * @param uuid the UUID of the photo to fetch
    * @param callback callback function that receives Result.success(DataPhoto) when operation
    *   succeed of Result.failure(exception) if error
    */
-  fun getPhoto(uid: UUID, onSuccess: (DataPhoto) -> Unit, onFailure: (Exception) -> Unit)
+  fun getPhoto(uuid: UUID, callback: (Result<DataPhoto>) -> Unit)
 
   /**
    * Converts a Bitmap to a Base64 encoded string.
@@ -45,8 +45,7 @@ interface PhotoRepository {
    * Uploads a photo to Firestore.
    *
    * @param dataPhoto the photo data to upload.
-   * @param onSuccess callback function that receives Unit if success.
-   * @param onFailure callback function that receives an exception if error.
+   * @param callback callback function that receives Unit if success or an an exception if error.
    */
-  fun addPhoto(dataPhoto: DataPhoto, onSuccess: () -> Unit, onFailure: (Exception) -> Unit)
+  fun addPhoto(dataPhoto: DataPhoto, callback: (Result<Unit>) -> Unit)
 }
