@@ -6,6 +6,7 @@ import androidx.compose.ui.test.performClick
 import com.android.bookswap.MainActivity
 import com.android.bookswap.data.source.network.BooksFirestoreRepository
 import com.android.bookswap.data.source.network.MessageFirestoreSource
+import com.android.bookswap.data.source.network.UserFirestoreSource
 import com.android.bookswap.ui.navigation.Route
 import com.google.firebase.firestore.FirebaseFirestore
 import io.mockk.every
@@ -30,7 +31,8 @@ class NavigationBarEndToEnd {
       val db = FirebaseFirestore.getInstance()
 
       val messageRepository = MessageFirestoreSource(db)
-      MainActivity().BookSwapApp(messageRepository, mockBookRepository, Route.MAP)
+	  val userRepository = UserFirestoreSource(db)
+      MainActivity().BookSwapApp(messageRepository, mockBookRepository, userRepository, Route.MAP)
     }
   }
 
