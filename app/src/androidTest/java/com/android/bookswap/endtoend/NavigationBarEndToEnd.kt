@@ -1,5 +1,6 @@
 package com.android.bookswap.endtoend
 
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
@@ -49,5 +50,11 @@ class NavigationBarEndToEnd {
     // Click on the Map tab and check if the MapScreen is displayed
     composeTestRule.onNodeWithTag("Map").assertExists().performClick()
     composeTestRule.onNodeWithTag("mapScreen").assertExists()
+  }
+
+  @Test
+  fun testMainActivity(){
+	  createAndroidComposeRule<MainActivity>()
+	
   }
 }
