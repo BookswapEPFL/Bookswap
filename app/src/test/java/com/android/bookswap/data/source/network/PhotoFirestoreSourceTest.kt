@@ -57,7 +57,7 @@ class PhotoFirestoreSourceTest {
 
     testPhoto =
         DataPhoto(
-            uid = UUID.randomUUID().toString(),
+            uuid = UUID.randomUUID(),
             url = "", // Optional url field (don't know if it is really useful)
             timestamp = System.currentTimeMillis(),
             base64 = PhotoFirestoreSource.bitmapToBase64(bitmap))
@@ -68,17 +68,17 @@ class PhotoFirestoreSourceTest {
     // Arrange
     `when`(mockDocumentReference.get()).thenReturn(Tasks.forResult(mockDocumentSnapshot))
 
-    `when`(mockDocumentSnapshot.getString("uid")).thenReturn(testPhoto.uid.toString())
+    `when`(mockDocumentSnapshot.getString("uuid")).thenReturn(testPhoto.uuid.toString())
     `when`(mockDocumentSnapshot.getString("url")).thenReturn(testPhoto.url)
     `when`(mockDocumentSnapshot.getLong("timestamp")).thenReturn(testPhoto.timestamp)
     `when`(mockDocumentSnapshot.getString("base64")).thenReturn(testPhoto.base64)
 
     // Act
     PhotoFirestoreSource.getPhoto(
-        UUID.fromString(testPhoto.uid),
+        testPhoto.uuid,
         onSuccess = { photo ->
           // Assert that the fetched photo matches the expected values
-          assert(photo.uid == testPhoto.uid)
+          assert(photo.uuid == testPhoto.uuid)
           assert(photo.url == testPhoto.url)
           assert(photo.timestamp == testPhoto.timestamp)
           assert(photo.base64 == testPhoto.base64)
@@ -86,7 +86,7 @@ class PhotoFirestoreSourceTest {
         onFailure = { throw AssertionError("Should not fail") })
 
     // Verify Firestore collection was called
-    verify(mockCollectionReference).document(testPhoto.uid.toString())
+    verify(mockCollectionReference).document(testPhoto.uuid.toString())
   }
 
   @Test
@@ -110,7 +110,7 @@ class PhotoFirestoreSourceTest {
   @Test
   fun documentToPhoto_returnsDataPhoto_whenDocumentIsValid() {
     // Arrange
-    `when`(mockDocumentSnapshot.getString("uid")).thenReturn(testPhoto.uid.toString())
+    `when`(mockDocumentSnapshot.getString("uuid")).thenReturn(testPhoto.uuid.toString())
     `when`(mockDocumentSnapshot.getString("url")).thenReturn(testPhoto.url)
     `when`(mockDocumentSnapshot.getLong("timestamp")).thenReturn(testPhoto.timestamp)
     `when`(mockDocumentSnapshot.getString("base64")).thenReturn(testPhoto.base64)
@@ -120,7 +120,7 @@ class PhotoFirestoreSourceTest {
 
     // Assert
     assert(result != null)
-    assert(result?.uid == testPhoto.uid)
+    assert(result?.uuid == testPhoto.uuid)
     assert(result?.url == testPhoto.url)
     assert(result?.timestamp == testPhoto.timestamp)
     assert(result?.base64 == testPhoto.base64)
@@ -129,7 +129,7 @@ class PhotoFirestoreSourceTest {
   @Test
   fun documentToPhoto_returnsNull_whenRequiredFieldIsMissing() {
     // Arrange - Missing "base64" field
-    `when`(mockDocumentSnapshot.getString("uid")).thenReturn(testPhoto.uid.toString())
+    `when`(mockDocumentSnapshot.getString("uuid")).thenReturn(testPhoto.uuid.toString())
     `when`(mockDocumentSnapshot.getString("url")).thenReturn(testPhoto.url)
     `when`(mockDocumentSnapshot.getLong("timestamp")).thenReturn(testPhoto.timestamp)
     `when`(mockDocumentSnapshot.getString("base64")).thenReturn(null)

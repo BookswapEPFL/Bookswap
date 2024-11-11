@@ -113,12 +113,12 @@ class PhotoFirestoreSource(private val db: FirebaseFirestore) : PhotoRepository 
       onSuccess: () -> Unit,
       onFailure: (Exception) -> Unit
   ) {
-    Log.d("PhotoFirestoreRepository", "Attempting to add photo with UUID: ${dataPhoto.uid}")
+    Log.d("PhotoFirestoreRepository", "Attempting to add photo with UUID: ${dataPhoto.uuid}")
 
     performFirestoreOperation(
-        db.collection(PHOTO_COLLECTION_PATH).document(dataPhoto.uid.toString()).set(dataPhoto),
+        db.collection(PHOTO_COLLECTION_PATH).document(dataPhoto.uuid.toString()).set(dataPhoto),
         {
-          Log.d("PhotoFirestoreRepository", "Photo added successfully with UUID: ${dataPhoto.uid}")
+          Log.d("PhotoFirestoreRepository", "Photo added successfully with UUID: ${dataPhoto.uuid}")
           onSuccess()
         },
         { e ->
@@ -135,12 +135,12 @@ class PhotoFirestoreSource(private val db: FirebaseFirestore) : PhotoRepository 
    */
   fun documentToPhoto(document: DocumentSnapshot): DataPhoto? {
     return try {
-      val uid = document.getString("uid") ?: return null
+      val uuid = UUID.fromString(document.getString("uuid")) ?: return null
       val url = document.getString("url") ?: ""
       val timestamp = document.getLong("timestamp") ?: System.currentTimeMillis()
       val base64 = document.getString("base64") ?: return null
 
-      DataPhoto(uid = uid, url = url, timestamp = timestamp, base64 = base64)
+      DataPhoto(uuid = uuid, url = url, timestamp = timestamp, base64 = base64)
     } catch (e: Exception) {
       Log.e("PhotoFirestoreRepository", "Error converting document to DataPhoto", e)
       null
