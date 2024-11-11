@@ -50,6 +50,13 @@ class ChatScreenTest {
                   timestamp = it.toLong())
             }
             .toMutableList()
+    (placeHolderData as MutableList<DataMessage>).add(
+        DataMessage(
+            uuid = imageTestMessageUUID,
+            senderUUID = currentUserUUID,
+            receiverUUID = otherUserUUID,
+            text = "Test message 101",
+            timestamp = 101L))
     mockMessageRepository =
         MockMessageFirestoreSource().apply {
           messages = placeHolderData as MutableList<DataMessage>
