@@ -11,6 +11,7 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollToIndex
 import androidx.compose.ui.test.performSemanticsAction
 import androidx.compose.ui.test.performTextClearance
 import androidx.compose.ui.test.performTextInput
@@ -29,7 +30,6 @@ import org.junit.Rule
 import org.junit.Test
 
 class ChatScreenTest {
-
   @get:Rule val composeTestRule = createComposeRule()
   private lateinit var placeHolderData: List<DataMessage>
   private lateinit var mockMessageRepository: MessageRepository
@@ -48,9 +48,11 @@ class ChatScreenTest {
               receiverUUID = otherUserUUID,
               text = "Test message $it",
               timestamp = it.toLong())
-        }
+        }.toMutableList()
     mockMessageRepository =
-        MockMessageFirestoreSource().apply { messages = placeHolderData.toMutableList() }
+        MockMessageFirestoreSource().apply {
+          messages = placeHolderData as MutableList<DataMessage>
+        }
   }
 
   private val palette =
@@ -97,28 +99,52 @@ class ChatScreenTest {
     composeTestRule.onNodeWithTag("message_input_field").assertIsDisplayed()
     composeTestRule.onNodeWithTag("send_button").assertIsDisplayed()
     placeHolderData.forEach { message ->
-      composeTestRule.waitUntil {
+      if (message.uuid != imageTestMessageUUID) {
+        composeTestRule.waitUntil {
+          composeTestRule
+              .onAllNodesWithTag("message_item ${message.uuid}", useUnmergedTree = true)
+              .fetchSemanticsNodes()
+              .isNotEmpty()
+        }
         composeTestRule
-            .onAllNodesWithTag("message_item ${message.uuid}", useUnmergedTree = true)
-            .fetchSemanticsNodes()
-            .isNotEmpty()
+            .onNodeWithTag("message_item ${message.uuid}", useUnmergedTree = true)
+            .assertIsDisplayed()
+        composeTestRule
+            .onNodeWithTag("message_text ${message.uuid}", useUnmergedTree = true)
+            .assertIsDisplayed()
+        composeTestRule
+            .onNodeWithTag("message_text ${message.uuid}", useUnmergedTree = true)
+            .assertTextEquals(message.text)
+        composeTestRule
+            .onNodeWithTag("message_timestamp ${message.uuid}", useUnmergedTree = true)
+            .assertIsDisplayed()
+        composeTestRule
+            .onNodeWithTag("message_timestamp ${message.uuid}", useUnmergedTree = true)
+            .assertTextEquals(formatTimestamp(message.timestamp))
       }
-      composeTestRule
-          .onNodeWithTag("message_item ${message.uuid}", useUnmergedTree = true)
-          .assertIsDisplayed()
-      composeTestRule
-          .onNodeWithTag("message_text ${message.uuid}", useUnmergedTree = true)
-          .assertIsDisplayed()
-      composeTestRule
-          .onNodeWithTag("message_text ${message.uuid}", useUnmergedTree = true)
-          .assertTextEquals(message.text)
-      composeTestRule
-          .onNodeWithTag("message_timestamp ${message.uuid}", useUnmergedTree = true)
-          .assertIsDisplayed()
-      composeTestRule
-          .onNodeWithTag("message_timestamp ${message.uuid}", useUnmergedTree = true)
-          .assertTextEquals(formatTimestamp(message.timestamp))
     }
+  }
+
+  @Test
+  fun CheckLastMessageIsImage() {
+    val mockMessageRepository =
+        MockMessageFirestoreSource().apply { messages = placeHolderData.toMutableList() }
+
+    composeTestRule.setContent {
+      ChatScreen(
+          messageRepository = mockMessageRepository,
+          currentUserUUID = currentUserUUID,
+          otherUserUUID = otherUserUUID,
+          mockNavigationActions)
+    }
+
+    composeTestRule
+        .onNodeWithTag("column", useUnmergedTree = true)
+        .performScrollToIndex(mockMessageRepository.messages.size - 1)
+
+    composeTestRule
+        .onNodeWithTag("hobbit", useUnmergedTree = true)
+        .assertExists("The last message should be an image with the test tag 'hobbit'")
   }
 
   @Test
@@ -338,6 +364,44 @@ class ChatScreenTest {
     composeTestRule
         .onNodeWithTag("message_input_field", useUnmergedTree = true)
         .assertTextEquals("")
+  }
+
+  @Test
+  fun scrollToBottomClickImageAndCheckPopup() {
+    val mockMessageRepository =
+        MockMessageFirestoreSource().apply { messages = placeHolderData.toMutableList() }
+
+    composeTestRule.setContent {
+      ChatScreen(
+          messageRepository = mockMessageRepository,
+          currentUserUUID = currentUserUUID,
+          otherUserUUID = otherUserUUID,
+          mockNavigationActions)
+    }
+
+    composeTestRule
+        .onNodeWithTag("column", useUnmergedTree = true)
+        .performScrollToIndex(mockMessageRepository.messages.size - 1)
+
+    composeTestRule.onNodeWithTag("hobbit", useUnmergedTree = true).performClick()
+
+    composeTestRule.waitUntil(timeoutMillis = 5000) {
+      composeTestRule
+          .onAllNodesWithTag("HobbitBig", useUnmergedTree = true)
+          .fetchSemanticsNodes()
+          .isNotEmpty()
+    }
+    composeTestRule.onNodeWithTag("HobbitBig", useUnmergedTree = true).assertIsDisplayed()
+
+    composeTestRule.onNodeWithTag("HobbitBig", useUnmergedTree = true).performClick()
+
+    composeTestRule.waitUntil(timeoutMillis = 5000) {
+      composeTestRule
+          .onAllNodesWithTag("HobbitBig", useUnmergedTree = true)
+          .fetchSemanticsNodes()
+          .isEmpty()
+    }
+    composeTestRule.onNodeWithTag("HobbitBig", useUnmergedTree = true).assertDoesNotExist()
   }
 
   @Test
