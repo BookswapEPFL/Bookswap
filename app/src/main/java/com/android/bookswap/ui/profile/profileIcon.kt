@@ -9,16 +9,19 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
+import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.theme.ColorVariable
 
 /** Profile Icon for the top app bar */
 @Composable
-fun ProfileIcon() {
-  IconButton(onClick = { /*TODO*/}, modifier = Modifier.testTag("profileIconButton")) {
-    Icon(
-        Icons.Filled.AccountCircle,
-        contentDescription = "Profile Icon",
-        tint = ColorVariable.Accent,
-        modifier = Modifier.size(32.dp).testTag("profileIcon"))
-  }
+fun ProfileIcon(navigationActions: NavigationActions) {
+  IconButton(
+      onClick = { navigationActions.navigateTo("Profile Screen") },
+      modifier = Modifier.testTag("profileIconButton")) {
+        Icon(
+            Icons.Filled.AccountCircle,
+            contentDescription = "Profile Icon",
+            tint = ColorVariable.Accent,
+            modifier = Modifier.size(32.dp).testTag("profileIcon"))
+      }
 }
