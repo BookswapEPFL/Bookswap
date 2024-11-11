@@ -51,9 +51,13 @@ class NavigationBarEndToEnd {
     composeTestRule.onNodeWithTag("Map").assertExists().performClick()
     composeTestRule.onNodeWithTag("mapScreen").assertExists()
   }
+}
+
+class MainActivityEndToEnd() {
+  @get:Rule val androidComposeRule = createAndroidComposeRule<MainActivity>()
 
   @Test
   fun testMainActivity() {
-    createAndroidComposeRule<MainActivity>()
+    androidComposeRule.onNodeWithTag("main_screen_container").assertExists()
   }
 }
