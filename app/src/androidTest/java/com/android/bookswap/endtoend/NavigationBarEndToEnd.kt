@@ -53,8 +53,7 @@ class NavigationBarEndToEnd {
   }
 
   @Test
-  fun testMainActivity(){
-	  createAndroidComposeRule<MainActivity>()
-	
+  fun testMainActivity() {
+    createAndroidComposeRule<MainActivity>()
   }
 }
