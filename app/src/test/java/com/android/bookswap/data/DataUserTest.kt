@@ -2,6 +2,7 @@ package com.android.bookswap.data
 
 import com.android.bookswap.data.repository.UsersRepository
 import com.android.bookswap.model.UserViewModel
+import java.util.UUID
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
 import org.junit.Before
@@ -28,6 +29,8 @@ class DataUserTest {
     assertEquals(0.0, u1.longitude, 0.000001)
     assertEquals("", u1.profilePictureUrl)
     assertEquals("", u1.userId)
+    assertEquals(emptyList<UUID>(), u1.bookList)
+    assertEquals("", u1.googleUid)
   }
 
   @Test

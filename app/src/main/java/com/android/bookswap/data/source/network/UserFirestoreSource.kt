@@ -6,6 +6,7 @@ import com.android.bookswap.data.repository.UsersRepository
 import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
+import java.util.UUID
 
 /** Name of the Firestore collection that stores users */
 private const val COLLECTION_NAME = "Users"
@@ -90,6 +91,8 @@ class UserFirestoreSource(private val db: FirebaseFirestore) : UsersRepository {
       val latitude = document.getDouble("Latitude")!!
       val longitude = document.getDouble("Longitude")!!
       val profilePicture = document.getString("Picture")!!
+      val bookList = (document.get("BookList") as List<String>).map { UUID.fromString(it) }
+      val googleUid = document.getString("GoogleUID")!!
       Result.success(
           DataUser(
               greeting,
@@ -100,7 +103,9 @@ class UserFirestoreSource(private val db: FirebaseFirestore) : UsersRepository {
               latitude,
               longitude,
               profilePicture,
-              userID))
+              userID,
+              bookList,
+              googleUid))
     } catch (e: Exception) {
       Log.e("FirestoreSource", "Error converting document to User: ${e.message}")
       Result.failure(e)

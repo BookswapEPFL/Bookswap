@@ -40,7 +40,6 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.Firebase
 import com.google.firebase.auth.AuthResult
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.auth
 import kotlinx.coroutines.launch
@@ -50,15 +49,15 @@ import kotlinx.coroutines.tasks.await
 fun SignInScreen(navigationActions: NavigationActions) { // Add this when navigation is
   // implemented
   val context = LocalContext.current
-    var googleUid = ""
+  var googleUid = ""
 
   val launcher =
       rememberFirebaseAuthLauncher(
           onAuthComplete = { result ->
-              val googleUserName = result.user?.displayName ?: ""
-              //TODO googleUserUid will be used for retrieving the corresponding DataUser
-              // will be done in another class.
-              googleUid = result.user?.uid ?: ""
+            val googleUserName = result.user?.displayName ?: ""
+            // TODO googleUserUid will be used for retrieving the corresponding DataUser
+            // will be done in another class.
+            googleUid = result.user?.uid ?: ""
             Log.d("SignInScreen", "User signed in: $googleUserName")
             Toast.makeText(context, "Welcome $googleUserName!", Toast.LENGTH_LONG).show()
             navigationActions.navigateTo(TopLevelDestinations.MAP)

@@ -12,7 +12,8 @@ data class DataUser(
     var longitude: Double = 0.0,
     var profilePictureUrl: String = "",
     var userId: String = "",
-    var bookList: List<UUID> = emptyList()
+    var bookList: List<UUID> = emptyList(),
+    var googleUid: String = ""
 ) {
 
   fun printFullname(): String {
