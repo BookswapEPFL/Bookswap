@@ -105,8 +105,7 @@ class PhotoFirestoreSource(private val db: FirebaseFirestore) : PhotoRepository 
    * Uploads a photo to Firestore.
    *
    * @param dataPhoto The DataPhoto object to be added to Firestore.
-   * @param onSuccess Callback function that is called when the photo is successfully added.
-   * @param onFailure Callback function that is called when there is an error adding the photo.
+   * @param callback Callback function that is called when the photo is successfully added or error otherwise.
    */
   override fun addPhoto(dataPhoto: DataPhoto, callback: (Result<Unit>) -> Unit) {
     Log.d("PhotoFirestoreRepository", "Attempting to add photo with UUID: ${dataPhoto.uuid}")
