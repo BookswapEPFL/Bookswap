@@ -15,8 +15,13 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
 import com.android.bookswap.data.DataUser
+import com.android.bookswap.data.repository.BooksRepository
+import com.android.bookswap.data.repository.MessageRepository
+import com.android.bookswap.data.repository.UsersRepository
 import com.android.bookswap.data.source.network.BooksFirestoreRepository
 import com.android.bookswap.data.source.network.MessageFirestoreSource
+import com.android.bookswap.data.source.network.UserFirestoreSource
+import com.android.bookswap.model.UserViewModel
 import com.android.bookswap.model.chat.MessageBox
 import com.android.bookswap.model.chat.PermissionHandler
 import com.android.bookswap.model.map.BookFilter
@@ -35,6 +40,7 @@ import com.android.bookswap.ui.map.MapScreen
 import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.navigation.Route
 import com.android.bookswap.ui.navigation.Screen
+import com.android.bookswap.ui.profile.UserProfile
 import com.android.bookswap.ui.theme.BookSwapAppTheme
 import com.google.firebase.firestore.FirebaseFirestore
 import java.util.UUID
@@ -48,12 +54,13 @@ class MainActivity : ComponentActivity() {
     // permissionHandler = PermissionHandler(this)
     // permissionHandler.askNotificationPermission()
 
-    // Initialize Firebase Firestore
+    // Initialize a Firebase Firestore database instance
     val db = FirebaseFirestore.getInstance()
 
-    // Create the MessageFirestoreSource object
+    // Create the data source objects
     val messageRepository = MessageFirestoreSource(db)
     val bookRepository = BooksFirestoreRepository(db)
+    val userDataSource = UserFirestoreSource(db)
 
     // Initialize the geolocation
     val geolocation = Geolocation(this)
@@ -64,7 +71,8 @@ class MainActivity : ComponentActivity() {
         Surface(
             modifier = Modifier.fillMaxSize().semantics { testTag = C.Tag.main_screen_container },
             color = MaterialTheme.colorScheme.background) {
-              BookSwapApp(messageRepository, bookRepository, geolocation = geolocation)
+              BookSwapApp(
+                  messageRepository, bookRepository, userDataSource, geolocation = geolocation)
             }
       }
     }
@@ -72,14 +80,16 @@ class MainActivity : ComponentActivity() {
 
   @Composable
   fun BookSwapApp(
-      messageRepository: MessageFirestoreSource,
-      bookRepository: BooksFirestoreRepository,
+      messageRepository: MessageRepository,
+      bookRepository: BooksRepository,
+      userRepository: UsersRepository,
       startDestination: String = Route.AUTH,
       geolocation: IGeolocation = DefaultGeolocation()
   ) {
     val navController = rememberNavController()
     val navigationActions = NavigationActions(navController)
     val bookFilter = BookFilter()
+    val userVM = UserViewModel("ERROR_UUID", userRepository)
     val placeHolder =
         listOf(
             MessageBox(
@@ -121,6 +131,9 @@ class MainActivity : ComponentActivity() {
         composable(Screen.ADD_BOOK_MANUALLY) { AddToBookScreen(bookRepository, navigationActions) }
         composable(Screen.ADD_BOOK_SCAN) { /*Todo*/}
         composable(Screen.ADD_BOOK_ISBN) { AddISBNScreen(navigationActions, bookRepository) }
+      }
+      navigation(startDestination = Screen.PROFILE, route = Route.PROFILE) {
+        composable(Screen.PROFILE) { UserProfile(userVM) }
       }
     }
   }
