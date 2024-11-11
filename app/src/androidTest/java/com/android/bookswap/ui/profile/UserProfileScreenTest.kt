@@ -1,7 +1,5 @@
 package com.android.bookswap.ui.profile
 
-import androidx.compose.ui.test.ExperimentalTestApi
-import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.android.bookswap.data.DataUser
@@ -78,7 +76,6 @@ class UserProfileScreenTest : TestCase() {
     }
   }
 
-  @OptIn(ExperimentalTestApi::class)
   @Test
   fun testEdit() {
     run(testName = "assertEditAction") {
