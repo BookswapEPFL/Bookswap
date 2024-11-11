@@ -126,7 +126,8 @@ open class NavigationActions(
   }
 
   private fun isCurrentDestination(route: String): Boolean {
-    // Retrieve the current route and check if it starts with the same route name
+    // Retrieve the current route and check if it starts with the same route name (as checking
+    // equality of the route name didn't worked)
     val currentRoute = currentRoute()
     return currentRoute.startsWith(route)
   }
