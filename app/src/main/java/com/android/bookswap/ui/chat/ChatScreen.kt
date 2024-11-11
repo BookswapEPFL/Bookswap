@@ -285,7 +285,7 @@ fun MessageItem(message: DataMessage, currentUserUUID: UUID, onLongPress: () -> 
   val cornerRadius = 25.dp
   val padding8 = 8.dp
   val padding16 = 16.dp
-  val imagePopUp = 300.dp 
+  val imagePopUp = 300.dp
   val shape =
       if (isCurrentUser) {
         RoundedCornerShape(
@@ -417,4 +417,7 @@ fun formatTimestamp(timestamp: Long): String {
   }
 }
 
-val imageTestMessageUUID: UUID = UUID.fromString("11111111-aa16-43d1-8c47-082ac787f755") //Placeholder message for testing image (adapted to use UUID)
+val imageTestMessageUUID: UUID =
+    UUID.fromString(
+        "11111111-aa16-43d1-8c47-082ac787f755") // Placeholder message for testing image (adapted to
+                                                // use UUID)

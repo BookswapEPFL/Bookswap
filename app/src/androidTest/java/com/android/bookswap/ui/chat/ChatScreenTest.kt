@@ -42,13 +42,14 @@ class ChatScreenTest {
     mockNavigationActions = mockk()
     placeHolderData =
         List(6) {
-          DataMessage(
-              uuid = UUID.randomUUID(),
-              senderUUID = currentUserUUID,
-              receiverUUID = otherUserUUID,
-              text = "Test message $it",
-              timestamp = it.toLong())
-        }.toMutableList()
+              DataMessage(
+                  uuid = UUID.randomUUID(),
+                  senderUUID = currentUserUUID,
+                  receiverUUID = otherUserUUID,
+                  text = "Test message $it",
+                  timestamp = it.toLong())
+            }
+            .toMutableList()
     mockMessageRepository =
         MockMessageFirestoreSource().apply {
           messages = placeHolderData as MutableList<DataMessage>
