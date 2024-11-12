@@ -16,7 +16,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 // A class that implements the BooksRepository interface using Firebase Firestore as the data source
-class BooksFirestoreRepository(private val db: FirebaseFirestore) : BooksRepository {
+class BooksFirestoreSource(private val db: FirebaseFirestore) : BooksRepository {
 
   // Name of the Firestore collection that stores books
   private val collectionBooks = "Books"
