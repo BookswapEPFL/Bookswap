@@ -1,8 +1,10 @@
 package com.android.bookswap.ui.components
 
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -17,9 +19,11 @@ fun TopAppBarComponent(
     title: String = navigationActions.currentRoute()
 ) {
   TopAppBar(
-      title = { Text(text = title, Modifier.testTag("TopAppBar_Title")) },
-      modifier = modifier.testTag("TopAppBar"),
-      { BackButtonComponent(navActions = navigationActions) },
-      { ProfileIcon(navigationActions = navigationActions) },
+	title = { Text(text = title, Modifier.testTag("TopAppBar_Title")) },
+	modifier = modifier.testTag("TopAppBar"),
+	{ BackButtonComponent(navActions = navigationActions) },
+	{ ProfileIcon(navigationActions = navigationActions) },
+	TopAppBarDefaults.windowInsets,
+	TopAppBarDefaults.topAppBarColors(MaterialTheme.colorScheme.background)
   )
 }
