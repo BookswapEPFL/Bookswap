@@ -10,9 +10,8 @@ import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QuerySnapshot
-import com.google.firebase.firestore.util.Assert.fail
-import org.junit.Assert
 import java.util.UUID
+import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -73,21 +72,17 @@ class BooksFirestoreSourceTest {
     `when`(mockDocumentSnapshot.getString("photo")).thenReturn(testBook.photo)
     `when`(mockDocumentSnapshot.getString("language")).thenReturn(testBook.language.name)
     `when`(mockDocumentSnapshot.getString("isbn")).thenReturn(testBook.isbn)
-    `when`(mockDocumentSnapshot.getLong("uuid.mostSignificantBits"))
-        .thenReturn(testBook.uuid.mostSignificantBits)
-    `when`(mockDocumentSnapshot.getLong("uuid.leastSignificantBits"))
-        .thenReturn(testBook.uuid.leastSignificantBits)
+    `when`(mockDocumentSnapshot.getString("uuid")).thenReturn(testBook.uuid.toString())
 
     // Act
     booksFirestorerRepository.getBook(
         callback = { result ->
-            Assert.assertTrue(result.isSuccess)
-            val books = result.getOrThrow()
+          Assert.assertTrue(result.isSuccess)
+          val books = result.getOrThrow()
           // Assert that the fetched books match the expected values
           assert(books.isNotEmpty())
           assert(books.first().title == testBook.title)
-        }
-    )
+        })
 
     // Verify that Firestore collection was called
     verify(mockCollectionReference).get()
@@ -111,15 +106,13 @@ class BooksFirestoreSourceTest {
     doAnswer { Tasks.forResult(null) }.`when`(mockDocumentReference).set(testBook)
 
     // Act
-    booksFirestorerRepository.addBook(
-        testBook
-    ) { result ->
-        Assert.assertTrue(result.isSuccess)
-        // Assert success callback
-        assert(true)
+    booksFirestorerRepository.addBook(testBook) { result ->
+      Assert.assertTrue(result.isSuccess)
+      // Assert success callback
+      assert(true)
     }
 
-      // Verify Firestore set operation
+    // Verify Firestore set operation
     verify(mockDocumentReference).set(testBook)
   }
 
@@ -129,13 +122,9 @@ class BooksFirestoreSourceTest {
     doAnswer { Tasks.forResult(null) }.`when`(mockDocumentReference).set(testBook)
 
     // Act
-    booksFirestorerRepository.updateBook(
-        testBook
-    ) { result ->
-        Assert.assertTrue(result.isSuccess)
-    }
+    booksFirestorerRepository.updateBook(testBook) { result -> Assert.assertTrue(result.isSuccess) }
 
-      // Verify Firestore update operation
+    // Verify Firestore update operation
     verify(mockDocumentReference).set(testBook)
   }
 
@@ -149,10 +138,7 @@ class BooksFirestoreSourceTest {
     `when`(mockDocumentSnapshot.getString("photo")).thenReturn(testBook.photo)
     `when`(mockDocumentSnapshot.getString("language")).thenReturn(testBook.language.name)
     `when`(mockDocumentSnapshot.getString("isbn")).thenReturn(testBook.isbn)
-    `when`(mockDocumentSnapshot.getLong("uuid.mostSignificantBits"))
-        .thenReturn(testBook.uuid.mostSignificantBits)
-    `when`(mockDocumentSnapshot.getLong("uuid.leastSignificantBits"))
-        .thenReturn(testBook.uuid.leastSignificantBits)
+    `when`(mockDocumentSnapshot.getString("uuid")).thenReturn(testBook.uuid.toString())
 
     // Act
     val result = booksFirestorerRepository.documentToBooks(mockDocumentSnapshot)
@@ -179,10 +165,7 @@ class BooksFirestoreSourceTest {
     `when`(mockDocumentSnapshot.getString("photo")).thenReturn(testBook.photo)
     `when`(mockDocumentSnapshot.getString("language")).thenReturn(testBook.language.name)
     `when`(mockDocumentSnapshot.getString("isbn")).thenReturn(testBook.isbn)
-    `when`(mockDocumentSnapshot.getLong("uuid.mostSignificantBits"))
-        .thenReturn(testBook.uuid.mostSignificantBits)
-    `when`(mockDocumentSnapshot.getLong("uuid.leastSignificantBits"))
-        .thenReturn(testBook.uuid.leastSignificantBits)
+    `when`(mockDocumentSnapshot.getString("uuid")).thenReturn(testBook.uuid.toString())
     // Act
     val result = booksFirestorerRepository.documentToBooks(mockDocumentSnapshot)
 
@@ -200,10 +183,7 @@ class BooksFirestoreSourceTest {
     `when`(mockDocumentSnapshot.getString("photo")).thenReturn(testBook.photo)
     `when`(mockDocumentSnapshot.getString("language")).thenReturn("INVALID_LANGUAGE")
     `when`(mockDocumentSnapshot.getString("isbn")).thenReturn(testBook.isbn)
-    `when`(mockDocumentSnapshot.getLong("uuid.mostSignificantBits"))
-        .thenReturn(testBook.uuid.mostSignificantBits)
-    `when`(mockDocumentSnapshot.getLong("uuid.leastSignificantBits"))
-        .thenReturn(testBook.uuid.leastSignificantBits)
+    `when`(mockDocumentSnapshot.getString("uuid")).thenReturn(testBook.uuid.toString())
 
     // Act
     val result = booksFirestorerRepository.documentToBooks(mockDocumentSnapshot)
