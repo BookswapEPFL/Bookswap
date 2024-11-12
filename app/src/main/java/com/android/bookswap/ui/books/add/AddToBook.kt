@@ -239,7 +239,7 @@ fun AddToBookScreen(repository: BooksRepository, navController: NavigationAction
                   val book =
                       createDataBook(
                           context,
-                          repository.getNewUid(),
+                          repository.getNewUUID(),
                           title,
                           author,
                           description,

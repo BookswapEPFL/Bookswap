@@ -169,7 +169,7 @@ class AddToBookTest {
       }
     }
 
-    override fun getNewUid(): UUID {
+    override fun getNewUUID(): UUID {
       return UUID.randomUUID()
     }
 
@@ -193,26 +193,26 @@ class AddToBookTest {
 
     override fun updateBook(
         dataBook: DataBook,
-        OnSucess: () -> Unit,
+        onSuccess: () -> Unit,
         onFailure: (Exception) -> Unit
     ) {
       if (!shouldFail) {
         isBookUpdated = true
-        OnSucess()
+        onSuccess()
       } else {
         onFailure(Exception("Failed to update book"))
       }
     }
 
     override fun deleteBooks(
-        id: String,
+        uuid: UUID,
         dataBook: DataBook,
-        OnSucess: () -> Unit,
+        onSuccess: () -> Unit,
         onFailure: (Exception) -> Unit
     ) {
       if (!shouldFail) {
         isBookDeleted = true
-        OnSucess()
+        onSuccess()
       } else {
         onFailure(Exception("Failed to delete book"))
       }

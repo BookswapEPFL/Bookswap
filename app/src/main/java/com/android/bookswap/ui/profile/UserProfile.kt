@@ -33,7 +33,7 @@ import com.android.bookswap.ui.theme.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun UserProfile(userVM: UserViewModel = UserViewModel()) {
+fun UserProfile(userVM: UserViewModel) {
 
   var user = userVM.getUser()
   var showEditProfile by remember { mutableStateOf(false) }

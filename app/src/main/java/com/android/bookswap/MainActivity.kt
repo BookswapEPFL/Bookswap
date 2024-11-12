@@ -112,7 +112,8 @@ class MainActivity : ComponentActivity() {
         composable("${Screen.CHAT}/{user1}/{user2}") { backStackEntry ->
           val user1 = backStackEntry.arguments?.getString("user1") ?: ""
           val user2 = backStackEntry.arguments?.getString("user2") ?: ""
-          ChatScreen(messageRepository, user1, user2, navigationActions)
+          ChatScreen(
+              messageRepository, UUID.fromString(user1), UUID.fromString(user2), navigationActions)
         }
       }
       navigation(startDestination = Screen.MAP, route = Route.MAP) {

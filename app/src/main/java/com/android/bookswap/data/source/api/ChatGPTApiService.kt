@@ -3,7 +3,6 @@ package com.android.bookswap.data.source.api
 import android.content.Context
 import android.util.Log
 import com.android.bookswap.BuildConfig
-import com.android.volley.Request
 import com.android.volley.RequestQueue
 import com.android.volley.Response
 import com.android.volley.toolbox.JsonObjectRequest
@@ -59,7 +58,7 @@ class ChatGPTApiService(context: Context, mode: Boolean = true) : ApiService {
     val jsonObjectRequest =
         object :
             JsonObjectRequest(
-                Request.Method.POST,
+                Method.POST,
                 apiUrl,
                 jsonBody,
                 Response.Listener { response ->
