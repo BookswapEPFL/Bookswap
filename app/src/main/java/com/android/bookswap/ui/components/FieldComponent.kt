@@ -41,7 +41,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
 private val FIELD_MIN_WIDTH = 280.dp
-private  val FIELD_MIN_HEIGHT = 56.dp
+private val FIELD_MIN_HEIGHT = 56.dp
 
 private val FIELD_PADDING = 8.dp
 private val FIELD_CONTENT_PADDING = 16.dp
@@ -171,8 +171,7 @@ fun FieldComponent(
                                 RoundedCornerShape(100)),
                     )
                   },
-                  contentPadding =
-                      PaddingValues(FIELD_CONTENT_PADDING))
+                  contentPadding = PaddingValues(FIELD_CONTENT_PADDING))
             })
   }
 }
