@@ -44,11 +44,12 @@ import com.android.bookswap.ui.components.BackButtonComponent
 import com.android.bookswap.ui.navigation.BottomNavigationMenu
 import com.android.bookswap.ui.navigation.List_Navigation_Bar_Destinations
 import com.android.bookswap.ui.navigation.NavigationActions
+import com.android.bookswap.ui.navigation.Screen
 import com.android.bookswap.ui.theme.ColorVariable
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BookProfileScreen(DataBook: DataBook, navController: NavigationActions) {
+fun BookProfileScreen(DataBook: DataBook, navController: NavigationActions, currentUserId: String) {
   val columnPadding = 8.dp
   val pictureWidth = (LocalConfiguration.current.screenWidthDp.dp * (0.60f))
   val pictureHeight = pictureWidth * 1.41f
@@ -92,7 +93,24 @@ fun BookProfileScreen(DataBook: DataBook, navController: NavigationActions) {
                     color = ColorVariable.AccentSecondary,
                     style = MaterialTheme.typography.titleMedium)
               }
+
               item { Spacer(modifier = Modifier.height(columnPadding)) }
+
+              // Conditionally display the "Edit Book" button if the current user owns the book
+              if (DataBook.userId == currentUserId) {
+                item {
+                  androidx.compose.material3.Button(
+                      onClick = {
+                        navController.navigateTo("${Screen.EDIT_BOOK}/${DataBook.uuid}")
+                      },
+                      modifier = Modifier.padding(8.dp)) {
+                        Text("Edit Book")
+                      }
+                }
+              }
+
+              item { Spacer(modifier = Modifier.height(columnPadding)) }
+
               item {
                 Box(
                     modifier =

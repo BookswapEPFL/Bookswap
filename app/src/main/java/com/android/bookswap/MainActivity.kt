@@ -118,7 +118,13 @@ class MainActivity : ComponentActivity() {
       }
       navigation(startDestination = Screen.NEWBOOK, route = Route.NEWBOOK) {
         composable(Screen.NEWBOOK) { BookAdditionChoiceScreen(navigationActions) }
-        composable(Screen.ADD_BOOK_MANUALLY) { AddToBookScreen(bookRepository, navigationActions) }
+        composable(Screen.ADD_BOOK_MANUALLY) {
+          AddToBookScreen(
+              bookRepository,
+              navigationActions,
+              user.get(0).userId //just for now !!SHOULD BE CHANGED TO THE CORRECT USER ID!!
+          )
+        }
         composable(Screen.ADD_BOOK_SCAN) { /*Todo*/}
         composable(Screen.ADD_BOOK_ISBN) { AddISBNScreen(navigationActions, bookRepository) }
       }

@@ -44,7 +44,11 @@ import java.util.UUID
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddToBookScreen(repository: BooksRepository, navController: NavigationActions) {
+fun AddToBookScreen(
+    repository: BooksRepository,
+    navController: NavigationActions,
+    currentUserId: String
+) {
   // State variables to store the values entered by the user
   var title by remember { mutableStateOf("") }
   var author by remember { mutableStateOf("") }
@@ -247,7 +251,8 @@ fun AddToBookScreen(repository: BooksRepository, navController: NavigationAction
                           photo,
                           language,
                           isbn,
-                          listOf(selectedGenre!!))
+                          listOf(selectedGenre!!),
+                          currentUserId)
                   if (book == null) {
                     Toast.makeText(context, "Invalid argument", Toast.LENGTH_SHORT).show()
                   } else {
@@ -278,7 +283,8 @@ fun createDataBook(
     photo: String,
     bookLanguageStr: String,
     isbn: String,
-    genres: List<BookGenres>
+    genres: List<BookGenres>,
+    userId: String
 ): DataBook? {
   // Validate UUID
   if (uuid.toString().isBlank()) {
@@ -360,5 +366,6 @@ fun createDataBook(
       photo = photo,
       language = languages,
       isbn = isbn,
-      genres = genres)
+      genres = genres,
+      userId = userId)
 }
