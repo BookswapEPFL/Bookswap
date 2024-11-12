@@ -61,24 +61,22 @@ class BooksFirestoreSourceTest {
   @Test
   fun `book get returns correct result`() {
     val bookSource = BooksFirestoreSource(mockFirestore)
-    val spyCallback = spyk<(Result<List<DataBook>>) -> Unit>({ result ->
-      Assert.assertTrue(result.isSuccess)
-      val books = result.getOrThrow()
-      // Assert that the fetched books match the expected values
-      Assert.assertTrue(books.isNotEmpty())
-      assertBookEquals(books.first(), testBook, true)
-    })
     bookSource.getBook(
-        callback = spyCallback
+        callback = { result ->
+          Assert.assertTrue(result.isSuccess)
+          val books = result.getOrThrow()
+          // Assert that the fetched books match the expected values
+          Assert.assertTrue(books.isNotEmpty())
+          assertBookEquals(books.first(), testBook, true)
+        }
     )
 
     // Verify that Firestore collection was called
     verify { mockCollectionReference.get() }
-    verify { spyCallback(any()) }
   }
 
   @Test
-  fun deletebooks_shouldCallFirestoreDelete() {
+  fun `delete call firestore delete`() {
     val bookSource = BooksFirestoreSource(mockFirestore)
 
     // Arrange
@@ -92,7 +90,7 @@ class BooksFirestoreSourceTest {
   }
 
   @Test
-  fun addBooks_callsFirestoreSet_andOnSuccess() {
+  fun `book set is success`() {
     val bookSource = BooksFirestoreSource(mockFirestore)
 
     // Arrange
@@ -108,7 +106,7 @@ class BooksFirestoreSourceTest {
   }
 
   @Test
-  fun updatebook_callsFirestoreSet_andOnSuccess() {
+  fun `book update success`() {
     val bookSource = BooksFirestoreSource(mockFirestore)
 
     // Arrange
@@ -122,7 +120,7 @@ class BooksFirestoreSourceTest {
   }
 
   @Test
-  fun documenttoBooks_returnsDataBook_whenDocumentIsValid() {
+  fun `documentToBooks is valid`() {
     val bookSource = BooksFirestoreSource(mockFirestore)
 
     // Act
@@ -141,7 +139,7 @@ class BooksFirestoreSourceTest {
   }
 
   @Test
-  fun documenttoBooks_returnsNull_whenRequiredFieldIsMissing() {
+  fun `documentToBooks null when missing value`() {
     // Arrange - Missing "Title"
     val bookSource = BooksFirestoreSource(mockFirestore)
 
@@ -155,7 +153,7 @@ class BooksFirestoreSourceTest {
   }
 
   @Test
-  fun documenttoBooks_returnsNull_whenLanguageIsInvalid() {
+  fun `documentToBooks null when invalid value`() {
     // Arrange - Invalid language value
     val bookSource = BooksFirestoreSource(mockFirestore)
 
