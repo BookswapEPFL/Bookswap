@@ -10,10 +10,10 @@ interface BooksRepository {
   // This default implementation does nothing, but subclasses can override it.
   fun init(OnSucess: () -> Unit)
 
-  // Function to generate and return a new unique identifier (UID) for a book.
+  // Function to generate and return a new unique identifier (UUID) for a book.
   // This default implementation returns an empty string, but it should be overridden to generate
-  // actual UIDs.
-  fun getNewUid(): UUID
+  // actual UUIDs.
+  fun getNewUUID(): UUID
 
   // Function to fetch a list of books from the repository.
   // Parameters:
@@ -32,22 +32,22 @@ interface BooksRepository {
   // Function to update an existing book in the repository.
   // Parameters:
   // - dataBook: The book data to be updated.
-  // - OnSucess: A callback function that receives the updated list of books when the operation
+  // - onSuccess: A callback function that receives the updated list of books when the operation
   // succeeds.
   // - onFailure: A callback function that receives an exception if the operation fails.
-  fun updateBook(dataBook: DataBook, OnSucess: () -> Unit, onFailure: (Exception) -> Unit)
+  fun updateBook(dataBook: DataBook, onSuccess: () -> Unit, onFailure: (Exception) -> Unit)
 
   // Function to delete a book from the repository.
   // Parameters:
-  // - id: The unique identifier of the book to be deleted.
-  // - dataBook: The book data to be deleted (can also just use the ID).
-  // - OnSucess: A callback function that receives the updated list of books when the operation
+  // - uuid: The unique identifier of the book to be deleted.
+  // - dataBook: The book data to be deleted (can also just use the uuid).
+  // - onSuccess: A callback function that receives the updated list of books when the operation
   // succeeds.
   // - onFailure: A callback function that receives an exception if the operation fails.
   fun deleteBooks(
-      id: String,
+      uuid: UUID,
       dataBook: DataBook,
-      OnSucess: () -> Unit,
+      onSuccess: () -> Unit,
       onFailure: (Exception) -> Unit
   )
 }

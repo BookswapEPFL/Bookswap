@@ -1,4 +1,4 @@
-package com.android.bookswap.ui.book
+package com.android.bookswap.ui.books.add
 
 import android.content.Context
 import android.widget.Toast
@@ -13,8 +13,6 @@ import com.android.bookswap.data.BookGenres
 import com.android.bookswap.data.BookLanguages
 import com.android.bookswap.data.DataBook
 import com.android.bookswap.data.repository.BooksRepository
-import com.android.bookswap.ui.books.add.AddToBookScreen
-import com.android.bookswap.ui.books.add.createDataBook
 import com.android.bookswap.ui.navigation.NavigationActions
 import io.mockk.every
 import io.mockk.mockk
@@ -171,7 +169,7 @@ class AddToBookTest {
       }
     }
 
-    override fun getNewUid(): UUID {
+    override fun getNewUUID(): UUID {
       return UUID.randomUUID()
     }
 
@@ -195,26 +193,26 @@ class AddToBookTest {
 
     override fun updateBook(
         dataBook: DataBook,
-        OnSucess: () -> Unit,
+        onSuccess: () -> Unit,
         onFailure: (Exception) -> Unit
     ) {
       if (!shouldFail) {
         isBookUpdated = true
-        OnSucess()
+        onSuccess()
       } else {
         onFailure(Exception("Failed to update book"))
       }
     }
 
     override fun deleteBooks(
-        id: String,
+        uuid: UUID,
         dataBook: DataBook,
-        OnSucess: () -> Unit,
+        onSuccess: () -> Unit,
         onFailure: (Exception) -> Unit
     ) {
       if (!shouldFail) {
         isBookDeleted = true
-        OnSucess()
+        onSuccess()
       } else {
         onFailure(Exception("Failed to delete book"))
       }
