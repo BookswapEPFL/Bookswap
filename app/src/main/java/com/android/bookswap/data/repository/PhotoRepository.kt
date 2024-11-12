@@ -2,10 +2,11 @@ package com.android.bookswap.data.repository
 
 import android.graphics.Bitmap
 import com.android.bookswap.data.DataPhoto
+import java.util.UUID
 
 interface PhotoRepository {
   /** Generates a new unique id for a message */
-  fun getNewUid(): String
+  fun getNewUUID(): UUID
 
   /**
    * Initialize the repository
@@ -16,18 +17,13 @@ interface PhotoRepository {
   fun init(callback: (Result<Unit>) -> Unit)
 
   /**
-   * Get all messages as a list
+   * Fetches a specific photo from Firestore by UUID
    *
-   * @param callback callback function that receives list of messages if success
+   * @param uuid the UUID of the photo to fetch
+   * @param callback callback function that receives Result.success(DataPhoto) when operation
+   *   succeed of Result.failure(exception) if error
    */
-  /**
-   * Get all photos as a list.
-   *
-   * @param callback callback function that receives list of photos if success.
-   */
-  fun getPhotos(
-      callback: (Result<List<DataPhoto>>) -> Unit,
-  )
+  fun getPhoto(uuid: UUID, callback: (Result<DataPhoto>) -> Unit)
 
   /**
    * Converts a Bitmap to a Base64 encoded string.
@@ -46,11 +42,10 @@ interface PhotoRepository {
   fun base64ToBitmap(base64: String): Bitmap
 
   /**
-   * Uploads an image to Firestore.
+   * Uploads a photo to Firestore.
    *
-   * @param base64 the Base64 encoded string of the image.
-   * @param metadata the metadata associated with the image.
-   * @param collectionPath the Firestore collection path where the image will be stored.
+   * @param dataPhoto the photo data to upload.
+   * @param callback callback function that receives Unit if success or an an exception if error.
    */
-  fun imageToFirestore(base64: String, metadata: Map<String, Any>, collectionPath: String)
+  fun addPhoto(dataPhoto: DataPhoto, callback: (Result<Unit>) -> Unit)
 }

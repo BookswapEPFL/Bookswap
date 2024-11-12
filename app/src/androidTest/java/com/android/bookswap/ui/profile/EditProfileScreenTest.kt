@@ -7,7 +7,7 @@ import com.android.bookswap.data.DataUser
 import com.android.bookswap.screen.EditProfileScreen
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
 import io.github.kakaocup.compose.node.element.ComposeScreen
-import org.junit.Before
+import java.util.UUID
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -21,16 +21,27 @@ import org.junit.runner.RunWith
 class EditProfileScreenTest : TestCase() {
   @get:Rule val composeTestRule = createComposeRule()
 
-  @Before fun setup() {}
+  private val standardUser =
+      DataUser(
+          UUID.randomUUID(),
+          "M.",
+          "John",
+          "Doe",
+          "John.Doe@example.com",
+          "+41223456789",
+          0.0,
+          0.0,
+          "dummyPic.png")
 
   @Test
   fun testDisplay() =
       run(testName = "test alert display") {
+        val userUUID = UUID.randomUUID()
         composeTestRule.setContent {
           EditProfileDialog(
               { Log.d("EditProfileTest_Dismiss", "User info discarded") },
               { Log.d("EditProfileTest_Save", "User info saved ${it.printFullname()}") },
-              DataUser("", "", "", "", "", 0.0, 0.0, "", ""))
+              DataUser(userUUID, "", "", "", "", "", 0.0, 0.0, ""))
         }
         step("try displaying the alert box") {
           ComposeScreen.onComposeScreen<EditProfileScreen>(composeTestRule) {
@@ -94,16 +105,7 @@ class EditProfileScreenTest : TestCase() {
           EditProfileDialog(
               { Log.d("EditProfileTest_Dismiss", "User info discarded") },
               { Log.d("EditProfileTest_Save", "User info saved ${it.printFullname()}") },
-              DataUser(
-                  "M.",
-                  "John",
-                  "Doe",
-                  "John.Doe@example.com",
-                  "+41223456789",
-                  0.0,
-                  0.0,
-                  "dummyPic.png",
-                  "dummyUUID0000"))
+              standardUser)
         }
         step("try editing the textbox values") {
           ComposeScreen.onComposeScreen<EditProfileScreen>(composeTestRule) {
@@ -177,16 +179,7 @@ class EditProfileScreenTest : TestCase() {
           EditProfileDialog(
               { Log.d("EditProfileTest_Dismiss", "User info discarded") },
               { Log.d("EditProfileTest_Save", "User info saved ${it.printFullname()}") },
-              DataUser(
-                  "M.",
-                  "John",
-                  "Doe",
-                  "John.Doe@example.com",
-                  "+41223456789",
-                  0.0,
-                  0.0,
-                  "dummyPic.png",
-                  "dummyUUID0000"))
+              standardUser)
         }
         step("try editing the textbox values then confirming the changes") {
           ComposeScreen.onComposeScreen<EditProfileScreen>(composeTestRule) {
@@ -293,16 +286,7 @@ class EditProfileScreenTest : TestCase() {
           EditProfileDialog(
               { Log.d("EditProfileTest_Dismiss", "User info discarded") },
               { Log.d("EditProfileTest_Save", "User info saved ${it.printFullname()}") },
-              DataUser(
-                  "M.",
-                  "John",
-                  "Doe",
-                  "John.Doe@example.com",
-                  "+41223456789",
-                  0.0,
-                  0.0,
-                  "dummyPic.png",
-                  "dummyUUID0000"))
+              standardUser)
         }
         step("try editing the textbox values then cancelling the changes") {
           ComposeScreen.onComposeScreen<EditProfileScreen>(composeTestRule) {

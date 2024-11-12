@@ -29,10 +29,9 @@ import com.android.bookswap.model.UserViewModel
 import com.android.bookswap.ui.components.ButtonComponent
 import com.android.bookswap.ui.theme.*
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UserProfile(
-    userVM: UserViewModel = UserViewModel(),
+    userVM: UserViewModel = UserViewModel(java.util.UUID.randomUUID()),
     topAppBar: @Composable () -> Unit = {},
     bottomAppBar: @Composable () -> Unit = {}
 ) {
