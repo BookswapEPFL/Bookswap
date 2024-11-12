@@ -2,9 +2,8 @@ package com.android.bookswap.data.source.api
 
 import com.android.bookswap.data.BookLanguages
 import com.android.bookswap.data.DataBook
-import java.util.UUID
+import com.android.bookswap.utils.assertBookEquals
 import org.junit.After
-import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -20,6 +19,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.robolectric.RobolectricTestRunner
+import java.util.UUID
 
 @RunWith(RobolectricTestRunner::class)
 class GoogleBookDataSourceTest {
@@ -233,15 +233,5 @@ class GoogleBookDataSourceTest {
 
     assertBookEquals(dataBook, mockGoogleBookDataSource.parseISBNResponse(fieldsEmpty).getOrNull())
     assertBookEquals(dataBook, mockGoogleBookDataSource.parseISBNResponse(listEmpty).getOrNull())
-  }
-
-  /**
-   * Assert that two books are identical except for their UUID
-   *
-   * @param expected the expected result
-   * @param result the result with it's UUID modified to match the UUID of expected
-   */
-  private fun assertBookEquals(expected: DataBook, result: DataBook?) {
-    assertEquals(expected, result?.copy(uuid = expected.uuid))
   }
 }
