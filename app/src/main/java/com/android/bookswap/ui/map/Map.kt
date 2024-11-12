@@ -175,55 +175,63 @@ fun MapScreen(
       topBar = topAppBar,
       bottomBar = bottomAppBar,
       content = { pd ->
-        GoogleMap(
-            onMapClick = { mutableStateSelectedUser = NO_USER_SELECTED },
-            modifier =
-                Modifier.fillMaxSize().padding(pd).testTag("mapGoogleMap").semantics {
-                  cameraPosition = cameraPositionState
-                },
-            cameraPositionState = cameraPositionState,
-            uiSettings = MapUiSettings(zoomControlsEnabled = false),
-        ) {
-          // Marker for user's current location
-          if (!latitude.isNaN() && !longitude.isNaN()) {
-            Marker(
-                state = MarkerState(position = LatLng(latitude, longitude)),
-                title = "Your Location",
-                icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE))
-          }
-          filteredUsers
-              .filter { !it.longitude.isNaN() && !it.latitude.isNaN() && it.books.isNotEmpty() }
-              .forEachIndexed { index, item ->
-                val markerState = MarkerState(position = LatLng(item.latitude, item.longitude))
+        Box(
+            Modifier.padding(
+                top = pd.calculateTopPadding(), bottom = pd.calculateBottomPadding())) {
+              GoogleMap(
+                  onMapClick = { mutableStateSelectedUser = NO_USER_SELECTED },
+                  modifier =
+                      Modifier.fillMaxSize().testTag("mapGoogleMap").semantics {
+                        cameraPosition = cameraPositionState
+                      },
+                  cameraPositionState = cameraPositionState,
+                  uiSettings = MapUiSettings(zoomControlsEnabled = false),
+              ) {
+                // Marker for user's current location
+                if (!latitude.isNaN() && !longitude.isNaN()) {
+                  Marker(
+                      state = MarkerState(position = LatLng(latitude, longitude)),
+                      title = "Your Location",
+                      icon =
+                          BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE))
+                }
+                filteredUsers
+                    .filter {
+                      !it.longitude.isNaN() && !it.latitude.isNaN() && it.books.isNotEmpty()
+                    }
+                    .forEachIndexed { index, item ->
+                      val markerState =
+                          MarkerState(position = LatLng(item.latitude, item.longitude))
 
-                Marker(
-                    state = markerState,
-                    onClick = {
-                      mutableStateSelectedUser = index
-                      coroutineScope.launch {
-                        computePositionOfMarker(cameraPositionState, markerState.position)
-                      }
-                      false
-                    })
+                      Marker(
+                          state = markerState,
+                          onClick = {
+                            mutableStateSelectedUser = index
+                            coroutineScope.launch {
+                              computePositionOfMarker(cameraPositionState, markerState.position)
+                            }
+                            false
+                          })
+                    }
               }
-        }
-        FilterButton { navigationActions.navigateTo(Screen.FILTER) }
+              FilterButton { navigationActions.navigateTo(Screen.FILTER) }
 
-        // Custom info window linked to the marker
-        markerScreenPosition?.let { screenPos ->
-          if (mutableStateSelectedUser >= 0 &&
-              mutableStateSelectedUser < filteredUsers.size &&
-              filteredUsers[mutableStateSelectedUser].books.isNotEmpty()) {
-            CustomInfoWindow(
-                modifier =
-                    Modifier.offset {
-                      IntOffset(screenPos.x.roundToInt(), screenPos.y.roundToInt())
-                    },
-                userBooks = filteredUsers[mutableStateSelectedUser].books)
-          }
-        }
-        // Draggable Bottom List
-        DraggableMenu(filteredBooks)
+              // Custom info window linked to the marker
+              markerScreenPosition?.let { screenPos ->
+                if (mutableStateSelectedUser >= 0 &&
+                    mutableStateSelectedUser < filteredUsers.size &&
+                    filteredUsers[mutableStateSelectedUser].books.isNotEmpty()) {
+                  CustomInfoWindow(
+                      modifier =
+                          Modifier.offset {
+                            IntOffset(screenPos.x.roundToInt(), screenPos.y.roundToInt())
+                          },
+                      userBooks = filteredUsers[mutableStateSelectedUser].books)
+                }
+              }
+              // Draggable Bottom List
+              DraggableMenu(filteredBooks)
+            }
       })
 }
 
@@ -330,7 +338,7 @@ private fun DraggableMenu(listAllBooks: List<DataBook>) {
 
   // State for menu drag offset
   val configuration = LocalConfiguration.current
-  val maxSheetOffsetY = configuration.screenHeightDp.dp - BOTTOM_NAV_HEIGHT
+  val maxSheetOffsetY = configuration.screenHeightDp.dp - BOTTOM_NAV_HEIGHT * 2
   var sheetOffsetY by remember {
     mutableStateOf((maxSheetOffsetY - HEIGHT_RETRACTED_DRAGGABLE_MENU_DP.dp) / 3 * 2)
   }
