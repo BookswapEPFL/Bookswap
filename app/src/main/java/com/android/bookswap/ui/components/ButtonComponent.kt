@@ -40,13 +40,13 @@ fun ButtonComponent(
   val shape = CircleShape
   val containerColor =
       if (enabled) {
-        colors.containerColor
+        MaterialTheme.colorScheme.primary
       } else {
         colors.disabledContainerColor
       }
   val contentColor =
       if (enabled) {
-        colors.contentColor
+        MaterialTheme.colorScheme.onPrimary
       } else {
         colors.disabledContentColor
       }
@@ -66,7 +66,7 @@ fun ButtonComponent(
             LocalContentColor provides contentColor, LocalTextStyle provides mergedStyle) {
               Row(
                   Modifier.defaultMinSize(
-                          minWidth = ButtonDefaults.MinHeight, minHeight = ButtonDefaults.MinHeight)
+                          minWidth = ButtonDefaults.MinWidth, minHeight = ButtonDefaults.MinHeight)
                       .padding(contentPadding),
                   horizontalArrangement = Arrangement.Center,
                   verticalAlignment = Alignment.CenterVertically,
