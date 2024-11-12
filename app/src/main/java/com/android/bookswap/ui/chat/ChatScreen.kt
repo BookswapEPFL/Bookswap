@@ -23,6 +23,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
@@ -57,6 +58,7 @@ import androidx.compose.ui.window.Popup
 import com.android.bookswap.R
 import com.android.bookswap.data.DataMessage
 import com.android.bookswap.data.repository.MessageRepository
+import com.android.bookswap.model.PhotoRequester
 import com.android.bookswap.ui.components.BackButtonComponent
 import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.theme.ColorVariable
@@ -82,6 +84,17 @@ fun ChatScreen(
   val padding8 = 8.dp
   val padding24 = 24.dp
   val padding36 = 36.dp
+  val photoReq =
+      PhotoRequester(context) { result ->
+        if (result.isSuccess) {} else {
+
+          Toast.makeText(context, "Image could not be stored.", Toast.LENGTH_LONG).show()
+          Log.e("ChatScreen", "Image could not be stored.")
+        }
+      }
+
+  photoReq.Init()
+
   LaunchedEffect(Unit) {
     while (true) {
       messageRepository.getMessages { result ->
@@ -145,6 +158,14 @@ fun ChatScreen(
             modifier =
                 Modifier.fillMaxWidth().padding(top = padding8).background(ColorVariable.Primary),
             verticalAlignment = Alignment.CenterVertically) {
+              IconButton(
+                  onClick = { photoReq.requestPhoto() },
+                  modifier = Modifier.testTag("photo_button")) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = "Previous Image",
+                        tint = ColorVariable.Accent)
+                  }
               BasicTextField(
                   value = newMessageText,
                   onValueChange = { newMessageText = it },
