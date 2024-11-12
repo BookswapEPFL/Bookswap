@@ -17,7 +17,7 @@ import com.android.bookswap.data.BookGenres
 import com.android.bookswap.data.BookLanguages
 import com.android.bookswap.data.DataBook
 import com.android.bookswap.data.DataUser
-import com.android.bookswap.data.source.network.BooksFirestoreRepository
+import com.android.bookswap.data.source.network.BooksFirestoreSource
 import com.android.bookswap.model.map.BookFilter
 import com.android.bookswap.model.map.DefaultGeolocation
 import com.android.bookswap.ui.navigation.NavigationActions
@@ -74,13 +74,13 @@ class MapScreenTest {
   private val userWithoutBooks = listOf(DataUser(bookList = emptyList()))
   @get:Rule val composeTestRule = createComposeRule()
 
-  private lateinit var mockBookRepository: BooksFirestoreRepository
+  private lateinit var mockBookRepository: BooksFirestoreSource
 
   @Before
   fun setup() {
     mockBookRepository = mockk()
 
-    every { mockBookRepository.getBook(any(), any()) } answers
+    every { mockBookRepository.getBook(any()) } answers
         {
           firstArg<(List<DataBook>) -> Unit>().invoke(books)
         }

@@ -11,6 +11,7 @@ import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.firestore.util.Assert.fail
+import org.junit.Assert
 import java.util.UUID
 import org.junit.Before
 import org.junit.Test
@@ -24,7 +25,7 @@ import org.mockito.kotlin.verify
 import org.robolectric.RobolectricTestRunner
 
 @RunWith(RobolectricTestRunner::class)
-class BooksFirestoreRepositoryTest {
+class BooksFirestoreSourceTest {
 
   @Mock private lateinit var mockFirestore: FirebaseFirestore
   @Mock private lateinit var mockCollectionReference: CollectionReference
@@ -32,7 +33,7 @@ class BooksFirestoreRepositoryTest {
   @Mock private lateinit var mockDocumentSnapshot: DocumentSnapshot
   @Mock private lateinit var mockQuerySnapshot: QuerySnapshot
 
-  private lateinit var booksFirestorerRepository: BooksFirestoreRepository
+  private lateinit var booksFirestorerRepository: BooksFirestoreSource
 
   private val testBook =
       DataBook(
@@ -54,7 +55,7 @@ class BooksFirestoreRepositoryTest {
       FirebaseApp.initializeApp(ApplicationProvider.getApplicationContext())
     }
 
-    booksFirestorerRepository = BooksFirestoreRepository(mockFirestore)
+    booksFirestorerRepository = BooksFirestoreSource(mockFirestore)
 
     `when`(mockFirestore.collection(ArgumentMatchers.any())).thenReturn(mockCollectionReference)
     `when`(mockCollectionReference.document(ArgumentMatchers.any()))
@@ -79,12 +80,14 @@ class BooksFirestoreRepositoryTest {
 
     // Act
     booksFirestorerRepository.getBook(
-        OnSucess = { books ->
+        callback = { result ->
+            Assert.assertTrue(result.isSuccess)
+            val books = result.getOrThrow()
           // Assert that the fetched books match the expected values
           assert(books.isNotEmpty())
           assert(books.first().title == testBook.title)
-        },
-        onFailure = { fail("Should not fail") })
+        }
+    )
 
     // Verify that Firestore collection was called
     verify(mockCollectionReference).get()
@@ -96,7 +99,7 @@ class BooksFirestoreRepositoryTest {
     doAnswer { Tasks.forResult(null) }.`when`(mockDocumentReference).delete()
 
     // Act
-    booksFirestorerRepository.deleteBooks(testBook.uuid, testBook, {}, {})
+    booksFirestorerRepository.deleteBooks(testBook.uuid, testBook, {})
 
     // Assert
     verify(mockDocumentReference).delete()
@@ -109,14 +112,14 @@ class BooksFirestoreRepositoryTest {
 
     // Act
     booksFirestorerRepository.addBook(
-        testBook,
-        {
-          // Assert success callback
-          assert(true)
-        },
-        { fail("Should not fail") })
+        testBook
+    ) { result ->
+        Assert.assertTrue(result.isSuccess)
+        // Assert success callback
+        assert(true)
+    }
 
-    // Verify Firestore set operation
+      // Verify Firestore set operation
     verify(mockDocumentReference).set(testBook)
   }
 
@@ -127,14 +130,12 @@ class BooksFirestoreRepositoryTest {
 
     // Act
     booksFirestorerRepository.updateBook(
-        testBook,
-        {
-          // Assert success callback
-          assert(true)
-        },
-        { fail("Should not fail") })
+        testBook
+    ) { result ->
+        Assert.assertTrue(result.isSuccess)
+    }
 
-    // Verify Firestore update operation
+      // Verify Firestore update operation
     verify(mockDocumentReference).set(testBook)
   }
 

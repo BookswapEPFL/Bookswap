@@ -113,16 +113,18 @@ fun MapScreen(
   // Fetch books
   LaunchedEffect(Unit) {
     booksRepository.getBook(
-        OnSucess = { books ->
-          listUser.forEach { user ->
-            userBooksList.add(
-                UserBooksWithLocation(
-                    user.longitude,
-                    user.latitude,
-                    books.filter { book -> book.uuid in user.bookList }))
+        callback = { result ->
+          if (result.isSuccess) {
+            val books = result.getOrThrow()
+            listUser.forEach { user ->
+              userBooksList.add(
+                  UserBooksWithLocation(
+                      user.longitude,
+                      user.latitude,
+                      books.filter { book -> book.uuid in user.bookList }))
+            }
           }
-        },
-        onFailure = {})
+        })
   }
 
   val listAllBooks = userBooksList.flatMap { it.books }

@@ -109,10 +109,15 @@ fun AddISBNScreen(navigationActions: NavigationActions, booksRepository: BooksRe
                             } else {
                               booksRepository.addBook(
                                   result.getOrThrow(),
-                                  { navigationActions.navigateTo(TopLevelDestinations.NEW_BOOK) },
-                                  { error ->
-                                    Log.e("AddBook", error.toString())
-                                    Toast.makeText(context, error.message, Toast.LENGTH_LONG).show()
+                                  callback = { res ->
+                                    if (res.isSuccess) {
+                                      navigationActions.navigateTo(TopLevelDestinations.NEW_BOOK)
+                                    } else {
+                                      val error = result.exceptionOrNull()!!
+                                      Log.e("AddBook", res.toString())
+                                      Toast.makeText(context, error.message, Toast.LENGTH_LONG)
+                                          .show()
+                                    }
                                   })
                             }
                           }

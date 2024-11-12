@@ -15,7 +15,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
 import com.android.bookswap.data.DataUser
-import com.android.bookswap.data.source.network.BooksFirestoreRepository
+import com.android.bookswap.data.source.network.BooksFirestoreSource
 import com.android.bookswap.data.source.network.MessageFirestoreSource
 import com.android.bookswap.model.chat.MessageBox
 import com.android.bookswap.model.chat.PermissionHandler
@@ -53,7 +53,7 @@ class MainActivity : ComponentActivity() {
 
     // Create the MessageFirestoreSource object
     val messageRepository = MessageFirestoreSource(db)
-    val bookRepository = BooksFirestoreRepository(db)
+    val bookRepository = BooksFirestoreSource(db)
 
     // Initialize the geolocation
     val geolocation = Geolocation(this)
@@ -73,7 +73,7 @@ class MainActivity : ComponentActivity() {
   @Composable
   fun BookSwapApp(
       messageRepository: MessageFirestoreSource,
-      bookRepository: BooksFirestoreRepository,
+      bookRepository: BooksFirestoreSource,
       startDestination: String = Route.AUTH,
       geolocation: IGeolocation = DefaultGeolocation()
   ) {
