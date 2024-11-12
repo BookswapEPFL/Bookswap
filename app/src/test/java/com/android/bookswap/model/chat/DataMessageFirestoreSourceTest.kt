@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.Looper
 import androidx.test.core.app.ApplicationProvider
 import com.android.bookswap.data.DataMessage
+import com.android.bookswap.data.MessageType
 import com.android.bookswap.data.source.network.COLLECTION_PATH
 import com.android.bookswap.data.source.network.MessageFirestoreSource
 import com.android.bookswap.data.source.network.documentToMessage
@@ -45,6 +46,7 @@ class DataMessageFirestoreSourceTest {
 
   private val testMessage =
       DataMessage(
+          messageType = MessageType.TEXT,
           uuid = UUID.randomUUID(),
           text = "Test message",
           senderUUID = UUID.randomUUID(),
@@ -193,6 +195,7 @@ class DataMessageFirestoreSourceTest {
     `when`(mockDocumentSnapshot.getString("receiverUUID"))
         .thenReturn(recentMessage.receiverUUID.toString())
     `when`(mockDocumentSnapshot.getLong("timestamp")).thenReturn(recentMessage.timestamp)
+    `when`(mockDocumentSnapshot.getString("messageType")).thenReturn(recentMessage.messageType.name)
     `when`(mockDocumentReference.delete()).thenReturn(Tasks.forResult(null))
 
     messageFirestoreSource.deleteMessage(
@@ -553,6 +556,7 @@ class DataMessageFirestoreSourceTest {
     `when`(mockDocumentSnapshot.getString("receiverUUID"))
         .thenReturn(testMessage.receiverUUID.toString())
     `when`(mockDocumentSnapshot.getLong("timestamp")).thenReturn(1634567890L)
+    `when`(mockDocumentSnapshot.getString("messageType")).thenReturn("TEXT")
 
     val result = documentToMessage(mockDocumentSnapshot)
 
@@ -564,15 +568,17 @@ class DataMessageFirestoreSourceTest {
     assert(message?.senderUUID == testMessage.senderUUID)
     assert(message?.receiverUUID == testMessage.receiverUUID)
     assert(message?.timestamp == 1634567890L)
+    assert(message?.messageType == MessageType.TEXT)
   }
 
   @Test
   fun documentToMessage_returnsFailureWhenFieldIsMissing() {
     `when`(mockDocumentSnapshot.getString("uuid")).thenReturn(UUID.randomUUID().toString())
     `when`(mockDocumentSnapshot.getString("text")).thenReturn(null) // Missing field
-    `when`(mockDocumentSnapshot.getString("senderId")).thenReturn("sender1")
-    `when`(mockDocumentSnapshot.getString("receiverId")).thenReturn("receiver1")
+    `when`(mockDocumentSnapshot.getString("senderUUID")).thenReturn("sender1")
+    `when`(mockDocumentSnapshot.getString("receiverUUID")).thenReturn("receiver1")
     `when`(mockDocumentSnapshot.getLong("timestamp")).thenReturn(1634567890L)
+    `when`(mockDocumentSnapshot.getString("messageType")).thenReturn("TEXT")
 
     val result = documentToMessage(mockDocumentSnapshot)
 

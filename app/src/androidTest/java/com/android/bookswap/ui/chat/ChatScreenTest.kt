@@ -16,6 +16,7 @@ import androidx.compose.ui.test.performSemanticsAction
 import androidx.compose.ui.test.performTextClearance
 import androidx.compose.ui.test.performTextInput
 import com.android.bookswap.data.DataMessage
+import com.android.bookswap.data.MessageType
 import com.android.bookswap.data.repository.MessageRepository
 import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.theme.ColorVariable
@@ -43,6 +44,7 @@ class ChatScreenTest {
     placeHolderData =
         List(6) {
               DataMessage(
+                  messageType = MessageType.TEXT,
                   uuid = UUID.randomUUID(),
                   senderUUID = currentUserUUID,
                   receiverUUID = otherUserUUID,
@@ -52,6 +54,7 @@ class ChatScreenTest {
             .toMutableList()
     (placeHolderData as MutableList<DataMessage>).add(
         DataMessage(
+            messageType = MessageType.IMAGE,
             uuid = imageTestMessageUUID,
             senderUUID = currentUserUUID,
             receiverUUID = otherUserUUID,

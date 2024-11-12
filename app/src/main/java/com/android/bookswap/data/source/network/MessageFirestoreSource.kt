@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.Log
 import android.widget.Toast
 import com.android.bookswap.data.DataMessage
+import com.android.bookswap.data.MessageType
 import com.android.bookswap.data.repository.MessageRepository
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
@@ -240,12 +241,13 @@ class MessageFirestoreSource(private val db: FirebaseFirestore) : MessageReposit
 
 fun documentToMessage(document: DocumentSnapshot): Result<DataMessage> {
   return try {
+    val type = MessageType.valueOf(document.getString("messageType")!!)
     val uuid = UUID.fromString(document.getString("uuid")!!)
     val text = document.getString("text")!!
     val senderUUID = UUID.fromString(document.getString("senderUUID")!!)
     val receiverUUID = UUID.fromString(document.getString("receiverUUID")!!)
     val timestamp = document.getLong("timestamp")!!
-    Result.success(DataMessage(uuid, text, senderUUID, receiverUUID, timestamp))
+    Result.success(DataMessage(type, uuid, text, senderUUID, receiverUUID, timestamp))
   } catch (e: Exception) {
     Log.e("MessageSource", "Error converting document to Message: ${e.message}")
     Result.failure(e)
