@@ -96,7 +96,7 @@ class BooksFirestoreRepositoryTest {
     doAnswer { Tasks.forResult(null) }.`when`(mockDocumentReference).delete()
 
     // Act
-    booksFirestorerRepository.deleteBooks(testBook.isbn!!, testBook, {}, {})
+    booksFirestorerRepository.deleteBooks(testBook.uuid, testBook, {}, {})
 
     // Assert
     verify(mockDocumentReference).delete()
@@ -219,8 +219,8 @@ class BooksFirestoreRepositoryTest {
    * `when`(mockFirestore.collection(collectionBooks).document()).thenReturn(mockDocumentReference)
    * `when`(mockDocumentReference.id).thenReturn(expectedUid)
    *
-   * // Act val uid = booksFirestorerRepository.getNewUid()
+   * // Act val uuid = booksFirestoreRepository.getNewUid()
    *
-   * // Assert assert(uid.toString() == expectedUid) // Ensure the ID matches the expected value }
+   * // Assert assert(uuid.toString() == expectedUid) // Ensure the ID matches the expected value }
    */
 }

@@ -6,10 +6,9 @@ import io.mockk.every
 import io.mockk.invoke
 import io.mockk.mockk
 import io.mockk.verify
-import junit.framework.Assert.assertTrue
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.fail
-import net.bytebuddy.implementation.InvokeDynamic.lambda
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 
