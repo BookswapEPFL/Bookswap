@@ -11,9 +11,8 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QuerySnapshot
 import io.mockk.every
 import io.mockk.mockk
-import io.mockk.spyk
 import io.mockk.verify
-import org.junit.Assert
+import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -63,10 +62,10 @@ class BooksFirestoreSourceTest {
     val bookSource = BooksFirestoreSource(mockFirestore)
     bookSource.getBook(
         callback = { result ->
-          Assert.assertTrue(result.isSuccess)
+          assertTrue(result.isSuccess)
           val books = result.getOrThrow()
           // Assert that the fetched books match the expected values
-          Assert.assertTrue(books.isNotEmpty())
+          assertTrue(books.isNotEmpty())
           assertBookEquals(books.first(), testBook, true)
         }
     )
@@ -98,7 +97,7 @@ class BooksFirestoreSourceTest {
 
     // Act
     bookSource.addBook(testBook) { result ->
-      Assert.assertTrue(result.isSuccess)
+      assertTrue(result.isSuccess)
     }
 
     // Verify Firestore set operation
@@ -113,7 +112,7 @@ class BooksFirestoreSourceTest {
     every { mockDocumentReference.set(testBook) }.returns(Tasks.forResult(null))
 
     // Act
-    bookSource.updateBook(testBook) { result -> Assert.assertTrue(result.isSuccess) }
+    bookSource.updateBook(testBook) { result -> assertTrue(result.isSuccess) }
 
     // Verify Firestore update operation
     verify { mockDocumentReference.set(testBook) }
@@ -127,15 +126,8 @@ class BooksFirestoreSourceTest {
     val result = bookSource.documentToBooks(mockDocumentSnapshot)
 
     // Assert
-    assert(result != null)
-    assert(result?.title == testBook.title)
-    assert(result?.author == testBook.author)
-    assert(result?.description == testBook.description)
-    assert(result?.rating == testBook.rating)
-    assert(result?.photo == testBook.photo)
-    assert(result?.language?.name == testBook.language.name)
-    assert(result?.isbn == testBook.isbn)
-    assert(result?.uuid == testBook.uuid)
+    assertNotNull(result)
+    assertBookEquals(testBook, result)
   }
 
   @Test
@@ -149,7 +141,7 @@ class BooksFirestoreSourceTest {
     val result = bookSource.documentToBooks(mockDocumentSnapshot)
 
     // Assert
-    assert(result == null)
+    assertNull(result)
   }
 
   @Test
@@ -163,6 +155,6 @@ class BooksFirestoreSourceTest {
     val result = bookSource.documentToBooks(mockDocumentSnapshot)
 
     // Assert
-    assert(result == null) // Should return null due to invalid language
+    assertNull(result) // Should return null due to invalid language
   }
 }
