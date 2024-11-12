@@ -53,6 +53,11 @@ class MainActivity : ComponentActivity() {
     super.onCreate(savedInstanceState)
     // permissionHandler = PermissionHandler(this)
     // permissionHandler.askNotificationPermission()
+    setContent { BookSwapApp() }
+  }
+
+  @Composable
+  fun BookSwapApp() {
 
     // Initialize a Firebase Firestore database instance
     val db = FirebaseFirestore.getInstance()
@@ -64,17 +69,14 @@ class MainActivity : ComponentActivity() {
 
     // Initialize the geolocation
     val geolocation = Geolocation(this)
-
-    setContent {
-      BookSwapAppTheme {
-        // A surface container using the 'background' color from the theme
-        Surface(
-            modifier = Modifier.fillMaxSize().semantics { testTag = C.Tag.main_screen_container },
-            color = MaterialTheme.colorScheme.background) {
-              BookSwapApp(
-                  messageRepository, bookRepository, userDataSource, geolocation = geolocation)
-            }
-      }
+    BookSwapAppTheme {
+      // A surface container using the 'background' color from the theme
+      Surface(
+          modifier = Modifier.fillMaxSize().semantics { testTag = C.Tag.main_screen_container },
+          color = MaterialTheme.colorScheme.background) {
+            BookSwapApp(
+                messageRepository, bookRepository, userDataSource, geolocation = geolocation)
+          }
     }
   }
 
