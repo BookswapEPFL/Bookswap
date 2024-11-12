@@ -140,11 +140,12 @@ class DataMessageFirestoreSourceTest {
   fun sendMessage_callsFirestoreSet_onSuccess() {
     val messageMap =
         mapOf(
-            "uuid" to testMessage.uuid,
+            "uuid" to testMessage.uuid.toString(),
             "text" to testMessage.text,
-            "senderId" to testMessage.senderUUID,
-            "receiverId" to testMessage.receiverUUID,
-            "timestamp" to testMessage.timestamp)
+            "senderUUID" to testMessage.senderUUID.toString(),
+            "receiverUUID" to testMessage.receiverUUID.toString(),
+            "timestamp" to testMessage.timestamp,
+            "messageType" to testMessage.messageType.name)
     `when`(mockFirestore.collection(COLLECTION_PATH)).thenReturn(mockCollectionReference)
     `when`(mockCollectionReference.document(testMessage.uuid.toString()))
         .thenReturn(mockDocumentReference)
@@ -160,11 +161,12 @@ class DataMessageFirestoreSourceTest {
     val exception = RuntimeException("Firestore error")
     val messageMap =
         mapOf(
-            "uuid" to testMessage.uuid,
+            "uuid" to testMessage.uuid.toString(),
             "text" to testMessage.text,
-            "senderId" to testMessage.senderUUID,
-            "receiverId" to testMessage.receiverUUID,
-            "timestamp" to testMessage.timestamp)
+            "senderUUID" to testMessage.senderUUID.toString(),
+            "receiverUUID" to testMessage.receiverUUID.toString(),
+            "timestamp" to testMessage.timestamp,
+            "messageType" to testMessage.messageType.name)
     `when`(mockFirestore.collection(COLLECTION_PATH)).thenReturn(mockCollectionReference)
     `when`(mockCollectionReference.document(testMessage.uuid.toString()))
         .thenReturn(mockDocumentReference)

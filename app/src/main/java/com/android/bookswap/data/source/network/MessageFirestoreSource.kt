@@ -46,11 +46,12 @@ class MessageFirestoreSource(private val db: FirebaseFirestore) : MessageReposit
   override fun sendMessage(message: DataMessage, callback: (Result<Unit>) -> Unit) {
     val messageMap =
         mapOf(
-            "uuid" to message.uuid,
+            "uuid" to message.uuid.toString(),
             "text" to message.text,
-            "senderId" to message.senderUUID,
-            "receiverId" to message.receiverUUID,
-            "timestamp" to message.timestamp)
+            "senderUUID" to message.senderUUID.toString(),
+            "receiverUUID" to message.receiverUUID.toString(),
+            "timestamp" to message.timestamp,
+            "messageType" to message.messageType.name)
 
     db.collection(COLLECTION_PATH)
         .document(message.uuid.toString())
@@ -167,8 +168,8 @@ class MessageFirestoreSource(private val db: FirebaseFirestore) : MessageReposit
               val messageMap =
                   mapOf(
                       "text" to message.text,
-                      "timestamp" to currentTime // Update the timestamp to the current time
-                      )
+                      "timestamp" to currentTime,
+                      "messageType" to message.messageType.name)
               db.collection(COLLECTION_PATH)
                   .document(message.uuid.toString())
                   .update(messageMap)
