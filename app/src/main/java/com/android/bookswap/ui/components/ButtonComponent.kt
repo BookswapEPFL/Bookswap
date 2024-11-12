@@ -26,6 +26,8 @@ import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 
+private val BUTTON_CONTENT_PADDING = 8.dp
+
 @Composable
 fun ButtonComponent(
     onClick: () -> Unit,
@@ -36,7 +38,7 @@ fun ButtonComponent(
     content: @Composable() (RowScope.() -> Unit)
 ) {
   val colors = ButtonDefaults.outlinedButtonColors()
-  val contentPadding = PaddingValues(8.dp, 8.dp)
+  val contentPadding = PaddingValues(BUTTON_CONTENT_PADDING)
   val shape = CircleShape
   val containerColor =
       if (enabled) {

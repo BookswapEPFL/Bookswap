@@ -40,6 +40,12 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
+private val FIELD_MIN_WIDTH = 280.dp
+private  val FIELD_MIN_HEIGHT = 56.dp
+
+private val FIELD_PADDING = 8.dp
+private val FIELD_CONTENT_PADDING = 16.dp
+
 @Composable
 fun FieldComponent(
     labelText: String,
@@ -88,11 +94,11 @@ fun FieldComponent(
         modifier =
             if (label != null) {
               modifier
-                  .defaultMinSize(280.dp, 56.dp)
+                  .defaultMinSize(FIELD_MIN_WIDTH, FIELD_MIN_HEIGHT)
                   // Merge semantics at the beginning of the modifier chain to ensure padding is
                   // considered part of the text field.
                   .semantics(mergeDescendants = true) {}
-                  .padding(top = 8.dp)
+                  .padding(top = FIELD_PADDING)
             } else {
               modifier
             },
@@ -147,8 +153,7 @@ fun FieldComponent(
                                         colors = colors)
                                     .value,
                                 RoundedCornerShape(100))
-                            .padding(8.dp)
-                            .padding(top = 0.dp)
+                            .padding(FIELD_PADDING)
                             .background(
                                 backgroundColor(
                                         enabled = enabled,
@@ -167,7 +172,7 @@ fun FieldComponent(
                     )
                   },
                   contentPadding =
-                      PaddingValues(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 16.dp))
+                      PaddingValues(FIELD_CONTENT_PADDING))
             })
   }
 }
