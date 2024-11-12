@@ -243,7 +243,7 @@ fun AddToBookScreen(
                   val book =
                       createDataBook(
                           context,
-                          repository.getNewUid(),
+                          repository.getNewUUID(),
                           title,
                           author,
                           description,
