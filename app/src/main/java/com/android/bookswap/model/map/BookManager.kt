@@ -6,19 +6,38 @@ import com.android.bookswap.data.DataBook
 import com.android.bookswap.data.DataUser
 import com.android.bookswap.data.repository.BooksRepository
 import com.android.bookswap.ui.map.UserBooksWithLocation
-import java.util.Timer
-import kotlin.concurrent.schedule
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 
 const val REFRESH_TIME_PERIOD = 5000L
 
+/**
+ * The `BookManager` class is responsible for managing book data and user data with location
+ * information, fetching data from the `BooksRepository`, computing distances between the current
+ * location and user locations, and filtering books based on user preferences. The list of all books
+ * can be obtained with the filteredBooks and the list of the list of books with the location of its
+ * owner with the filteredUsers
+ *
+ * @param geolocation the geolocation of the current user
+ * @param booksRepository an instance of [BooksRepository] to retrieve the books from the database.
+ * @param listUser list of users [DataUser], will be replaced in the future by an instance of
+ *   [UserFirestoreSource]
+ * @param bookFilter an instance of [BookFilter] that manages the filter that needs to be applied.
+ * @param isTesting if true, BookManager use the given computation method for distances.
+ * @param testComputingDistance a computation method for distances for testing
+ */
 class BookManager(
     private val geolocation: IGeolocation,
     private val booksRepository: BooksRepository,
     // TODO replace the listUser by a User repository to retrieve the users from the database
     listUser: List<DataUser>,
-    private val bookFilter: BookFilter
+    private val bookFilter: BookFilter,
+    // For the unit tests, the Android framework cannot be interacted with. The
+    // Location.distanceBetween needs to be replaced for testing.
+    private val isTesting: Boolean = false,
+    private val testComputingDistance: (Double, Double, Double, Double) -> Double = { _, _, _, _ ->
+      Double.NaN
+    }
 ) {
   // Internal MutableStateFlows to manage dynamic data
   private val _allBooks = MutableStateFlow<List<DataBook>>(emptyList())
@@ -34,12 +53,12 @@ class BookManager(
   private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
   init {
-      scope.launch {
-          while (true){
-              fetchBooksFromRepository()
-              delay(REFRESH_TIME_PERIOD)
-          }
+    scope.launch {
+      while (true) {
+        fetchBooksFromRepository()
+        delay(REFRESH_TIME_PERIOD)
       }
+    }
     computeDistanceOfUsers()
     combineFlowsAndFilterBooks()
   }
@@ -83,14 +102,26 @@ class BookManager(
             ->
             val userDistance =
                 users.map { user ->
-                  val result = FloatArray(1)
-                  Location.distanceBetween(
-                      latitude, longitude, user.latitude, user.longitude, result)
-                  user to result[0].toDouble()
+                  user to computeDistance(latitude, longitude, user.latitude, user.longitude)
                 }
             userDistance.sortedBy { it.second }
           }
           .collect { sortedUserDistance -> _allUserDistance.value = sortedUserDistance }
+    }
+  }
+
+  private fun computeDistance(
+      startLatitude: Double,
+      startLongitude: Double,
+      endLatitude: Double,
+      endLongitude: Double
+  ): Double {
+    if (isTesting) {
+      return testComputingDistance(startLatitude, startLongitude, endLatitude, endLongitude)
+    } else {
+      val result = FloatArray(1)
+      Location.distanceBetween(startLatitude, startLongitude, endLatitude, endLongitude, result)
+      return result[0].toDouble()
     }
   }
 }
