@@ -89,7 +89,7 @@ class MainActivity : ComponentActivity() {
     val navController = rememberNavController()
     val navigationActions = NavigationActions(navController)
     val bookFilter = BookFilter()
-    val userVM = UserViewModel("ERROR_UUID", userRepository)
+    val userVM = UserViewModel(UUID.randomUUID(), userRepository)
     val placeHolder =
         listOf(
             MessageBox(
