@@ -19,11 +19,10 @@ fun TopAppBarComponent(
     title: String = navigationActions.currentRoute()
 ) {
   TopAppBar(
-	title = { Text(text = title, Modifier.testTag("TopAppBar_Title")) },
-	modifier = modifier.testTag("TopAppBar"),
-	{ BackButtonComponent(navActions = navigationActions) },
-	{ ProfileIcon(navigationActions = navigationActions) },
-	TopAppBarDefaults.windowInsets,
-	TopAppBarDefaults.topAppBarColors(MaterialTheme.colorScheme.background)
-  )
+      title = { Text(text = title, Modifier.testTag("TopAppBar_Title")) },
+      modifier = modifier.testTag("TopAppBar"),
+      { BackButtonComponent(navActions = navigationActions) },
+      { ProfileIcon(navigationActions = navigationActions) },
+      TopAppBarDefaults.windowInsets,
+      TopAppBarDefaults.topAppBarColors(MaterialTheme.colorScheme.background))
 }
