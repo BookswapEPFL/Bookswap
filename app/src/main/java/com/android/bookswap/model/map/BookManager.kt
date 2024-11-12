@@ -20,11 +20,10 @@ const val REFRESH_TIME_PERIOD = 5000L
  *
  * @param geolocation the geolocation of the current user
  * @param booksRepository an instance of [BooksRepository] to retrieve the books from the database.
- * @param listUser list of users [DataUser], will be replaced in the future by an instance of
- *   [UserFirestoreSource]
+ * @param listUser list of users [DataUser], will be replaced in the future by an instance of a
+ *   UserFirestoreSource
  * @param bookFilter an instance of [BookFilter] that manages the filter that needs to be applied.
- * @param isTesting if true, BookManager use the given computation method for distances.
- * @param testComputingDistance a computation method for distances for testing
+ * @param computingDistanceMethod optional : a computation method for distances for testing purposes
  */
 class BookManager(
     private val geolocation: IGeolocation,
@@ -34,10 +33,12 @@ class BookManager(
     private val bookFilter: BookFilter,
     // For the unit tests, the Android framework cannot be interacted with. The
     // Location.distanceBetween needs to be replaced for testing.
-    private val isTesting: Boolean = false,
-    private val testComputingDistance: (Double, Double, Double, Double) -> Double = { _, _, _, _ ->
-      Double.NaN
-    }
+    private val computingDistanceMethod: (Double, Double, Double, Double) -> Double =
+        { startLatitude, startLongitude, endLatitude, endLongitude ->
+          val result = FloatArray(1)
+          Location.distanceBetween(startLatitude, startLongitude, endLatitude, endLongitude, result)
+          result[0].toDouble()
+        }
 ) {
   // Internal MutableStateFlows to manage dynamic data
   private val _allBooks = MutableStateFlow<List<DataBook>>(emptyList())
@@ -102,26 +103,12 @@ class BookManager(
             ->
             val userDistance =
                 users.map { user ->
-                  user to computeDistance(latitude, longitude, user.latitude, user.longitude)
+                  user to
+                      computingDistanceMethod(latitude, longitude, user.latitude, user.longitude)
                 }
             userDistance.sortedBy { it.second }
           }
           .collect { sortedUserDistance -> _allUserDistance.value = sortedUserDistance }
-    }
-  }
-
-  private fun computeDistance(
-      startLatitude: Double,
-      startLongitude: Double,
-      endLatitude: Double,
-      endLongitude: Double
-  ): Double {
-    if (isTesting) {
-      return testComputingDistance(startLatitude, startLongitude, endLatitude, endLongitude)
-    } else {
-      val result = FloatArray(1)
-      Location.distanceBetween(startLatitude, startLongitude, endLatitude, endLongitude, result)
-      return result[0].toDouble()
     }
   }
 }

@@ -122,11 +122,8 @@ class BookManagerTest {
   @Test
   fun defaultCaseNoFilterOrSortingNecessary() = runTest {
     bookManager =
-        BookManager(mockGeolocation1, mockBookRepository, users, mockBookFilterEmpty, true) {
-            _,
-            _,
-            _,
-            _ ->
+        BookManager(mockGeolocation1, mockBookRepository, users, mockBookFilterEmpty) { _, _, _, _
+          ->
           0.0
         }
     bookManager.filteredBooks.first { it != emptyList<DataBook>() }
@@ -137,7 +134,7 @@ class BookManagerTest {
   @Test
   fun returnFilteredListOfBooks() = runTest {
     bookManager =
-        BookManager(mockGeolocation1, mockBookRepository, users, mockBookFilter, true, sortingTest)
+        BookManager(mockGeolocation1, mockBookRepository, users, mockBookFilter, sortingTest)
     bookManager.filteredBooks.first { it != emptyList<DataBook>() }
     assertEquals(listOf(book3), bookManager.filteredBooks.value)
     assertEquals(filteredBooksWithLocation, bookManager.filteredUsers.value)
@@ -146,8 +143,7 @@ class BookManagerTest {
   @Test
   fun sortTheUsers() = runTest {
     bookManager =
-        BookManager(
-            mockGeolocation2, mockBookRepository, users, mockBookFilterEmpty, true, sortingTest)
+        BookManager(mockGeolocation2, mockBookRepository, users, mockBookFilterEmpty, sortingTest)
     bookManager.filteredBooks.first { it != emptyList<DataBook>() }
     assertEquals(listOf(book1, book2, book3), bookManager.filteredBooks.value)
     assertEquals(
