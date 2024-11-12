@@ -1,6 +1,7 @@
 package com.android.bookswap.data.repository
 
 import com.android.bookswap.data.DataUser
+import java.util.UUID
 
 /** Interface defining a contract for managing user-related operations in a repository. */
 interface UsersRepository {
@@ -19,7 +20,7 @@ interface UsersRepository {
    * @param callback callback function that receives list of user if success
    */
   fun getUser(
-      uuid: String,
+      uuid: UUID,
       callback: (Result<DataUser>) -> Unit,
   )
 
@@ -48,5 +49,5 @@ interface UsersRepository {
    * @param callback callback function that receives Result.success() when operation succeed of
    *   Result.failure(exception) if error
    */
-  fun deleteUser(uuid: String, callback: (Result<Unit>) -> Unit)
+  fun deleteUser(uuid: UUID, callback: (Result<Unit>) -> Unit)
 }

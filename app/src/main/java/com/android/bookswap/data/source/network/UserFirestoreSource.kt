@@ -35,7 +35,7 @@ class UserFirestoreSource(private val db: FirebaseFirestore) : UsersRepository {
    * Firestore documents to DataUser objects Calls OnSuccess with the list of users, or onFailure if
    * the task fails
    */
-  override fun getUser(uuid: String, callback: (Result<DataUser>) -> Unit) {
+  override fun getUser(uuid: UUID, callback: (Result<DataUser>) -> Unit) {
 
     db.collection(COLLECTION_NAME).whereEqualTo("UUID", uuid).get().addOnCompleteListener { task ->
       if (task.isSuccessful) {
@@ -52,7 +52,7 @@ class UserFirestoreSource(private val db: FirebaseFirestore) : UsersRepository {
   /** Adds a new user to the Firestore collection */
   override fun addUser(dataUser: DataUser, callback: (Result<Unit>) -> Unit) {
     performFirestoreOperation(
-        db.collection(COLLECTION_NAME).document(dataUser.userId).set(dataUser),
+        db.collection(COLLECTION_NAME).document(dataUser.userUUID.toString()).set(dataUser),
         callback,
     )
   }
@@ -62,14 +62,15 @@ class UserFirestoreSource(private val db: FirebaseFirestore) : UsersRepository {
    */
   override fun updateUser(dataUser: DataUser, callback: (Result<Unit>) -> Unit) {
     performFirestoreOperation(
-        db.collection(COLLECTION_NAME).document(dataUser.userId).set(dataUser), callback)
+        db.collection(COLLECTION_NAME).document(dataUser.userUUID.toString()).set(dataUser),
+        callback)
   }
 
   /**
    * Deletes a user from Firestore by its title Uses performFirestoreOperation to handle success and
    * failure
    */
-  override fun deleteUser(uuid: String, callback: (Result<Unit>) -> Unit) {
+  override fun deleteUser(uuid: UUID, callback: (Result<Unit>) -> Unit) {
     performFirestoreOperation(
         db.collection(COLLECTION_NAME).document(uuid.toString()).delete(), callback)
   }
@@ -82,7 +83,7 @@ class UserFirestoreSource(private val db: FirebaseFirestore) : UsersRepository {
   fun documentToUser(document: DocumentSnapshot): Result<DataUser> {
 
     return try {
-      val userID = document.getString("UUID")!!
+      val userUUID = UUID.fromString(document.getString("UUID")!!)
       val greeting = document.getString("Greeting")!!
       val firstname = document.getString("Firstname")!!
       val lastname = document.getString("Lastname")!!
@@ -95,6 +96,7 @@ class UserFirestoreSource(private val db: FirebaseFirestore) : UsersRepository {
       val googleUid = document.getString("GoogleUID")!!
       Result.success(
           DataUser(
+              userUUID,
               greeting,
               firstname,
               lastname,
@@ -103,7 +105,6 @@ class UserFirestoreSource(private val db: FirebaseFirestore) : UsersRepository {
               latitude,
               longitude,
               profilePicture,
-              userID,
               bookList,
               googleUid))
     } catch (e: Exception) {
