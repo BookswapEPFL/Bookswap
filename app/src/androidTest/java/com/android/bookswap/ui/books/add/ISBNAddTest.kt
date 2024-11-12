@@ -110,7 +110,7 @@ class ISBNAddTest : TestCase() {
     val mockBooksRepository: BooksRepository = mockk()
     every { mockBooksRepository.addBook(matchDataBook(dataBook), any()) } answers
         {
-          secondArg<() -> Unit>()()
+          secondArg<(Result<Unit>) -> Unit>()(Result.success(Unit))
         } andThenJust
         Runs
 
@@ -183,7 +183,7 @@ class ISBNAddTest : TestCase() {
     val mockBooksRepository: BooksRepository = mockk()
     every { mockBooksRepository.addBook(matchDataBook(dataBook), any()) } answers
         {
-          thirdArg<(Exception) -> Unit>()(Exception("Error message"))
+          secondArg<(Result<Unit>) -> Unit>()(Result.failure(Exception("Error message")))
         } andThenJust
         Runs
 

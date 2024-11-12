@@ -113,7 +113,7 @@ fun AddISBNScreen(navigationActions: NavigationActions, booksRepository: BooksRe
                                     if (res.isSuccess) {
                                       navigationActions.navigateTo(TopLevelDestinations.NEW_BOOK)
                                     } else {
-                                      val error = result.exceptionOrNull()!!
+                                      val error = res.exceptionOrNull()!!
                                       Log.e("AddBook", res.toString())
                                       Toast.makeText(context, error.message, Toast.LENGTH_LONG)
                                           .show()

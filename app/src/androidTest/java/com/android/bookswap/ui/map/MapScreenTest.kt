@@ -82,7 +82,7 @@ class MapScreenTest {
 
     every { mockBookRepository.getBook(any()) } answers
         {
-          firstArg<(List<DataBook>) -> Unit>().invoke(books)
+          firstArg<(Result<List<DataBook>>) -> Unit>().invoke(Result.success(books))
         }
   }
 
