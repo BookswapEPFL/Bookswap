@@ -12,12 +12,12 @@ import com.google.firebase.firestore.QuerySnapshot
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import java.util.UUID
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
-import java.util.UUID
 
 @RunWith(RobolectricTestRunner::class)
 class BooksFirestoreSourceTest {
@@ -45,7 +45,7 @@ class BooksFirestoreSourceTest {
     every { mockCollectionReference.document(any()) }.returns(mockDocumentReference)
     every { mockCollectionReference.get() }.returns(Tasks.forResult(mockQuerySnapshot))
 
-    //Mock of snapshot
+    // Mock of snapshot
     every { mockDocumentSnapshot.getString("title") }.returns(testBook.title)
     every { mockDocumentSnapshot.getString("author") }.returns(testBook.author)
     every { mockDocumentSnapshot.getString("description") }.returns(testBook.description)
@@ -67,8 +67,7 @@ class BooksFirestoreSourceTest {
           // Assert that the fetched books match the expected values
           assertTrue(books.isNotEmpty())
           assertBookEquals(books.first(), testBook, true)
-        }
-    )
+        })
 
     // Verify that Firestore collection was called
     verify { mockCollectionReference.get() }
@@ -96,9 +95,7 @@ class BooksFirestoreSourceTest {
     every { mockDocumentReference.set(testBook) }.returns(Tasks.forResult(null))
 
     // Act
-    bookSource.addBook(testBook) { result ->
-      assertTrue(result.isSuccess)
-    }
+    bookSource.addBook(testBook) { result -> assertTrue(result.isSuccess) }
 
     // Verify Firestore set operation
     verify { mockDocumentReference.set(testBook) }

@@ -11,5 +11,5 @@ import org.junit.Assert.assertEquals
  * @param strict true if the two books should have the same UUID
  */
 fun assertBookEquals(expected: DataBook, result: DataBook?, strict: Boolean = false) {
-    assertEquals(expected, if (strict) result else result?.copy(uuid = expected.uuid))
+  assertEquals(expected, if (strict) result else result?.copy(uuid = expected.uuid))
 }

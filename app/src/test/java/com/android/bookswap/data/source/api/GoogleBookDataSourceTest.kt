@@ -3,6 +3,7 @@ package com.android.bookswap.data.source.api
 import com.android.bookswap.data.BookLanguages
 import com.android.bookswap.data.DataBook
 import com.android.bookswap.utils.assertBookEquals
+import java.util.UUID
 import org.junit.After
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -19,7 +20,6 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.robolectric.RobolectricTestRunner
-import java.util.UUID
 
 @RunWith(RobolectricTestRunner::class)
 class GoogleBookDataSourceTest {
