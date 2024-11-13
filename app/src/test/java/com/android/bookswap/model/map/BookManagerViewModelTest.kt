@@ -31,7 +31,7 @@ class BookManagerViewModelTest {
           author = "Author 1",
           description = "Description of Book 1",
           rating = 5,
-          photo = "url_to_photo_1",
+          photo = null,
           language = BookLanguages.ENGLISH,
           isbn = "123-456-789",
           genres = listOf(BookGenres.FICTION, BookGenres.HORROR))
@@ -43,7 +43,7 @@ class BookManagerViewModelTest {
           author = "Author 2",
           description = "Description of Book 2",
           rating = 4,
-          photo = "url_to_photo_2",
+          photo = null,
           language = BookLanguages.GERMAN,
           isbn = "234-567-890",
           genres = listOf(BookGenres.FICTION))
@@ -55,7 +55,7 @@ class BookManagerViewModelTest {
           author = "Author 3",
           description = "Description of Book 3",
           rating = 4,
-          photo = "url_to_photo_3",
+          photo = null,
           language = BookLanguages.GERMAN,
           isbn = "234-567-890",
           genres = listOf(BookGenres.NONFICTION, BookGenres.HORROR))

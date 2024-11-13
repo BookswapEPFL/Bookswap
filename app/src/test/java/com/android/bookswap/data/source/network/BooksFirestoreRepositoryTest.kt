@@ -41,7 +41,7 @@ class BooksFirestoreRepositoryTest {
           author = "Test Author",
           description = "Test Description",
           rating = 5,
-          photo = "http://example.com/photo.jpg",
+          photo = null,
           language = BookLanguages.ENGLISH,
           isbn = "1234567890")
 
@@ -69,7 +69,7 @@ class BooksFirestoreRepositoryTest {
     `when`(mockDocumentSnapshot.getString("author")).thenReturn(testBook.author)
     `when`(mockDocumentSnapshot.getString("description")).thenReturn(testBook.description)
     `when`(mockDocumentSnapshot.getLong("rating")).thenReturn(testBook.rating?.toLong())
-    `when`(mockDocumentSnapshot.getString("photo")).thenReturn(testBook.photo)
+    `when`(mockDocumentSnapshot.getString("photo")).thenReturn(null)
     `when`(mockDocumentSnapshot.getString("language")).thenReturn(testBook.language.name)
     `when`(mockDocumentSnapshot.getString("isbn")).thenReturn(testBook.isbn)
     `when`(mockDocumentSnapshot.getLong("uuid.mostSignificantBits"))
@@ -145,7 +145,7 @@ class BooksFirestoreRepositoryTest {
     `when`(mockDocumentSnapshot.getString("author")).thenReturn(testBook.author)
     `when`(mockDocumentSnapshot.getString("description")).thenReturn(testBook.description)
     `when`(mockDocumentSnapshot.getLong("rating")).thenReturn(testBook.rating?.toLong())
-    `when`(mockDocumentSnapshot.getString("photo")).thenReturn(testBook.photo)
+    `when`(mockDocumentSnapshot.getString("photo")).thenReturn(null)
     `when`(mockDocumentSnapshot.getString("language")).thenReturn(testBook.language.name)
     `when`(mockDocumentSnapshot.getString("isbn")).thenReturn(testBook.isbn)
     `when`(mockDocumentSnapshot.getLong("uuid.mostSignificantBits"))
@@ -175,7 +175,7 @@ class BooksFirestoreRepositoryTest {
     `when`(mockDocumentSnapshot.getString("author")).thenReturn(testBook.author)
     `when`(mockDocumentSnapshot.getString("description")).thenReturn(testBook.description)
     `when`(mockDocumentSnapshot.getLong("rating")).thenReturn(testBook.rating?.toLong())
-    `when`(mockDocumentSnapshot.getString("photo")).thenReturn(testBook.photo)
+    `when`(mockDocumentSnapshot.getString("photo")).thenReturn(null)
     `when`(mockDocumentSnapshot.getString("language")).thenReturn(testBook.language.name)
     `when`(mockDocumentSnapshot.getString("isbn")).thenReturn(testBook.isbn)
     `when`(mockDocumentSnapshot.getLong("uuid.mostSignificantBits"))
@@ -196,7 +196,7 @@ class BooksFirestoreRepositoryTest {
     `when`(mockDocumentSnapshot.getString("author")).thenReturn(testBook.author)
     `when`(mockDocumentSnapshot.getString("description")).thenReturn(testBook.description)
     `when`(mockDocumentSnapshot.getLong("rating")).thenReturn(testBook.rating?.toLong())
-    `when`(mockDocumentSnapshot.getString("photo")).thenReturn(testBook.photo)
+    `when`(mockDocumentSnapshot.getString("photo")).thenReturn(null)
     `when`(mockDocumentSnapshot.getString("language")).thenReturn("INVALID_LANGUAGE")
     `when`(mockDocumentSnapshot.getString("isbn")).thenReturn(testBook.isbn)
     `when`(mockDocumentSnapshot.getLong("uuid.mostSignificantBits"))
