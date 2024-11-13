@@ -147,7 +147,11 @@ class MainActivity : ComponentActivity() {
       }
       navigation(startDestination = Screen.MAP, route = Route.MAP) {
         composable(Screen.MAP) {
-          MapScreen(bookManagerViewModel, navigationActions = navigationActions, geolocation = geolocation,topAppBar = { topAppBar("Map") },
+          MapScreen(
+              bookManagerViewModel,
+              navigationActions = navigationActions,
+              geolocation = geolocation,
+              topAppBar = { topAppBar("Map") },
               bottomAppBar = { bottomAppBar(this@navigation.route ?: "") })
         }
         composable(Screen.FILTER) { FilterMapScreen(navigationActions, bookFilter) }
