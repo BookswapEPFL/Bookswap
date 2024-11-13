@@ -56,6 +56,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import com.android.bookswap.R
 import com.android.bookswap.data.DataMessage
+import com.android.bookswap.data.MessageType
 import com.android.bookswap.data.repository.MessageRepository
 import com.android.bookswap.ui.components.BackButtonComponent
 import com.android.bookswap.ui.navigation.NavigationActions
@@ -183,6 +184,7 @@ fun ChatScreen(
                       val messageId = messageRepository.getNewUUID()
                       val newMessage =
                           DataMessage(
+                              messageType = MessageType.TEXT,
                               uuid = messageId,
                               text = newMessageText.text,
                               senderUUID = currentUserUUID,
@@ -329,11 +331,13 @@ fun MessageItem(message: DataMessage, currentUserUUID: UUID, onLongPress: () -> 
                     .widthIn(max = (LocalConfiguration.current.screenWidthDp.dp * 2 / 3))
                     .border(1.dp, ColorVariable.Accent, shape)
                     .combinedClickable(
-                        onClick = { if (message.uuid == imageTestMessageUUID) showPopup = true },
+                        onClick = {
+                          if (message.messageType == MessageType.IMAGE) showPopup = true
+                        },
                         onLongClick = { onLongPress() })
                     .testTag("message_item ${message.uuid}")) {
               Column(modifier = Modifier.padding(16.dp)) {
-                if (message.uuid == imageTestMessageUUID) {
+                if (message.messageType == MessageType.IMAGE) {
                   Image(
                       painter = painterResource(id = R.drawable.the_hobbit_cover),
                       contentDescription = "Message Image",
