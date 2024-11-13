@@ -6,7 +6,6 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -49,6 +48,7 @@ import com.android.bookswap.data.repository.BooksRepository
 import com.android.bookswap.model.map.BookFilter
 import com.android.bookswap.model.map.DefaultGeolocation
 import com.android.bookswap.model.map.IGeolocation
+import com.android.bookswap.ui.components.BookDisplayComponent
 import com.android.bookswap.ui.navigation.BOTTOM_NAV_HEIGHT
 import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.navigation.Screen
@@ -408,72 +408,11 @@ private fun DraggableMenu(listAllBooks: List<DataBook>) {
             } else {
               itemsIndexed(listAllBooks) { index, book ->
                 Spacer(modifier = Modifier.height(PADDING_VERTICAL_DP.dp))
-                Row(
+                BookDisplayComponent(
                     modifier =
                         Modifier.heightIn(min = MIN_BOX_BOOK_HEIGHT_DP.dp)
-                            .testTag("mapDraggableMenuBookBox${index}")) {
-                      // Image Box
-                      Box(
-                          modifier =
-                              Modifier.height(IMAGE_HEIGHT_DP.dp)
-                                  .width(IMAGE_WIDTH_DP.dp)
-                                  .padding(
-                                      start = PADDING_HORIZONTAL_DP.dp,
-                                      end = PADDING_HORIZONTAL_DP.dp)
-                                  .testTag("mapDraggableMenuBookBoxImage")) {
-                            // Image of the books, will be added at a later date
-                            // We didn't discussed about how we will store the image or how we
-                            // will
-                            // encode them
-                            Box(
-                                modifier =
-                                    Modifier.fillMaxSize()
-                                        .background(Color.Gray) // Placeholder for the image
-                                )
-                          }
-
-                      // Column for text content
-                      Column(
-                          modifier =
-                              Modifier.padding(vertical = PADDING_VERTICAL_DP.dp)
-                                  .width(WIDTH_TITLE_BOX_DP.dp)
-                                  .testTag("mapDraggableMenuBookBoxMiddle")) {
-                            Text(
-                                text = book.title,
-                                color = ColorVariable.Accent,
-                                fontSize = PRIMARY_TEXT_FONT_SP.sp,
-                                modifier =
-                                    Modifier.padding(bottom = PADDING_VERTICAL_DP.dp)
-                                        .width(WIDTH_TITLE_BOX_DP.dp)
-                                        .testTag("mapDraggableMenuBookBoxTitle"))
-                            Text(
-                                text = book.author ?: "",
-                                color = ColorVariable.AccentSecondary,
-                                fontSize = SECONDARY_TEXT_FONT_SP.sp,
-                                modifier =
-                                    Modifier.width(WIDTH_TITLE_BOX_DP.dp)
-                                        .testTag("mapDraggableMenuBookBoxAuthor"))
-                          }
-                      Column(
-                          modifier = Modifier.fillMaxWidth().testTag("mapDraggableMenuBookRight")) {
-                            Row(
-                                modifier =
-                                    Modifier.fillMaxWidth()
-                                        .height(STAR_HEIGHT_DP.dp)
-                                        .testTag("mapDraggableMenuBookBoxRating")) {
-                                  // leave all stars empty if no rating
-                                  DisplayStarReview(book.rating ?: 0)
-                                }
-                            // text for the tags of the book, will be added at a later date
-                            // It isn't decided how we will handle the tag for the books
-                            Text(
-                                text = book.genres.joinToString(separator = ", ") { it.Genre },
-                                modifier =
-                                    Modifier.fillMaxWidth().testTag("mapDraggableMenuBookBoxTag"),
-                                fontSize = SECONDARY_TEXT_FONT_SP.sp,
-                                color = ColorVariable.AccentSecondary)
-                          }
-                    }
+                            .testTag("mapDraggableMenuBookBox${index}"),
+                    book = book)
 
                 // Divider below each item
                 HorizontalDivider(
