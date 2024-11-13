@@ -1,7 +1,6 @@
 package com.android.bookswap
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
@@ -89,7 +88,7 @@ class MainActivity : ComponentActivity() {
       messageRepository: MessageRepository,
       bookRepository: BooksRepository,
       userRepository: UsersRepository,
-      startDestination: String = Route.AUTH,
+      startDestination: String = Route.MAP,
       geolocation: IGeolocation = DefaultGeolocation()
   ) {
     val navController = rememberNavController()
@@ -169,18 +168,19 @@ class MainActivity : ComponentActivity() {
               placeHolder,
               navigationActions,
               topAppBar = { topAppBar("Messages") },
-              bottomAppBar = { bottomAppBar(this@navigation.route ?: "") },
-              currentUser)
+              bottomAppBar = { bottomAppBar(this@navigation.route ?: "") })
         }
-        composable("${Screen.CHAT}/{user1}/{user2}") { backStackEntry ->
-          val user1UUID = UUID.fromString(backStackEntry.arguments?.getString("user1") ?: "")
-          val user2UUID = UUID.fromString(backStackEntry.arguments?.getString("user2") ?: "")
-          val user1 = placeHolder.firstOrNull { it.contact.userUUID == user1UUID }?.contact
+        composable("${Screen.CHAT}/{user2}") { backStackEntry ->
+          val user2UUID = UUID.fromString(backStackEntry.arguments?.getString("user2"))
           val user2 = placeHolder.firstOrNull { it.contact.userUUID == user2UUID }?.contact
-          if (user1 != null && user2 != null) {
-            ChatScreen(messageRepository, user1, user2, navigationActions)
+
+          if (user2 != null) {
+            ChatScreen(messageRepository, currentUser, user2, navigationActions)
           } else {
-            Log.e("MainActivity", "User not found in placeholder list")
+            BookAdditionChoiceScreen(
+                navigationActions,
+                topAppBar = { topAppBar("Add a Book") },
+                bottomAppBar = { bottomAppBar(this@navigation.route ?: "") })
           }
         }
       }

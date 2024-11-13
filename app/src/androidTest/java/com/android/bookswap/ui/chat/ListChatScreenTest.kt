@@ -29,9 +29,6 @@ class ListChatScreenTest {
   private lateinit var placeHolderData: List<MessageBox>
   private lateinit var placeHolderDataEmpty: List<MessageBox>
   private val currentUserUUID = UUID.randomUUID()
-  private val currentUser =
-      DataUser(
-          currentUserUUID, "Hello", "Jaime", "Oliver Pastor", "", "", 0.0, 0.0, "", emptyList(), "")
 
   @Before
   fun setUp() {
@@ -70,8 +67,7 @@ class ListChatScreenTest {
                 onTabSelect = { destination -> navigationActions.navigateTo(destination) },
                 tabList = List_Navigation_Bar_Destinations,
                 selectedItem = navigationActions.currentRoute())
-          },
-          currentUser)
+          })
     }
     composeTestRule.onNodeWithTag("TopAppBar").assertIsDisplayed()
     composeTestRule.onNodeWithTag("profileIconButton").assertIsDisplayed()
@@ -96,8 +92,7 @@ class ListChatScreenTest {
                 onTabSelect = { destination -> navigationActions.navigateTo(destination) },
                 tabList = List_Navigation_Bar_Destinations,
                 selectedItem = navigationActions.currentRoute())
-          },
-          currentUser)
+          })
     }
     composeTestRule.onNodeWithTag("TopAppBar").assertIsDisplayed()
     composeTestRule.onNodeWithTag("profileIconButton").assertIsDisplayed()
@@ -123,8 +118,7 @@ class ListChatScreenTest {
                 onTabSelect = { destination -> navigationActions.navigateTo(destination) },
                 tabList = List_Navigation_Bar_Destinations,
                 selectedItem = navigationActions.currentRoute())
-          },
-          currentUser)
+          })
     }
     composeTestRule.onNodeWithTag("profileIconButton").assertHasClickAction()
   }
@@ -143,8 +137,7 @@ class ListChatScreenTest {
                 onTabSelect = { destination -> navigationActions.navigateTo(destination) },
                 tabList = List_Navigation_Bar_Destinations,
                 selectedItem = navigationActions.currentRoute())
-          },
-          currentUser)
+          })
     }
     val messageNodes = composeTestRule.onAllNodesWithTag("chat_messageBox")
     assert(messageNodes.fetchSemanticsNodes().isNotEmpty())

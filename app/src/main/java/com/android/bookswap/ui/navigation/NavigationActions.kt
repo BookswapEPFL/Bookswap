@@ -8,7 +8,6 @@ import androidx.compose.material.icons.outlined.Place
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
-import com.android.bookswap.data.DataUser
 
 object Route {
   const val CHAT = "Chat"
@@ -86,12 +85,8 @@ open class NavigationActions(
    * @param user1 The first user to pass to the screen
    * @param user2 The second user to pass to the screen
    */
-  open fun navigateTo(screen: String, user1: DataUser? = null, user2: DataUser? = null) {
-    val route =
-        when (screen) {
-          Screen.CHAT -> "$screen/${user1?.userUUID}/${user2?.userUUID}"
-          else -> screen
-        }
+  open fun navigateTo(screen: String, otherUserUUID: String) {
+    val route = "$screen/$otherUserUUID"
     navController.navigate(route)
   }
 

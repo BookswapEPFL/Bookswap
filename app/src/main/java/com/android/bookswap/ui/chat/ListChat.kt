@@ -30,7 +30,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.android.bookswap.data.DataUser
 import com.android.bookswap.data.MessageBox
 import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.navigation.Screen
@@ -44,7 +43,6 @@ fun ListChatScreen(
     navigationActions: NavigationActions,
     topAppBar: @Composable () -> Unit = {},
     bottomAppBar: @Composable () -> Unit = {},
-    currentUser: DataUser
 ) {
   Scaffold(
       modifier = Modifier.testTag("chat_listScreen"),
@@ -71,7 +69,7 @@ fun ListChatScreen(
                 items(placeHolderData.size) { message ->
                   MessageBoxDisplay(placeHolderData[message]) {
                     navigationActions.navigateTo(
-                        Screen.CHAT, currentUser, placeHolderData[message].contact)
+                        Screen.CHAT, placeHolderData[message].contact.userUUID.toString())
                   }
                   MessageDivider()
                 }
