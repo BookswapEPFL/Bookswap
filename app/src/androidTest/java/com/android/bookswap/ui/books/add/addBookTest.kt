@@ -52,30 +52,29 @@ class AddToBookTest {
     composeTestRule.onNodeWithText("Save").assertIsEnabled()
   }
 
-
   @Test
   fun testCreateDataBook_ValidData() {
-      // Test with valid data
-      val book = createDataBook(
-          context = mockContext,
-          uuid = UUID.randomUUID(),
-          title = "My Book",
-          author = "Author Name",
-          description = "This is a description",
-          ratingStr = "4",
-          photo = "",
-          bookLanguageStr = "ENGLISH",
-          isbn = "1234567890",
-          genres = listOf(BookGenres.TRAVEL)
-      )
+    // Test with valid data
+    val book =
+        createDataBook(
+            context = mockContext,
+            uuid = UUID.randomUUID(),
+            title = "My Book",
+            author = "Author Name",
+            description = "This is a description",
+            ratingStr = "4",
+            photo = "",
+            bookLanguageStr = "ENGLISH",
+            isbn = "1234567890",
+            genres = listOf(BookGenres.TRAVEL))
 
-      // Assert the book is created correctly
-      assertEquals("My Book", book?.title)
-      assertEquals("Author Name", book?.author)
-      assertEquals("This is a description", book?.description)
-      assertEquals(4, book?.rating)
-      assertEquals(BookLanguages.ENGLISH, book?.language)
-      assertEquals("1234567890", book?.isbn)
+    // Assert the book is created correctly
+    assertEquals("My Book", book?.title)
+    assertEquals("Author Name", book?.author)
+    assertEquals("This is a description", book?.description)
+    assertEquals(4, book?.rating)
+    assertEquals(BookLanguages.ENGLISH, book?.language)
+    assertEquals("1234567890", book?.isbn)
   }
 
   @Test

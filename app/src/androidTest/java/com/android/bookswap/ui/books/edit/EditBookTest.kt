@@ -114,13 +114,13 @@ class EditBookScreenTest {
     composeTestRule.onNodeWithTag("inputBookDescription").assertIsDisplayed()
   }
 
-
   @Test
   fun displayEditBookRatingComponent() {
-    composeTestRule.setContent { EditBookScreen(booksRepository, navigationActions, sampleBook.copy(photo = null)) }
+    composeTestRule.setContent {
+      EditBookScreen(booksRepository, navigationActions, sampleBook.copy(photo = null))
+    }
     composeTestRule.onNodeWithTag("inputBookRating").assertIsDisplayed()
   }
-
 
   @Test
   fun displayEditBookPhotoComponent() {

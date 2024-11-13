@@ -302,7 +302,6 @@ fun createDataBook(
         return null
       }
 
-
   // Validate Language
   val languages: BookLanguages =
       try {
