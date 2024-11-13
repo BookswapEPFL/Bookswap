@@ -56,6 +56,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import com.android.bookswap.R
 import com.android.bookswap.data.DataMessage
+import com.android.bookswap.data.DataUser
 import com.android.bookswap.data.MessageType
 import com.android.bookswap.data.repository.MessageRepository
 import com.android.bookswap.ui.components.BackButtonComponent
@@ -71,8 +72,8 @@ import kotlinx.coroutines.delay
 @Composable
 fun ChatScreen(
     messageRepository: MessageRepository,
-    currentUserUUID: UUID, // To identify the current user for aligning messages
-    otherUserUUID: UUID,
+    currentUser: DataUser,
+    otherUser: DataUser,
     navController: NavigationActions
 ) {
   val context = LocalContext.current
@@ -91,8 +92,10 @@ fun ChatScreen(
               result
                   .getOrThrow()
                   .filter {
-                    (it.senderUUID == currentUserUUID && it.receiverUUID == otherUserUUID) ||
-                        (it.senderUUID == otherUserUUID && it.receiverUUID == currentUserUUID)
+                    (it.senderUUID == currentUser.userUUID &&
+                        it.receiverUUID == otherUser.userUUID) ||
+                        (it.senderUUID == otherUser.userUUID &&
+                            it.receiverUUID == currentUser.userUUID)
                   }
                   .sortedBy { it.timestamp }
           Log.d("ChatScreen", "Fetched messages: $messages")
@@ -108,7 +111,7 @@ fun ChatScreen(
       TopAppBar(
           title = {
             Text(
-                text = otherUserUUID.toString(),
+                text = otherUser.firstName + " " + otherUser.lastName,
                 style = MaterialTheme.typography.titleMedium,
                 color = ColorVariable.Accent,
                 modifier =
@@ -136,7 +139,7 @@ fun ChatScreen(
               items(messages) { message ->
                 MessageItem(
                     message = message,
-                    currentUserUUID = currentUserUUID,
+                    currentUserUUID = currentUser.userUUID,
                     onLongPress = { selectedMessage = message })
               }
             }
@@ -187,8 +190,8 @@ fun ChatScreen(
                               messageType = MessageType.TEXT,
                               uuid = messageId,
                               text = newMessageText.text,
-                              senderUUID = currentUserUUID,
-                              receiverUUID = otherUserUUID, // Ensure receiverId is set here
+                              senderUUID = currentUser.userUUID,
+                              receiverUUID = otherUser.userUUID, // Ensure receiverId is set here
                               timestamp = System.currentTimeMillis())
                       // Send the message
                       messageRepository.sendMessage(

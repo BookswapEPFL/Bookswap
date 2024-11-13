@@ -2,6 +2,7 @@ package com.android.bookswap.model.map
 
 import android.util.Log
 import androidx.compose.runtime.mutableStateOf
+import kotlinx.coroutines.flow.MutableStateFlow
 
 /**
  * Mock implementation of [IGeolocation] for testing purposes.
@@ -16,8 +17,8 @@ import androidx.compose.runtime.mutableStateOf
  *   environment.
  */
 class DefaultGeolocation : IGeolocation {
-  override val latitude = mutableStateOf(0.0)
-  override val longitude = mutableStateOf(0.0)
+  override val latitude = MutableStateFlow(0.0)
+  override val longitude = MutableStateFlow(0.0)
   private val isRunning = mutableStateOf(false)
 
   override fun startLocationUpdates() {
