@@ -302,12 +302,6 @@ fun createDataBook(
         return null
       }
 
-  // Validate Photo (assuming basic validation here, just checking if not empty)
-  if (photo.isBlank()) {
-    Log.e("AddToBookScreen", "Photo URL cannot be empty.")
-    Toast.makeText(context, "Photo URL cannot be empty.", Toast.LENGTH_LONG).show()
-    return null
-  }
 
   // Validate Language
   val languages: BookLanguages =
@@ -335,7 +329,7 @@ fun createDataBook(
       author = author,
       description = description,
       rating = rating,
-      photo = UUID.fromString(photo),
+      photo = null,
       language = languages,
       isbn = isbn,
       genres = genres,
