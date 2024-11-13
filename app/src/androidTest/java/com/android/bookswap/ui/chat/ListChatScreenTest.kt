@@ -12,11 +12,13 @@ import androidx.compose.ui.test.onChild
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.navigation.compose.rememberNavController
-import com.android.bookswap.model.chat.MessageBox
+import com.android.bookswap.data.DataUser
+import com.android.bookswap.data.MessageBox
 import com.android.bookswap.ui.components.TopAppBarComponent
 import com.android.bookswap.ui.navigation.BottomNavigationMenu
 import com.android.bookswap.ui.navigation.List_Navigation_Bar_Destinations
 import com.android.bookswap.ui.navigation.NavigationActions
+import java.util.UUID
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -26,13 +28,28 @@ class ListChatScreenTest {
   @get:Rule val composeTestRule = createComposeRule()
   private lateinit var placeHolderData: List<MessageBox>
   private lateinit var placeHolderDataEmpty: List<MessageBox>
+  private val currentUserUUID = UUID.randomUUID()
+  private val currentUser =
+      DataUser(
+          currentUserUUID, "Hello", "Jaime", "Oliver Pastor", "", "", 0.0, 0.0, "", emptyList(), "")
 
   @Before
   fun setUp() {
     placeHolderData =
         List(12) {
           MessageBox(
-              "Contact ${it + 1}",
+              DataUser(
+                  UUID.randomUUID(),
+                  "Hello",
+                  "First ${it + 1}",
+                  "Last ${it + 1}",
+                  "",
+                  "",
+                  0.0,
+                  0.0,
+                  "",
+                  emptyList(),
+                  "googleUid"),
               "Test message $it test for the feature of ellipsis in the message",
               "01.01.24")
         }
@@ -53,7 +70,8 @@ class ListChatScreenTest {
                 onTabSelect = { destination -> navigationActions.navigateTo(destination) },
                 tabList = List_Navigation_Bar_Destinations,
                 selectedItem = navigationActions.currentRoute())
-          })
+          },
+          currentUser)
     }
     composeTestRule.onNodeWithTag("TopAppBar").assertIsDisplayed()
     composeTestRule.onNodeWithTag("profileIconButton").assertIsDisplayed()
@@ -78,7 +96,8 @@ class ListChatScreenTest {
                 onTabSelect = { destination -> navigationActions.navigateTo(destination) },
                 tabList = List_Navigation_Bar_Destinations,
                 selectedItem = navigationActions.currentRoute())
-          })
+          },
+          currentUser)
     }
     composeTestRule.onNodeWithTag("TopAppBar").assertIsDisplayed()
     composeTestRule.onNodeWithTag("profileIconButton").assertIsDisplayed()
@@ -98,7 +117,14 @@ class ListChatScreenTest {
       ListChatScreen(
           placeHolderData,
           navigationActions,
-          { TopAppBarComponent(Modifier, navigationActions, "Messages") })
+          { TopAppBarComponent(Modifier, navigationActions, "Messages") },
+          {
+            BottomNavigationMenu(
+                onTabSelect = { destination -> navigationActions.navigateTo(destination) },
+                tabList = List_Navigation_Bar_Destinations,
+                selectedItem = navigationActions.currentRoute())
+          },
+          currentUser)
     }
     composeTestRule.onNodeWithTag("profileIconButton").assertHasClickAction()
   }
@@ -108,7 +134,17 @@ class ListChatScreenTest {
     composeTestRule.setContent {
       val navController = rememberNavController()
       val navigationActions = NavigationActions(navController)
-      ListChatScreen(placeHolderData, navigationActions)
+      ListChatScreen(
+          placeHolderData,
+          navigationActions,
+          { TopAppBarComponent(Modifier, navigationActions, "Messages") },
+          {
+            BottomNavigationMenu(
+                onTabSelect = { destination -> navigationActions.navigateTo(destination) },
+                tabList = List_Navigation_Bar_Destinations,
+                selectedItem = navigationActions.currentRoute())
+          },
+          currentUser)
     }
     val messageNodes = composeTestRule.onAllNodesWithTag("chat_messageBox")
     assert(messageNodes.fetchSemanticsNodes().isNotEmpty())

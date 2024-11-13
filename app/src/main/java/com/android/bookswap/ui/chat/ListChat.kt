@@ -30,7 +30,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.android.bookswap.model.chat.MessageBox
+import com.android.bookswap.data.DataUser
+import com.android.bookswap.data.MessageBox
 import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.navigation.Screen
 import com.android.bookswap.ui.theme.ColorVariable
@@ -42,7 +43,8 @@ fun ListChatScreen(
     placeHolderData: List<MessageBox> = emptyList(),
     navigationActions: NavigationActions,
     topAppBar: @Composable () -> Unit = {},
-    bottomAppBar: @Composable () -> Unit = {}
+    bottomAppBar: @Composable () -> Unit = {},
+    currentUser: DataUser
 ) {
   Scaffold(
       modifier = Modifier.testTag("chat_listScreen"),
@@ -69,7 +71,7 @@ fun ListChatScreen(
                 items(placeHolderData.size) { message ->
                   MessageBoxDisplay(placeHolderData[message]) {
                     navigationActions.navigateTo(
-                        Screen.CHAT, "user123", placeHolderData[message].contactName)
+                        Screen.CHAT, currentUser, placeHolderData[message].contact)
                   }
                   MessageDivider()
                 }
@@ -103,7 +105,7 @@ fun MessageBoxDisplay(message: MessageBox, onClick: () -> Unit = {}) {
               modifier = Modifier.fillMaxWidth(),
               horizontalArrangement = Arrangement.SpaceBetween) {
                 Text(
-                    text = message.contactName,
+                    text = message.contact.firstName + " " + message.contact.lastName,
                     fontWeight = FontWeight.Medium,
                     fontSize = 18.sp,
                     color = ColorVariable.Accent,

@@ -1,6 +1,7 @@
 package com.android.bookswap
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
@@ -8,7 +9,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTag
 import androidx.navigation.compose.NavHost
@@ -16,6 +16,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
 import com.android.bookswap.data.DataUser
+import com.android.bookswap.data.MessageBox
 import com.android.bookswap.data.repository.BooksRepository
 import com.android.bookswap.data.repository.MessageRepository
 import com.android.bookswap.data.repository.UsersRepository
@@ -23,7 +24,6 @@ import com.android.bookswap.data.source.network.BooksFirestoreRepository
 import com.android.bookswap.data.source.network.MessageFirestoreSource
 import com.android.bookswap.data.source.network.UserFirestoreSource
 import com.android.bookswap.model.UserViewModel
-import com.android.bookswap.model.chat.MessageBox
 import com.android.bookswap.model.chat.PermissionHandler
 import com.android.bookswap.model.map.BookFilter
 import com.android.bookswap.model.map.DefaultGeolocation
@@ -96,15 +96,51 @@ class MainActivity : ComponentActivity() {
     val navigationActions = NavigationActions(navController)
     val bookFilter = BookFilter()
     val userVM = UserViewModel(UUID.randomUUID(), userRepository)
+    val currentUserUUID = UUID.fromString("550e8400-e29b-41d4-a716-446655440000")
+    val otherUserUUID = UUID.fromString("550e8400-e29b-41d4-a716-446655440001")
+    val currentUser =
+        DataUser(
+            currentUserUUID,
+            "Hello",
+            "Jaime",
+            "Oliver Pastor",
+            "",
+            "",
+            42.5717,
+            0.5471,
+            "https://media.istockphoto.com/id/693813718/photo/the-fortress-of-jaca-soain.jpg?s=612x612&w=0&k=20&c=MdnKl1VJIKQRwGdrGwBFx_L00vS8UVphR9J-nS6J90c=",
+            emptyList(),
+            "googleUid")
+
+    val otherUser =
+        DataUser(
+            otherUserUUID,
+            "Hey",
+            "Théo",
+            "Schlaeppi",
+            "",
+            "",
+            46.3,
+            6.43,
+            "https://www.shutterstock.com/image-photo/wonderful-epesses-fairtytale-village-middle-600nw-2174791585.jpg",
+            emptyList(),
+            "googleUid")
     val placeHolder =
-        listOf(
-            MessageBox(
-                contactName = "user124",
-                message = "Welcome message for user124",
-                date = "01.01.24")) +
+        listOf(MessageBox(otherUser, message = "Welcome message for user124", date = "01.01.24")) +
             List(6) {
               MessageBox(
-                  contactName = "Contact ${it + 1}",
+                  DataUser(
+                      UUID.randomUUID(),
+                      "Hello",
+                      "First ${it + 1}",
+                      "Last ${it + 1}",
+                      "",
+                      "",
+                      0.0,
+                      0.0,
+                      "",
+                      emptyList(),
+                      "googleUid"),
                   message = "Test message $it test for the feature of ellipsis in the message",
                   date = "01.01.24")
             }
@@ -133,13 +169,19 @@ class MainActivity : ComponentActivity() {
               placeHolder,
               navigationActions,
               topAppBar = { topAppBar("Messages") },
-              bottomAppBar = { bottomAppBar(this@navigation.route ?: "") })
+              bottomAppBar = { bottomAppBar(this@navigation.route ?: "") },
+              currentUser)
         }
         composable("${Screen.CHAT}/{user1}/{user2}") { backStackEntry ->
-          val user1 = backStackEntry.arguments?.getString("user1") ?: ""
-          val user2 = backStackEntry.arguments?.getString("user2") ?: ""
-          ChatScreen(
-              messageRepository, UUID.fromString(user1), UUID.fromString(user2), navigationActions)
+          val user1UUID = UUID.fromString(backStackEntry.arguments?.getString("user1") ?: "")
+          val user2UUID = UUID.fromString(backStackEntry.arguments?.getString("user2") ?: "")
+          val user1 = placeHolder.firstOrNull { it.contact.userUUID == user1UUID }?.contact
+          val user2 = placeHolder.firstOrNull { it.contact.userUUID == user2UUID }?.contact
+          if (user1 != null && user2 != null) {
+            ChatScreen(messageRepository, user1, user2, navigationActions)
+          } else {
+            Log.e("MainActivity", "User not found in placeholder list")
+          }
         }
       }
       navigation(startDestination = Screen.MAP, route = Route.MAP) {
