@@ -28,7 +28,6 @@ class ListChatScreenTest {
   @get:Rule val composeTestRule = createComposeRule()
   private lateinit var placeHolderData: List<MessageBox>
   private lateinit var placeHolderDataEmpty: List<MessageBox>
-  private val currentUserUUID = UUID.randomUUID()
 
   @Before
   fun setUp() {
