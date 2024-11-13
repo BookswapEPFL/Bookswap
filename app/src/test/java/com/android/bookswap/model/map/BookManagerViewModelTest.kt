@@ -126,27 +126,33 @@ class BookManagerViewModelTest {
           ->
           0.0
         }
+      bookManagerViewModel.startUpdatingBooks()
     bookManagerViewModel.filteredBooks.first { it != emptyList<DataBook>() }
     assertEquals(books, bookManagerViewModel.filteredBooks.value)
     assertEquals(userBooksWithLocation, bookManagerViewModel.filteredUsers.value)
+      bookManagerViewModel.stopUpdatingBooks()
   }
 
   @Test
   fun returnFilteredListOfBooks() = runTest {
     bookManagerViewModel =
         BookManagerViewModel(mockGeolocation1, mockBookRepository, users, mockBookFilter, sortingTest)
+      bookManagerViewModel.startUpdatingBooks()
     bookManagerViewModel.filteredBooks.first { it != emptyList<DataBook>() }
     assertEquals(listOf(book3), bookManagerViewModel.filteredBooks.value)
     assertEquals(filteredBooksWithLocation, bookManagerViewModel.filteredUsers.value)
+      bookManagerViewModel.stopUpdatingBooks()
   }
 
   @Test
   fun sortTheUsers() = runTest {
     bookManagerViewModel =
         BookManagerViewModel(mockGeolocation2, mockBookRepository, users, mockBookFilterEmpty, sortingTest)
-    bookManagerViewModel.filteredBooks.first { it != emptyList<DataBook>() }
+      bookManagerViewModel.startUpdatingBooks()
+      bookManagerViewModel.filteredBooks.first { it != emptyList<DataBook>() }
     assertEquals(listOf(book1, book2, book3), bookManagerViewModel.filteredBooks.value)
     assertEquals(
         listOf(userBooksWithLocation1, userBooksWithLocation2), bookManagerViewModel.filteredUsers.value)
+      bookManagerViewModel.stopUpdatingBooks()
   }
 }

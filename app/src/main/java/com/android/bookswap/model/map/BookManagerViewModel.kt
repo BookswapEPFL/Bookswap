@@ -54,16 +54,20 @@ class BookManagerViewModel(
 
   private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
-  init {
-    scope.launch {
-      while (true) {
-        fetchBooksFromRepository()
-        delay(REFRESH_TIME_PERIOD)
-      }
+    fun startUpdatingBooks(){
+        scope.launch {
+            while (true) {
+                fetchBooksFromRepository()
+                delay(REFRESH_TIME_PERIOD)
+            }
+        }
+        computeDistanceOfUsers()
+        combineFlowsAndFilterBooks()
     }
-    computeDistanceOfUsers()
-    combineFlowsAndFilterBooks()
-  }
+
+    fun stopUpdatingBooks(){
+        scope.cancel()
+    }
 
   // Fetch books from the repository and update `_allBooks`
   private fun fetchBooksFromRepository() {

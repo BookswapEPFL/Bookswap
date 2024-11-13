@@ -93,14 +93,16 @@ fun MapScreen(
   // Get the user's current location
   val latitude = geolocation.latitude.collectAsState()
   val longitude = geolocation.longitude.collectAsState()
-  // Start location updates
+  // Start location and books updates
   LaunchedEffect(Unit) {
+      bookManagerViewModel.startUpdatingBooks()
     geolocation.startLocationUpdates()
     cameraPositionState.position =
         CameraPosition.fromLatLngZoom(LatLng(latitude.value, longitude.value), INIT_ZOOM)
   }
-  // Stop location updates when the screen is disposed
-  DisposableEffect(Unit) { onDispose { geolocation.stopLocationUpdates() } }
+  // Stop location and books updates when the screen is disposed
+  DisposableEffect(Unit) { onDispose { geolocation.stopLocationUpdates()
+  bookManagerViewModel.stopUpdatingBooks()} }
 
   var mutableStateSelectedUser by remember { mutableStateOf(selectedUser) }
   var markerScreenPosition by remember { mutableStateOf<Offset?>(null) }
