@@ -5,7 +5,6 @@ import androidx.annotation.VisibleForTesting
 import com.android.bookswap.data.BookLanguages
 import com.android.bookswap.data.DataBook
 import com.android.bookswap.utils.getJSONArrayOrNull
-import com.android.bookswap.utils.getJSONObjectOrNull
 import com.android.bookswap.utils.getStringOrNull
 import com.android.volley.Request
 import com.android.volley.VolleyError
@@ -79,7 +78,7 @@ class GoogleBookDataSource(context: Context) {
               item.getJSONArrayOrNull("authors")?.getStringOrNull(0),
               item.getStringOrNull("description"),
               null,
-              item.getJSONObjectOrNull("imageLinks")?.getStringOrNull("thumbnail"),
+              null,
               language ?: BookLanguages.OTHER,
               identifier))
     } catch (exception: Exception) {

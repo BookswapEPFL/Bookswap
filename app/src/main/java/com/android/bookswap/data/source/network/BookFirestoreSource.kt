@@ -120,7 +120,7 @@ class BooksFirestoreRepository(private val db: FirebaseFirestore) : BooksReposit
       val author = document.getString("author")
       val description = document.getString("description")
       val rating = document.getLong("rating")
-        val photo = document.get("photo") as? UUID
+      val photo = document.get("photo") as? UUID
       val isbn = document.getString("isbn")
       val languageBook = BookLanguages.valueOf(document.getString("language") ?: return null)
       val genres = document.get("genres") as? List<String> ?: emptyList()
@@ -132,17 +132,16 @@ class BooksFirestoreRepository(private val db: FirebaseFirestore) : BooksReposit
               null
             }
           }
-        DataBook(
-            UUID(mostSignificantBits, leastSignificantBits),
-            title,
-            author,
-            description,
-            rating?.toInt(),
-            photo,
-            languageBook,
-            isbn,
-            bookGenres
-        )
+      DataBook(
+          UUID(mostSignificantBits, leastSignificantBits),
+          title,
+          author,
+          description,
+          rating?.toInt(),
+          photo,
+          languageBook,
+          isbn,
+          bookGenres)
     } catch (e: Exception) {
       null // Return null in case of any exception during the conversion
     }

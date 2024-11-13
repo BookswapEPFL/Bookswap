@@ -1,7 +1,5 @@
 package com.android.bookswap.data
 
-import android.net.Uri
-import java.util.Base64
 import java.util.UUID
 
 data class DataPhoto(

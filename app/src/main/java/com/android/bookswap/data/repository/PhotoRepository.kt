@@ -1,5 +1,6 @@
 import android.graphics.Bitmap
 import com.android.bookswap.data.DataPhoto
+import java.util.UUID
 
 interface PhotoRepository {
   /** Generates a new unique id for a message */
@@ -45,4 +46,11 @@ interface PhotoRepository {
    * @param callback callback function that receives Unit if success or an an exception if error.
    */
   fun addPhoto(dataPhoto: DataPhoto, callback: (Result<Unit>) -> Unit)
+  /**
+   * Converts a URL to a Bitmap.
+   *
+   * @param urlString The URL of the image to convert.
+   * @return The Bitmap representation of the image, or null if conversion fails.
+   */
+  fun urlToBitmap(urlString: String): Bitmap?
 }

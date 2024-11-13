@@ -193,7 +193,7 @@ fun AddToBookScreen(
                       focusedLabelColor = Secondary, // Custom green for focused label
                       unfocusedLabelColor = Secondary // Lighter color for unfocused label
                       ))
-            //TODO: Add a photo picker here
+          // TODO: Add a photo picker here
 
           // Language Input Field
           OutlinedTextField(
@@ -232,8 +232,6 @@ fun AddToBookScreen(
                           language,
                           isbn,
                           listOf(selectedGenre!!),
-                          publicationDate = "", // Provide appropriate value
-                          publisher = "" // Provide appropriate value
                       )
                   if (book == null) {
                     Toast.makeText(context, "Invalid argument", Toast.LENGTH_SHORT).show()
@@ -253,7 +251,9 @@ fun AddToBookScreen(
               }
         }
       })
-}fun createDataBook(
+}
+
+fun createDataBook(
     context: Context,
     uuid: UUID,
     title: String,
@@ -264,96 +264,80 @@ fun AddToBookScreen(
     bookLanguageStr: String,
     isbn: String,
     genres: List<BookGenres>,
-    publicationDate: String, // New field
-    publisher: String // New field
 ): DataBook? {
-    // Validate UUID
-    if (uuid.toString().isBlank()) {
-        Log.e("AddToBookScreen", "UUID cannot be empty.")
-        Toast.makeText(context, "UUID cannot be empty.", Toast.LENGTH_LONG).show()
-        return null
-    }
+  // Validate UUID
+  if (uuid.toString().isBlank()) {
+    Log.e("AddToBookScreen", "UUID cannot be empty.")
+    Toast.makeText(context, "UUID cannot be empty.", Toast.LENGTH_LONG).show()
+    return null
+  }
 
-    // Validate Title
-    if (title.isBlank()) {
-        Log.e("AddToBookScreen", "Title cannot be empty.")
-        Toast.makeText(context, "Title cannot be empty.", Toast.LENGTH_LONG).show()
-        return null
-    }
+  // Validate Title
+  if (title.isBlank()) {
+    Log.e("AddToBookScreen", "Title cannot be empty.")
+    Toast.makeText(context, "Title cannot be empty.", Toast.LENGTH_LONG).show()
+    return null
+  }
 
-    // Validate Author
-    if (author.isBlank()) {
-        Log.e("AddToBookScreen", "Author cannot be empty.")
-        Toast.makeText(context, "Author cannot be empty.", Toast.LENGTH_LONG).show()
-        return null
-    }
+  // Validate Author
+  if (author.isBlank()) {
+    Log.e("AddToBookScreen", "Author cannot be empty.")
+    Toast.makeText(context, "Author cannot be empty.", Toast.LENGTH_LONG).show()
+    return null
+  }
 
-    // Validate Rating
-    val rating: Int =
-        try {
-            ratingStr.toInt().also {
-                if (it !in 0..5) {
-                    Log.e("AddToBookScreen", "Rating must be between 0 and 5.")
-                    Toast.makeText(context, "Rating must be between 0 and 5.", Toast.LENGTH_LONG).show()
-                    return null
-                }
-            }
-        } catch (e: NumberFormatException) {
-            Log.e("AddToBookScreen", "Rating must be a valid number.")
-            Toast.makeText(context, "Rating must be a valid number.", Toast.LENGTH_LONG).show()
+  // Validate Rating
+  val rating: Int =
+      try {
+        ratingStr.toInt().also {
+          if (it !in 0..5) {
+            Log.e("AddToBookScreen", "Rating must be between 0 and 5.")
+            Toast.makeText(context, "Rating must be between 0 and 5.", Toast.LENGTH_LONG).show()
             return null
+          }
         }
-
-    // Validate Photo (assuming basic validation here, just checking if not empty)
-    if (photo.isBlank()) {
-        Log.e("AddToBookScreen", "Photo URL cannot be empty.")
-        Toast.makeText(context, "Photo URL cannot be empty.", Toast.LENGTH_LONG).show()
+      } catch (e: NumberFormatException) {
+        Log.e("AddToBookScreen", "Rating must be a valid number.")
+        Toast.makeText(context, "Rating must be a valid number.", Toast.LENGTH_LONG).show()
         return null
-    }
+      }
 
-    // Validate Language
-    val languages: BookLanguages =
-        try {
-            BookLanguages.valueOf(bookLanguageStr.uppercase())
-        } catch (e: IllegalArgumentException) {
-            Log.e(
-                "AddToBookScreen",
-                "Invalid language: $bookLanguageStr. Please use one of the supported languages.")
-            Toast.makeText(context, "Invalid language: $bookLanguageStr.", Toast.LENGTH_LONG).show()
-            return null
-        }
+  // Validate Photo (assuming basic validation here, just checking if not empty)
+  if (photo.isBlank()) {
+    Log.e("AddToBookScreen", "Photo URL cannot be empty.")
+    Toast.makeText(context, "Photo URL cannot be empty.", Toast.LENGTH_LONG).show()
+    return null
+  }
 
-    // Validate ISBN
-    if (isbn.isBlank()) {
-        Log.e("AddToBookScreen", "ISBN cannot be empty.")
-        Toast.makeText(context, "ISBN cannot be empty.", Toast.LENGTH_LONG).show()
+  // Validate Language
+  val languages: BookLanguages =
+      try {
+        BookLanguages.valueOf(bookLanguageStr.uppercase())
+      } catch (e: IllegalArgumentException) {
+        Log.e(
+            "AddToBookScreen",
+            "Invalid language: $bookLanguageStr. Please use one of the supported languages.")
+        Toast.makeText(context, "Invalid language: $bookLanguageStr.", Toast.LENGTH_LONG).show()
         return null
-    }
+      }
 
-    // Validate Publication Date
-    if (publicationDate.isBlank()) {
-        Log.e("AddToBookScreen", "Publication Date cannot be empty.")
-        Toast.makeText(context, "Publication Date cannot be empty.", Toast.LENGTH_LONG).show()
-        return null
-    }
+  // Validate ISBN
+  if (isbn.isBlank()) {
+    Log.e("AddToBookScreen", "ISBN cannot be empty.")
+    Toast.makeText(context, "ISBN cannot be empty.", Toast.LENGTH_LONG).show()
+    return null
+  }
 
-    // Validate Publisher
-    if (publisher.isBlank()) {
-        Log.e("AddToBookScreen", "Publisher cannot be empty.")
-        Toast.makeText(context, "Publisher cannot be empty.", Toast.LENGTH_LONG).show()
-        return null
-    }
-
-    // If all validations pass, return a new DataBook instance
-    return DataBook(
-        uuid = uuid,
-        title = title,
-        author = author,
-        description = description,
-        rating = rating,
-        photo = UUID.fromString(photo),
-        language = languages,
-        isbn = isbn,
-        genres = genres,
-    )
+  // If all validations pass, return a new DataBook instance
+  return DataBook(
+      uuid = uuid,
+      title = title,
+      author = author,
+      description = description,
+      rating = rating,
+      photo = UUID.fromString(photo),
+      language = languages,
+      isbn = isbn,
+      genres = genres,
+  )
 }

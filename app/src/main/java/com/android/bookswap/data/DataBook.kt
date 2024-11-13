@@ -23,7 +23,7 @@ data class DataBook(
     val photo: UUID?,
     val language: BookLanguages,
     val isbn: String?,
-    val genres: List<BookGenres> = emptyList(),
+    val genres: List<BookGenres> = emptyList()
 )
 
 /** All supported book language type */

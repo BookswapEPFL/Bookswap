@@ -39,7 +39,6 @@ import androidx.compose.ui.unit.dp
 import com.android.bookswap.data.BookGenres
 import com.android.bookswap.data.DataBook
 import com.android.bookswap.data.source.network.BooksFirestoreRepository
-import com.android.bookswap.model.PhotoViewModel
 import com.android.bookswap.ui.books.add.createDataBook
 import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.theme.ColorVariable
@@ -55,7 +54,6 @@ private const val COLUMN_WIDTH_RATIO = 0.9f // Column width as 90% of screen wid
 fun EditBookScreen(
     booksRepository: BooksFirestoreRepository,
     navigationActions: NavigationActions,
-    photoViewModel: PhotoViewModel,
     book: DataBook
 ) {
 
@@ -266,20 +264,18 @@ fun EditBookScreen(
                         if (genres.isEmpty())
                             throw IllegalArgumentException("Genres cannot be empty")
 
-                          val updatedBook =
-                              createDataBook(
-                                  context = context,
-                                  uuid = book.uuid,
-                                  title = title,
-                                  author = author,
-                                  description = description,
-                                  ratingStr = rating,
-                                  photo = book.photo.toString(),
-                                  bookLanguageStr = language,
-                                  isbn = book.isbn,
-                                  publicationDate = "",
-                                  publisher = "",
-                                  genres = genres)
+                        val updatedBook =
+                            createDataBook(
+                                context = context,
+                                uuid = book.uuid,
+                                title = title,
+                                author = author,
+                                description = description,
+                                ratingStr = rating,
+                                photo = book.photo.toString(),
+                                bookLanguageStr = language,
+                                isbn = book.isbn,
+                                genres = genres)
 
                         booksRepository.updateBook(
                             updatedBook!!,

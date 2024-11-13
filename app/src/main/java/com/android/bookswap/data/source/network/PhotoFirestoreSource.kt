@@ -1,11 +1,11 @@
 package com.android.bookswap.data.source.network
 
+import PhotoRepository
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.util.Base64
 import android.util.Log
 import com.android.bookswap.data.DataPhoto
-import com.android.bookswap.data.repository.PhotoRepository
 import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
@@ -121,6 +121,10 @@ class PhotoFirestoreSource(private val db: FirebaseFirestore) : PhotoRepository 
           Log.e("PhotoFirestoreRepository", "Failed to add photo: ${e.message}", e)
           callback(Result.failure(e))
         })
+  }
+
+  override fun urlToBitmap(urlString: String): Bitmap? {
+    TODO("Not yet implemented")
   }
 
   /**

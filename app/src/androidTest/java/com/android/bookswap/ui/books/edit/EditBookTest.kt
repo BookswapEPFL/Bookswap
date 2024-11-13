@@ -36,7 +36,7 @@ class EditBookScreenTest {
           author = "Sample Author",
           description = "Sample Description",
           rating = 4,
-          photo = "sample_photo_url",
+          photo = null,
           language = BookLanguages.ENGLISH,
           isbn = "123456789",
           genres = listOf(BookGenres.FANTASY))
@@ -141,7 +141,6 @@ class EditBookScreenTest {
     composeTestRule
         .onNodeWithTag("inputBookDescription")
         .assertTextContains(sampleBook.description ?: "")
-    composeTestRule.onNodeWithTag("inputBookPhoto").assertTextContains(sampleBook.photo ?: "")
     composeTestRule
         .onNodeWithTag("inputBookLanguage")
         .assertTextContains(sampleBook.language.toString())
