@@ -11,10 +11,12 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollToIndex
 import androidx.compose.ui.test.performSemanticsAction
 import androidx.compose.ui.test.performTextClearance
 import androidx.compose.ui.test.performTextInput
 import com.android.bookswap.data.DataMessage
+import com.android.bookswap.data.MessageType
 import com.android.bookswap.data.repository.MessageRepository
 import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.theme.ColorVariable
@@ -23,17 +25,17 @@ import io.mockk.mockk
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import java.util.UUID
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
 class ChatScreenTest {
-
   @get:Rule val composeTestRule = createComposeRule()
   private lateinit var placeHolderData: List<DataMessage>
   private lateinit var mockMessageRepository: MessageRepository
-  private val currentUserId = "current-user-id"
-  private val otherUserId = "other-user-id"
+  private val currentUserUUID = UUID.randomUUID()
+  private val otherUserUUID = UUID.randomUUID()
   private lateinit var mockNavigationActions: NavigationActions
 
   @Before
@@ -41,15 +43,27 @@ class ChatScreenTest {
     mockNavigationActions = mockk()
     placeHolderData =
         List(6) {
-          DataMessage(
-              id = it.toString(),
-              senderId = "current-user-id",
-              receiverId = "other-user-id",
-              text = "Test message $it",
-              timestamp = it.toLong())
-        }
+              DataMessage(
+                  messageType = MessageType.TEXT,
+                  uuid = UUID.randomUUID(),
+                  senderUUID = currentUserUUID,
+                  receiverUUID = otherUserUUID,
+                  text = "Test message $it",
+                  timestamp = it.toLong())
+            }
+            .toMutableList()
+    (placeHolderData as MutableList<DataMessage>).add(
+        DataMessage(
+            messageType = MessageType.IMAGE,
+            uuid = imageTestMessageUUID,
+            senderUUID = currentUserUUID,
+            receiverUUID = otherUserUUID,
+            text = "Test message 101",
+            timestamp = 101L))
     mockMessageRepository =
-        MockMessageFirestoreSource().apply { messages = placeHolderData.toMutableList() }
+        MockMessageFirestoreSource().apply {
+          messages = placeHolderData as MutableList<DataMessage>
+        }
   }
 
   private val palette =
@@ -73,8 +87,8 @@ class ChatScreenTest {
     composeTestRule.setContent {
       ChatScreen(
           messageRepository = mockMessageRepository,
-          currentUserId = currentUserId,
-          otherUserId = otherUserId,
+          currentUserUUID = currentUserUUID,
+          otherUserUUID = otherUserUUID,
           mockNavigationActions)
     }
     composeTestRule.onNodeWithTag("message_input_field").assertIsDisplayed()
@@ -89,35 +103,59 @@ class ChatScreenTest {
     composeTestRule.setContent {
       ChatScreen(
           messageRepository = mockMessageRepository,
-          currentUserId = currentUserId,
-          otherUserId = otherUserId,
+          currentUserUUID = currentUserUUID,
+          otherUserUUID = otherUserUUID,
           mockNavigationActions)
     }
     composeTestRule.onNodeWithTag("message_input_field").assertIsDisplayed()
     composeTestRule.onNodeWithTag("send_button").assertIsDisplayed()
     placeHolderData.forEach { message ->
-      composeTestRule.waitUntil {
+      if (message.uuid != imageTestMessageUUID) {
+        composeTestRule.waitUntil {
+          composeTestRule
+              .onAllNodesWithTag("message_item ${message.uuid}", useUnmergedTree = true)
+              .fetchSemanticsNodes()
+              .isNotEmpty()
+        }
         composeTestRule
-            .onAllNodesWithTag("message_item ${message.id}", useUnmergedTree = true)
-            .fetchSemanticsNodes()
-            .isNotEmpty()
+            .onNodeWithTag("message_item ${message.uuid}", useUnmergedTree = true)
+            .assertIsDisplayed()
+        composeTestRule
+            .onNodeWithTag("message_text ${message.uuid}", useUnmergedTree = true)
+            .assertIsDisplayed()
+        composeTestRule
+            .onNodeWithTag("message_text ${message.uuid}", useUnmergedTree = true)
+            .assertTextEquals(message.text)
+        composeTestRule
+            .onNodeWithTag("message_timestamp ${message.uuid}", useUnmergedTree = true)
+            .assertIsDisplayed()
+        composeTestRule
+            .onNodeWithTag("message_timestamp ${message.uuid}", useUnmergedTree = true)
+            .assertTextEquals(formatTimestamp(message.timestamp))
       }
-      composeTestRule
-          .onNodeWithTag("message_item ${message.id}", useUnmergedTree = true)
-          .assertIsDisplayed()
-      composeTestRule
-          .onNodeWithTag("message_text ${message.id}", useUnmergedTree = true)
-          .assertIsDisplayed()
-      composeTestRule
-          .onNodeWithTag("message_text ${message.id}", useUnmergedTree = true)
-          .assertTextEquals(message.text)
-      composeTestRule
-          .onNodeWithTag("message_timestamp ${message.id}", useUnmergedTree = true)
-          .assertIsDisplayed()
-      composeTestRule
-          .onNodeWithTag("message_timestamp ${message.id}", useUnmergedTree = true)
-          .assertTextEquals(formatTimestamp(message.timestamp))
     }
+  }
+
+  @Test
+  fun CheckLastMessageIsImage() {
+    val mockMessageRepository =
+        MockMessageFirestoreSource().apply { messages = placeHolderData.toMutableList() }
+
+    composeTestRule.setContent {
+      ChatScreen(
+          messageRepository = mockMessageRepository,
+          currentUserUUID = currentUserUUID,
+          otherUserUUID = otherUserUUID,
+          mockNavigationActions)
+    }
+
+    composeTestRule
+        .onNodeWithTag("column", useUnmergedTree = true)
+        .performScrollToIndex(mockMessageRepository.messages.size - 1)
+
+    composeTestRule
+        .onNodeWithTag("hobbit", useUnmergedTree = true)
+        .assertExists("The last message should be an image with the test tag 'hobbit'")
   }
 
   @Test
@@ -125,8 +163,8 @@ class ChatScreenTest {
     composeTestRule.setContent {
       ChatScreen(
           messageRepository = mockMessageRepository,
-          currentUserId = currentUserId,
-          otherUserId = otherUserId,
+          currentUserUUID = currentUserUUID,
+          otherUserUUID = otherUserUUID,
           mockNavigationActions)
     }
     composeTestRule.onNodeWithTag("send_button").assertHasClickAction()
@@ -137,8 +175,8 @@ class ChatScreenTest {
     composeTestRule.setContent {
       ChatScreen(
           messageRepository = mockMessageRepository,
-          currentUserId = currentUserId,
-          otherUserId = otherUserId,
+          currentUserUUID = currentUserUUID,
+          otherUserUUID = otherUserUUID,
           mockNavigationActions)
     }
     val testInput = "Hello, World!"
@@ -148,14 +186,14 @@ class ChatScreenTest {
 
   @Test
   fun testSendMessage() {
-    val testMessageId = "test-message-id"
-    val mockMessageRepository = MockMessageFirestoreSource().apply { mockNewUid = testMessageId }
+    val testMessageId = UUID.randomUUID()
+    val mockMessageRepository = MockMessageFirestoreSource().apply { mockNewUUID = testMessageId }
 
     composeTestRule.setContent {
       ChatScreen(
           messageRepository = mockMessageRepository,
-          currentUserId = currentUserId,
-          otherUserId = otherUserId,
+          currentUserUUID = currentUserUUID,
+          otherUserUUID = otherUserUUID,
           mockNavigationActions)
     }
 
@@ -165,11 +203,11 @@ class ChatScreenTest {
     composeTestRule.onNodeWithTag("send_button").performClick()
 
     // Verify that the message was sent
-    val sentMessage = mockMessageRepository.messages.find { it.id == testMessageId }
+    val sentMessage = mockMessageRepository.messages.find { it.uuid == testMessageId }
     assert(sentMessage != null) { "Message was not sent" }
     assert(sentMessage?.text == testInput) { "Message text does not match" }
-    assert(sentMessage?.senderId == currentUserId) { "Sender ID does not match" }
-    assert(sentMessage?.receiverId == otherUserId) { "Receiver ID does not match" }
+    assert(sentMessage?.senderUUID == currentUserUUID) { "Sender UUID does not match" }
+    assert(sentMessage?.receiverUUID == otherUserUUID) { "Receiver UUID does not match" }
   }
 
   @Test
@@ -177,14 +215,14 @@ class ChatScreenTest {
     composeTestRule.setContent {
       ChatScreen(
           messageRepository = mockMessageRepository,
-          currentUserId = currentUserId,
-          otherUserId = otherUserId,
+          currentUserUUID = currentUserUUID,
+          otherUserUUID = otherUserUUID,
           mockNavigationActions)
     }
 
     composeTestRule.onNodeWithTag("chatTopAppBar").assertIsDisplayed()
     composeTestRule.onNodeWithTag("chatName").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("chatName").assertTextEquals(otherUserId)
+    composeTestRule.onNodeWithTag("chatName").assertTextEquals(otherUserUUID.toString())
     composeTestRule.onNodeWithTag("profileIcon", useUnmergedTree = true).assertIsDisplayed()
   }
 
@@ -193,8 +231,8 @@ class ChatScreenTest {
     composeTestRule.setContent {
       ChatScreen(
           messageRepository = mockMessageRepository,
-          currentUserId = currentUserId,
-          otherUserId = otherUserId,
+          currentUserUUID = currentUserUUID,
+          otherUserUUID = otherUserUUID,
           navController = mockNavigationActions)
     }
 
@@ -202,7 +240,7 @@ class ChatScreenTest {
 
     val messageNode =
         composeTestRule.onNodeWithTag(
-            "message_item ${placeHolderData.first().id}", useUnmergedTree = true)
+            "message_item ${placeHolderData.first().uuid}", useUnmergedTree = true)
     messageNode.assertExists("Message item not found")
 
     messageNode.performSemanticsAction(SemanticsActions.OnLongClick)
@@ -233,14 +271,14 @@ class ChatScreenTest {
     composeTestRule.setContent {
       ChatScreen(
           messageRepository = mockMessageRepository,
-          currentUserId = currentUserId,
-          otherUserId = otherUserId,
+          currentUserUUID = currentUserUUID,
+          otherUserUUID = otherUserUUID,
           mockNavigationActions)
     }
 
     val message = placeHolderData.first()
     val messageNode =
-        composeTestRule.onNodeWithTag("message_item ${message.id}", useUnmergedTree = true)
+        composeTestRule.onNodeWithTag("message_item ${message.uuid}", useUnmergedTree = true)
     messageNode.assertExists("Message item not found")
 
     messageNode.performSemanticsAction(SemanticsActions.OnLongClick)
@@ -254,18 +292,18 @@ class ChatScreenTest {
 
     composeTestRule.onNodeWithTag("deleteButton", useUnmergedTree = true).performClick()
 
-    val deletedMessage = mockMessageRepository.messages.find { it.id == message.id }
+    val deletedMessage = mockMessageRepository.messages.find { it.uuid == message.uuid }
     assert(deletedMessage == null) { "Message was not deleted" }
 
     composeTestRule.waitUntil(timeoutMillis = 5000) {
       composeTestRule
-          .onAllNodesWithTag("message_item ${message.id}", useUnmergedTree = true)
+          .onAllNodesWithTag("message_item ${message.uuid}", useUnmergedTree = true)
           .fetchSemanticsNodes()
           .isEmpty()
     }
 
     composeTestRule
-        .onNodeWithTag("message_item ${message.id}", useUnmergedTree = true)
+        .onNodeWithTag("message_item ${message.uuid}", useUnmergedTree = true)
         .assertDoesNotExist()
   }
 
@@ -277,8 +315,8 @@ class ChatScreenTest {
     composeTestRule.setContent {
       ChatScreen(
           messageRepository = mockMessageRepository,
-          currentUserId = currentUserId,
-          otherUserId = otherUserId,
+          currentUserUUID = currentUserUUID,
+          otherUserUUID = otherUserUUID,
           navController = mockNavigationActions)
     }
 
@@ -286,7 +324,7 @@ class ChatScreenTest {
     val newText = "Updated message text"
 
     val messageNode =
-        composeTestRule.onNodeWithTag("message_item ${message.id}", useUnmergedTree = true)
+        composeTestRule.onNodeWithTag("message_item ${message.uuid}", useUnmergedTree = true)
     messageNode.assertExists("Message item not found")
 
     messageNode.performSemanticsAction(SemanticsActions.OnLongClick)
@@ -313,17 +351,17 @@ class ChatScreenTest {
     composeTestRule.onNodeWithTag("send_button", useUnmergedTree = true).performClick()
 
     composeTestRule.waitUntil(timeoutMillis = 5000) {
-      mockMessageRepository.messages.find { it.id == message.id }?.text == newText
+      mockMessageRepository.messages.find { it.uuid == message.uuid }?.text == newText
     }
 
-    val updatedMessage = mockMessageRepository.messages.find { it.id == message.id }
+    val updatedMessage = mockMessageRepository.messages.find { it.uuid == message.uuid }
     assert(updatedMessage != null && updatedMessage.text == newText) {
       "Message was not updated correctly"
     }
 
     composeTestRule.waitUntil(timeoutMillis = 5000) {
       composeTestRule
-          .onNodeWithTag("message_text ${message.id}", useUnmergedTree = true)
+          .onNodeWithTag("message_text ${message.uuid}", useUnmergedTree = true)
           .fetchSemanticsNode()
           .config
           .getOrNull(SemanticsProperties.Text)
@@ -331,7 +369,7 @@ class ChatScreenTest {
     }
 
     composeTestRule
-        .onNodeWithTag("message_text ${message.id}", useUnmergedTree = true)
+        .onNodeWithTag("message_text ${message.uuid}", useUnmergedTree = true)
         .assertTextEquals(newText)
 
     composeTestRule
@@ -340,12 +378,50 @@ class ChatScreenTest {
   }
 
   @Test
+  fun scrollToBottomClickImageAndCheckPopup() {
+    val mockMessageRepository =
+        MockMessageFirestoreSource().apply { messages = placeHolderData.toMutableList() }
+
+    composeTestRule.setContent {
+      ChatScreen(
+          messageRepository = mockMessageRepository,
+          currentUserUUID = currentUserUUID,
+          otherUserUUID = otherUserUUID,
+          mockNavigationActions)
+    }
+
+    composeTestRule
+        .onNodeWithTag("column", useUnmergedTree = true)
+        .performScrollToIndex(mockMessageRepository.messages.size - 1)
+
+    composeTestRule.onNodeWithTag("hobbit", useUnmergedTree = true).performClick()
+
+    composeTestRule.waitUntil(timeoutMillis = 5000) {
+      composeTestRule
+          .onAllNodesWithTag("HobbitBig", useUnmergedTree = true)
+          .fetchSemanticsNodes()
+          .isNotEmpty()
+    }
+    composeTestRule.onNodeWithTag("HobbitBig", useUnmergedTree = true).assertIsDisplayed()
+
+    composeTestRule.onNodeWithTag("HobbitBig", useUnmergedTree = true).performClick()
+
+    composeTestRule.waitUntil(timeoutMillis = 5000) {
+      composeTestRule
+          .onAllNodesWithTag("HobbitBig", useUnmergedTree = true)
+          .fetchSemanticsNodes()
+          .isEmpty()
+    }
+    composeTestRule.onNodeWithTag("HobbitBig", useUnmergedTree = true).assertDoesNotExist()
+  }
+
+  @Test
   fun testAllColorsBelongToPalette() {
     composeTestRule.setContent {
       ChatScreen(
           messageRepository = mockMessageRepository,
-          currentUserId = currentUserId,
-          otherUserId = otherUserId,
+          currentUserUUID = currentUserUUID,
+          otherUserUUID = otherUserUUID,
           mockNavigationActions)
     }
 
@@ -363,7 +439,7 @@ class ChatScreenTest {
   }
 
   class MockMessageFirestoreSource : MessageRepository {
-    var mockNewUid: String = "mock-uid"
+    var mockNewUUID: UUID = UUID.randomUUID()
     var messages: MutableList<DataMessage> = mutableListOf()
     private var sendMessageResult: Result<Unit> = Result.success(Unit)
 
@@ -371,8 +447,8 @@ class ChatScreenTest {
       callback(Result.success(Unit))
     }
 
-    override fun getNewUid(): String {
-      return mockNewUid
+    override fun getNewUUID(): UUID {
+      return mockNewUUID
     }
 
     override fun getMessages(callback: (Result<List<DataMessage>>) -> Unit) {
@@ -385,21 +461,21 @@ class ChatScreenTest {
     }
 
     override fun deleteMessage(
-        messageId: String,
+        messageUUID: UUID,
         callback: (Result<Unit>) -> Unit,
         context: Context
     ) {
-      messages.removeIf { it.id == messageId }
+      messages.removeIf { it.uuid == messageUUID }
       callback(Result.success(Unit))
     }
 
     override fun deleteAllMessages(
-        user1Id: String,
-        user2Id: String,
+        user1UUID: UUID,
+        user2UUID: UUID,
         callback: (Result<Unit>) -> Unit
     ) {
-      messages.removeIf { it.senderId == user1Id && it.receiverId == user2Id }
-      messages.removeIf { it.senderId == user2Id && it.receiverId == user1Id }
+      messages.removeIf { it.senderUUID == user1UUID && it.receiverUUID == user2UUID }
+      messages.removeIf { it.senderUUID == user2UUID && it.receiverUUID == user1UUID }
       callback(Result.success(Unit))
     }
 
@@ -408,7 +484,7 @@ class ChatScreenTest {
         callback: (Result<Unit>) -> Unit,
         context: Context
     ) {
-      val index = messages.indexOfFirst { it.id == message.id }
+      val index = messages.indexOfFirst { it.uuid == message.uuid }
       if (index != -1) {
         messages[index] = message.copy(text = message.text) // Update the message text
         callback(Result.success(Unit)) // Simulate success
@@ -418,12 +494,12 @@ class ChatScreenTest {
     }
 
     override fun addMessagesListener(
-        otherUserId: String,
-        currentUserId: String,
+        otherUserUUID: UUID,
+        currentUserUUID: UUID,
         callback: (Result<List<DataMessage>>) -> Unit
     ): ListenerRegistration {
-      requireNotNull(otherUserId) { "otherUserId must not be null" }
-      requireNotNull(currentUserId) { "currentUserId must not be null" }
+      requireNotNull(otherUserUUID) { "otherUserId must not be null" }
+      requireNotNull(currentUserUUID) { "currentUserId must not be null" }
 
       callback(Result.success(messages)) // Or whatever logic you'd like to simulate
       return mockk()

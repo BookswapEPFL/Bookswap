@@ -11,7 +11,15 @@ import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -49,12 +57,17 @@ import kotlinx.coroutines.tasks.await
 fun SignInScreen(navigationActions: NavigationActions) { // Add this when navigation is
   // implemented
   val context = LocalContext.current
+  var googleUid = ""
 
   val launcher =
       rememberFirebaseAuthLauncher(
           onAuthComplete = { result ->
-            Log.d("SignInScreen", "User signed in: ${result.user?.displayName}")
-            Toast.makeText(context, "Login successful!", Toast.LENGTH_LONG).show()
+            val googleUserName = result.user?.displayName ?: ""
+            // TODO googleUserUid will be used for retrieving the corresponding DataUser
+            // will be done in another class.
+            googleUid = result.user?.uid ?: ""
+            Log.d("SignInScreen", "User signed in: $googleUserName")
+            Toast.makeText(context, "Welcome $googleUserName!", Toast.LENGTH_LONG).show()
             navigationActions.navigateTo(TopLevelDestinations.MAP)
           },
           onAuthError = {

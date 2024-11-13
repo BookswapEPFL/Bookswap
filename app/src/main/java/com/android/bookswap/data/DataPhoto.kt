@@ -5,7 +5,8 @@ import java.util.Base64
 import java.util.UUID
 
 data class DataPhoto(
-    val uuid: UUID,
+    val uuid: UUID, // UUID,
     val url: String,
     val timestamp: Long,
-    val base64: String)
+    val base64: String,
+)

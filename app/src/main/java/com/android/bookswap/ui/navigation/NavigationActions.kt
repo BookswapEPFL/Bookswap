@@ -11,7 +11,7 @@ import androidx.navigation.NavHostController
 
 object Route {
   const val CHAT = "Chat"
-  const val PROFIL = "Profil"
+  const val PROFILE = "Profile"
   const val MAP = "Map"
   const val NEWBOOK = "NewBook"
   const val AUTH = "Auth"
@@ -28,6 +28,7 @@ object Screen {
   const val ADD_BOOK_ISBN = "AddBookISBN Screen"
   const val SETTINGS = "Settings Screen"
   const val FILTER = "Filter Screen"
+  const val PROFILE = "Profile Screen"
 }
 
 data class TopLevelDestination(val route: String, val icon: ImageVector, val textId: String)
@@ -41,7 +42,7 @@ object TopLevelDestinations {
           route = Route.NEWBOOK, icon = Icons.Outlined.AddCircle, textId = "New Book")
   val PROFILE =
       TopLevelDestination(
-          route = Route.PROFIL, icon = Icons.Outlined.AccountCircle, textId = "Profile")
+          route = Route.PROFILE, icon = Icons.Outlined.AccountCircle, textId = "Profile")
 }
 /** List of top level destinations that are shown in the bottom navigation bar */
 val List_Navigation_Bar_Destinations =

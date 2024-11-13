@@ -40,7 +40,7 @@ class BooksFirestoreRepository(private val db: FirebaseFirestore) : BooksReposit
     }
   }
   // Generates and returns a new unique document ID for a book in Firestore
-  override fun getNewUid(): UUID {
+  override fun getNewUUID(): UUID {
     return UUID.randomUUID()
   }
   // Fetches the list of books from the Firestore collection
@@ -89,25 +89,25 @@ class BooksFirestoreRepository(private val db: FirebaseFirestore) : BooksReposit
   // Uses performFirestoreOperation to handle success and failure
   override fun updateBook(
       dataBook: DataBook,
-      onSucess: () -> Unit,
+      onSuccess: () -> Unit,
       onFailure: (Exception) -> Unit
   ) {
     performFirestoreOperation(
         db.collection(collectionBooks).document(dataBook.uuid.toString()).set(dataBook),
-        onSucess,
+        onSuccess,
         onFailure)
   }
   // Deletes a book from Firestore by its title
   // Uses performFirestoreOperation to handle success and failure
   override fun deleteBooks(
-      id: String,
+      uuid: UUID,
       dataBook: DataBook,
-      onSucess: () -> Unit,
+      onSuccess: () -> Unit,
       onFailure: (Exception) -> Unit
   ) {
     performFirestoreOperation(
         db.collection(collectionBooks).document(dataBook.uuid.toString()).delete(),
-        onSucess,
+        onSuccess,
         onFailure)
   }
   // Maps a Firestore document to a DataBook object
