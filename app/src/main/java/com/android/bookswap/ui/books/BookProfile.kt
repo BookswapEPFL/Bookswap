@@ -22,8 +22,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -32,7 +30,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
@@ -40,15 +37,17 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.android.bookswap.R
 import com.android.bookswap.data.DataBook
-import com.android.bookswap.ui.components.BackButtonComponent
-import com.android.bookswap.ui.navigation.BottomNavigationMenu
-import com.android.bookswap.ui.navigation.List_Navigation_Bar_Destinations
 import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.theme.ColorVariable
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BookProfileScreen(DataBook: DataBook, navController: NavigationActions) {
+fun BookProfileScreen(
+    DataBook: DataBook,
+    navController: NavigationActions,
+    topAppBar: @Composable () -> Unit = {},
+    bottomAppBar: @Composable () -> Unit = {},
+) {
   val columnPadding = 8.dp
   val pictureWidth = (LocalConfiguration.current.screenWidthDp.dp * (0.60f))
   val pictureHeight = pictureWidth * 1.41f
@@ -58,18 +57,8 @@ fun BookProfileScreen(DataBook: DataBook, navController: NavigationActions) {
   var currentImageIndex by remember { mutableIntStateOf(0) }
   Scaffold(
       modifier = Modifier.testTag("bookProfileScreen"),
-      topBar = {
-        TopAppBar(
-            title = { Text("Book Profile", color = Color.Transparent) },
-            navigationIcon = { BackButtonComponent(navController) },
-            colors = TopAppBarDefaults.topAppBarColors(containerColor = ColorVariable.BackGround))
-      },
-      bottomBar = {
-        BottomNavigationMenu(
-            onTabSelect = { destination -> navController.navigateTo(destination) },
-            tabList = List_Navigation_Bar_Destinations,
-            selectedItem = navController.currentRoute())
-      }) { innerPadding ->
+      topBar = topAppBar,
+      bottomBar = bottomAppBar) { innerPadding ->
         LazyColumn(
             modifier =
                 Modifier.fillMaxSize()
