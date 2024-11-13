@@ -58,11 +58,11 @@ private val INFO_FONT_WEIGHT = FontWeight(400)
  */
 @Composable
 fun NewUserScreen(navigationActions: NavigationActions) {
-  val _email = remember { mutableStateOf("") }
-  val _phone = remember { mutableStateOf("") }
-  val _greeting = remember { mutableStateOf("") }
-  val _firstName = remember { mutableStateOf("") }
-  val _lastName = remember { mutableStateOf("") }
+  val email = remember { mutableStateOf("") }
+  val phone = remember { mutableStateOf("") }
+  val greeting = remember { mutableStateOf("") }
+  val firstName = remember { mutableStateOf("") }
+  val lastName = remember { mutableStateOf("") }
 
   LazyColumn(
       contentPadding = PaddingValues(CONTENT_PADDING),
@@ -119,8 +119,8 @@ fun NewUserScreen(navigationActions: NavigationActions) {
                                 modifier = Modifier.size(ICON_SIZE))
                           }
                       OutlinedTextField(
-                          _greeting.value,
-                          { _greeting.value = it },
+                          greeting.value,
+                          { greeting.value = it },
                           Modifier.testTag("greetingTF").fillMaxWidth().padding(TEXT_PADDING),
                           label = { Text("Greeting") },
                           placeholder = { Text("Mr.", Modifier, Color.Gray) },
@@ -128,8 +128,8 @@ fun NewUserScreen(navigationActions: NavigationActions) {
                           singleLine = true)
 
                       OutlinedTextField(
-                          _firstName.value,
-                          { _firstName.value = it },
+                          firstName.value,
+                          { firstName.value = it },
                           Modifier.testTag("firstnameTF").fillMaxWidth().padding(TEXT_PADDING),
                           label = { Text("Firstname") },
                           placeholder = { Text("John", Modifier, Color.Gray) },
@@ -137,8 +137,8 @@ fun NewUserScreen(navigationActions: NavigationActions) {
                           singleLine = true)
 
                       OutlinedTextField(
-                          _lastName.value,
-                          { _lastName.value = it },
+                          lastName.value,
+                          { lastName.value = it },
                           Modifier.testTag("lastnameTF").fillMaxWidth().padding(TEXT_PADDING),
                           label = { Text("Lastname") },
                           placeholder = { Text("Doe", Modifier, Color.Gray) },
@@ -146,8 +146,8 @@ fun NewUserScreen(navigationActions: NavigationActions) {
                           singleLine = true)
 
                       OutlinedTextField(
-                          _email.value,
-                          { _email.value = it },
+                          email.value,
+                          { email.value = it },
                           Modifier.testTag("emailTF").fillMaxWidth().padding(TEXT_PADDING),
                           label = { Text("Email") },
                           placeholder = { Text("John.Doe@example.com", Modifier, Color.Gray) },
@@ -155,8 +155,8 @@ fun NewUserScreen(navigationActions: NavigationActions) {
                           singleLine = true)
 
                       OutlinedTextField(
-                          _phone.value,
-                          { _phone.value = it },
+                          phone.value,
+                          { phone.value = it },
                           Modifier.testTag("phoneTF").fillMaxWidth().padding(TEXT_PADDING),
                           label = { Text("Phone") },
                           placeholder = { Text("+4122345678", Modifier, Color.Gray) },
