@@ -39,6 +39,17 @@ import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.navigation.Route
 import com.android.bookswap.ui.theme.ColorVariable
 
+// Constants for magic numbers used in the UI layout
+private val CONTENT_PADDING = 16.dp
+private val ICON_SIZE = 80.dp
+private val TEXT_PADDING = PaddingValues(8.dp, 4.dp)
+private val BUTTON_WIDTH = 200.dp
+private val BUTTON_HEIGHT = 50.dp
+private val WELCOME_FONT_SIZE = 40.sp
+private val INFO_FONT_SIZE = 18.sp
+private val WELCOME_FONT_WEIGHT = FontWeight(600)
+private val INFO_FONT_WEIGHT = FontWeight(400)
+
 /**
  * NewUserScreen is the screen where the user can create a new account by filling in his personal
  * information
@@ -54,7 +65,7 @@ fun NewUserScreen(navigationActions: NavigationActions) {
   val _lastName = remember { mutableStateOf("") }
 
   LazyColumn(
-      contentPadding = PaddingValues(16.dp),
+      contentPadding = PaddingValues(CONTENT_PADDING),
       modifier =
           Modifier.fillMaxSize()
               .background(color = ColorVariable.BackGround)
@@ -67,9 +78,9 @@ fun NewUserScreen(navigationActions: NavigationActions) {
               style =
                   TextStyle(
                       color = ColorVariable.Accent,
-                      fontWeight = FontWeight(600),
+                      fontWeight = WELCOME_FONT_WEIGHT,
                       textAlign = TextAlign.Center,
-                      fontSize = 40.sp,
+                      fontSize = WELCOME_FONT_SIZE,
                   ))
         }
         item {
@@ -80,9 +91,9 @@ fun NewUserScreen(navigationActions: NavigationActions) {
               style =
                   TextStyle(
                       color = ColorVariable.Accent,
-                      fontWeight = FontWeight(400),
+                      fontWeight = INFO_FONT_WEIGHT,
                       textAlign = TextAlign.Center,
-                      fontSize = 18.sp,
+                      fontSize = INFO_FONT_SIZE,
                   ))
         }
         item {
@@ -93,24 +104,24 @@ fun NewUserScreen(navigationActions: NavigationActions) {
                   androidx.compose.material3.CardDefaults.cardColors()
                       .copy(containerColor = ColorVariable.BackGround)) {
                 Column(
-                    Modifier.fillMaxWidth().padding(16.dp).background(ColorVariable.BackGround),
+                    Modifier.fillMaxWidth()
+                        .padding(CONTENT_PADDING)
+                        .background(ColorVariable.BackGround),
                     Arrangement.Center,
                     Alignment.CenterHorizontally) {
                       IconButton(
-                          // The profile picture icon TODO: Add the functionality to change the
-                          // profile picture
-                          onClick = { /*TODO*/},
-                          modifier = Modifier.size(80.dp).testTag("profilPics")) {
+                          onClick = { /* TODO */},
+                          modifier = Modifier.size(ICON_SIZE).testTag("profilPics")) {
                             Icon(
                                 imageVector = Icons.Default.AccountCircle,
                                 contentDescription = "profile picture",
                                 tint = ColorVariable.Accent,
-                                modifier = Modifier.size(80.dp))
+                                modifier = Modifier.size(ICON_SIZE))
                           }
                       OutlinedTextField(
                           _greeting.value,
                           { _greeting.value = it },
-                          Modifier.testTag("greetingTF").fillMaxWidth().padding(8.dp, 4.dp),
+                          Modifier.testTag("greetingTF").fillMaxWidth().padding(TEXT_PADDING),
                           label = { Text("Greeting") },
                           placeholder = { Text("Mr.", Modifier, Color.Gray) },
                           keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
@@ -119,7 +130,7 @@ fun NewUserScreen(navigationActions: NavigationActions) {
                       OutlinedTextField(
                           _firstName.value,
                           { _firstName.value = it },
-                          Modifier.testTag("firstnameTF").fillMaxWidth().padding(8.dp, 4.dp),
+                          Modifier.testTag("firstnameTF").fillMaxWidth().padding(TEXT_PADDING),
                           label = { Text("Firstname") },
                           placeholder = { Text("John", Modifier, Color.Gray) },
                           keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
@@ -128,7 +139,7 @@ fun NewUserScreen(navigationActions: NavigationActions) {
                       OutlinedTextField(
                           _lastName.value,
                           { _lastName.value = it },
-                          Modifier.testTag("lastnameTF").fillMaxWidth().padding(8.dp, 4.dp),
+                          Modifier.testTag("lastnameTF").fillMaxWidth().padding(TEXT_PADDING),
                           label = { Text("Lastname") },
                           placeholder = { Text("Doe", Modifier, Color.Gray) },
                           keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
@@ -137,7 +148,7 @@ fun NewUserScreen(navigationActions: NavigationActions) {
                       OutlinedTextField(
                           _email.value,
                           { _email.value = it },
-                          Modifier.testTag("emailTF").fillMaxWidth().padding(8.dp, 4.dp),
+                          Modifier.testTag("emailTF").fillMaxWidth().padding(TEXT_PADDING),
                           label = { Text("Email") },
                           placeholder = { Text("John.Doe@example.com", Modifier, Color.Gray) },
                           keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
@@ -146,7 +157,7 @@ fun NewUserScreen(navigationActions: NavigationActions) {
                       OutlinedTextField(
                           _phone.value,
                           { _phone.value = it },
-                          Modifier.testTag("phoneTF").fillMaxWidth().padding(8.dp, 4.dp),
+                          Modifier.testTag("phoneTF").fillMaxWidth().padding(TEXT_PADDING),
                           label = { Text("Phone") },
                           placeholder = { Text("+4122345678", Modifier, Color.Gray) },
                           keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
@@ -159,7 +170,8 @@ fun NewUserScreen(navigationActions: NavigationActions) {
             Button(
                 onClick = { navigationActions.navigateTo(Route.MAP) },
                 colors = ButtonDefaults.buttonColors(ColorVariable.Primary),
-                modifier = Modifier.width(200.dp).height(50.dp).testTag("CreateButton")) {
+                modifier =
+                    Modifier.width(BUTTON_WIDTH).height(BUTTON_HEIGHT).testTag("CreateButton")) {
                   Text(
                       text = "Create",
                       textAlign = TextAlign.Center,
