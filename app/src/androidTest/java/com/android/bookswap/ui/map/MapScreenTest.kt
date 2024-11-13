@@ -87,7 +87,8 @@ class MapScreenTest {
 
     every { mockBookManagerViewModel.filteredBooks } returns MutableStateFlow(books)
 
-    every { mockBookManagerViewModel.filteredUsers } returns MutableStateFlow(userBooksWithLocationList)
+    every { mockBookManagerViewModel.filteredUsers } returns
+        MutableStateFlow(userBooksWithLocationList)
   }
 
   @Test

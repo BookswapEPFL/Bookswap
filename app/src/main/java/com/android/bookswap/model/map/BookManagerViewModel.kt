@@ -15,11 +15,11 @@ private const val RETRY_TIME_DELAY = 250L
 private const val MAXIMUM_RETRIES = 3
 
 /**
- * The `BookManagerViewModel` class is responsible for managing book data and user data with location
- * information, fetching data from the `BooksRepository`, computing distances between the current
- * location and user locations, and filtering books based on user preferences. The list of all books
- * can be obtained with the filteredBooks and the list of the list of books with the location of its
- * owner with the filteredUsers
+ * The `BookManagerViewModel` class is responsible for managing book data and user data with
+ * location information, fetching data from the `BooksRepository`, computing distances between the
+ * current location and user locations, and filtering books based on user preferences. The list of
+ * all books can be obtained with the filteredBooks and the list of the list of books with the
+ * location of its owner with the filteredUsers
  *
  * @param geolocation the geolocation of the current user
  * @param booksRepository an instance of [BooksRepository] to retrieve the books from the database.
@@ -56,40 +56,44 @@ class BookManagerViewModel(
 
   private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
-    fun startUpdatingBooks(){
-        scope.launch {
-            while (true) {
-                fetchBooksFromRepository()
-                delay(REFRESH_TIME_DELAY)
-            }
-        }
-        computeDistanceOfUsers()
-        combineFlowsAndFilterBooks()
+  fun startUpdatingBooks() {
+    scope.launch {
+      while (true) {
+        fetchBooksFromRepository()
+        delay(REFRESH_TIME_DELAY)
+      }
     }
+    computeDistanceOfUsers()
+    combineFlowsAndFilterBooks()
+  }
 
-    fun stopUpdatingBooks(){
-        scope.cancel()
-    }
+  fun stopUpdatingBooks() {
+    scope.cancel()
+  }
 
   // Fetch books from the repository and update `_allBooks`
   private suspend fun fetchBooksFromRepository() {
-      var success = false
-      var currentAttempt = 0
-      while(!success && currentAttempt < MAXIMUM_RETRIES){
-          booksRepository.getBook(
-              OnSucess = { books -> _allBooks.value = books
-                  success = true},
-              onFailure = { error -> Log.e("BookManagerViewModel", "Failed to fetch books: ${error.message}") })
+    var success = false
+    var currentAttempt = 0
+    while (!success && currentAttempt < MAXIMUM_RETRIES) {
+      booksRepository.getBook(
+          OnSucess = { books ->
+            _allBooks.value = books
+            success = true
+          },
+          onFailure = { error ->
+            Log.e("BookManagerViewModel", "Failed to fetch books: ${error.message}")
+          })
 
-          if(!success){
-              currentAttempt++
-              delay(RETRY_TIME_DELAY)
-          }
-          if(currentAttempt == MAXIMUM_RETRIES){
-              Log.e("BookManagerViewModel","All retries failed.")
-          }
+      if (!success) {
+        currentAttempt++
+        delay(RETRY_TIME_DELAY)
+      }
+      if (currentAttempt == MAXIMUM_RETRIES) {
+        Log.e("BookManagerViewModel", "All retries failed.")
       }
     }
+  }
 
   // Combine books and filter flows and apply filtering logic
   private fun combineFlowsAndFilterBooks() {

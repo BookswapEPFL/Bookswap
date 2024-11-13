@@ -44,8 +44,6 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.bookswap.data.DataBook
-import com.android.bookswap.data.DataUser
-import com.android.bookswap.data.repository.BooksRepository
 import com.android.bookswap.model.map.BookFilter
 import com.android.bookswap.model.map.BookManagerViewModel
 import com.android.bookswap.model.map.DefaultGeolocation
@@ -95,14 +93,18 @@ fun MapScreen(
   val longitude = geolocation.longitude.collectAsState()
   // Start location and books updates
   LaunchedEffect(Unit) {
-      bookManagerViewModel.startUpdatingBooks()
+    bookManagerViewModel.startUpdatingBooks()
     geolocation.startLocationUpdates()
     cameraPositionState.position =
         CameraPosition.fromLatLngZoom(LatLng(latitude.value, longitude.value), INIT_ZOOM)
   }
   // Stop location and books updates when the screen is disposed
-  DisposableEffect(Unit) { onDispose { geolocation.stopLocationUpdates()
-  bookManagerViewModel.stopUpdatingBooks()} }
+  DisposableEffect(Unit) {
+    onDispose {
+      geolocation.stopLocationUpdates()
+      bookManagerViewModel.stopUpdatingBooks()
+    }
+  }
 
   var mutableStateSelectedUser by remember { mutableStateOf(selectedUser) }
   var markerScreenPosition by remember { mutableStateOf<Offset?>(null) }
@@ -147,29 +149,33 @@ fun MapScreen(
       topBar = topAppBar,
       bottomBar = bottomAppBar,
       content = { pd ->
-          Box(
-              Modifier.padding(
-                  top = pd.calculateTopPadding(), bottom = pd.calculateBottomPadding())) {
-        GoogleMap(
-            onMapClick = { mutableStateSelectedUser = NO_USER_SELECTED },
-            modifier =
-                Modifier.fillMaxSize().padding(pd).testTag("mapGoogleMap").semantics {
-                  cameraPosition = cameraPositionState
-                },
-            cameraPositionState = cameraPositionState,
-            uiSettings = MapUiSettings(zoomControlsEnabled = false),
-        ) {
-          // Marker for user's current location
-          if (!latitude.value.isNaN() && !longitude.value.isNaN()) {
-            Marker(
-                state = MarkerState(position = LatLng(latitude.value, longitude.value)),
-                title = "Your Location",
-                icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE))
-          }
-          filteredUsers.value
-              .filter { !it.longitude.isNaN() && !it.latitude.isNaN() && it.books.isNotEmpty() }
-              .forEachIndexed { index, item ->
-                val markerState = MarkerState(position = LatLng(item.latitude, item.longitude))
+        Box(
+            Modifier.padding(
+                top = pd.calculateTopPadding(), bottom = pd.calculateBottomPadding())) {
+              GoogleMap(
+                  onMapClick = { mutableStateSelectedUser = NO_USER_SELECTED },
+                  modifier =
+                      Modifier.fillMaxSize().testTag("mapGoogleMap").semantics {
+                        cameraPosition = cameraPositionState
+                      },
+                  cameraPositionState = cameraPositionState,
+                  uiSettings = MapUiSettings(zoomControlsEnabled = false),
+              ) {
+                // Marker for user's current location
+                if (!latitude.value.isNaN() && !longitude.value.isNaN()) {
+                  Marker(
+                      state = MarkerState(position = LatLng(latitude.value, longitude.value)),
+                      title = "Your Location",
+                      icon =
+                          BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE))
+                }
+                filteredUsers.value
+                    .filter {
+                      !it.longitude.isNaN() && !it.latitude.isNaN() && it.books.isNotEmpty()
+                    }
+                    .forEachIndexed { index, item ->
+                      val markerState =
+                          MarkerState(position = LatLng(item.latitude, item.longitude))
 
                       Marker(
                           state = markerState,
@@ -184,22 +190,22 @@ fun MapScreen(
               }
               FilterButton { navigationActions.navigateTo(Screen.FILTER) }
 
-        // Custom info window linked to the marker
-        markerScreenPosition?.let { screenPos ->
-          if (mutableStateSelectedUser >= 0 &&
-              mutableStateSelectedUser < filteredUsers.value.size &&
-              filteredUsers.value[mutableStateSelectedUser].books.isNotEmpty()) {
-            CustomInfoWindow(
-                modifier =
-                    Modifier.offset {
-                      IntOffset(screenPos.x.roundToInt(), screenPos.y.roundToInt())
-                    },
-                userBooks = filteredUsers.value[mutableStateSelectedUser].books)
-          }
-        }
-        // Draggable Bottom List
-        DraggableMenu(filteredBooks.value)
-          }
+              // Custom info window linked to the marker
+              markerScreenPosition?.let { screenPos ->
+                if (mutableStateSelectedUser >= 0 &&
+                    mutableStateSelectedUser < filteredUsers.value.size &&
+                    filteredUsers.value[mutableStateSelectedUser].books.isNotEmpty()) {
+                  CustomInfoWindow(
+                      modifier =
+                          Modifier.offset {
+                            IntOffset(screenPos.x.roundToInt(), screenPos.y.roundToInt())
+                          },
+                      userBooks = filteredUsers.value[mutableStateSelectedUser].books)
+                }
+              }
+              // Draggable Bottom List
+              DraggableMenu(filteredBooks.value)
+            }
       })
 }
 
