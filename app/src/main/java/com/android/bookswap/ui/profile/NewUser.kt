@@ -39,8 +39,14 @@ import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.navigation.Route
 import com.android.bookswap.ui.theme.ColorVariable
 
+/**
+ * NewUserScreen is the screen where the user can create a new account by filling in his personal
+ * information
+ *
+ * @param navigationActions: NavigationActions
+ */
 @Composable
-fun NewUserScreen(navigaionActions: NavigationActions) {
+fun NewUserScreen(navigationActions: NavigationActions) {
   val _email = remember { mutableStateOf("") }
   val _phone = remember { mutableStateOf("") }
   val _greeting = remember { mutableStateOf("") }
@@ -54,6 +60,7 @@ fun NewUserScreen(navigaionActions: NavigationActions) {
               .background(color = ColorVariable.BackGround)
               .testTag("chat_messageList")) {
         item {
+          // The welcome text
           Text(
               "Welcome",
               modifier = Modifier.testTag("welcomeTxt").fillMaxWidth(),
@@ -66,6 +73,7 @@ fun NewUserScreen(navigaionActions: NavigationActions) {
                   ))
         }
         item {
+          // The personal information text
           Text(
               "Please fill in your personal information to start BookSwapping",
               modifier = Modifier.testTag("personalInfoTxt").fillMaxWidth(),
@@ -78,6 +86,7 @@ fun NewUserScreen(navigaionActions: NavigationActions) {
                   ))
         }
         item {
+          // The card containing the form to fill in the personal information
           Card(
               Modifier.testTag("editProfileContainer").background(ColorVariable.BackGround),
               colors =
@@ -88,6 +97,8 @@ fun NewUserScreen(navigaionActions: NavigationActions) {
                     Arrangement.Center,
                     Alignment.CenterHorizontally) {
                       IconButton(
+                          // The profile picture icon TODO: Add the functionality to change the
+                          // profile picture
                           onClick = { /*TODO*/},
                           modifier = Modifier.size(80.dp).testTag("profilPics")) {
                             Icon(
@@ -146,7 +157,7 @@ fun NewUserScreen(navigaionActions: NavigationActions) {
         item {
           Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
             Button(
-                onClick = { navigaionActions.navigateTo(Route.MAP) },
+                onClick = { navigationActions.navigateTo(Route.MAP) },
                 colors = ButtonDefaults.buttonColors(ColorVariable.Primary),
                 modifier = Modifier.width(200.dp).height(50.dp).testTag("CreateButton")) {
                   Text(
