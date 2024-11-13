@@ -10,7 +10,9 @@ import com.android.bookswap.ui.map.UserBooksWithLocation
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 
-const val REFRESH_TIME_PERIOD = 5000L
+private const val REFRESH_TIME_DELAY = 5000L
+private const val RETRY_TIME_DELAY = 250L
+private const val MAXIMUM_RETRIES = 3
 
 /**
  * The `BookManagerViewModel` class is responsible for managing book data and user data with location
@@ -58,7 +60,7 @@ class BookManagerViewModel(
         scope.launch {
             while (true) {
                 fetchBooksFromRepository()
-                delay(REFRESH_TIME_PERIOD)
+                delay(REFRESH_TIME_DELAY)
             }
         }
         computeDistanceOfUsers()
@@ -70,11 +72,24 @@ class BookManagerViewModel(
     }
 
   // Fetch books from the repository and update `_allBooks`
-  private fun fetchBooksFromRepository() {
-    booksRepository.getBook(
-        OnSucess = { books -> _allBooks.value = books },
-        onFailure = { error -> Log.e("BookManager", "Failed to fetch books: ${error.message}") })
-  }
+  private suspend fun fetchBooksFromRepository() {
+      var success = false
+      var currentAttempt = 0
+      while(!success && currentAttempt < MAXIMUM_RETRIES){
+          booksRepository.getBook(
+              OnSucess = { books -> _allBooks.value = books
+                  success = true},
+              onFailure = { error -> Log.e("BookManagerViewModel", "Failed to fetch books: ${error.message}") })
+
+          if(!success){
+              currentAttempt++
+              delay(RETRY_TIME_DELAY)
+          }
+          if(currentAttempt == MAXIMUM_RETRIES){
+              Log.e("BookManagerViewModel","All retries failed.")
+          }
+      }
+    }
 
   // Combine books and filter flows and apply filtering logic
   private fun combineFlowsAndFilterBooks() {
