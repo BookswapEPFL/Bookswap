@@ -1,7 +1,6 @@
 package com.android.bookswap.ui.components
 
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -10,6 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.profile.ProfileIcon
+import com.android.bookswap.ui.theme.ColorVariable
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -24,5 +24,5 @@ fun TopAppBarComponent(
       { BackButtonComponent(navActions = navigationActions) },
       { ProfileIcon(navigationActions = navigationActions) },
       TopAppBarDefaults.windowInsets,
-      TopAppBarDefaults.topAppBarColors(MaterialTheme.colorScheme.background))
+      TopAppBarDefaults.topAppBarColors(ColorVariable.BackGround))
 }
