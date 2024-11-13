@@ -20,7 +20,7 @@ import com.android.bookswap.data.source.network.MessageFirestoreSource
 import com.android.bookswap.model.chat.MessageBox
 import com.android.bookswap.model.chat.PermissionHandler
 import com.android.bookswap.model.map.BookFilter
-import com.android.bookswap.model.map.BookManager
+import com.android.bookswap.model.map.BookManagerViewModel
 import com.android.bookswap.model.map.DefaultGeolocation
 import com.android.bookswap.model.map.Geolocation
 import com.android.bookswap.model.map.IGeolocation
@@ -81,7 +81,7 @@ class MainActivity : ComponentActivity() {
     val navController = rememberNavController()
     val navigationActions = NavigationActions(navController)
     val bookFilter = BookFilter()
-    val bookManager = BookManager(geolocation, bookRepository, user, bookFilter)
+    val bookManagerViewModel = BookManagerViewModel(geolocation, bookRepository, user, bookFilter)
 
     val placeHolder =
         listOf(
@@ -111,7 +111,7 @@ class MainActivity : ComponentActivity() {
       }
       navigation(startDestination = Screen.MAP, route = Route.MAP) {
         composable(Screen.MAP) {
-          MapScreen(bookManager, navigationActions = navigationActions, geolocation = geolocation)
+          MapScreen(bookManagerViewModel, navigationActions = navigationActions, geolocation = geolocation)
         }
         composable(Screen.FILTER) { FilterMapScreen(navigationActions, bookFilter) }
       }

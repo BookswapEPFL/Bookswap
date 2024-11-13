@@ -2,6 +2,7 @@ package com.android.bookswap.model.map
 
 import android.location.Location
 import android.util.Log
+import androidx.lifecycle.ViewModel
 import com.android.bookswap.data.DataBook
 import com.android.bookswap.data.DataUser
 import com.android.bookswap.data.repository.BooksRepository
@@ -12,7 +13,7 @@ import kotlinx.coroutines.flow.*
 const val REFRESH_TIME_PERIOD = 5000L
 
 /**
- * The `BookManager` class is responsible for managing book data and user data with location
+ * The `BookManagerViewModel` class is responsible for managing book data and user data with location
  * information, fetching data from the `BooksRepository`, computing distances between the current
  * location and user locations, and filtering books based on user preferences. The list of all books
  * can be obtained with the filteredBooks and the list of the list of books with the location of its
@@ -25,7 +26,7 @@ const val REFRESH_TIME_PERIOD = 5000L
  * @param bookFilter an instance of [BookFilter] that manages the filter that needs to be applied.
  * @param computingDistanceMethod optional : a computation method for distances for testing purposes
  */
-class BookManager(
+class BookManagerViewModel(
     private val geolocation: IGeolocation,
     private val booksRepository: BooksRepository,
     // TODO replace the listUser by a User repository to retrieve the users from the database
@@ -39,7 +40,7 @@ class BookManager(
           Location.distanceBetween(startLatitude, startLongitude, endLatitude, endLongitude, result)
           result[0].toDouble()
         }
-) {
+) : ViewModel() {
   // Internal MutableStateFlows to manage dynamic data
   private val _allBooks = MutableStateFlow<List<DataBook>>(emptyList())
   private val _allUsers = MutableStateFlow(listUser)

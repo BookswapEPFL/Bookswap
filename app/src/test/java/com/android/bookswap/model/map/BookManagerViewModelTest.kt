@@ -17,7 +17,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
 
-class BookManagerTest {
+class BookManagerViewModelTest {
 
   private val user1 =
       DataUser(bookList = listOf(UUID(1, 2), UUID(2, 1)), longitude = 50.0, latitude = 50.0)
@@ -88,7 +88,7 @@ class BookManagerTest {
   private lateinit var mockGeolocation2: IGeolocation
   private lateinit var mockBookFilter: BookFilter
   private lateinit var mockBookFilterEmpty: BookFilter
-  private lateinit var bookManager: BookManager
+  private lateinit var bookManagerViewModel: BookManagerViewModel
 
   @Before
   fun setup() {
@@ -121,32 +121,32 @@ class BookManagerTest {
 
   @Test
   fun defaultCaseNoFilterOrSortingNecessary() = runTest {
-    bookManager =
-        BookManager(mockGeolocation1, mockBookRepository, users, mockBookFilterEmpty) { _, _, _, _
+    bookManagerViewModel =
+        BookManagerViewModel(mockGeolocation1, mockBookRepository, users, mockBookFilterEmpty) { _, _, _, _
           ->
           0.0
         }
-    bookManager.filteredBooks.first { it != emptyList<DataBook>() }
-    assertEquals(books, bookManager.filteredBooks.value)
-    assertEquals(userBooksWithLocation, bookManager.filteredUsers.value)
+    bookManagerViewModel.filteredBooks.first { it != emptyList<DataBook>() }
+    assertEquals(books, bookManagerViewModel.filteredBooks.value)
+    assertEquals(userBooksWithLocation, bookManagerViewModel.filteredUsers.value)
   }
 
   @Test
   fun returnFilteredListOfBooks() = runTest {
-    bookManager =
-        BookManager(mockGeolocation1, mockBookRepository, users, mockBookFilter, sortingTest)
-    bookManager.filteredBooks.first { it != emptyList<DataBook>() }
-    assertEquals(listOf(book3), bookManager.filteredBooks.value)
-    assertEquals(filteredBooksWithLocation, bookManager.filteredUsers.value)
+    bookManagerViewModel =
+        BookManagerViewModel(mockGeolocation1, mockBookRepository, users, mockBookFilter, sortingTest)
+    bookManagerViewModel.filteredBooks.first { it != emptyList<DataBook>() }
+    assertEquals(listOf(book3), bookManagerViewModel.filteredBooks.value)
+    assertEquals(filteredBooksWithLocation, bookManagerViewModel.filteredUsers.value)
   }
 
   @Test
   fun sortTheUsers() = runTest {
-    bookManager =
-        BookManager(mockGeolocation2, mockBookRepository, users, mockBookFilterEmpty, sortingTest)
-    bookManager.filteredBooks.first { it != emptyList<DataBook>() }
-    assertEquals(listOf(book1, book2, book3), bookManager.filteredBooks.value)
+    bookManagerViewModel =
+        BookManagerViewModel(mockGeolocation2, mockBookRepository, users, mockBookFilterEmpty, sortingTest)
+    bookManagerViewModel.filteredBooks.first { it != emptyList<DataBook>() }
+    assertEquals(listOf(book1, book2, book3), bookManagerViewModel.filteredBooks.value)
     assertEquals(
-        listOf(userBooksWithLocation1, userBooksWithLocation2), bookManager.filteredUsers.value)
+        listOf(userBooksWithLocation1, userBooksWithLocation2), bookManagerViewModel.filteredUsers.value)
   }
 }

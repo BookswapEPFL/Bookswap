@@ -47,7 +47,7 @@ import com.android.bookswap.data.DataBook
 import com.android.bookswap.data.DataUser
 import com.android.bookswap.data.repository.BooksRepository
 import com.android.bookswap.model.map.BookFilter
-import com.android.bookswap.model.map.BookManager
+import com.android.bookswap.model.map.BookManagerViewModel
 import com.android.bookswap.model.map.DefaultGeolocation
 import com.android.bookswap.model.map.IGeolocation
 import com.android.bookswap.ui.navigation.BOTTOM_NAV_HEIGHT
@@ -76,18 +76,15 @@ var SemanticsPropertyReceiver.cameraPosition by CameraPositionKey
  * This screen renders a GoogleMap that shows books locations as markers. Upon clicking a marker, it
  * displays a custom info window with the list of books at this location.
  *
- * @param listUser List of users [DataUser] to display on the map, will be replaced by a model that
- *   retrieves the users from the database.
- * @param navigationActions An instance of [NavigationActions] to handle navigation actions.
+ * @param bookManagerViewModel the view model that give the mapScreen the list of books to display
  * @param bookFilter An instance of [BookFilter] to filter the books displayed on the map.
- * @param booksRepository An instance of [BooksRepository] to retrieve the books from the database.
  * @param selectedUser An optional user, it will display the infoWindow related to this user. This
  *   user’s info window will be shown if it is bigger or equal to 0.
  * @param geolocation An instance of [IGeolocation] to get the user's current location.
  */
 @Composable
 fun MapScreen(
-    bookManager: BookManager,
+    bookManagerViewModel: BookManagerViewModel,
     navigationActions: NavigationActions,
     selectedUser: Int = NO_USER_SELECTED,
     geolocation: IGeolocation = DefaultGeolocation()
@@ -108,9 +105,9 @@ fun MapScreen(
   var mutableStateSelectedUser by remember { mutableStateOf(selectedUser) }
   var markerScreenPosition by remember { mutableStateOf<Offset?>(null) }
 
-  val filteredBooks = bookManager.filteredBooks.collectAsState()
+  val filteredBooks = bookManagerViewModel.filteredBooks.collectAsState()
 
-  val filteredUsers = bookManager.filteredUsers.collectAsState()
+  val filteredUsers = bookManagerViewModel.filteredUsers.collectAsState()
 
   // compute the position of the marker on the screen given the camera position and the marker's
   // position on the map
