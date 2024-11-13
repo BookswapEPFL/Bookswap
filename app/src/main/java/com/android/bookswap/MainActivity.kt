@@ -88,7 +88,7 @@ class MainActivity : ComponentActivity() {
       messageRepository: MessageRepository,
       bookRepository: BooksRepository,
       userRepository: UsersRepository,
-      startDestination: String = Route.MAP,
+      startDestination: String = Route.AUTH,
       geolocation: IGeolocation = DefaultGeolocation()
   ) {
     val navController = rememberNavController()
