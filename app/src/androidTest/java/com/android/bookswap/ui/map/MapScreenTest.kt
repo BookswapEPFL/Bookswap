@@ -22,7 +22,9 @@ import com.android.bookswap.model.map.DefaultGeolocation
 import com.android.bookswap.ui.navigation.NavigationActions
 import com.google.maps.android.compose.CameraPositionState
 import io.mockk.every
+import io.mockk.just
 import io.mockk.mockk
+import io.mockk.runs
 import java.util.UUID
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -89,6 +91,8 @@ class MapScreenTest {
 
     every { mockBookManagerViewModel.filteredUsers } returns
         MutableStateFlow(userBooksWithLocationList)
+    every { mockBookManagerViewModel.startUpdatingBooks() } just runs
+    every { mockBookManagerViewModel.stopUpdatingBooks() } just runs
   }
 
   @Test
