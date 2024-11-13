@@ -60,15 +60,6 @@ class PhotoViewModel(private val photoRepository: PhotoRepository) : ViewModel()
     return photoRepository.bitmapToBase64(bitmap)
   }
   /**
-   * Converts a Base64-encoded string to a Bitmap.
-   *
-   * @param base64 The Base64-encoded string to convert.
-   * @return The Bitmap representation of the Base64-encoded string.
-   */
-  fun base64ToBitmap(base64: String): Bitmap {
-    return photoRepository.base64ToBitmap(base64)
-  }
-  /**
    * Converts an ImageBitmap to a Bitmap.
    *
    * @param imageBitmap The ImageBitmap to convert.
@@ -100,30 +91,6 @@ class PhotoViewModel(private val photoRepository: PhotoRepository) : ViewModel()
 
     photoRequester.Init()
     photoRequester.requestPhoto()
-  }
-  /**
-   * Converts a Bitmap to a Base64-encoded PNG string.
-   *
-   * @param bitmap The Bitmap to convert.
-   * @return The Base64-encoded PNG string representation of the Bitmap.
-   */
-  private fun bitmapToPng(bitmap: Bitmap): String {
-    val outputStream = ByteArrayOutputStream()
-    bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
-    val byteArray = outputStream.toByteArray()
-    return Base64.encodeToString(byteArray, Base64.DEFAULT)
-  }
-  /**
-   * Converts a Bitmap to a Base64-encoded JPEG string.
-   *
-   * @param bitmap The Bitmap to convert.
-   * @return The Base64-encoded JPEG string representation of the Bitmap.
-   */
-  private fun bitmapToJpeg(bitmap: Bitmap): String {
-    val outputStream = ByteArrayOutputStream()
-    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
-    val byteArray = outputStream.toByteArray()
-    return Base64.encodeToString(byteArray, Base64.DEFAULT)
   }
   /**
    * Converts a Base64-encoded JPEG string to a Bitmap.
