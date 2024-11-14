@@ -49,7 +49,7 @@ class DataUserTest {
   @Test
   fun viewModelFetch() {
     val userVM = UserViewModel(standardUser.userUUID, mockUsersRepo)
-    assertTrue(!userVM.isStored)
+    assertTrue(!userVM.isStored.value!!)
 
     every { mockUsersRepo.getUser(standardUser.userUUID, any()) } answers
         {
@@ -60,11 +60,11 @@ class DataUserTest {
     val result = userVM.getUser()
 
     assertEquals(standardUser, result)
-    assertTrue(userVM.isStored)
+    assertTrue(userVM.isStored.value!!)
 
     // Verify that second calls does not fetch again
     userVM.getUser()
-    verify(exactly = 1) { mockUsersRepo.getUser(any(), any()) }
+    verify(exactly = 1) { mockUsersRepo.getUser(uuid = any(), any()) }
   }
 
   @Test
@@ -99,7 +99,7 @@ class DataUserTest {
         updatedUser.bookList,
         updatedUser.googleUid)
 
-    assertTrue(userVM.isStored)
+    assertTrue(userVM.isStored.value!!)
 
     // Verify it fails correctly
     every { mockUsersRepo.updateUser(any(), any()) } answers
@@ -119,6 +119,6 @@ class DataUserTest {
         updatedUser.bookList,
         updatedUser.googleUid)
 
-    assertTrue(!userVM.isStored)
+    assertTrue(!userVM.isStored.value!!)
   }
 }

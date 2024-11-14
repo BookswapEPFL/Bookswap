@@ -91,23 +91,20 @@ class NewUserScreenTest {
 
   @Test
   fun clickOnCreateButtonWithInvalidEmailDoesNotNavigate() {
-    // Configure mock behavior
+
     composeTestRule.setContent { NewUserScreen(navigationActions, userVM) }
 
-    // Simuler la saisie de données incorrectes
+
     composeTestRule.onNodeWithTag("greetingTF").performTextInput("Mr.")
     composeTestRule.onNodeWithTag("firstnameTF").performTextInput("John")
     composeTestRule.onNodeWithTag("lastnameTF").performTextInput("Doe")
     composeTestRule.onNodeWithTag("emailTF").performTextInput("john.doe.com") // Email invalide
     composeTestRule.onNodeWithTag("phoneTF").performTextInput("+4122345678")
 
-    // Cliquer sur le bouton "Create"
     composeTestRule.onNodeWithTag("CreateButton").performClick()
 
-    // Vérifier que la navigation ne se produit pas si les informations sont incorrectes
     verify(exactly = 0) { navigationActions.navigateTo(Route.MAP) }
 
-    // Vérifier si un message d'erreur est affiché (selon la logique de validation)
     composeTestRule
         .onNodeWithTag("emailError")
         .assertExists()
@@ -117,26 +114,20 @@ class NewUserScreenTest {
 
   @Test
   fun clickOnCreateButtonWithEmptyFieldsShowsErrors() {
-    // Configure mock behavior
     justRun {
       userVM.updateUser(any(), any(), any(), any(), any(), any(), any(), any(), any(), any())
     }
     composeTestRule.setContent { NewUserScreen(navigationActions, userVM) }
 
-    // Simuler la saisie de données manquantes ou incorrectes
     composeTestRule.onNodeWithTag("greetingTF").performTextInput("")
     composeTestRule.onNodeWithTag("firstnameTF").performTextInput("")
     composeTestRule.onNodeWithTag("lastnameTF").performTextInput("")
     composeTestRule.onNodeWithTag("emailTF").performTextInput("notanemail")
     composeTestRule.onNodeWithTag("phoneTF").performTextInput("")
 
-    // Cliquer sur le bouton "Create"
     composeTestRule.onNodeWithTag("CreateButton").performClick()
 
-    // Vérifier que la navigation ne se produit pas si des champs sont manquants
     verify(exactly = 0) { navigationActions.navigateTo(Route.MAP) }
-
-    // Vérifier si des messages d'erreur sont affichés pour chaque champ
 
     composeTestRule
         .onNodeWithTag("firstnameError")
