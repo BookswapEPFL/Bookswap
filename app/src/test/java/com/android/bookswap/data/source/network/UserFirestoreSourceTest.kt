@@ -85,6 +85,8 @@ class UserFirestoreSourceTest {
     `when`(mockDocumentSnapshot.getDouble("Latitude")).thenReturn(testUser.latitude)
     `when`(mockDocumentSnapshot.getDouble("Longitude")).thenReturn(testUser.longitude)
     `when`(mockDocumentSnapshot.getString("Picture")).thenReturn(testUser.profilePictureUrl)
+    `when`(mockDocumentSnapshot.get("BookList")).thenReturn(testUser.bookList)
+    `when`(mockDocumentSnapshot.getString("GoogleUID")).thenReturn(testUser.googleUid)
 
     // Act
     userFirestoreSource.getUsers { result ->
@@ -117,6 +119,8 @@ class UserFirestoreSourceTest {
     `when`(mockDocumentSnapshot.getDouble("Latitude")).thenReturn(testUser.latitude)
     `when`(mockDocumentSnapshot.getDouble("Longitude")).thenReturn(testUser.longitude)
     `when`(mockDocumentSnapshot.getString("Picture")).thenReturn(testUser.profilePictureUrl)
+    `when`(mockDocumentSnapshot.get("BookList")).thenReturn(testUser.bookList)
+    `when`(mockDocumentSnapshot.getString("GoogleUID")).thenReturn(testUser.googleUid)
 
     // Act
     userFirestoreSource.getUser(testUser.userUUID) { result ->
@@ -186,6 +190,8 @@ class UserFirestoreSourceTest {
     `when`(mockDocumentSnapshot.getDouble("Latitude")).thenReturn(testUser.latitude)
     `when`(mockDocumentSnapshot.getDouble("Longitude")).thenReturn(testUser.longitude)
     `when`(mockDocumentSnapshot.getString("Picture")).thenReturn(testUser.profilePictureUrl)
+    `when`(mockDocumentSnapshot.get("BookList")).thenReturn(testUser.bookList)
+    `when`(mockDocumentSnapshot.getString("GoogleUID")).thenReturn(testUser.googleUid)
 
     // Act
     val result = userFirestoreSource.documentToUser(mockDocumentSnapshot)
@@ -207,6 +213,8 @@ class UserFirestoreSourceTest {
     `when`(mockDocumentSnapshot.getDouble("Latitude")).thenReturn(testUser.latitude)
     `when`(mockDocumentSnapshot.getDouble("Longitude")).thenReturn(testUser.longitude)
     `when`(mockDocumentSnapshot.getString("Picture")).thenReturn(testUser.profilePictureUrl)
+    `when`(mockDocumentSnapshot.get("BookList")).thenReturn(testUser.bookList)
+    `when`(mockDocumentSnapshot.getString("GoogleUID")).thenReturn(testUser.googleUid)
 
     // Act
     val result = userFirestoreSource.documentToUser(mockDocumentSnapshot)

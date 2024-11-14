@@ -92,6 +92,8 @@ class UserFirestoreSource(private val db: FirebaseFirestore) : UsersRepository {
       val latitude = document.getDouble("Latitude")!!
       val longitude = document.getDouble("Longitude")!!
       val profilePicture = document.getString("Picture")!!
+      val bookList = (document.get("BookList") as List<String>).map { UUID.fromString(it) }
+      val googleUid = document.getString("GoogleUID")!!
       Result.success(
           DataUser(
               userUUID,
@@ -103,7 +105,8 @@ class UserFirestoreSource(private val db: FirebaseFirestore) : UsersRepository {
               latitude,
               longitude,
               profilePicture,
-          ))
+              bookList,
+              googleUid))
     } catch (e: Exception) {
       Log.e("FirestoreSource", "Error converting document to User: ${e.message}")
       Result.failure(e)

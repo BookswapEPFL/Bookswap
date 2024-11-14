@@ -42,7 +42,8 @@ open class UserViewModel(
       latitude: Double = dataUser.latitude,
       longitude: Double = dataUser.longitude,
       picURL: String = dataUser.profilePictureUrl,
-      bookList: List<UUID> = dataUser.bookList
+      bookList: List<UUID> = dataUser.bookList,
+      googleUid: String = dataUser.googleUid
   ) {
     updateUser(
         DataUser(
@@ -55,7 +56,8 @@ open class UserViewModel(
             latitude,
             longitude,
             picURL,
-            bookList))
+            bookList,
+            googleUid))
   }
 
   fun updateUser(newDataUser: DataUser) {
