@@ -29,6 +29,7 @@ object Screen {
   const val SETTINGS = "Settings Screen"
   const val FILTER = "Filter Screen"
   const val PROFILE = "Profile Screen"
+  const val NEW_USER = "New User Screen"
 }
 
 data class TopLevelDestination(val route: String, val icon: ImageVector, val textId: String)

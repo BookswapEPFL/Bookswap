@@ -44,6 +44,7 @@ import com.android.bookswap.ui.navigation.List_Navigation_Bar_Destinations
 import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.navigation.Route
 import com.android.bookswap.ui.navigation.Screen
+import com.android.bookswap.ui.profile.NewUserScreen
 import com.android.bookswap.ui.profile.UserProfile
 import com.android.bookswap.ui.theme.BookSwapAppTheme
 import com.google.firebase.Firebase
@@ -110,7 +111,7 @@ class MainActivity : ComponentActivity() {
 
     val currentUserUUID = UUID.fromString("550e8400-e29b-41d4-a716-446655440000")
     val otherUserUUID = UUID.fromString("550e8400-e29b-41d4-a716-446655440001")
-    val currentUser =
+    val currentUserPlaceholder =
         DataUser(
             currentUserUUID,
             "Hello",
@@ -175,6 +176,7 @@ class MainActivity : ComponentActivity() {
     NavHost(navController = navController, startDestination = startDestination) {
       navigation(startDestination = Screen.AUTH, route = Route.AUTH) {
         composable(Screen.AUTH) { SignInScreen(navigationActions, userVM) }
+        composable(Screen.NEW_USER) { NewUserScreen(navigationActions) }
       }
       navigation(startDestination = Screen.CHATLIST, route = Route.CHAT) {
         composable(Screen.CHATLIST) {
@@ -189,7 +191,7 @@ class MainActivity : ComponentActivity() {
           val user2 = placeHolder.firstOrNull { it.contact.userUUID == user2UUID }?.contact
 
           if (user2 != null) {
-            ChatScreen(messageRepository, currentUser, user2, navigationActions)
+            ChatScreen(messageRepository, currentUserPlaceholder, user2, navigationActions)
           } else {
             BookAdditionChoiceScreen(
                 navigationActions,
