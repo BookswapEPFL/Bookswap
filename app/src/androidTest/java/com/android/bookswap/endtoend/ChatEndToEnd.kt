@@ -163,7 +163,7 @@ class ChatEndToEnd {
       }
     }
     // Simulate navigating to the chat screen by clicking on John Doe's message box
-    composeTestRule.onNodeWithTag("chat_messageBox $currentUserUUID").assertExists().performClick()
+    composeTestRule.onNodeWithTag("chat_messageBox").assertExists().performClick()
 
     // Wait until placeholder messages appear
     val firstPlaceholderUUID = mockMessageRepository.messages[0].uuid
@@ -285,6 +285,9 @@ class ChatEndToEnd {
       moveBy(Offset(50f, 50f)) // Simulate a drag to increase the scale
       up() // Release the finger to end the gesture
     }
+
+    // **CLOSE POPUP**: Click on the image popup to close it
+    composeTestRule.onNodeWithTag("popupImage", useUnmergedTree = true).performClick()
 
     // Wait until the popup is closed
     composeTestRule.waitUntil(timeoutMillis = 5000) {

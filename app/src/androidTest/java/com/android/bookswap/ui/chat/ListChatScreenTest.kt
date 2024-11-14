@@ -1,10 +1,13 @@
 package com.android.bookswap.ui.chat
 
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.test.assertAll
 import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextEquals
+import androidx.compose.ui.test.hasClickAction
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onChild
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
@@ -136,10 +139,8 @@ class ListChatScreenTest {
           })
     }
 
-    placeHolderData.forEachIndexed { index, _ ->
-      composeTestRule
-          .onNodeWithTag("chat_messageBox ${placeHolderData[index].contact.userUUID}")
-          .assertHasClickAction()
-    }
+    val messageNodes = composeTestRule.onAllNodesWithTag("chat_messageBox")
+    assert(messageNodes.fetchSemanticsNodes().isNotEmpty())
+    messageNodes.assertAll(hasClickAction())
   }
 }

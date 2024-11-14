@@ -89,7 +89,7 @@ fun MessageBoxDisplay(message: MessageBox, onClick: () -> Unit = {}) {
           .height(55.dp)
           .background(color = ColorVariable.BackGround)
           .clickable(onClick = onClick)
-          .testTag("chat_messageBox ${message.contact.userUUID}"),
+          .testTag("chat_messageBox"),
   ) {
     Icon(
         imageVector = Icons.Filled.Person,
