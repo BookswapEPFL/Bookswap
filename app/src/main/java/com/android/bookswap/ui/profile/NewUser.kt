@@ -66,14 +66,13 @@ private val ERROR_FONT_SIZE = 12.sp
 fun NewUserScreen(navigationActions: NavigationActions, userVM: UserViewModel) {
   val context = LocalContext.current
 
-  // État des champs de saisie
   val email = remember { mutableStateOf("") }
   val phone = remember { mutableStateOf("") }
   val greeting = remember { mutableStateOf("") }
   val firstName = remember { mutableStateOf("") }
   val lastName = remember { mutableStateOf("") }
 
-  // État des messages d'erreur pour chaque champ
+
   val emailError = remember { mutableStateOf<String?>(null) }
   val phoneError = remember { mutableStateOf<String?>(null) }
   val firstNameError = remember { mutableStateOf<String?>(null) }
@@ -86,21 +85,21 @@ fun NewUserScreen(navigationActions: NavigationActions, userVM: UserViewModel) {
 
   fun validatePhone(input: String): Boolean {
     return input.matches(
-        Regex("^\\+?\\d{10,15}$")) // Valide les numéros de téléphone de type +4122345678
+        Regex("^\\+?\\d{10,15}$"))
   }
 
   fun validateNonEmpty(input: String): Boolean {
     return input.isNotBlank()
   }
 
-  // Fonction pour valider l'ensemble des champs
+
   fun validateForm(): Boolean {
     emailError.value = if (validateEmail(email.value)) null else "Invalid email format"
     phoneError.value = if (validatePhone(phone.value)) null else "Invalid phone number"
     firstNameError.value = if (validateNonEmpty(firstName.value)) null else "First name required"
     lastNameError.value = if (validateNonEmpty(lastName.value)) null else "Last name required"
 
-    // Retourne `true` si tous les champs sont valides, sinon `false`
+
     return emailError.value == null &&
         phoneError.value == null &&
         firstNameError.value == null &&
@@ -140,7 +139,6 @@ fun NewUserScreen(navigationActions: NavigationActions, userVM: UserViewModel) {
         }
 
         item {
-          // Formulaire d'informations personnelles
           Card(
               Modifier.testTag("editProfileContainer").background(ColorVariable.BackGround),
               colors =

@@ -82,7 +82,7 @@ fun AddToBookScreen(
                     title = it
                   }
               ExposedDropdownMenuBox(
-                  modifier = Modifier.fillMaxWidth().padding(horizontal = HORIZONTAL_PADDING.dp),
+                  modifier = Modifier.fillMaxWidth().padding(horizontal = HORIZONTAL_PADDING.dp).testTag("genre_field"),
                   expanded = expanded,
                   onExpandedChange = { expanded = !expanded }) {
                     FieldComponent(
@@ -189,12 +189,15 @@ fun AddToBookScreen(
                               isbn,
                               listOf(selectedGenre!!))
                       if (book == null) {
+                        Log.e("AddToBookScreen", "Invalid argument")
                         Toast.makeText(context, "Invalid argument", Toast.LENGTH_SHORT).show()
                       } else {
+                        Log.d("AddToBookScreen", "Adding book: $book")
                         repository.addBook(book, callback = {})
                       }
                     } else {
                       // Show a Toast message if title or ISBN is empty
+                      Log.e("AddToBookScreen", "Title and ISBN are required.")
                       Toast.makeText(context, "Title and ISBN are required.", Toast.LENGTH_SHORT)
                           .show()
                     }
