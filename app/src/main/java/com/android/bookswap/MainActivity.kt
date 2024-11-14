@@ -90,8 +90,8 @@ class MainActivity : ComponentActivity() {
                 messageRepository,
                 bookRepository,
                 userDataSource,
-                geolocation = geolocation,
-                photoStorage = photoStorage)
+                photoStorage = photoStorage,
+                geolocation = geolocation)
           }
     }
   }
@@ -102,8 +102,8 @@ class MainActivity : ComponentActivity() {
       bookRepository: BooksRepository,
       userRepository: UsersRepository,
       startDestination: String = Route.AUTH,
-      geolocation: IGeolocation = DefaultGeolocation(),
-      photoStorage: PhotoFirebaseStorageSource
+      photoStorage: PhotoFirebaseStorageSource,
+      geolocation: IGeolocation = DefaultGeolocation()
   ) {
     // navigation part
     val navController = rememberNavController()
