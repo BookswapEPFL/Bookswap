@@ -1,5 +1,6 @@
 package com.android.bookswap.ui.chat
 
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.assertAll
 import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertIsDisplayed
@@ -11,8 +12,13 @@ import androidx.compose.ui.test.onChild
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.navigation.compose.rememberNavController
-import com.android.bookswap.model.chat.MessageBox
+import com.android.bookswap.data.DataUser
+import com.android.bookswap.data.MessageBox
+import com.android.bookswap.ui.components.TopAppBarComponent
+import com.android.bookswap.ui.navigation.BottomNavigationMenu
+import com.android.bookswap.ui.navigation.List_Navigation_Bar_Destinations
 import com.android.bookswap.ui.navigation.NavigationActions
+import java.util.UUID
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -28,7 +34,18 @@ class ListChatScreenTest {
     placeHolderData =
         List(12) {
           MessageBox(
-              "Contact ${it + 1}",
+              DataUser(
+                  UUID.randomUUID(),
+                  "Hello",
+                  "First ${it + 1}",
+                  "Last ${it + 1}",
+                  "",
+                  "",
+                  0.0,
+                  0.0,
+                  "",
+                  emptyList(),
+                  "googleUid"),
               "Test message $it test for the feature of ellipsis in the message",
               "01.01.24")
         }
@@ -40,15 +57,24 @@ class ListChatScreenTest {
     composeTestRule.setContent {
       val navController = rememberNavController()
       val navigationActions = NavigationActions(navController)
-      ListChatScreen(placeHolderData, navigationActions)
+      ListChatScreen(
+          placeHolderData,
+          navigationActions,
+          { TopAppBarComponent(Modifier, navigationActions, "Messages") },
+          {
+            BottomNavigationMenu(
+                onTabSelect = { destination -> navigationActions.navigateTo(destination) },
+                tabList = List_Navigation_Bar_Destinations,
+                selectedItem = navigationActions.currentRoute())
+          })
     }
-    composeTestRule.onNodeWithTag("chat_messageScreenTitle").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("TopAppBar").assertIsDisplayed()
     composeTestRule.onNodeWithTag("profileIconButton").assertIsDisplayed()
     composeTestRule.onNodeWithContentDescription("Profile Icon").assertIsDisplayed()
     composeTestRule.onNodeWithTag("chat_messageList").assertIsDisplayed()
     composeTestRule.onNodeWithTag("bottomNavigationMenu").assertIsDisplayed()
 
-    composeTestRule.onNodeWithTag("chat_messageScreenTitle").onChild().assertTextEquals("Messages")
+    composeTestRule.onNodeWithTag("TopAppBar_Title").assertTextEquals("Messages")
   }
 
   @Test
@@ -56,15 +82,24 @@ class ListChatScreenTest {
     composeTestRule.setContent {
       val navController = rememberNavController()
       val navigationActions = NavigationActions(navController)
-      ListChatScreen(placeHolderDataEmpty, navigationActions)
+      ListChatScreen(
+          placeHolderDataEmpty,
+          navigationActions,
+          { TopAppBarComponent(Modifier, navigationActions, "Messages") },
+          {
+            BottomNavigationMenu(
+                onTabSelect = { destination -> navigationActions.navigateTo(destination) },
+                tabList = List_Navigation_Bar_Destinations,
+                selectedItem = navigationActions.currentRoute())
+          })
     }
-    composeTestRule.onNodeWithTag("chat_messageScreenTitle").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("TopAppBar").assertIsDisplayed()
     composeTestRule.onNodeWithTag("profileIconButton").assertIsDisplayed()
     composeTestRule.onNodeWithContentDescription("Profile Icon").assertIsDisplayed()
     composeTestRule.onNodeWithTag("chat_messageList").assertIsDisplayed()
     composeTestRule.onNodeWithTag("bottomNavigationMenu").assertIsDisplayed()
 
-    composeTestRule.onNodeWithTag("chat_messageScreenTitle").onChild().assertTextEquals("Messages")
+    composeTestRule.onNodeWithTag("TopAppBar_Title").assertTextEquals("Messages")
     composeTestRule.onNodeWithTag("chat_messageList").onChild().assertTextEquals("No messages yet")
   }
 
@@ -73,7 +108,16 @@ class ListChatScreenTest {
     composeTestRule.setContent {
       val navController = rememberNavController()
       val navigationActions = NavigationActions(navController)
-      ListChatScreen(placeHolderData, navigationActions)
+      ListChatScreen(
+          placeHolderData,
+          navigationActions,
+          { TopAppBarComponent(Modifier, navigationActions, "Messages") },
+          {
+            BottomNavigationMenu(
+                onTabSelect = { destination -> navigationActions.navigateTo(destination) },
+                tabList = List_Navigation_Bar_Destinations,
+                selectedItem = navigationActions.currentRoute())
+          })
     }
     composeTestRule.onNodeWithTag("profileIconButton").assertHasClickAction()
   }
@@ -83,7 +127,16 @@ class ListChatScreenTest {
     composeTestRule.setContent {
       val navController = rememberNavController()
       val navigationActions = NavigationActions(navController)
-      ListChatScreen(placeHolderData, navigationActions)
+      ListChatScreen(
+          placeHolderData,
+          navigationActions,
+          { TopAppBarComponent(Modifier, navigationActions, "Messages") },
+          {
+            BottomNavigationMenu(
+                onTabSelect = { destination -> navigationActions.navigateTo(destination) },
+                tabList = List_Navigation_Bar_Destinations,
+                selectedItem = navigationActions.currentRoute())
+          })
     }
     val messageNodes = composeTestRule.onAllNodesWithTag("chat_messageBox")
     assert(messageNodes.fetchSemanticsNodes().isNotEmpty())
