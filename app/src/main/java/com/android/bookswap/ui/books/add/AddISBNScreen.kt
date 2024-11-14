@@ -1,5 +1,7 @@
 package com.android.bookswap.ui.books.add
 
+/// ## THIS LINE IS MARKED AS DELETED BY KTFMTCHECK ON GITHUB ACTION
+/// ## THIS LINE IS MARKED AS DELETED BY KTFMTCHECK ON GITHUB ACTION
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
@@ -25,9 +27,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-/// ## THIS LINE IS MARKED AS DELETED BY KTFMTCHECK ON GITHUB ACTION
 import androidx.compose.ui.platform.LocalContext
-/// ## THIS LINE IS MARKED AS DELETED BY KTFMTCHECK ON GITHUB ACTION
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -56,7 +56,7 @@ fun AddISBNScreen(navigationActions: NavigationActions, booksRepository: BooksRe
                     containerColor = ColorVariable.BackGround,
                 ),
             title = {
-              Box(modifier = Modifier) {
+              Box {
                 Row(
                     horizontalArrangement = Arrangement.Center,
                     modifier = Modifier.fillMaxWidth(0.85f)) {
@@ -80,9 +80,7 @@ fun AddISBNScreen(navigationActions: NavigationActions, booksRepository: BooksRe
       content = { pv ->
         Box(
             modifier =
-                Modifier.fillMaxSize()
-                    .padding(pv)
-					    .background(color = ColorVariable.BackGround)) {
+                Modifier.fillMaxSize().padding(pv).background(color = ColorVariable.BackGround)) {
               var isbn by remember { mutableStateOf("") }
 
               Column(
