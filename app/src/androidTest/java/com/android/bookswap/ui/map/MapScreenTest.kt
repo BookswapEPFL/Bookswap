@@ -177,7 +177,7 @@ class MapScreenTest {
     composeTestRule
         .onNodeWithTag("mapDraggableMenuNoBook")
         .assertIsDisplayed()
-        .assertTextContains("No books found")
+        .assertTextContains("No books to display")
   }
 
   @Test
