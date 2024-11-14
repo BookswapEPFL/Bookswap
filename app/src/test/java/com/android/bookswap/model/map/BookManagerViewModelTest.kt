@@ -4,8 +4,9 @@ import com.android.bookswap.data.BookGenres
 import com.android.bookswap.data.BookLanguages
 import com.android.bookswap.data.DataBook
 import com.android.bookswap.data.DataUser
+import com.android.bookswap.data.UserBooksWithLocation
+import com.android.bookswap.data.repository.UsersRepository
 import com.android.bookswap.data.source.network.BooksFirestoreRepository
-import com.android.bookswap.ui.map.UserBooksWithLocation
 import io.mockk.every
 import io.mockk.mockk
 import java.util.UUID
@@ -63,17 +64,18 @@ class BookManagerViewModelTest {
   private val books = listOf(book3, book1, book2)
 
   private val userBooksWithLocation1 =
-      UserBooksWithLocation(user1.longitude, user1.latitude, listOf(book1, book2))
+      UserBooksWithLocation(
+          UUID.randomUUID(), user1.longitude, user1.latitude, listOf(book1, book2))
 
   private val userBooksWithLocation2 =
-      UserBooksWithLocation(user2.longitude, user2.latitude, listOf(book3))
+      UserBooksWithLocation(UUID.randomUUID(), user2.longitude, user2.latitude, listOf(book3))
 
   private val userBooksWithLocation = listOf(userBooksWithLocation2, userBooksWithLocation1)
 
   private val filteredBooksWithLocation =
       listOf(
           userBooksWithLocation2,
-          UserBooksWithLocation(user1.longitude, user1.latitude, emptyList()))
+          UserBooksWithLocation(UUID.randomUUID(), user1.longitude, user1.latitude, emptyList()))
 
   private val geolocation1 = listOf(0.0, 0.0)
   private val geolocation2 = listOf(100.0, 100.0)
@@ -84,6 +86,7 @@ class BookManagerViewModelTest {
       }
 
   private lateinit var mockBookRepository: BooksFirestoreRepository
+  private lateinit var mockUsersRepository: UsersRepository
   private lateinit var mockGeolocation1: IGeolocation
   private lateinit var mockGeolocation2: IGeolocation
   private lateinit var mockBookFilter: BookFilter
@@ -97,6 +100,12 @@ class BookManagerViewModelTest {
         {
           firstArg<(List<DataBook>) -> Unit>().invoke(books)
         }
+    mockUsersRepository = mockk()
+    every { mockUsersRepository.getUsers(any()) } answers
+        {
+          firstArg<(Result<List<DataUser>>) -> Unit>().invoke(Result.success(users))
+        }
+
     mockGeolocation1 = mockk()
     every { mockGeolocation1.longitude } answers { MutableStateFlow(geolocation1[0]) }
     every { mockGeolocation1.latitude } answers { MutableStateFlow(geolocation1[1]) }
@@ -122,13 +131,14 @@ class BookManagerViewModelTest {
   @Test
   fun defaultCaseNoFilterOrSortingNecessary() = runTest {
     bookManagerViewModel =
-        BookManagerViewModel(mockGeolocation1, mockBookRepository, users, mockBookFilterEmpty) {
-            _,
-            _,
-            _,
-            _ ->
-          0.0
-        }
+        BookManagerViewModel(
+            mockGeolocation1, mockBookRepository, mockUsersRepository, mockBookFilterEmpty) {
+                _,
+                _,
+                _,
+                _ ->
+              0.0
+            }
     bookManagerViewModel.startUpdatingBooks()
     bookManagerViewModel.filteredBooks.first { it != emptyList<DataBook>() }
     bookManagerViewModel.filteredUsers.first { it != emptyList<UserBooksWithLocation>() }
@@ -141,7 +151,7 @@ class BookManagerViewModelTest {
   fun returnFilteredListOfBooks() = runTest {
     bookManagerViewModel =
         BookManagerViewModel(
-            mockGeolocation1, mockBookRepository, users, mockBookFilter, sortingTest)
+            mockGeolocation1, mockBookRepository, mockUsersRepository, mockBookFilter, sortingTest)
     bookManagerViewModel.startUpdatingBooks()
     bookManagerViewModel.filteredBooks.first { it != emptyList<DataBook>() }
     bookManagerViewModel.filteredUsers.first { it != emptyList<UserBooksWithLocation>() }
@@ -154,7 +164,11 @@ class BookManagerViewModelTest {
   fun sortTheUsers() = runTest {
     bookManagerViewModel =
         BookManagerViewModel(
-            mockGeolocation2, mockBookRepository, users, mockBookFilterEmpty, sortingTest)
+            mockGeolocation2,
+            mockBookRepository,
+            mockUsersRepository,
+            mockBookFilterEmpty,
+            sortingTest)
     bookManagerViewModel.startUpdatingBooks()
     bookManagerViewModel.filteredBooks.first { it != emptyList<DataBook>() }
     bookManagerViewModel.filteredUsers.first { it != emptyList<UserBooksWithLocation>() }

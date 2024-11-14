@@ -17,6 +17,7 @@ import com.android.bookswap.data.BookGenres
 import com.android.bookswap.data.BookLanguages
 import com.android.bookswap.data.DataBook
 import com.android.bookswap.data.DataUser
+import com.android.bookswap.data.UserBooksWithLocation
 import com.android.bookswap.model.map.BookManagerViewModel
 import com.android.bookswap.model.map.DefaultGeolocation
 import com.android.bookswap.ui.navigation.NavigationActions
@@ -73,12 +74,14 @@ class MapScreenTest {
   private val userLongList = listOf(DataUser(bookList = listOf(UUID(2000, 2000))))
 
   private val userBooksWithLocationList =
-      listOf(UserBooksWithLocation(user[0].longitude, user[0].latitude, books))
+      listOf(UserBooksWithLocation(UUID.randomUUID(), user[0].longitude, user[0].latitude, books))
   private val userBooksWithLocationLongList =
       listOf(
-          UserBooksWithLocation(userLongList[0].longitude, userLongList[0].latitude, longListBook))
+          UserBooksWithLocation(
+              UUID.randomUUID(), userLongList[0].longitude, userLongList[0].latitude, longListBook))
 
-  private val userWithoutBooks = listOf(UserBooksWithLocation(0.0, 0.0, emptyList()))
+  private val userWithoutBooks =
+      listOf(UserBooksWithLocation(UUID.randomUUID(), 0.0, 0.0, emptyList()))
   @get:Rule val composeTestRule = createComposeRule()
 
   private lateinit var mockBookManagerViewModel: BookManagerViewModel
