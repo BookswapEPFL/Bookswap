@@ -39,9 +39,7 @@ class AddToBookTest {
   @Test
   fun testSaveButtonDisabledInitially() {
     composeTestRule.setContent {
-      val navController = rememberNavController()
-      val navigationActions = NavigationActions(navController)
-      AddToBookScreen(mockBooksRepository, navigationActions)
+         AddToBookScreen(mockBooksRepository)
     }
     // Check if the Save button is initially disabled
     composeTestRule.onNodeWithText("Save").assertIsNotEnabled()
@@ -50,9 +48,7 @@ class AddToBookTest {
   @Test
   fun testSaveButtonEnabledWhenRequiredFieldsAreFilled() {
     composeTestRule.setContent {
-      val navController = rememberNavController()
-      val navigationActions = NavigationActions(navController)
-      AddToBookScreen(mockBooksRepository, navigationActions)
+      AddToBookScreen(mockBooksRepository)
     }
     // Fill in the Title and ISBN fields
     composeTestRule.onNodeWithText("Title").performTextInput("My Book Title")
@@ -147,7 +143,7 @@ class AddToBookTest {
     composeTestRule.setContent {
       val navController = rememberNavController()
       val navigationActions = NavigationActions(navController)
-      AddToBookScreen(mockBooksRepository, navigationActions)
+      AddToBookScreen(mockBooksRepository)
     }
     // Fill in the ISBN field but leave the Title field empty
     composeTestRule.onNodeWithText("ISBN").performTextInput("1234567890")

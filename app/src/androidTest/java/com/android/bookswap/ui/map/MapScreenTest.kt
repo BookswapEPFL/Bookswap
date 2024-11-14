@@ -17,15 +17,18 @@ import com.android.bookswap.data.BookGenres
 import com.android.bookswap.data.BookLanguages
 import com.android.bookswap.data.DataBook
 import com.android.bookswap.data.DataUser
-import com.android.bookswap.data.source.network.BooksFirestoreSource
-import com.android.bookswap.model.map.BookFilter
+import com.android.bookswap.data.UserBooksWithLocation
+import com.android.bookswap.model.map.BookManagerViewModel
 import com.android.bookswap.model.map.DefaultGeolocation
 import com.android.bookswap.ui.navigation.NavigationActions
 import com.google.maps.android.compose.CameraPositionState
 import io.mockk.every
+import io.mockk.just
 import io.mockk.mockk
+import io.mockk.runs
 import java.util.UUID
 import junit.framework.TestCase.assertEquals
+import kotlinx.coroutines.flow.MutableStateFlow
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -69,21 +72,31 @@ val books =
 
 class MapScreenTest {
   private val user = listOf(DataUser(bookList = listOf(UUID(1000, 1000), UUID(2000, 1000))))
-  private val userLongListOnly = listOf(DataUser(bookList = listOf(UUID(2000, 2000))))
+  private val userLongList = listOf(DataUser(bookList = listOf(UUID(2000, 2000))))
 
-  private val userWithoutBooks = listOf(DataUser(bookList = emptyList()))
+  private val userBooksWithLocationList =
+      listOf(UserBooksWithLocation(UUID.randomUUID(), user[0].longitude, user[0].latitude, books))
+  private val userBooksWithLocationLongList =
+      listOf(
+          UserBooksWithLocation(
+              UUID.randomUUID(), userLongList[0].longitude, userLongList[0].latitude, longListBook))
+
+  private val userWithoutBooks =
+      listOf(UserBooksWithLocation(UUID.randomUUID(), 0.0, 0.0, emptyList()))
   @get:Rule val composeTestRule = createComposeRule()
 
-  private lateinit var mockBookRepository: BooksFirestoreSource
+  private lateinit var mockBookManagerViewModel: BookManagerViewModel
 
   @Before
   fun setup() {
-    mockBookRepository = mockk()
+    mockBookManagerViewModel = mockk()
 
-    every { mockBookRepository.getBook(any()) } answers
-        {
-          firstArg<(Result<List<DataBook>>) -> Unit>().invoke(Result.success(books))
-        }
+    every { mockBookManagerViewModel.filteredBooks } returns MutableStateFlow(books)
+
+    every { mockBookManagerViewModel.filteredUsers } returns
+        MutableStateFlow(userBooksWithLocationList)
+    every { mockBookManagerViewModel.startUpdatingBooks() } just runs
+    every { mockBookManagerViewModel.stopUpdatingBooks() } just runs
   }
 
   @Test
@@ -91,7 +104,7 @@ class MapScreenTest {
     composeTestRule.setContent {
       val navController = rememberNavController()
       val navigationActions = NavigationActions(navController)
-      MapScreen(user, navigationActions, BookFilter(), mockBookRepository, 0)
+      MapScreen(mockBookManagerViewModel, navigationActions, 0)
     }
     composeTestRule.onNodeWithTag("mapScreen").assertIsDisplayed()
     composeTestRule.onNodeWithTag("mapGoogleMap").assertIsDisplayed()
@@ -117,14 +130,18 @@ class MapScreenTest {
     composeTestRule.onAllNodesWithTag("mapDraggableMenuBookBoxEmptyStar").assertCountEquals(1)
     composeTestRule.onAllNodesWithTag("mapDraggableMenuBookBoxTag").assertCountEquals(2)
     composeTestRule.onAllNodesWithTag("mapDraggableMenuBookBoxDivider").assertCountEquals(2)
+
+    composeTestRule.onNodeWithTag("filterButton").assertIsDisplayed()
   }
 
   @Test
   fun noMarkerDisplayedForUserWithoutBooks() {
+    every { mockBookManagerViewModel.filteredBooks } answers { MutableStateFlow(emptyList()) }
+    every { mockBookManagerViewModel.filteredUsers } answers { MutableStateFlow(userWithoutBooks) }
     composeTestRule.setContent {
       val navController = rememberNavController()
       val navigationActions = NavigationActions(navController)
-      MapScreen(userWithoutBooks, navigationActions, BookFilter(), mockBookRepository, 0)
+      MapScreen(mockBookManagerViewModel, navigationActions, 0)
     }
 
     // Assert that the marker info window is displayed, but without book entries
@@ -133,23 +150,13 @@ class MapScreenTest {
   }
 
   @Test
-  fun noBookDisplayedInDraggableMenuForAllUsersWithNoBook() {
-    composeTestRule.setContent {
-      val navController = rememberNavController()
-      val navigationActions = NavigationActions(navController)
-      MapScreen(userWithoutBooks, navigationActions, BookFilter(), mockBookRepository)
-    }
-
-    composeTestRule.onNodeWithTag("mapDraggableMenu").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("mapDraggableMenuBookBox0").assertIsNotDisplayed() // No books
-  }
-
-  @Test
   fun emptyUserListDoesNotShowMarkers() {
+    every { mockBookManagerViewModel.filteredBooks } answers { MutableStateFlow(emptyList()) }
+    every { mockBookManagerViewModel.filteredUsers } answers { MutableStateFlow(emptyList()) }
     composeTestRule.setContent {
       val navController = rememberNavController()
       val navigationActions = NavigationActions(navController)
-      MapScreen(listOf(), navigationActions, BookFilter(), mockBookRepository)
+      MapScreen(mockBookManagerViewModel, navigationActions)
     }
 
     // Assert that the map is displayed but no marker and info window is shown
@@ -158,16 +165,21 @@ class MapScreenTest {
   }
 
   @Test
-  fun emptyUserListGiveEmptyDraggableMenu() {
+  fun emptyBooksListGiveEmptyDraggableMenu() {
+    every { mockBookManagerViewModel.filteredBooks } answers { MutableStateFlow(emptyList()) }
+    every { mockBookManagerViewModel.filteredUsers } answers { MutableStateFlow(emptyList()) }
     composeTestRule.setContent {
       val navController = rememberNavController()
       val navigationActions = NavigationActions(navController)
-      MapScreen(userWithoutBooks, navigationActions, BookFilter(), mockBookRepository)
+      MapScreen(mockBookManagerViewModel, navigationActions)
     }
-
     // Assert that the marker info window is displayed, but without book entries
     composeTestRule.onNodeWithTag("mapDraggableMenu").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("mapDraggableMenuBookBox0").assertIsNotDisplayed() // No books
+    composeTestRule.onNodeWithTag("mapDraggableMenuBookBox0").assertIsNotDisplayed()
+    composeTestRule
+        .onNodeWithTag("mapDraggableMenuNoBook")
+        .assertIsDisplayed()
+        .assertTextContains("No books found")
   }
 
   @Test
@@ -175,7 +187,7 @@ class MapScreenTest {
     composeTestRule.setContent {
       val navController = rememberNavController()
       val navigationActions = NavigationActions(navController)
-      MapScreen(user, navigationActions, BookFilter(), mockBookRepository)
+      MapScreen(mockBookManagerViewModel, navigationActions)
     }
 
     // Assert that no info window is displayed when no user is selected
@@ -188,9 +200,8 @@ class MapScreenTest {
     composeTestRule.setContent {
       val navController = rememberNavController()
       val navigationActions = NavigationActions(navController)
-      MapScreen(user, navigationActions, BookFilter(), mockBookRepository, 0)
+      MapScreen(mockBookManagerViewModel, navigationActions, 0)
     }
-
     // Ensure the DraggableMenu is initially displayed
     composeTestRule.onNodeWithTag("mapDraggableMenu").assertIsDisplayed()
 
@@ -212,35 +223,17 @@ class MapScreenTest {
   }
 
   @Test
-  fun filterButtonIsDisplayed() {
-    composeTestRule.setContent {
-      val navController = rememberNavController()
-      val navigationActions = NavigationActions(navController)
-      MapScreen(user, navigationActions, BookFilter(), mockBookRepository, 0)
-    }
-    composeTestRule.onNodeWithTag("filterButton").assertIsDisplayed()
-  }
-
-  @Test
-  fun bookChangedWhenFilterApplied() {
-    val bookFilter = BookFilter()
-    bookFilter.setGenres(listOf("Horror"))
-    composeTestRule.setContent {
-      val navController = rememberNavController()
-      val navigationActions = NavigationActions(navController)
-      MapScreen(user, navigationActions, bookFilter, mockBookRepository, 0)
-    }
-    composeTestRule.onNodeWithTag("mapDraggableMenuBookBox0").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("mapDraggableMenuBookBox1").assertIsNotDisplayed()
-  }
-
-  @Test
   fun draggableMenuListIsScrollable() {
+
+    every { mockBookManagerViewModel.filteredBooks } answers { MutableStateFlow(longListBook) }
+    every { mockBookManagerViewModel.filteredUsers } answers
+        {
+          MutableStateFlow(userBooksWithLocationLongList)
+        }
     composeTestRule.setContent {
       val navController = rememberNavController()
       val navigationActions = NavigationActions(navController)
-      // Passing multiple books to ensure list needs scrolling
-      MapScreen(userLongListOnly, navigationActions, BookFilter(), mockBookRepository, 0)
+      MapScreen(mockBookManagerViewModel, navigationActions, 0)
     }
 
     // Assert initial state: Only first item(s) are visible
@@ -257,42 +250,12 @@ class MapScreenTest {
   }
 
   @Test
-  fun listMarkerBookChangedWhenFilterApplied() {
-    val bookFilter = BookFilter()
-    bookFilter.setGenres(listOf("Horror"))
-    composeTestRule.setContent {
-      val navController = rememberNavController()
-      val navigationActions = NavigationActions(navController)
-      MapScreen(user, navigationActions, bookFilter, mockBookRepository, 0)
-    }
-    composeTestRule.onNodeWithTag("mapBoxMarkerListBox").assertIsDisplayed()
-    composeTestRule.onAllNodesWithTag("mapBoxMarkerListBox").assertCountEquals(1)
-    composeTestRule.onNodeWithTag("mapBoxMarkerListBoxTitle").assertTextContains("Book 1")
-  }
-
-  @Test
-  fun noBooksTextDisplayedWhenNoBooksFound() {
-    val bookFilter = BookFilter()
-    bookFilter.setGenres(listOf("Dystopian"))
-    composeTestRule.setContent {
-      val navController = rememberNavController()
-      val navigationActions = NavigationActions(navController)
-      MapScreen(user, navigationActions, bookFilter, mockBookRepository, 0)
-    }
-    composeTestRule
-        .onNodeWithTag("mapDraggableMenuNoBook")
-        .assertIsDisplayed()
-        .assertTextContains("No books found")
-    composeTestRule.onNodeWithTag("mapDraggableMenuBookBox").assertIsNotDisplayed()
-  }
-
-  @Test
   fun mapHasGeoLocation() {
     val geolocation = DefaultGeolocation()
     composeTestRule.setContent {
       val navController = rememberNavController()
       val navigationActions = NavigationActions(navController)
-      MapScreen(user, navigationActions, BookFilter(), mockBookRepository, 0)
+      MapScreen(mockBookManagerViewModel, navigationActions, 0)
     }
     val node1 = composeTestRule.onNodeWithTag("mapGoogleMap").fetchSemanticsNode()
     val cameraPositionState: CameraPositionState? = node1.config.getOrNull(CameraPositionKey)

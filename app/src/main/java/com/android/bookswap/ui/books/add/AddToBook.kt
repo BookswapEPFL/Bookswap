@@ -14,10 +14,9 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -26,17 +25,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.android.bookswap.data.BookGenres
 import com.android.bookswap.data.BookLanguages
 import com.android.bookswap.data.DataBook
 import com.android.bookswap.data.repository.BooksRepository
-import com.android.bookswap.ui.components.BackButtonComponent
-import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.theme.ColorVariable
-import com.android.bookswap.ui.theme.ColorVariable.Accent
 import com.android.bookswap.ui.theme.ColorVariable.BackGround
 import com.android.bookswap.ui.theme.ColorVariable.Primary
 import com.android.bookswap.ui.theme.ColorVariable.Secondary
@@ -44,7 +38,11 @@ import java.util.UUID
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddToBookScreen(repository: BooksRepository, navController: NavigationActions) {
+fun AddToBookScreen(
+    repository: BooksRepository,
+    topAppBar: @Composable () -> Unit = {},
+    bottomAppBar: @Composable () -> Unit = {}
+) {
   // State variables to store the values entered by the user
   var title by remember { mutableStateOf("") }
   var author by remember { mutableStateOf("") }
@@ -61,24 +59,8 @@ fun AddToBookScreen(repository: BooksRepository, navController: NavigationAction
   // Scaffold to provide basic UI structure with a top app bar
   Scaffold(
       modifier = Modifier.testTag("addBookScreen").background(BackGround),
-      topBar = {
-        TopAppBar(
-            // Title of the screen
-            title = {
-              Text(
-                  text = "Add Your Book",
-                  fontSize = 24.sp,
-                  fontWeight = FontWeight.Bold,
-                  color = Accent,
-                  modifier = Modifier.testTag("addBookTitle"))
-            },
-            // Icon button for navigation (currently no action defined)
-            // navigationIcon = { BackButton(navController) },
-            navigationIcon = {
-              BackButtonComponent(navController)
-              // You can add an icon here for the button
-            })
-      },
+      topBar = topAppBar,
+      bottomBar = bottomAppBar,
       content = { paddingValues ->
         // Column layout to stack input fields vertically with spacing
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -93,7 +75,7 @@ fun AddToBookScreen(repository: BooksRepository, navController: NavigationAction
                       .testTag("inputBookTitle")
                       .testTag("Title"), // Light background color inside the ,
               colors =
-                  TextFieldDefaults.outlinedTextFieldColors(
+                  OutlinedTextFieldDefaults.colors(
                       focusedBorderColor = Secondary, // Custom green for focused border
                       unfocusedBorderColor = Secondary, // Lighter green for unfocused border
                       cursorColor = Secondary, // Custom green for the cursor
@@ -143,7 +125,7 @@ fun AddToBookScreen(repository: BooksRepository, navController: NavigationAction
               modifier =
                   Modifier.padding(paddingValues).testTag("inputBookAuthor").testTag("Author"),
               colors =
-                  TextFieldDefaults.outlinedTextFieldColors(
+                  OutlinedTextFieldDefaults.colors(
                       focusedBorderColor = Secondary, // Custom green for focused border
                       unfocusedBorderColor = Secondary, // Lighter green for unfocused border
                       cursorColor = Secondary, // Custom green for the cursor
@@ -159,7 +141,7 @@ fun AddToBookScreen(repository: BooksRepository, navController: NavigationAction
               placeholder = { Text("Provide a description of the book") },
               modifier = Modifier.testTag("inputBookDescription").testTag("Description"),
               colors =
-                  TextFieldDefaults.outlinedTextFieldColors(
+                  OutlinedTextFieldDefaults.colors(
                       focusedBorderColor = Secondary, // Custom green for focused border
                       unfocusedBorderColor = Secondary, // Lighter green for unfocused border
                       cursorColor = Secondary, // Custom green for the cursor
@@ -174,7 +156,7 @@ fun AddToBookScreen(repository: BooksRepository, navController: NavigationAction
               placeholder = { Text("Rate the book (e.g. 4.5)") },
               modifier = Modifier.testTag("inputBookRating"),
               colors =
-                  TextFieldDefaults.outlinedTextFieldColors(
+                  OutlinedTextFieldDefaults.colors(
                       focusedBorderColor = Secondary, // Custom green for focused border
                       unfocusedBorderColor = Secondary, // Lighter green for unfocused border
                       cursorColor = Secondary, // Custom green for the cursor
@@ -189,7 +171,7 @@ fun AddToBookScreen(repository: BooksRepository, navController: NavigationAction
               placeholder = { Text("Enter the ISBN") },
               modifier = Modifier.testTag("inputBookISBN").testTag("ISBN"),
               colors =
-                  TextFieldDefaults.outlinedTextFieldColors(
+                  OutlinedTextFieldDefaults.colors(
                       focusedBorderColor = Secondary, // Custom green for focused border
                       unfocusedBorderColor = Secondary, // Lighter green for unfocused border
                       cursorColor = Secondary, // Custom green for the cursor
@@ -204,7 +186,7 @@ fun AddToBookScreen(repository: BooksRepository, navController: NavigationAction
               placeholder = { Text("Enter a photo of the books") },
               modifier = Modifier.testTag("inputBookPhoto").testTag("Photo"),
               colors =
-                  TextFieldDefaults.outlinedTextFieldColors(
+                  OutlinedTextFieldDefaults.colors(
                       focusedBorderColor = Secondary, // Custom green for focused border
                       unfocusedBorderColor = Secondary, // Lighter green for unfocused border
                       cursorColor = Secondary, // Custom green for the cursor
@@ -219,7 +201,7 @@ fun AddToBookScreen(repository: BooksRepository, navController: NavigationAction
               placeholder = { Text("In which language are the book") },
               modifier = Modifier.testTag("inputBookLanguage").testTag("Language"),
               colors =
-                  TextFieldDefaults.outlinedTextFieldColors(
+                  OutlinedTextFieldDefaults.colors(
                       focusedBorderColor = Secondary, // Custom green for focused border
                       unfocusedBorderColor = Secondary, // Lighter green for unfocused border
                       cursorColor = Secondary, // Custom green for the cursor

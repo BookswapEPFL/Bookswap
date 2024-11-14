@@ -82,15 +82,11 @@ open class NavigationActions(
    * Navigate to the specified screen with optional parameters.
    *
    * @param screen The screen to navigate to
-   * @param user1 The first user parameter
-   * @param user2 The second user parameter
+   * @param user1 The first user to pass to the screen
+   * @param user2 The second user to pass to the screen
    */
-  open fun navigateTo(screen: String, user1: String? = null, user2: String? = null) {
-    val route =
-        when (screen) {
-          Screen.CHAT -> "$screen/$user1/$user2"
-          else -> screen
-        }
+  open fun navigateTo(screen: String, otherUserUUID: String) {
+    val route = "$screen/$otherUserUUID"
     navController.navigate(route)
   }
 
