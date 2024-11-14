@@ -5,8 +5,9 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.android.bookswap.data.DataBook
 import com.android.bookswap.data.DataUser
+import com.android.bookswap.data.UserBooksWithLocation
 import com.android.bookswap.data.repository.BooksRepository
-import com.android.bookswap.ui.map.UserBooksWithLocation
+import com.android.bookswap.data.repository.UsersRepository
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 
@@ -23,16 +24,14 @@ private const val MAXIMUM_RETRIES = 3
  *
  * @param geolocation the geolocation of the current user
  * @param booksRepository an instance of [BooksRepository] to retrieve the books from the database.
- * @param listUser list of users [DataUser], will be replaced in the future by an instance of a
- *   UserFirestoreSource
+ * @param userRepository an instance of [UsersRepository] to retrieve the users from the database.
  * @param bookFilter an instance of [BookFilter] that manages the filter that needs to be applied.
  * @param computingDistanceMethod optional : a computation method for distances for testing purposes
  */
 class BookManagerViewModel(
     private val geolocation: IGeolocation,
     private val booksRepository: BooksRepository,
-    // TODO replace the listUser by a User repository to retrieve the users from the database
-    listUser: List<DataUser>,
+    private val userRepository: UsersRepository,
     private val bookFilter: BookFilter,
     // For the unit tests, the Android framework cannot be interacted with. The
     // Location.distanceBetween needs to be replaced for testing.
@@ -45,7 +44,7 @@ class BookManagerViewModel(
 ) : ViewModel() {
   // Internal MutableStateFlows to manage dynamic data
   private val _allBooks = MutableStateFlow<List<DataBook>>(emptyList())
-  private val _allUsers = MutableStateFlow(listUser)
+  private val _allUsers = MutableStateFlow<List<DataUser>>(emptyList())
   private val _allUserDistance = MutableStateFlow<List<Pair<DataUser, Double>>>(emptyList())
   private val _filteredBooks = MutableStateFlow<List<DataBook>>(emptyList())
   private val _filteredUsers = MutableStateFlow<List<UserBooksWithLocation>>(emptyList())
@@ -78,20 +77,30 @@ class BookManagerViewModel(
    * Fetches books from the repository and updates the `_allBooks` state flow. Retries fetching up
    * to `MAXIMUM_RETRIES` times if the initial attempt fails.
    */
+  // Fetch books and users from the repository and update `_allBooks` and `_allUsers`
   private suspend fun fetchBooksFromRepository() {
-    var success = false
+    var successBooks = false
+    var successUsers = false
     var currentAttempt = 0
-    while (!success && currentAttempt < MAXIMUM_RETRIES) {
+    while ((!successBooks || !successUsers) && currentAttempt < MAXIMUM_RETRIES) {
+      userRepository.getUsers { users ->
+        if (users.isSuccess) {
+          _allUsers.value = users.getOrNull()!!
+          successUsers = true
+        } else {
+          Log.e("BookManagerViewModel", "Failed to fetch users.")
+        }
+      }
       booksRepository.getBook(
           OnSucess = { books ->
             _allBooks.value = books
-            success = true
+            successBooks = true
           },
           onFailure = { error ->
             Log.e("BookManagerViewModel", "Failed to fetch books: ${error.message}")
           })
 
-      if (!success) {
+      if (!successBooks || !successUsers) {
         currentAttempt++
         delay(RETRY_TIME_DELAY)
       }
@@ -114,6 +123,7 @@ class BookManagerViewModel(
             val userBooksWithLocation =
                 userDistance.map { user ->
                   UserBooksWithLocation(
+                      userUUID = user.first.userUUID,
                       longitude = user.first.longitude,
                       latitude = user.first.latitude,
                       books =
