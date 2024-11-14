@@ -125,7 +125,9 @@ class MapScreenTest {
     composeTestRule.onAllNodesWithTag("mapDraggableMenuBookBoxStar").assertCountEquals(9)
     composeTestRule.onAllNodesWithTag("mapDraggableMenuBookBoxEmptyStar").assertCountEquals(1)
     composeTestRule.onAllNodesWithTag("mapDraggableMenuBookBoxTag").assertCountEquals(2)
-    composeTestRule.onAllNodesWithTag("mapDraggableMenuBookBoxDivider").assertCountEquals(books.size-1)
+    composeTestRule
+        .onAllNodesWithTag("mapDraggableMenuBookBoxDivider")
+        .assertCountEquals(books.size - 1)
 
     composeTestRule.onNodeWithTag("filterButton").assertIsDisplayed()
   }
