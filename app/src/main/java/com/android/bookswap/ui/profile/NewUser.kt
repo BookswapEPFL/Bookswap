@@ -72,7 +72,6 @@ fun NewUserScreen(navigationActions: NavigationActions, userVM: UserViewModel) {
   val firstName = remember { mutableStateOf("") }
   val lastName = remember { mutableStateOf("") }
 
-
   val emailError = remember { mutableStateOf<String?>(null) }
   val phoneError = remember { mutableStateOf<String?>(null) }
   val firstNameError = remember { mutableStateOf<String?>(null) }
@@ -84,21 +83,18 @@ fun NewUserScreen(navigationActions: NavigationActions, userVM: UserViewModel) {
   }
 
   fun validatePhone(input: String): Boolean {
-    return input.matches(
-        Regex("^\\+?\\d{10,15}$"))
+    return input.matches(Regex("^\\+?\\d{10,15}$"))
   }
 
   fun validateNonEmpty(input: String): Boolean {
     return input.isNotBlank()
   }
 
-
   fun validateForm(): Boolean {
     emailError.value = if (validateEmail(email.value)) null else "Invalid email format"
     phoneError.value = if (validatePhone(phone.value)) null else "Invalid phone number"
     firstNameError.value = if (validateNonEmpty(firstName.value)) null else "First name required"
     lastNameError.value = if (validateNonEmpty(lastName.value)) null else "Last name required"
-
 
     return emailError.value == null &&
         phoneError.value == null &&

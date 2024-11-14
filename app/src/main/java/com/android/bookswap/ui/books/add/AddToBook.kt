@@ -82,7 +82,10 @@ fun AddToBookScreen(
                     title = it
                   }
               ExposedDropdownMenuBox(
-                  modifier = Modifier.fillMaxWidth().padding(horizontal = HORIZONTAL_PADDING.dp).testTag("genre_field"),
+                  modifier =
+                      Modifier.fillMaxWidth()
+                          .padding(horizontal = HORIZONTAL_PADDING.dp)
+                          .testTag("genre_field"),
                   expanded = expanded,
                   onExpandedChange = { expanded = !expanded }) {
                     FieldComponent(
