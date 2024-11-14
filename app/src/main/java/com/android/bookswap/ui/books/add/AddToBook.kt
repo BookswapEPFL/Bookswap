@@ -144,7 +144,7 @@ fun AddToBookScreen(
                       Modifier.testTag("isbn_field")
                           .fillMaxWidth()
                           .padding(horizontal = HORIZONTAL_PADDING.dp),
-                  labelText = "ISBN",
+                  labelText = "ISBN*",
                   value = isbn) {
                     isbn = it
                   }
@@ -162,7 +162,7 @@ fun AddToBookScreen(
                       Modifier.testTag("language_field")
                           .fillMaxWidth()
                           .padding(horizontal = HORIZONTAL_PADDING.dp),
-                  labelText = "Language*",
+                  labelText = "Language",
                   value = language) {
                     language = it
                   }
@@ -171,6 +171,7 @@ fun AddToBookScreen(
                       Modifier.testTag("save_button")
                           .align(Alignment.CenterHorizontally)
                           .fillMaxWidth(0.5f),
+                  enabled = title.isNotBlank() && isbn.isNotBlank(),
                   onClick = {
                     // Check if title and ISBN are not blank (required fields)
                     if (title.isNotBlank() && isbn.isNotBlank() && selectedGenre != null) {

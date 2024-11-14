@@ -5,6 +5,7 @@ import android.widget.Toast
 import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
@@ -47,11 +48,11 @@ class AddToBookTest {
   fun testSaveButtonEnabledWhenRequiredFieldsAreFilled() {
     composeTestRule.setContent { AddToBookScreen(mockBooksRepository) }
     // Fill in the Title and ISBN fields
-    composeTestRule.onNodeWithText("Title").performTextInput("My Book Title")
-    composeTestRule.onNodeWithText("ISBN").performTextInput("1234567890")
+    composeTestRule.onNodeWithTag("title_field").performTextInput("My Book Title")
+    composeTestRule.onNodeWithTag("isbn_field").performTextInput("1234567890")
     // Check if the Save button is now enabled
-    composeTestRule.onNodeWithText("Select Genre").performClick()
-    composeTestRule.onNodeWithText("Save").assertIsEnabled()
+    composeTestRule.onNodeWithTag("save_button").performClick()
+    composeTestRule.onNodeWithTag("save_button").assertIsEnabled()
   }
 
   @Test
