@@ -21,8 +21,14 @@ import org.junit.Test
 class BookManagerViewModelTest {
 
   private val user1 =
-      DataUser(bookList = listOf(UUID(1, 2), UUID(2, 1)), longitude = 50.0, latitude = 50.0)
-  private val user2 = DataUser(bookList = listOf(UUID(1, 1)), longitude = 0.0, latitude = 0.0)
+      DataUser(
+          userUUID = UUID(1, 1),
+          bookList = listOf(UUID(1, 2), UUID(2, 1)),
+          longitude = 50.0,
+          latitude = 50.0)
+  private val user2 =
+      DataUser(
+          userUUID = UUID(2, 2), bookList = listOf(UUID(1, 1)), longitude = 0.0, latitude = 0.0)
   private val users = listOf(user2, user1)
 
   private val book1 =
@@ -64,18 +70,17 @@ class BookManagerViewModelTest {
   private val books = listOf(book3, book1, book2)
 
   private val userBooksWithLocation1 =
-      UserBooksWithLocation(
-          UUID.randomUUID(), user1.longitude, user1.latitude, listOf(book1, book2))
+      UserBooksWithLocation(user1.userUUID, user1.longitude, user1.latitude, listOf(book1, book2))
 
   private val userBooksWithLocation2 =
-      UserBooksWithLocation(UUID.randomUUID(), user2.longitude, user2.latitude, listOf(book3))
+      UserBooksWithLocation(user2.userUUID, user2.longitude, user2.latitude, listOf(book3))
 
   private val userBooksWithLocation = listOf(userBooksWithLocation2, userBooksWithLocation1)
 
   private val filteredBooksWithLocation =
       listOf(
           userBooksWithLocation2,
-          UserBooksWithLocation(UUID.randomUUID(), user1.longitude, user1.latitude, emptyList()))
+          UserBooksWithLocation(user1.userUUID, user1.longitude, user1.latitude, emptyList()))
 
   private val geolocation1 = listOf(0.0, 0.0)
   private val geolocation2 = listOf(100.0, 100.0)
