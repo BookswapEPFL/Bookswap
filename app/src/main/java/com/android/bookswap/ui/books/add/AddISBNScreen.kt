@@ -78,7 +78,10 @@ fun AddISBNScreen(navigationActions: NavigationActions, booksRepository: BooksRe
       content = { pv ->
         Box(
             modifier =
-                Modifier.fillMaxSize().padding(pv).background(color = ColorVariable.BackGround)) {
+                Modifier.fillMaxSize()
+                    .padding(pv)
+                    .padding()
+                    .background(color = ColorVariable.BackGround)) {
               var isbn by remember { mutableStateOf("") }
 
               Column(
