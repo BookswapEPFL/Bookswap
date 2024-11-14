@@ -53,8 +53,11 @@ class BooksFirestoreSourceTest {
     every { mockDocumentSnapshot.getString("photo") }.returns(testBook.photo)
     every { mockDocumentSnapshot.getString("language") }.returns(testBook.language.name)
     every { mockDocumentSnapshot.getString("isbn") }.returns(testBook.isbn)
-    every { mockDocumentSnapshot.getString("uuid") }.returns(testBook.uuid.toString())
     every { mockDocumentSnapshot.get("genres") }.returns(emptyList<String>())
+    every { mockDocumentSnapshot.getLong("uuid.mostSignificantBits") }
+        .returns(testBook.uuid.mostSignificantBits)
+    every { mockDocumentSnapshot.getLong("uuid.leastSignificantBits") }
+        .returns(testBook.uuid.leastSignificantBits)
   }
 
   @Test
