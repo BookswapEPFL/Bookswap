@@ -68,7 +68,7 @@ val books =
             photo = "url_to_photo_2",
             language = BookLanguages.FRENCH,
             isbn = "234-567-890",
-            genres = listOf(BookGenres.FICTION))) + longListBook
+            genres = listOf(BookGenres.FICTION)))
 
 class MapScreenTest {
   private val user = listOf(DataUser(bookList = listOf(UUID(1000, 1000), UUID(2000, 1000))))
@@ -85,11 +85,10 @@ class MapScreenTest {
       listOf(UserBooksWithLocation(UUID.randomUUID(), 0.0, 0.0, emptyList()))
   @get:Rule val composeTestRule = createComposeRule()
 
-  private lateinit var mockBookManagerViewModel: BookManagerViewModel
+  private val mockBookManagerViewModel: BookManagerViewModel = mockk()
 
   @Before
   fun setup() {
-    mockBookManagerViewModel = mockk()
 
     every { mockBookManagerViewModel.filteredBooks } returns MutableStateFlow(books)
 
