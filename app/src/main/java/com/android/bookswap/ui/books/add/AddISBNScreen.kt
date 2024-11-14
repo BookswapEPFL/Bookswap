@@ -2,6 +2,7 @@ package com.android.bookswap.ui.books.add
 
 import android.util.Log
 import android.widget.Toast
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -75,46 +76,51 @@ fun AddISBNScreen(navigationActions: NavigationActions, booksRepository: BooksRe
             actions = { Box(modifier = Modifier.padding(top = 30.dp)) { ProfileIcon() } })
       },
       content = { pv ->
-        Box(modifier = Modifier.fillMaxSize().padding(pv)) {
-          var isbn by remember { mutableStateOf("") }
+        Box(
+            modifier =
+                Modifier.fillMaxSize().padding(pv).background(color = ColorVariable.BackGround)) {
+              var isbn by remember { mutableStateOf("") }
 
-          Column(
-              modifier = Modifier.fillMaxWidth().padding(top = 40.dp),
-              horizontalAlignment = Alignment.CenterHorizontally,
-              verticalArrangement = Arrangement.spacedBy(45.dp)) {
-                FieldComponent(
-                    modifier = Modifier.testTag("isbn_field"), labelText = "ISBN*", value = isbn) {
-                      if (it.all { c -> c.isDigit() } && it.length <= 13) {
-                        isbn = it
-                      }
-                    }
-                ButtonComponent(
-                    modifier = Modifier.testTag("isbn_searchButton"),
-                    onClick = {
-                      GoogleBookDataSource(context).getBookFromISBN(isbn) { result ->
-                        if (result.isFailure) {
-                          Toast.makeText(context, "Search unsuccessful", Toast.LENGTH_LONG).show()
-                          Log.e("AddBook", result.exceptionOrNull().toString())
-                        } else {
-                          booksRepository.addBook(
-                              result.getOrThrow(),
-                              { navigationActions.navigateTo(TopLevelDestinations.NEW_BOOK) },
-                              { error ->
-                                Log.e("AddBook", error.toString())
-                                Toast.makeText(context, error.message, Toast.LENGTH_LONG).show()
-                              })
+              Column(
+                  modifier = Modifier.fillMaxWidth().padding(top = 40.dp),
+                  horizontalAlignment = Alignment.CenterHorizontally,
+                  verticalArrangement = Arrangement.spacedBy(45.dp)) {
+                    FieldComponent(
+                        modifier = Modifier.testTag("isbn_field"),
+                        labelText = "ISBN*",
+                        value = isbn) {
+                          if (it.all { c -> c.isDigit() } && it.length <= 13) {
+                            isbn = it
+                          }
                         }
-                      }
-                    }) {
-                      Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text("Search")
-                        Icon(
-                            Icons.Filled.Search,
-                            contentDescription = "Search icon",
-                        )
-                      }
-                    }
-              }
-        }
+                    ButtonComponent(
+                        modifier = Modifier.testTag("isbn_searchButton"),
+                        onClick = {
+                          GoogleBookDataSource(context).getBookFromISBN(isbn) { result ->
+                            if (result.isFailure) {
+                              Toast.makeText(context, "Search unsuccessful", Toast.LENGTH_LONG)
+                                  .show()
+                              Log.e("AddBook", result.exceptionOrNull().toString())
+                            } else {
+                              booksRepository.addBook(
+                                  result.getOrThrow(),
+                                  { navigationActions.navigateTo(TopLevelDestinations.NEW_BOOK) },
+                                  { error ->
+                                    Log.e("AddBook", error.toString())
+                                    Toast.makeText(context, error.message, Toast.LENGTH_LONG).show()
+                                  })
+                            }
+                          }
+                        }) {
+                          Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text("Search")
+                            Icon(
+                                Icons.Filled.Search,
+                                contentDescription = "Search icon",
+                            )
+                          }
+                        }
+                  }
+            }
       })
 }
