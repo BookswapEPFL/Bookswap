@@ -21,6 +21,7 @@ import com.android.bookswap.data.repository.MessageRepository
 import com.android.bookswap.data.repository.UsersRepository
 import com.android.bookswap.data.source.network.BooksFirestoreSource
 import com.android.bookswap.data.source.network.MessageFirestoreSource
+import com.android.bookswap.data.source.network.PhotoFirebaseStorageSource
 import com.android.bookswap.data.source.network.UserFirestoreSource
 import com.android.bookswap.model.UserViewModel
 import com.android.bookswap.model.chat.PermissionHandler
@@ -47,6 +48,7 @@ import com.android.bookswap.ui.navigation.Screen
 import com.android.bookswap.ui.profile.UserProfile
 import com.android.bookswap.ui.theme.BookSwapAppTheme
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.FirebaseStorage
 import java.util.UUID
 
 class MainActivity : ComponentActivity() {
@@ -65,11 +67,13 @@ class MainActivity : ComponentActivity() {
 
     // Initialize a Firebase Firestore database instance
     val db = FirebaseFirestore.getInstance()
+    val storage = FirebaseStorage.getInstance()
 
     // Create the data source objects
     val messageRepository = MessageFirestoreSource(db)
     val bookRepository = BooksFirestoreSource(db)
     val userDataSource = UserFirestoreSource(db)
+    val photoStorage = PhotoFirebaseStorageSource(storage)
 
     // Initialize the geolocation
     val geolocation = Geolocation(this)
@@ -79,7 +83,11 @@ class MainActivity : ComponentActivity() {
           modifier = Modifier.fillMaxSize().semantics { testTag = C.Tag.main_screen_container },
           color = MaterialTheme.colorScheme.background) {
             BookSwapApp(
-                messageRepository, bookRepository, userDataSource, geolocation = geolocation)
+                messageRepository,
+                bookRepository,
+                userDataSource,
+                geolocation = geolocation,
+                photoStorage = photoStorage)
           }
     }
   }
@@ -90,7 +98,8 @@ class MainActivity : ComponentActivity() {
       bookRepository: BooksRepository,
       userRepository: UsersRepository,
       startDestination: String = Route.AUTH,
-      geolocation: IGeolocation = DefaultGeolocation()
+      geolocation: IGeolocation = DefaultGeolocation(),
+      photoStorage: PhotoFirebaseStorageSource
   ) {
     val navController = rememberNavController()
     val navigationActions = NavigationActions(navController)
@@ -195,7 +204,7 @@ class MainActivity : ComponentActivity() {
           val user2 = placeHolder.firstOrNull { it.contact.userUUID == user2UUID }?.contact
 
           if (user2 != null) {
-            ChatScreen(messageRepository, currentUser, user2, navigationActions)
+            ChatScreen(messageRepository, currentUser, user2, navigationActions, photoStorage)
           } else {
             BookAdditionChoiceScreen(
                 navigationActions,
