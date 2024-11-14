@@ -494,9 +494,3 @@ private fun DisplayStarReview(rating: Int) {
     }
   }
 }
-
-data class UserBooksWithLocation(
-    val longitude: Double,
-    val latitude: Double,
-    val books: List<DataBook>
-)
