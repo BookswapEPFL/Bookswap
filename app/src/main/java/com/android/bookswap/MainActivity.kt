@@ -240,7 +240,7 @@ class MainActivity : ComponentActivity() {
         composable(Screen.ADD_BOOK_MANUALLY) {
           AddToBookScreen(
               bookRepository,
-              topAppBar = { topAppBar(null) },
+              topAppBar = { topAppBar("Add your Book") },
               bottomAppBar = { bottomAppBar(this@navigation.route ?: "") })
         }
         composable(Screen.ADD_BOOK_SCAN) { /*Todo*/}
