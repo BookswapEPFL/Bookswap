@@ -122,8 +122,8 @@ class MainActivity : ComponentActivity() {
     val bookManagerViewModel =
         BookManagerViewModel(geolocation, bookRepository, userRepository, bookFilter)
 
-    val currentUserUUID = UUID.fromString("550e8400-e29b-41d4-a716-446655440000")
-    val otherUserUUID = UUID.fromString("550e8400-e29b-41d4-a716-446655440001")
+    val currentUserUUID = UUID.fromString("77942cd7-8b99-41ba-a0a5-147214703434")
+    val otherUserUUID = UUID.fromString("7284fd9d-3edc-458b-93cd-2b0c4a8c0fc0")
     val testUserUUID = UUID.fromString("550e8400-e29b-41d4-a716-446655440002")
     val currentUserPlaceholder =
         DataUser(
@@ -167,7 +167,12 @@ class MainActivity : ComponentActivity() {
             "googleUid")
 
     val placeHolder =
-        listOf(MessageBox(otherUser, message = "Welcome message for user124", date = "01.01.24")) +
+        listOf(
+            MessageBox(otherUser, message = "Welcome message for user124", date = "01.01.24"),
+            MessageBox(
+                currentUserPlaceholder,
+                message = "Welcome message for user123",
+                date = "01.01.24")) +
             List(5) {
               MessageBox(
                   DataUser(
@@ -219,8 +224,7 @@ class MainActivity : ComponentActivity() {
           val user2 = placeHolder.firstOrNull { it.contact.userUUID == user2UUID }?.contact
 
           if (user2 != null) {
-            ChatScreen(
-                messageRepository, currentUserPlaceholder, user2, navigationActions, photoStorage)
+            ChatScreen(messageRepository, userVM.getUser(), user2, navigationActions, photoStorage)
           } else {
             BookAdditionChoiceScreen(
                 navigationActions,

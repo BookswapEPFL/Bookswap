@@ -95,7 +95,6 @@ fun SignInScreen(
     when (isStored) {
       true -> navigationActions.navigateTo(TopLevelDestinations.MAP)
       false -> {
-        userVM.updateGoogleUid(googleUid)
         navigationActions.navigateTo(Screen.NEW_USER)
       }
       null -> {} // Attendre que `isStored` soit défini
