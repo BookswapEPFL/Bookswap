@@ -6,7 +6,7 @@ import com.android.bookswap.data.DataBook
 import com.android.bookswap.data.DataUser
 import com.android.bookswap.data.UserBooksWithLocation
 import com.android.bookswap.data.repository.UsersRepository
-import com.android.bookswap.data.source.network.BooksFirestoreRepository
+import com.android.bookswap.data.source.network.BooksFirestoreSource
 import io.mockk.every
 import io.mockk.mockk
 import java.util.UUID
@@ -90,36 +90,30 @@ class BookManagerViewModelTest {
         abs(endLatitude - startLatitude)
       }
 
-  private lateinit var mockBookRepository: BooksFirestoreRepository
-  private lateinit var mockUsersRepository: UsersRepository
-  private lateinit var mockGeolocation1: IGeolocation
-  private lateinit var mockGeolocation2: IGeolocation
-  private lateinit var mockBookFilter: BookFilter
-  private lateinit var mockBookFilterEmpty: BookFilter
-  private lateinit var bookManagerViewModel: BookManagerViewModel
+  private val mockBookRepository: BooksFirestoreSource = mockk()
+  private val mockUsersRepository: UsersRepository = mockk()
+  private val mockGeolocation1: IGeolocation = mockk()
+  private val mockGeolocation2: IGeolocation = mockk()
+  private val mockBookFilter: BookFilter = mockk()
+  private val mockBookFilterEmpty: BookFilter = mockk()
 
   @Before
   fun setup() {
-    mockBookRepository = mockk()
-    every { mockBookRepository.getBook(any(), any()) } answers
+    every { mockBookRepository.getBook(any()) } answers
         {
-          firstArg<(List<DataBook>) -> Unit>().invoke(books)
+          firstArg<(Result<List<DataBook>>) -> Unit>().invoke(Result.success(books))
         }
-    mockUsersRepository = mockk()
     every { mockUsersRepository.getUsers(any()) } answers
         {
           firstArg<(Result<List<DataUser>>) -> Unit>().invoke(Result.success(users))
         }
 
-    mockGeolocation1 = mockk()
     every { mockGeolocation1.longitude } answers { MutableStateFlow(geolocation1[0]) }
     every { mockGeolocation1.latitude } answers { MutableStateFlow(geolocation1[1]) }
 
-    mockGeolocation2 = mockk()
     every { mockGeolocation2.longitude } answers { MutableStateFlow(geolocation2[0]) }
     every { mockGeolocation2.latitude } answers { MutableStateFlow(geolocation2[1]) }
 
-    mockBookFilter = mockk()
     every { mockBookFilter.genresFilter } answers { MutableStateFlow(listOf(BookGenres.HORROR)) }
     every { mockBookFilter.languagesFilter } answers
         {
@@ -127,7 +121,6 @@ class BookManagerViewModelTest {
         }
     every { mockBookFilter.filterBooks(any()) } answers { listOf(book3) }
 
-    mockBookFilterEmpty = mockk()
     every { mockBookFilterEmpty.genresFilter } answers { MutableStateFlow(emptyList()) }
     every { mockBookFilterEmpty.languagesFilter } answers { MutableStateFlow(emptyList()) }
     every { mockBookFilterEmpty.filterBooks(any()) } answers { firstArg() }
@@ -135,7 +128,7 @@ class BookManagerViewModelTest {
 
   @Test
   fun defaultCaseNoFilterOrSortingNecessary() = runTest {
-    bookManagerViewModel =
+    val bookManagerViewModel =
         BookManagerViewModel(
             mockGeolocation1, mockBookRepository, mockUsersRepository, mockBookFilterEmpty) {
                 _,
@@ -154,7 +147,7 @@ class BookManagerViewModelTest {
 
   @Test
   fun returnFilteredListOfBooks() = runTest {
-    bookManagerViewModel =
+    val bookManagerViewModel =
         BookManagerViewModel(
             mockGeolocation1, mockBookRepository, mockUsersRepository, mockBookFilter, sortingTest)
     bookManagerViewModel.startUpdatingBooks()
@@ -167,7 +160,7 @@ class BookManagerViewModelTest {
 
   @Test
   fun sortTheUsers() = runTest {
-    bookManagerViewModel =
+    val bookManagerViewModel =
         BookManagerViewModel(
             mockGeolocation2,
             mockBookRepository,
