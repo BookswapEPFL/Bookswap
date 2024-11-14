@@ -89,6 +89,26 @@ class BooksFirestoreSource(private val db: FirebaseFirestore) : BooksRepository 
     performFirestoreOperation(
         db.collection(collectionBooks).document(dataBook.uuid.toString()).delete(), callback)
   }
+
+  override fun getBooksList(
+      bookList: List<UUID>,
+      callback: (Result<Unit>) -> Unit
+  ): List<DataBook> {
+    val books = mutableListOf<DataBook>()
+    bookList.forEach { uuid ->
+      db.collection(collectionBooks).document(uuid.toString()).get().addOnCompleteListener { task ->
+        if (task.isSuccessful) {
+          task.result?.let { document ->
+            documentToBooks(document)?.let { book -> books.add(book) }
+          }
+        } else {
+          task.exception?.let { e -> callback(Result.failure(e)) }
+        }
+      }
+    }
+    return books
+  }
+
   // Maps a Firestore document to a DataBook object
   // If any required field is missing, returns null to avoid incomplete objects
   fun documentToBooks(document: DocumentSnapshot): DataBook? {

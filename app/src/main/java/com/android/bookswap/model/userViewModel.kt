@@ -1,16 +1,21 @@
 package com.android.bookswap.model
 
 import androidx.lifecycle.ViewModel
+import com.android.bookswap.data.DataBook
 import com.android.bookswap.data.DataUser
+import com.android.bookswap.data.repository.BooksRepository
 import com.android.bookswap.data.repository.UsersRepository
+import com.android.bookswap.data.source.network.BooksFirestoreSource
 import com.android.bookswap.data.source.network.UserFirestoreSource
 import com.google.firebase.firestore.FirebaseFirestore
 import java.util.UUID
 
 open class UserViewModel(
     var uuid: UUID,
-    repository: UsersRepository = UserFirestoreSource(FirebaseFirestore.getInstance())
+    firebaseFirestore: FirebaseFirestore,
 ) : ViewModel() {
+  val repository: UsersRepository = UserFirestoreSource(firebaseFirestore)
+  val booksRepository: BooksRepository = BooksFirestoreSource(firebaseFirestore)
   private var dataUser = DataUser(uuid)
   private var isLoaded = false
   var isStored = false
@@ -67,5 +72,9 @@ open class UserViewModel(
     userRepository.updateUser(dataUser) { result ->
       result.fold({ isStored = true }, { isStored = false })
     }
+  }
+
+  fun getBooks(): List<DataBook> {
+    return booksRepository.getBooksList(dataUser.bookList, {})
   }
 }

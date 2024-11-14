@@ -50,4 +50,6 @@ interface BooksRepository {
    * @param callback A callback function that receives an exception if the operation fails.
    */
   fun deleteBooks(uuid: UUID, dataBook: DataBook, callback: (Result<Unit>) -> Unit)
+
+  fun getBooksList(bookList: List<UUID>, callback: (Result<Unit>) -> Unit): List<DataBook>
 }

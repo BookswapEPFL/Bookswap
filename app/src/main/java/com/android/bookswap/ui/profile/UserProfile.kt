@@ -26,12 +26,15 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.android.bookswap.model.UserViewModel
+import com.android.bookswap.ui.components.BookListComponent
 import com.android.bookswap.ui.components.ButtonComponent
 import com.android.bookswap.ui.theme.*
+import com.google.firebase.firestore.FirebaseFirestore
 
 @Composable
 fun UserProfile(
-    userVM: UserViewModel = UserViewModel(java.util.UUID.randomUUID()),
+    userVM: UserViewModel =
+        UserViewModel(java.util.UUID.randomUUID(), FirebaseFirestore.getInstance()),
     topAppBar: @Composable () -> Unit = {},
     bottomAppBar: @Composable () -> Unit = {}
 ) {
@@ -126,6 +129,8 @@ fun UserProfile(
                 }
               }
             }
+        BookListComponent(
+            modifier = Modifier.fillMaxWidth().padding(8.dp), bookList = userVM.getBooks())
       }
 }
 

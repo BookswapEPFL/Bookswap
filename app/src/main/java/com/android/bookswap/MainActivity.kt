@@ -95,7 +95,7 @@ class MainActivity : ComponentActivity() {
     val navController = rememberNavController()
     val navigationActions = NavigationActions(navController)
     val bookFilter = BookFilter()
-    val userVM = UserViewModel(UUID.randomUUID(), userRepository)
+    val userVM = UserViewModel(UUID.randomUUID(), firebaseFirestore = FirebaseFirestore.getInstance())
     val bookManagerViewModel =
         BookManagerViewModel(geolocation, bookRepository, userRepository, bookFilter)
 

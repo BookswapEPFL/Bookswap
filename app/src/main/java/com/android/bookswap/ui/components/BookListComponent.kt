@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.Dp
 import com.android.bookswap.data.DataBook
+import com.android.bookswap.ui.books.BookProfileScreen
 
 val DIVIDER_THICKNESS_DP = Dp.Hairline
 
@@ -39,6 +40,7 @@ fun BookListComponent(
           HorizontalDivider(
               modifier = Modifier.testTag("mapDraggableMenuBookBoxDivider"),
           )
+          BookProfileScreen(book, {}, {})
         }
       }
     }
