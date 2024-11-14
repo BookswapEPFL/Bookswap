@@ -353,7 +353,7 @@ fun MessageItem(message: DataMessage, currentUserUUID: UUID, onLongPress: () -> 
                       Image(
                           painter = painterResource(id = R.drawable.the_hobbit_cover),
                           contentDescription = "Hobbit",
-                          modifier = Modifier.size(100.dp))
+                          modifier = Modifier.size(100.dp).testTag("hobbit"))
                     } else {
                       Text(
                           text = message.text,
