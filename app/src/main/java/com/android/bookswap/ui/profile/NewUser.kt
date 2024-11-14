@@ -1,5 +1,6 @@
 package com.android.bookswap.ui.profile
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -28,6 +29,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -52,6 +54,7 @@ private val WELCOME_FONT_SIZE = 40.sp
 private val INFO_FONT_SIZE = 18.sp
 private val WELCOME_FONT_WEIGHT = FontWeight(600)
 private val INFO_FONT_WEIGHT = FontWeight(400)
+private val ERROR_FONT_SIZE = 12.sp
 
 /**
  * NewUserScreen is the screen where the user can create a new account by filling in his personal
@@ -60,21 +63,57 @@ private val INFO_FONT_WEIGHT = FontWeight(400)
  * @param navigationActions: NavigationActions
  */
 @Composable
-fun NewUserScreen(navigationActions: NavigationActions,userVM: UserViewModel) {
+fun NewUserScreen(navigationActions: NavigationActions, userVM: UserViewModel) {
+  val context = LocalContext.current
+
+  // État des champs de saisie
   val email = remember { mutableStateOf("") }
   val phone = remember { mutableStateOf("") }
   val greeting = remember { mutableStateOf("") }
   val firstName = remember { mutableStateOf("") }
   val lastName = remember { mutableStateOf("") }
 
+  // État des messages d'erreur pour chaque champ
+  val emailError = remember { mutableStateOf<String?>(null) }
+  val phoneError = remember { mutableStateOf<String?>(null) }
+  val firstNameError = remember { mutableStateOf<String?>(null) }
+  val lastNameError = remember { mutableStateOf<String?>(null) }
+
+  // Fonctions de validation
+  fun validateEmail(input: String): Boolean {
+    return android.util.Patterns.EMAIL_ADDRESS.matcher(input).matches()
+  }
+
+  fun validatePhone(input: String): Boolean {
+    return input.matches(
+        Regex("^\\+?\\d{10,15}$")) // Valide les numéros de téléphone de type +4122345678
+  }
+
+  fun validateNonEmpty(input: String): Boolean {
+    return input.isNotBlank()
+  }
+
+  // Fonction pour valider l'ensemble des champs
+  fun validateForm(): Boolean {
+    emailError.value = if (validateEmail(email.value)) null else "Invalid email format"
+    phoneError.value = if (validatePhone(phone.value)) null else "Invalid phone number"
+    firstNameError.value = if (validateNonEmpty(firstName.value)) null else "First name required"
+    lastNameError.value = if (validateNonEmpty(lastName.value)) null else "Last name required"
+
+    // Retourne `true` si tous les champs sont valides, sinon `false`
+    return emailError.value == null &&
+        phoneError.value == null &&
+        firstNameError.value == null &&
+        lastNameError.value == null
+  }
+
   LazyColumn(
       contentPadding = PaddingValues(CONTENT_PADDING),
       modifier =
           Modifier.fillMaxSize()
               .background(color = ColorVariable.BackGround)
-              .testTag("chat_messageList")) {
+              .testTag("NewUserScreen")) {
         item {
-          // The welcome text
           Text(
               "Welcome",
               modifier = Modifier.testTag("welcomeTxt").fillMaxWidth(),
@@ -99,8 +138,9 @@ fun NewUserScreen(navigationActions: NavigationActions,userVM: UserViewModel) {
                       fontSize = INFO_FONT_SIZE,
                   ))
         }
+
         item {
-          // The card containing the form to fill in the personal information
+          // Formulaire d'informations personnelles
           Card(
               Modifier.testTag("editProfileContainer").background(ColorVariable.BackGround),
               colors =
@@ -137,7 +177,15 @@ fun NewUserScreen(navigationActions: NavigationActions,userVM: UserViewModel) {
                           label = { Text("Firstname") },
                           placeholder = { Text("John", Modifier, Color.Gray) },
                           keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-                          singleLine = true)
+                          singleLine = true,
+                          isError = firstNameError.value != null)
+                      if (firstNameError.value != null) {
+                        Text(
+                            firstNameError.value!!,
+                            color = Color.Red,
+                            fontSize = ERROR_FONT_SIZE,
+                            modifier = Modifier.testTag("firstnameError"))
+                      }
 
                       OutlinedTextField(
                           lastName.value,
@@ -146,7 +194,15 @@ fun NewUserScreen(navigationActions: NavigationActions,userVM: UserViewModel) {
                           label = { Text("Lastname") },
                           placeholder = { Text("Doe", Modifier, Color.Gray) },
                           keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-                          singleLine = true)
+                          singleLine = true,
+                          isError = lastNameError.value != null)
+                      if (lastNameError.value != null) {
+                        Text(
+                            lastNameError.value!!,
+                            color = Color.Red,
+                            fontSize = ERROR_FONT_SIZE,
+                            modifier = Modifier.testTag("lastnameError"))
+                      }
 
                       OutlinedTextField(
                           email.value,
@@ -155,7 +211,15 @@ fun NewUserScreen(navigationActions: NavigationActions,userVM: UserViewModel) {
                           label = { Text("Email") },
                           placeholder = { Text("John.Doe@example.com", Modifier, Color.Gray) },
                           keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-                          singleLine = true)
+                          singleLine = true,
+                          isError = emailError.value != null)
+                      if (emailError.value != null) {
+                        Text(
+                            emailError.value!!,
+                            color = Color.Red,
+                            fontSize = ERROR_FONT_SIZE,
+                            modifier = Modifier.testTag("emailError"))
+                      }
 
                       OutlinedTextField(
                           phone.value,
@@ -164,14 +228,24 @@ fun NewUserScreen(navigationActions: NavigationActions,userVM: UserViewModel) {
                           label = { Text("Phone") },
                           placeholder = { Text("+4122345678", Modifier, Color.Gray) },
                           keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
-                          singleLine = true)
+                          singleLine = true,
+                          isError = phoneError.value != null)
+                      if (phoneError.value != null) {
+                        Text(
+                            phoneError.value!!,
+                            color = Color.Red,
+                            fontSize = ERROR_FONT_SIZE,
+                            modifier = Modifier.testTag("phoneError"))
+                      }
                     }
               }
         }
+
         item {
           Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
             Button(
                 onClick = {
+                  if (validateForm()) {
                     userVM.updateUser(
                         greeting = greeting.value,
                         firstName = firstName.value,
@@ -179,17 +253,18 @@ fun NewUserScreen(navigationActions: NavigationActions,userVM: UserViewModel) {
                         email = email.value,
                         phone = phone.value,
                         googleUid = Firebase.auth.currentUser?.uid ?: "")
-                    navigationActions.navigateTo(Route.MAP) },
+                    navigationActions.navigateTo(Route.MAP)
+                  } else {
+                    Toast.makeText(context, "Please correct the errors", Toast.LENGTH_SHORT).show()
+                  }
+                },
                 colors = ButtonDefaults.buttonColors(ColorVariable.Primary),
                 modifier =
                     Modifier.width(BUTTON_WIDTH).height(BUTTON_HEIGHT).testTag("CreateButton")) {
                   Text(
                       text = "Create",
                       textAlign = TextAlign.Center,
-                      style =
-                          TextStyle(
-                              color = ColorVariable.BackGround,
-                          ))
+                      style = TextStyle(color = ColorVariable.BackGround))
                 }
           }
         }

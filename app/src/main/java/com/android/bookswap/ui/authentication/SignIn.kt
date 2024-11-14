@@ -59,15 +59,19 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
 @Composable
-fun SignInScreen(navigationActions: NavigationActions,userVM: UserViewModel) { // Add this when navigation is
+fun SignInScreen(
+    navigationActions: NavigationActions,
+    userVM: UserViewModel
+) { // Add this when navigation is
   // implemented
   val context = LocalContext.current
   var googleUid = ""
-    // Check if user is already signed in
-  LaunchedEffect(Unit) { if (Firebase.auth.currentUser != null) {
-              navigationActions.navigateTo(TopLevelDestinations.MAP)
-  } }
-
+  // Check if user is already signed in
+  LaunchedEffect(Unit) {
+    if (Firebase.auth.currentUser != null) {
+      navigationActions.navigateTo(TopLevelDestinations.MAP)
+    }
+  }
 
   val launcher =
       rememberFirebaseAuthLauncher(
@@ -85,18 +89,18 @@ fun SignInScreen(navigationActions: NavigationActions,userVM: UserViewModel) { /
           })
   val token = stringResource(R.string.default_web_client_id)
 
-    val isStored by userVM.isStored.collectAsState()
+  val isStored by userVM.isStored.collectAsState()
 
-    LaunchedEffect(isStored) {
-        when (isStored) {
-            true -> navigationActions.navigateTo(TopLevelDestinations.MAP)
-            false -> {
-                userVM.updateGoogleUid(googleUid)
-                navigationActions.navigateTo(Screen.NEW_USER)
-            }
-            null -> {} // Attendre que `isStored` soit défini
-        }
+  LaunchedEffect(isStored) {
+    when (isStored) {
+      true -> navigationActions.navigateTo(TopLevelDestinations.MAP)
+      false -> {
+        userVM.updateGoogleUid(googleUid)
+        navigationActions.navigateTo(Screen.NEW_USER)
+      }
+      null -> {} // Attendre que `isStored` soit défini
     }
+  }
 
   Scaffold(
       modifier = Modifier.fillMaxSize().testTag("SignInScreen"),

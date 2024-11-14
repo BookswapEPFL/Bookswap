@@ -2,34 +2,31 @@ package com.android.bookswap.model
 
 import android.util.Log
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import com.android.bookswap.data.DataUser
 import com.android.bookswap.data.repository.UsersRepository
 import com.android.bookswap.data.source.network.UserFirestoreSource
 import com.google.firebase.firestore.FirebaseFirestore
+import java.util.UUID
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import java.util.UUID
-import java.util.concurrent.CountDownLatch
+
 /**
  * ViewModel for the user data of the application.
  *
  * @param uuid UUID of the user
  * @param repository Repository to fetch user data
  */
-
 open class UserViewModel(
     var uuid: UUID,
     repository: UsersRepository = UserFirestoreSource(FirebaseFirestore.getInstance())
 ) : ViewModel() {
   private var dataUser = DataUser(uuid)
   private var isLoaded = false
-    private val _isStored = MutableStateFlow<Boolean?>(null)
-    val isStored: StateFlow<Boolean?> = _isStored
+  private val _isStored = MutableStateFlow<Boolean?>(null)
+  val isStored: StateFlow<Boolean?> = _isStored
   private val userRepository: UsersRepository = repository
-
 
   open fun getUser(force: Boolean = false): DataUser {
     if (!isLoaded || force) {
@@ -84,32 +81,36 @@ open class UserViewModel(
     }
   }
 
-    fun addUser() {
+  fun addUser() {
     userRepository.addUser(this.dataUser) { result ->
-      result.fold({ Log.d("UserViewModel", "User added successfully") }, { Log.e("UserViewModel", "Error adding user") })
+      result.fold(
+          { Log.d("UserViewModel", "User added successfully") },
+          { Log.e("UserViewModel", "Error adding user") })
     }
   }
 
-    fun getUserByGoogleUid(googleUid: String) {
-        userRepository.getUser(googleUid) { result ->
-            // If the user is found, update the dataUser and set isLoaded to true
-            result.onSuccess {
-                dataUser = it
-                isLoaded = true
-                _isStored.value = true
-                Log.e("UserViewModel", "User found {${dataUser.firstName}}{${dataUser.lastName}}{${dataUser.userUUID}}")
-            }
-            //If the user is not found, set isLoaded to false
-            result.onFailure {
-                Log.e("UserViewModel", "User not found")
-                isLoaded = false
-                _isStored.value = false
-            }
-        }
+  fun getUserByGoogleUid(googleUid: String) {
+    userRepository.getUser(googleUid) { result ->
+      // If the user is found, update the dataUser and set isLoaded to true
+      result.onSuccess {
+        dataUser = it
+        isLoaded = true
+        _isStored.value = true
+        Log.e(
+            "UserViewModel",
+            "User found {${dataUser.firstName}}{${dataUser.lastName}}{${dataUser.userUUID}}")
+      }
+      // If the user is not found, set isLoaded to false
+      result.onFailure {
+        Log.e("UserViewModel", "User not found")
+        isLoaded = false
+        _isStored.value = false
+      }
     }
+  }
 
-    fun updateGoogleUid(googleUid: String) {
-        dataUser.googleUid = googleUid
-        updateUser(dataUser)
-    }
+  fun updateGoogleUid(googleUid: String) {
+    dataUser.googleUid = googleUid
+    updateUser(dataUser)
+  }
 }

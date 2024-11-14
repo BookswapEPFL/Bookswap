@@ -14,7 +14,6 @@ interface UsersRepository {
       callback: (Result<List<DataUser>>) -> Unit,
   )
 
-
   /**
    * Function to fetch a list of users from the repository.
    *
@@ -25,11 +24,12 @@ interface UsersRepository {
       callback: (Result<DataUser>) -> Unit,
   )
 
-    /**
-     * Function to fetch a list of users from the repository.
-     * @param googleUid The unique identifier of the user
-     * @param callback callback function that receives the DataUser if success
-     */
+  /**
+   * Function to fetch a list of users from the repository.
+   *
+   * @param googleUid The unique identifier of the user
+   * @param callback callback function that receives the DataUser if success
+   */
   fun getUser(
       googleUid: String,
       callback: (Result<DataUser>) -> Unit,

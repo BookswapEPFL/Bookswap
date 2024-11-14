@@ -54,21 +54,25 @@ class UserFirestoreSource(private val db: FirebaseFirestore) : UsersRepository {
    * the task fails
    */
   override fun getUser(googleUid: String, callback: (Result<DataUser>) -> Unit) {
-      db.collection(COLLECTION_NAME).whereEqualTo("googleUid", googleUid).get().addOnCompleteListener { task ->
+    db.collection(COLLECTION_NAME)
+        .whereEqualTo("googleUid", googleUid)
+        .get()
+        .addOnCompleteListener { task ->
           if (task.isSuccessful) {
-              Log.d("TAG_USR_GET_BY_GUID","usr count: ${task.result?.size()}")
-              val user = task.result?.firstNotNullOfOrNull { documentToUser(it).getOrNull() }
-              if (user != null) {
-                  callback(Result.success(user))
-              } else {
-                  callback(Result.failure(NoSuchElementException("No user found with googleUID: $googleUid")))
-              }
+            Log.d("TAG_USR_GET_BY_GUID", "usr count: ${task.result?.size()}")
+            val user = task.result?.firstNotNullOfOrNull { documentToUser(it).getOrNull() }
+            if (user != null) {
+              callback(Result.success(user))
+            } else {
+              callback(
+                  Result.failure(
+                      NoSuchElementException("No user found with googleUID: $googleUid")))
+            }
           } else {
-              callback(Result.failure(task.exception ?: Exception("Unknown error occurred")))
+            callback(Result.failure(task.exception ?: Exception("Unknown error occurred")))
           }
-      }
+        }
   }
-
 
   /** Adds a new user to the Firestore collection */
   override fun addUser(dataUser: DataUser, callback: (Result<Unit>) -> Unit) {
@@ -115,7 +119,7 @@ class UserFirestoreSource(private val db: FirebaseFirestore) : UsersRepository {
       val longitude = document.getDouble("longitude")!!
       val profilePicture = document.getString("profilePictureUrl")!!
       val googleUid = document.getString("googleUid")!!
-        Log.d("TAG_DOC2USR","GUID: $googleUid")
+      Log.d("TAG_DOC2USR", "GUID: $googleUid")
       val bookList =
           (document.get("bookList") as List<Map<String, Long>>).map { bookMap ->
             val mostSigBits = bookMap["mostSignificantBits"]

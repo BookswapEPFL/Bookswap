@@ -96,23 +96,22 @@ class MainActivity : ComponentActivity() {
       startDestination: String = Route.AUTH,
       geolocation: IGeolocation = DefaultGeolocation()
   ) {
-    //navigation part
+    // navigation part
     val navController = rememberNavController()
     val navigationActions = NavigationActions(navController)
 
-    //user part
-    //Firebase.auth.signOut() //Uncomment this line to test the sign in screen
+    // user part
+    Firebase.auth.signOut() // Uncomment this line to test the sign in screen
     val currentUser = Firebase.auth.currentUser
     val userVM = UserViewModel(UUID.randomUUID(), userRepository)
 
-    if(currentUser != null) {
-      userVM.getUserByGoogleUid(currentUser.uid) //This will scrap the user from the database
+    if (currentUser != null) {
+      userVM.getUserByGoogleUid(currentUser.uid) // This will scrap the user from the database
     }
-    //Book part
-      val bookFilter = BookFilter()
+    // Book part
+    val bookFilter = BookFilter()
     val bookManagerViewModel =
         BookManagerViewModel(geolocation, bookRepository, userRepository, bookFilter)
-
 
     val currentUserUUID = UUID.fromString("550e8400-e29b-41d4-a716-446655440000")
     val otherUserUUID = UUID.fromString("550e8400-e29b-41d4-a716-446655440001")
@@ -181,7 +180,7 @@ class MainActivity : ComponentActivity() {
     NavHost(navController = navController, startDestination = startDestination) {
       navigation(startDestination = Screen.AUTH, route = Route.AUTH) {
         composable(Screen.AUTH) { SignInScreen(navigationActions, userVM) }
-        composable(Screen.NEW_USER) { NewUserScreen(navigationActions,userVM) }
+        composable(Screen.NEW_USER) { NewUserScreen(navigationActions, userVM) }
       }
       navigation(startDestination = Screen.CHATLIST, route = Route.CHAT) {
         composable(Screen.CHATLIST) {
