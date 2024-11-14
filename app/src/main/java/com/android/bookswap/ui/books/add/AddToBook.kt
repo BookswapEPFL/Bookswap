@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
@@ -45,6 +47,7 @@ import com.android.bookswap.ui.components.FieldComponent
 import com.android.bookswap.ui.navigation.TopLevelDestinations
 import com.android.bookswap.ui.theme.ColorVariable
 import com.android.bookswap.ui.theme.ColorVariable.BackGround
+import com.android.bookswap.ui.theme.ColorVariable.Green
 import com.android.bookswap.ui.theme.ColorVariable.Primary
 import com.android.bookswap.ui.theme.ColorVariable.Secondary
 import java.util.UUID
@@ -68,6 +71,7 @@ fun AddToBookScreen(
   var language by remember { mutableStateOf("") }
   var selectedGenre by remember { mutableStateOf<BookGenres?>(null) } // Genre selection state
   var expanded by remember { mutableStateOf(false) } // State for dropdown menu
+    var expandedLanguage by remember { mutableStateOf(false) } // State for dropdown menu Language
   // Getting the context for showing Toast messages
   val context = LocalContext.current
 
@@ -88,28 +92,50 @@ fun AddToBookScreen(
                   labelText = "Title*",
                   value = title
               ) { title = it }
-              FieldComponent(
-                  modifier = Modifier.testTag("genre_field").fillMaxWidth()
-                      .padding(horizontal = HORIZONTAL_PADDING.dp),
-                  labelText = "Genre*",
-                  value = title
-              ) { title = it }
+              ExposedDropdownMenuBox(
+                  modifier = Modifier.fillMaxWidth().padding(horizontal = HORIZONTAL_PADDING.dp),
+                  expanded = expanded,
+                  onExpandedChange = { expanded = !expanded }
+              ) {
+                  FieldComponent(
+                      value = selectedGenre?.Genre ?: "",
+                      onValueChange = {},
+                      readOnly = true,
+                      label = { Text(text = "Genres*")},
+                      modifier = Modifier.menuAnchor().fillMaxWidth()
+                          //.background(shape = RoundedCornerShape(100), color = Secondary).fillMaxWidth()
+                              )
+                  ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }, modifier = Modifier.fillMaxWidth()) {
+                      BookGenres.values().forEach { genre ->
+                          DropdownMenuItem(
+                              text = {
+                                  Text(
+                                      text = genre.Genre,
+                                  )
+                              },
+                              onClick = {
+                                  selectedGenre = genre
+                                  expanded = false
+                              })
+                      }
+                  }
+              }
               FieldComponent(
                   modifier = Modifier.testTag("author_field").fillMaxWidth()
                       .padding(horizontal = HORIZONTAL_PADDING.dp),
-                  labelText = "Author*",
+                  labelText = "Author",
                   value = author
               ) { author = it }
               FieldComponent(
                   modifier = Modifier.testTag("description_field").fillMaxWidth()
                       .padding(horizontal = HORIZONTAL_PADDING.dp),
-                  labelText = "Description*",
+                  labelText = "Description",
                   value = description
               ) { description = it }
               FieldComponent(
                   modifier = Modifier.testTag("rating_field").fillMaxWidth()
                       .padding(horizontal = HORIZONTAL_PADDING.dp),
-                  labelText = "Rating*",
+                  labelText = "Rating",
                   value = rating
               ) { rating = it }
               FieldComponent(
@@ -128,147 +154,37 @@ fun AddToBookScreen(
                   labelText = "Language*",
                   value = language
               ) { language = it }
-              ExposedDropdownMenuBox(
-                  expanded = expanded,
-                  onExpandedChange = { expanded = !expanded },
-                  modifier = Modifier.background(ColorVariable.BackGround) // Set background color here
-              ) {
-                  OutlinedTextField(
-                      value = selectedGenre?.Genre ?: "Select Genre",
-                      onValueChange = {},
-                      label = { Text("Genre") },
-                      readOnly = true,
-                      trailingIcon = {
-                          ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
-                      },
-                      modifier = Modifier.menuAnchor())
-                  ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-                      BookGenres.values().forEach { genre ->
-                          DropdownMenuItem(
-                              text = {
-                                  Text(
-                                      text = genre.Genre,
-                                      // color = ColorVariable.Secondary // Green text in dropdownmenu
-                                  )
-                              },
-                              onClick = {
-                                  selectedGenre = genre
-                                  expanded = false
-                              })
-                      }
-                  }
-              }
               ButtonComponent(
-                  modifier = Modifier.testTag("save_button").align(Alignment.CenterHorizontally).fillMaxWidth(0.5f), onClick = {})
-              { Text("Save") }/*
-          Button(
-              colors =
-              ButtonDefaults.buttonColors(
-                  containerColor = Primary, // Light green
-                  contentColor = BackGround),
-              onClick = {
-                  // Check if title and ISBN are not blank (required fields)
-                  if (title.isNotBlank() && isbn.isNotBlank() && selectedGenre != null) {
-                      // You can handle book object creation here (e.g., save the book)
-                      val book =
-                          createDataBook(
-                              context,
-                              repository.getNewUUID(),
-                              title,
-                              author,
-                              description,
-                              rating,
-                              photo,
-                              language,
-                              isbn,
-                              listOf(selectedGenre!!))
-                      if (book == null) {
-                          Toast.makeText(context, "Invalid argument", Toast.LENGTH_SHORT).show()
+                  modifier = Modifier.testTag("save_button").align(Alignment.CenterHorizontally).fillMaxWidth(0.5f), onClick = {
+                      // Check if title and ISBN are not blank (required fields)
+                      if (title.isNotBlank() && isbn.isNotBlank() && selectedGenre != null) {
+                          // You can handle book object creation here (e.g., save the book)
+                          val book =
+                              createDataBook(
+                                  context,
+                                  repository.getNewUUID(),
+                                  title,
+                                  author,
+                                  description,
+                                  rating,
+                                  photo,
+                                  language,
+                                  isbn,
+                                  listOf(selectedGenre!!))
+                          if (book == null) {
+                              Toast.makeText(context, "Invalid argument", Toast.LENGTH_SHORT).show()
+                          } else {
+                              repository.addBook(book, OnSucess = {}, onFailure = {})
+                          }
                       } else {
-                          repository.addBook(book, OnSucess = {}, onFailure = {})
+                          // Show a Toast message if title or ISBN is empty
+                          Toast.makeText(context, "Title and ISBN are required.", Toast.LENGTH_SHORT).show()
                       }
-                  } else {
-                      // Show a Toast message if title or ISBN is empty
-                      Toast.makeText(context, "Title and ISBN are required.", Toast.LENGTH_SHORT).show()
-                  }
-              },
-              // Enable the button only if title and ISBN are filled
-              enabled = title.isNotBlank() && isbn.isNotBlank(),
-              modifier = Modifier.testTag("bookSave").testTag("Save")) {
-              // Text displayed on the button
-              Text("Save", modifier = Modifier.testTag("bookSave").testTag("Save"))
-          }*/
-      }
+                  })
+              { Text("Save") }
+          }
       }
   )
-
-
-          /*OutlinedTextField(
-              value = title,
-              onValueChange = { title = it },
-              label = { Text("Title") },
-              placeholder = { Text("Enter the book title") },
-              modifier =
-                  Modifier.padding(paddingValues)
-                      .testTag("inputBookTitle")
-                      .testTag("Title"), // Light background color inside the ,
-              colors =
-                  OutlinedTextFieldDefaults.colors(
-                      focusedBorderColor = Secondary, // Custom green for focused border
-                      unfocusedBorderColor = Secondary, // Lighter green for unfocused border
-                      cursorColor = Secondary, // Custom green for the cursor
-                      focusedLabelColor = Secondary, // Custom green for focused label
-                      unfocusedLabelColor = Secondary, // Lighter color for unfocused label
-                  ) // Adding padding to the input field
-              )
-
-          // Genre Dropdown
-          ExposedDropdownMenuBox(
-              expanded = expanded,
-              onExpandedChange = { expanded = !expanded },
-              modifier = Modifier.background(ColorVariable.BackGround) // Set background color here
-              ) {
-                OutlinedTextField(
-                    value = selectedGenre?.Genre ?: "Select Genre",
-                    onValueChange = {},
-                    label = { Text("Genre") },
-                    readOnly = true,
-                    trailingIcon = {
-                      ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
-                    },
-                    modifier = Modifier.menuAnchor())
-                ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-                  BookGenres.values().forEach { genre ->
-                    DropdownMenuItem(
-                        text = {
-                          Text(
-                              text = genre.Genre,
-                              // color = ColorVariable.Secondary // Green text in dropdownmenu
-                          )
-                        },
-                        onClick = {
-                          selectedGenre = genre
-                          expanded = false
-                        })
-                  }
-                }
-              }
-          // Language Input Field
-          OutlinedTextField(
-              value = language,
-              onValueChange = { language = it },
-              label = { Text("Language ") },
-              placeholder = { Text("In which language are the book") },
-              modifier = Modifier.testTag("inputBookLanguage").testTag("Language"),
-              colors =
-                  OutlinedTextFieldDefaults.colors(
-                      focusedBorderColor = Secondary, // Custom green for focused border
-                      unfocusedBorderColor = Secondary, // Lighter green for unfocused border
-                      cursorColor = Secondary, // Custom green for the cursor
-                      focusedLabelColor = Secondary, // Custom green for focused label
-                      unfocusedLabelColor = Secondary // Lighter color for unfocused label
-                      ))*/
-
 }
 
 fun createDataBook(
