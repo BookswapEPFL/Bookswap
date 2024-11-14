@@ -16,6 +16,7 @@ import org.junit.Test
 class DataUserTest {
 
   private val mockUsersRepo: UsersRepository = mockk()
+
   private val standardUser =
       DataUser(
           userUUID = UUID.randomUUID(),
@@ -26,7 +27,9 @@ class DataUserTest {
           phoneNumber = "+41223456789",
           latitude = 1.0,
           longitude = 7.0,
-          profilePictureUrl = "dummyPic.png")
+          profilePictureUrl = "dummyPic.png",
+          bookList = listOf(UUID(1000, 2000)),
+          googleUid = "googleUid")
 
   @Test
   fun checkAssign() {
@@ -39,6 +42,8 @@ class DataUserTest {
     assertEquals(1.0, standardUser.latitude, 0.000001)
     assertEquals(7.0, standardUser.longitude, 0.000001)
     assertEquals("dummyPic.png", standardUser.profilePictureUrl)
+    assertEquals(listOf(UUID(1000, 2000)), standardUser.bookList)
+    assertEquals("googleUid", standardUser.googleUid)
   }
 
   @Test
@@ -71,7 +76,10 @@ class DataUserTest {
             email = "alice.doe@example.com",
             longitude = 5.0,
             latitude = 3.2,
-            phoneNumber = "+4122346666")
+            phoneNumber = "+4122346666",
+            profilePictureUrl = "zzz",
+            bookList = listOf(UUID(10, 5)),
+            googleUid = "googleUid")
 
     every { mockUsersRepo.updateUser(any(), any()) } answers
         {
@@ -86,7 +94,10 @@ class DataUserTest {
         updatedUser.email,
         updatedUser.phoneNumber,
         updatedUser.latitude,
-        updatedUser.longitude)
+        updatedUser.longitude,
+        updatedUser.profilePictureUrl,
+        updatedUser.bookList,
+        updatedUser.googleUid)
 
     assertTrue(userVM.isStored)
 
@@ -103,7 +114,10 @@ class DataUserTest {
         updatedUser.email,
         updatedUser.phoneNumber,
         updatedUser.latitude,
-        updatedUser.longitude)
+        updatedUser.longitude,
+        updatedUser.profilePictureUrl,
+        updatedUser.bookList,
+        updatedUser.googleUid)
 
     assertTrue(!userVM.isStored)
   }
