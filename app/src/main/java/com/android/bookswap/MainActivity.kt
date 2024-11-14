@@ -101,10 +101,11 @@ class MainActivity : ComponentActivity() {
 
     val currentUserUUID = UUID.fromString("550e8400-e29b-41d4-a716-446655440000")
     val otherUserUUID = UUID.fromString("550e8400-e29b-41d4-a716-446655440001")
+    val testUserUUID = UUID.fromString("550e8400-e29b-41d4-a716-446655440002")
     val currentUser =
         DataUser(
             currentUserUUID,
-            "Hello",
+            "Mr.",
             "Jaime",
             "Oliver Pastor",
             "",
@@ -118,7 +119,7 @@ class MainActivity : ComponentActivity() {
     val otherUser =
         DataUser(
             otherUserUUID,
-            "Hey",
+            "Mr.",
             "Théo",
             "Schlaeppi",
             "",
@@ -128,9 +129,23 @@ class MainActivity : ComponentActivity() {
             "https://www.shutterstock.com/image-photo/wonderful-epesses-fairtytale-village-middle-600nw-2174791585.jpg",
             emptyList(),
             "googleUid")
+
+    val testUser =
+        DataUser(
+            testUserUUID,
+            "Mr.",
+            "John",
+            "Doe",
+            "john.doe@hotmail.com",
+            "+41999999999",
+            0.0,
+            0.0,
+            "john_doe.jpg",
+            emptyList(),
+            "googleUid")
     val placeHolder =
         listOf(MessageBox(otherUser, message = "Welcome message for user124", date = "01.01.24")) +
-            List(6) {
+            List(5) {
               MessageBox(
                   DataUser(
                       UUID.randomUUID(),
@@ -146,7 +161,8 @@ class MainActivity : ComponentActivity() {
                       "googleUid"),
                   message = "Test message $it test for the feature of ellipsis in the message",
                   date = "01.01.24")
-            }
+            } +
+            listOf(MessageBox(testUser, message = "Welcome message for test", date = "01.01.24"))
     val topAppBar =
         @Composable { s: String? ->
           TopAppBarComponent(

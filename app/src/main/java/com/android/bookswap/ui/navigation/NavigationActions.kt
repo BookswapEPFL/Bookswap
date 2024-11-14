@@ -60,20 +60,23 @@ open class NavigationActions(
    */
   open fun navigateTo(destination: TopLevelDestination) {
 
-    navController.navigate(destination.route) {
-      // Pop up to the start destination of the graph to
-      // avoid building up a large stack of destinations
-      popUpTo(navController.graph.findStartDestination().id) {
-        saveState = true
-        inclusive = true
-      }
+    // Only navigate if the route is different from the current route
+    if (!isCurrentDestination(destination.route)) {
+      navController.navigate(destination.route) {
+        // Pop up to the start destination of the graph to
+        // avoid building up a large stack of destinations
+        popUpTo(navController.graph.findStartDestination().id) {
+          saveState = true
+          inclusive = true
+        }
 
-      // Avoid multiple copies of the same destination when reelecting same item
-      launchSingleTop = true
+        // Avoid multiple copies of the same destination when reelecting same item
+        launchSingleTop = true
 
-      // Restore state when reelecting a previously selected item
-      if (destination.route != Route.AUTH) {
-        restoreState = true
+        // Restore state when reelecting a previously selected item
+        if (destination.route != Route.AUTH) {
+          restoreState = true
+        }
       }
     }
   }
@@ -87,7 +90,10 @@ open class NavigationActions(
    */
   open fun navigateTo(screen: String, otherUserUUID: String) {
     val route = "$screen/$otherUserUUID"
-    navController.navigate(route)
+    // Only navigate if the route is different from the current route
+    if (!isCurrentDestination(route)) {
+      navController.navigate(route)
+    }
   }
 
   /**
@@ -96,7 +102,10 @@ open class NavigationActions(
    * @param screen The screen to navigate to
    */
   open fun navigateTo(screen: String) {
-    navController.navigate(screen)
+    // Only navigate if the route is different from the current route
+    if (!isCurrentDestination(screen)) {
+      navController.navigate(screen)
+    }
   }
 
   /** Navigate back to the previous screen. */
@@ -111,5 +120,12 @@ open class NavigationActions(
    */
   open fun currentRoute(): String {
     return navController.currentDestination?.route ?: ""
+  }
+
+  private fun isCurrentDestination(route: String): Boolean {
+    // Retrieve the current route and check if it starts with the same route name (as checking
+    // equality of the route name didn't worked)
+    val currentRoute = currentRoute()
+    return currentRoute.startsWith(route)
   }
 }

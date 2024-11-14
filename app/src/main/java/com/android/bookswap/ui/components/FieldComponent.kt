@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
@@ -45,6 +46,8 @@ private val FIELD_MIN_HEIGHT = 56.dp
 
 private val FIELD_PADDING = 8.dp
 private val FIELD_CONTENT_PADDING = 16.dp
+
+private val ANIMATION_DURATION = 150
 
 @Composable
 fun FieldComponent(
@@ -152,7 +155,7 @@ fun FieldComponent(
                                             },
                                         colors = colors)
                                     .value,
-                                RoundedCornerShape(100))
+                                CircleShape)
                             .padding(FIELD_PADDING)
                             .background(
                                 backgroundColor(
@@ -168,7 +171,7 @@ fun FieldComponent(
                                             },
                                         colors = colors)
                                     .value,
-                                RoundedCornerShape(100)),
+                                CircleShape),
                     )
                   },
                   contentPadding = PaddingValues(FIELD_CONTENT_PADDING))
@@ -190,7 +193,7 @@ private fun animateBorderStrokeAsState(
   val targetThickness = if (focused) focusedBorderThickness else unfocusedBorderThickness
   val animatedThickness =
       if (enabled) {
-        animateDpAsState(targetThickness, tween(durationMillis = 150))
+        animateDpAsState(targetThickness, tween(durationMillis = ANIMATION_DURATION))
       } else {
         rememberUpdatedState(unfocusedBorderThickness)
       }
@@ -213,7 +216,8 @@ internal fun backgroundColor(
         else -> colors.unfocusedContainerColor
       }
   return if (enabled) {
-    animateColorAsState(targetValue, tween(durationMillis = 150), "BackgroundColorAnim")
+    animateColorAsState(
+        targetValue, tween(durationMillis = ANIMATION_DURATION), "BackgroundColorAnim")
   } else {
     rememberUpdatedState(targetValue)
   }
@@ -254,7 +258,8 @@ internal fun indicatorColor(
         else -> colors.unfocusedIndicatorColor
       }
   return if (enabled) {
-    animateColorAsState(targetValue, tween(durationMillis = 150), "IndicatorColorAnim")
+    animateColorAsState(
+        targetValue, tween(durationMillis = ANIMATION_DURATION), "IndicatorColorAnim")
   } else {
     rememberUpdatedState(targetValue)
   }
