@@ -33,11 +33,24 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
-class MapScreenTest {
-  private val longListBook =
-      List(20) {
+val longListBook =
+    List(20) {
+      DataBook(
+          uuid = UUID(2000, 2000),
+          title = "Book 1",
+          author = "Author 1",
+          description = "Description of Book 1",
+          rating = 5,
+          photo = "url_to_photo_1",
+          language = BookLanguages.ENGLISH,
+          isbn = "123-456-789",
+          genres = listOf(BookGenres.FICTION, BookGenres.NONFICTION))
+    }
+
+val books =
+    listOf(
         DataBook(
-            uuid = UUID(2000, 2000),
+            uuid = UUID(1000, 1000),
             title = "Book 1",
             author = "Author 1",
             description = "Description of Book 1",
@@ -45,31 +58,19 @@ class MapScreenTest {
             photo = "url_to_photo_1",
             language = BookLanguages.ENGLISH,
             isbn = "123-456-789",
-            genres = listOf(BookGenres.FICTION, BookGenres.NONFICTION))
-      }
+            genres = listOf(BookGenres.FICTION, BookGenres.HORROR)),
+        DataBook(
+            uuid = UUID(2000, 1000),
+            title = "Book 2",
+            author = "Author 2",
+            description = "Description of Book 2",
+            rating = 4,
+            photo = "url_to_photo_2",
+            language = BookLanguages.FRENCH,
+            isbn = "234-567-890",
+            genres = listOf(BookGenres.FICTION)))
 
-  private val books =
-      listOf(
-          DataBook(
-              uuid = UUID(1000, 1000),
-              title = "Book 1",
-              author = "Author 1",
-              description = "Description of Book 1",
-              rating = 5,
-              photo = "url_to_photo_1",
-              language = BookLanguages.ENGLISH,
-              isbn = "123-456-789",
-              genres = listOf(BookGenres.FICTION, BookGenres.HORROR)),
-          DataBook(
-              uuid = UUID(2000, 1000),
-              title = "Book 2",
-              author = "Author 2",
-              description = "Description of Book 2",
-              rating = 4,
-              photo = "url_to_photo_2",
-              language = BookLanguages.FRENCH,
-              isbn = "234-567-890",
-              genres = listOf(BookGenres.FICTION)))
+class MapScreenTest {
   private val user = listOf(DataUser(bookList = listOf(UUID(1000, 1000), UUID(2000, 1000))))
   private val userLongList = listOf(DataUser(bookList = listOf(UUID(2000, 2000))))
 
@@ -84,11 +85,10 @@ class MapScreenTest {
       listOf(UserBooksWithLocation(UUID.randomUUID(), 0.0, 0.0, emptyList()))
   @get:Rule val composeTestRule = createComposeRule()
 
-  private lateinit var mockBookManagerViewModel: BookManagerViewModel
+  private val mockBookManagerViewModel: BookManagerViewModel = mockk()
 
   @Before
   fun setup() {
-    mockBookManagerViewModel = mockk()
 
     every { mockBookManagerViewModel.filteredBooks } returns MutableStateFlow(books)
 

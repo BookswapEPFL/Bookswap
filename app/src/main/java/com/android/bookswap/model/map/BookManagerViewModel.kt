@@ -85,12 +85,15 @@ class BookManagerViewModel(
         }
       }
       booksRepository.getBook(
-          OnSucess = { books ->
-            _allBooks.value = books
-            successBooks = true
-          },
-          onFailure = { error ->
-            Log.e("BookManagerViewModel", "Failed to fetch books: ${error.message}")
+          callback = { result ->
+            if (result.isSuccess) {
+              _allBooks.value = result.getOrThrow()
+              successBooks = true
+            } else {
+              Log.e(
+                  "BookManagerViewModel",
+                  "Failed to fetch books: ${result.exceptionOrNull()!!.message}")
+            }
           })
 
       if (!successBooks || !successUsers) {
