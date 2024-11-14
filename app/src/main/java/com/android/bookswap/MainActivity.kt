@@ -19,7 +19,7 @@ import com.android.bookswap.data.MessageBox
 import com.android.bookswap.data.repository.BooksRepository
 import com.android.bookswap.data.repository.MessageRepository
 import com.android.bookswap.data.repository.UsersRepository
-import com.android.bookswap.data.source.network.BooksFirestoreRepository
+import com.android.bookswap.data.source.network.BooksFirestoreSource
 import com.android.bookswap.data.source.network.MessageFirestoreSource
 import com.android.bookswap.data.source.network.UserFirestoreSource
 import com.android.bookswap.model.UserViewModel
@@ -72,7 +72,7 @@ class MainActivity : ComponentActivity() {
 
     // Create the data source objects
     val messageRepository = MessageFirestoreSource(db)
-    val bookRepository = BooksFirestoreRepository(db)
+    val bookRepository = BooksFirestoreSource(db)
     val userDataSource = UserFirestoreSource(db)
 
     // Initialize the geolocation
