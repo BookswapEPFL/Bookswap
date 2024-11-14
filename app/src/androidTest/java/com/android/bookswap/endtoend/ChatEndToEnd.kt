@@ -26,6 +26,7 @@ import com.android.bookswap.data.MessageType
 import com.android.bookswap.data.repository.MessageRepository
 import com.android.bookswap.ui.chat.ChatScreen
 import com.android.bookswap.ui.chat.ListChatScreen
+import com.android.bookswap.ui.chat.imageTestMessageUUID
 import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.navigation.TopLevelDestination
 import com.google.firebase.firestore.ListenerRegistration
@@ -93,7 +94,7 @@ class ChatEndToEnd {
                 timestamp = System.currentTimeMillis() - 50000),
             DataMessage(
                 messageType = MessageType.IMAGE,
-                uuid = UUID.randomUUID(),
+                uuid = imageTestMessageUUID,
                 senderUUID = otherUserUUID,
                 receiverUUID = currentUserUUID,
                 text = "Image Message",
@@ -182,6 +183,13 @@ class ChatEndToEnd {
     composeTestRule
         .onNodeWithTag("message_text $secondPlaceholderUUID", useUnmergedTree = true)
         .assertExists()
+
+    composeTestRule.waitUntil(timeoutMillis = 5000) {
+      composeTestRule
+          .onAllNodesWithTag("hobbit", useUnmergedTree = true)
+          .fetchSemanticsNodes()
+          .isNotEmpty()
+    }
     composeTestRule.onNodeWithTag("hobbit", useUnmergedTree = true).assertExists()
 
     // Send a new text message
@@ -265,30 +273,27 @@ class ChatEndToEnd {
     // Wait for the popup to appear
     composeTestRule.waitUntil(timeoutMillis = 5000) {
       composeTestRule
-          .onAllNodesWithTag("HobbitBig", useUnmergedTree = true)
+          .onAllNodesWithTag("popupImage", useUnmergedTree = true)
           .fetchSemanticsNodes()
           .isNotEmpty()
     }
-    composeTestRule.onNodeWithTag("HobbitBig", useUnmergedTree = true).assertIsDisplayed()
+    composeTestRule.onNodeWithTag("popupImage", useUnmergedTree = true).assertIsDisplayed()
 
     // **SIMULATED ZOOM STEP**: Perform scaling on the image popup to simulate zoom
-    composeTestRule.onNodeWithTag("HobbitBig", useUnmergedTree = true).performGesture {
+    composeTestRule.onNodeWithTag("popupImage", useUnmergedTree = true).performGesture {
       down(Offset(150f, 150f)) // Simulate a finger press at the center of the image
       moveBy(Offset(50f, 50f)) // Simulate a drag to increase the scale
       up() // Release the finger to end the gesture
     }
 
-    // **CLOSE POPUP**: Click on the image popup to close it
-    composeTestRule.onNodeWithTag("HobbitBig", useUnmergedTree = true).performClick()
-
     // Wait until the popup is closed
     composeTestRule.waitUntil(timeoutMillis = 5000) {
       composeTestRule
-          .onAllNodesWithTag("HobbitBig", useUnmergedTree = true)
+          .onAllNodesWithTag("popupImage", useUnmergedTree = true)
           .fetchSemanticsNodes()
           .isEmpty()
     }
-    composeTestRule.onNodeWithTag("HobbitBig", useUnmergedTree = true).assertDoesNotExist()
+    composeTestRule.onNodeWithTag("popupImage", useUnmergedTree = true).assertDoesNotExist()
 
     // Go back to the chat list screen
     composeTestRule.onNodeWithTag("backIcon", useUnmergedTree = true).performClick()

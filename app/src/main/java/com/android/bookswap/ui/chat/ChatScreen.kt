@@ -3,6 +3,7 @@ package com.android.bookswap.ui.chat
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -49,10 +50,12 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import coil.compose.AsyncImage
+import com.android.bookswap.R
 import com.android.bookswap.data.DataMessage
 import com.android.bookswap.data.DataUser
 import com.android.bookswap.data.MessageType
@@ -340,10 +343,16 @@ fun MessageItem(message: DataMessage, currentUserUUID: UUID, onLongPress: () -> 
               Column(
                   modifier =
                       Modifier.padding(16.dp).testTag("message_item_column ${message.uuid}")) {
-                    if (message.uuid == imageTestMessageUUID) {
+                    if (message.messageType == MessageType.IMAGE &&
+                        message.uuid != imageTestMessageUUID) {
                       AsyncImage(
                           model = message.text,
                           contentDescription = "Message Image",
+                          modifier = Modifier.testTag("hobbit"))
+                    } else if (message.uuid == imageTestMessageUUID) {
+                      Image(
+                          painter = painterResource(id = R.drawable.the_hobbit_cover),
+                          contentDescription = "Hobbit",
                           modifier = Modifier.testTag("hobbit"))
                     } else {
                       Text(
@@ -392,20 +401,27 @@ fun MessageItem(message: DataMessage, currentUserUUID: UUID, onLongPress: () -> 
                                 scaleY = scale,
                                 translationX = offsetX,
                                 translationY = offsetY)) {
-                      AsyncImage(
-                          model = message.text,
-                          contentDescription = "Enlarged Image",
-                          modifier =
-                              Modifier.size(imagePopUp * scale)
-                                  .pointerInput(Unit) {
-                                    detectTransformGestures { _, _, zoom, _ -> scale *= zoom }
-                                  }
-                                  .graphicsLayer(
-                                      scaleX = scale,
-                                      scaleY = scale,
-                                      translationX = offsetX,
-                                      translationY = offsetY)
-                                  .testTag("HobbitBig"))
+                      if (message.uuid == imageTestMessageUUID) {
+                        Image(
+                            painter = painterResource(id = R.drawable.the_hobbit_cover),
+                            contentDescription = "Hobbit",
+                            modifier = Modifier.testTag("hobbitBig"))
+                      } else {
+                        AsyncImage(
+                            model = message.text,
+                            contentDescription = "Enlarged Image",
+                            modifier =
+                                Modifier.size(imagePopUp * scale)
+                                    .pointerInput(Unit) {
+                                      detectTransformGestures { _, _, zoom, _ -> scale *= zoom }
+                                    }
+                                    .graphicsLayer(
+                                        scaleX = scale,
+                                        scaleY = scale,
+                                        translationX = offsetX,
+                                        translationY = offsetY)
+                                    .testTag("HobbitBig"))
+                      }
                     }
               }
         }
