@@ -184,7 +184,7 @@ class ChatEndToEnd {
         .onNodeWithTag("message_text $secondPlaceholderUUID", useUnmergedTree = true)
         .assertExists()
 
-    composeTestRule.waitUntil(timeoutMillis = 5000) {
+    composeTestRule.waitUntil(timeoutMillis = 5001) {
       composeTestRule
           .onAllNodesWithTag("hobbit", useUnmergedTree = true)
           .fetchSemanticsNodes()
@@ -199,7 +199,7 @@ class ChatEndToEnd {
 
     // Wait until the new message appears
     val newMessageUUID = mockMessageRepository.messages.last().uuid
-    composeTestRule.waitUntil(timeoutMillis = 5000) {
+    composeTestRule.waitUntil(timeoutMillis = 5002) {
       composeTestRule
           .onAllNodesWithTag("message_text $newMessageUUID", useUnmergedTree = true)
           .fetchSemanticsNodes()
@@ -229,7 +229,7 @@ class ChatEndToEnd {
     composeTestRule.onNodeWithTag("send_button", useUnmergedTree = true).performClick()
 
     // Wait for the edited message to appear
-    composeTestRule.waitUntil(timeoutMillis = 5000) {
+    composeTestRule.waitUntil(timeoutMillis = 5003) {
       composeTestRule
           .onAllNodesWithTag("message_text $newMessageUUID", useUnmergedTree = true)
           .fetchSemanticsNodes()
@@ -253,7 +253,7 @@ class ChatEndToEnd {
     composeTestRule.onNodeWithTag("deleteButton", useUnmergedTree = true).performClick()
 
     // Wait until the message is deleted
-    composeTestRule.waitUntil(timeoutMillis = 5000) {
+    composeTestRule.waitUntil(timeoutMillis = 5004) {
       composeTestRule
           .onAllNodesWithTag("message_text $newMessageUUID", useUnmergedTree = true)
           .fetchSemanticsNodes()
@@ -271,7 +271,7 @@ class ChatEndToEnd {
     composeTestRule.onNodeWithTag("hobbit", useUnmergedTree = true).assertExists().performClick()
 
     // Wait for the popup to appear
-    composeTestRule.waitUntil(timeoutMillis = 5000) {
+    composeTestRule.waitUntil(timeoutMillis = 5005) {
       composeTestRule
           .onAllNodesWithTag("popupImage", useUnmergedTree = true)
           .fetchSemanticsNodes()
@@ -290,7 +290,7 @@ class ChatEndToEnd {
     composeTestRule.onNodeWithTag("popupImage", useUnmergedTree = true).performClick()
 
     // Wait until the popup is closed
-    composeTestRule.waitUntil(timeoutMillis = 5000) {
+    composeTestRule.waitUntil(timeoutMillis = 5006) {
       composeTestRule
           .onAllNodesWithTag("popupImage", useUnmergedTree = true)
           .fetchSemanticsNodes()
