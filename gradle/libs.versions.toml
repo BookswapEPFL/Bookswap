@@ -48,6 +48,7 @@ mapsCompose = "4.3.3"
 mapsComposeUtils = "4.3.0"
 
 byteBuddy= "1.15.4"
+firebaseStorageKtx = "21.0.1"
 
 [libraries]
 google-play-services-location = { group = "com.google.android.gms", name = "play-services-location", version = "19.0.1" }
@@ -107,6 +108,7 @@ firebase-messaging-ktx = { group = "com.google.firebase", name = "firebase-messa
 
 maps-compose = { module = "com.google.maps.android:maps-compose", version.ref = "mapsCompose" }
 maps-compose-utils = { module = "com.google.maps.android:maps-compose-utils", version.ref = "mapsComposeUtils" }
+firebase-storage-ktx = { group = "com.google.firebase", name = "firebase-storage-ktx", version.ref = "firebaseStorageKtx" }
 
 
 

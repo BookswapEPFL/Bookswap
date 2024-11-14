@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
@@ -45,9 +46,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
@@ -55,8 +58,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
+import coil.compose.AsyncImage
 import com.android.bookswap.R
 import com.android.bookswap.data.DataMessage
+import com.android.bookswap.data.DataUser
+import com.android.bookswap.data.MessageType
 import com.android.bookswap.data.repository.MessageRepository
 import com.android.bookswap.model.PhotoRequester
 import com.android.bookswap.ui.components.BackButtonComponent
@@ -72,8 +78,8 @@ import kotlinx.coroutines.delay
 @Composable
 fun ChatScreen(
     messageRepository: MessageRepository,
-    currentUserUUID: UUID, // To identify the current user for aligning messages
-    otherUserUUID: UUID,
+    currentUser: DataUser,
+    otherUser: DataUser,
     navController: NavigationActions
 ) {
   val context = LocalContext.current
@@ -103,8 +109,10 @@ fun ChatScreen(
               result
                   .getOrThrow()
                   .filter {
-                    (it.senderUUID == currentUserUUID && it.receiverUUID == otherUserUUID) ||
-                        (it.senderUUID == otherUserUUID && it.receiverUUID == currentUserUUID)
+                    (it.senderUUID == currentUser.userUUID &&
+                        it.receiverUUID == otherUser.userUUID) ||
+                        (it.senderUUID == otherUser.userUUID &&
+                            it.receiverUUID == currentUser.userUUID)
                   }
                   .sortedBy { it.timestamp }
           Log.d("ChatScreen", "Fetched messages: $messages")
@@ -120,7 +128,7 @@ fun ChatScreen(
       TopAppBar(
           title = {
             Text(
-                text = otherUserUUID.toString(),
+                text = otherUser.firstName + " " + otherUser.lastName,
                 style = MaterialTheme.typography.titleMedium,
                 color = ColorVariable.Accent,
                 modifier =
@@ -131,11 +139,11 @@ fun ChatScreen(
           navigationIcon = { BackButtonComponent(navController) },
           actions = {
             IconButton(onClick = { /* Handle profile icon click */}) {
-              Icon(
-                  imageVector = Icons.Default.Person,
-                  contentDescription = "Profile",
-                  modifier = Modifier.testTag("profileIcon").size(padding36),
-                  tint = ColorVariable.Accent)
+              AsyncImage(
+                  model = otherUser.profilePictureUrl,
+                  contentDescription = "Profile Picture",
+                  contentScale = ContentScale.Crop,
+                  modifier = Modifier.testTag("profileIcon").size(padding36).clip(CircleShape))
             }
           },
           colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
@@ -148,7 +156,7 @@ fun ChatScreen(
               items(messages) { message ->
                 MessageItem(
                     message = message,
-                    currentUserUUID = currentUserUUID,
+                    currentUserUUID = currentUser.userUUID,
                     onLongPress = { selectedMessage = message })
               }
             }
@@ -204,6 +212,7 @@ fun ChatScreen(
                       val messageId = messageRepository.getNewUUID()
                       val newMessage =
                           DataMessage(
+                              messageType = MessageType.TEXT,
                               uuid = messageId,
                               text = newMessageText.text,
                               senderUUID = currentUserUUID,
