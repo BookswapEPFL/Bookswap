@@ -1,57 +1,48 @@
 package com.android.bookswap.data.source.api
 
+import android.content.Context
 import com.android.bookswap.data.BookLanguages
 import com.android.bookswap.data.DataBook
 import com.android.bookswap.utils.assertBookEquals
-import java.util.UUID
-import org.junit.After
+import com.android.volley.RequestQueue
+import com.android.volley.toolbox.Volley
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.mockkStatic
+import io.mockk.spyk
+import io.mockk.verify
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.ArgumentCaptor
-import org.mockito.ArgumentMatchers
-import org.mockito.Captor
-import org.mockito.Mockito.anyString
-import org.mockito.Mockito.`when`
-import org.mockito.MockitoAnnotations
-import org.mockito.kotlin.capture
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.times
-import org.mockito.kotlin.verify
 import org.robolectric.RobolectricTestRunner
+import java.util.UUID
 
 @RunWith(RobolectricTestRunner::class)
 class GoogleBookDataSourceTest {
+    private lateinit var mockGoogleBookDataSource: GoogleBookDataSource
 
-  private lateinit var mockitoClosable: AutoCloseable
-  @Captor private lateinit var resultDataBookCaptor: ArgumentCaptor<Result<DataBook>>
+    @Before
+    fun setup() {
+        val mockContext: Context = mockk()
+        val mockQueue: RequestQueue = mockk()
+        mockkStatic(Volley::class)
+        every { Volley.newRequestQueue(any()) } returns mockQueue
 
-  @Before
-  fun init() {
-    mockitoClosable = MockitoAnnotations.openMocks(this)
-  }
-
-  @After
-  fun close() {
-    mockitoClosable.close()
-  }
-
+        mockGoogleBookDataSource = spyk(GoogleBookDataSource(mockContext))
+    }
   @Test
   fun `ISBN input validation`() {
-    val mockGoogleBookDataSource: GoogleBookDataSource = mock()
 
-    val callback: (Result<DataBook>) -> Unit = mock()
-    `when`(
-            mockGoogleBookDataSource.getBookFromISBN(
-                anyString(), ArgumentMatchers.any(callback::class.java) ?: callback))
-        .thenCallRealMethod()
+    val callback: (Result<DataBook>) -> Unit = mockk()
+      every { callback(any()) } answers {
+          assertTrue(firstArg<Result<DataBook>>().isFailure)
+      }
 
     mockGoogleBookDataSource.getBookFromISBN("01a3456789", callback)
     mockGoogleBookDataSource.getBookFromISBN("01234567890", callback)
-    verify(callback, times(2)).invoke(capture(resultDataBookCaptor))
 
-    assert(resultDataBookCaptor.value.isFailure)
+  verify(exactly = 2) { callback(any()) }
   }
 
   @Test
@@ -102,8 +93,7 @@ class GoogleBookDataSourceTest {
             language = BookLanguages.ENGLISH,
             isbn = "9780435123437")
 
-    val mockGoogleBookDataSource: GoogleBookDataSource = mock()
-    `when`(mockGoogleBookDataSource.parseISBNResponse(jsonBook)).thenCallRealMethod()
+
 
     assertBookEquals(dataBook, mockGoogleBookDataSource.parseISBNResponse(jsonBook).getOrNull())
   }
@@ -112,10 +102,7 @@ class GoogleBookDataSourceTest {
   fun `parseISBNResponse fail when json is wrong`() {
     val brokenJSON = "BROKEN JSON"
 
-    val mockGoogleBookDataSource: GoogleBookDataSource = mock()
-    `when`(mockGoogleBookDataSource.parseISBNResponse(brokenJSON)).thenCallRealMethod()
-
-    assertTrue(mockGoogleBookDataSource.parseISBNResponse(brokenJSON).isFailure)
+      assertTrue(mockGoogleBookDataSource.parseISBNResponse(brokenJSON).isFailure)
   }
 
   @Test
@@ -155,10 +142,7 @@ class GoogleBookDataSourceTest {
     """
             .trimIndent()
 
-    val mockGoogleBookDataSource: GoogleBookDataSource = mock()
-    `when`(mockGoogleBookDataSource.parseISBNResponse(missingTitleJson)).thenCallRealMethod()
-
-    assertTrue(mockGoogleBookDataSource.parseISBNResponse(missingTitleJson).isFailure)
+      assertTrue(mockGoogleBookDataSource.parseISBNResponse(missingTitleJson).isFailure)
   }
 
   @Test
@@ -227,9 +211,6 @@ class GoogleBookDataSourceTest {
             photo = null,
             language = BookLanguages.OTHER,
             isbn = "9780435123437")
-
-    val mockGoogleBookDataSource: GoogleBookDataSource = mock()
-    `when`(mockGoogleBookDataSource.parseISBNResponse(anyString())).thenCallRealMethod()
 
     assertBookEquals(dataBook, mockGoogleBookDataSource.parseISBNResponse(fieldsEmpty).getOrNull())
     assertBookEquals(dataBook, mockGoogleBookDataSource.parseISBNResponse(listEmpty).getOrNull())
