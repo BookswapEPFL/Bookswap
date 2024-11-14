@@ -94,7 +94,6 @@ class NewUserScreenTest {
 
     composeTestRule.setContent { NewUserScreen(navigationActions, userVM) }
 
-
     composeTestRule.onNodeWithTag("greetingTF").performTextInput("Mr.")
     composeTestRule.onNodeWithTag("firstnameTF").performTextInput("John")
     composeTestRule.onNodeWithTag("lastnameTF").performTextInput("Doe")
