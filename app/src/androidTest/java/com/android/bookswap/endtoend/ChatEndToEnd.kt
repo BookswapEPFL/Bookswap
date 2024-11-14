@@ -282,9 +282,6 @@ class ChatEndToEnd {
       up() // Release the finger to end the gesture
     }
 
-    // **CLOSE POPUP**: Click on the image popup to close it
-    composeTestRule.onNodeWithTag("popupImage", useUnmergedTree = true).performClick()
-
     // Wait until the popup is closed
     composeTestRule.waitUntil(timeoutMillis = 5006) {
       composeTestRule
