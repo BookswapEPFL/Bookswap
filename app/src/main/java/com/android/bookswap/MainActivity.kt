@@ -19,7 +19,7 @@ import com.android.bookswap.data.MessageBox
 import com.android.bookswap.data.repository.BooksRepository
 import com.android.bookswap.data.repository.MessageRepository
 import com.android.bookswap.data.repository.UsersRepository
-import com.android.bookswap.data.source.network.BooksFirestoreRepository
+import com.android.bookswap.data.source.network.BooksFirestoreSource
 import com.android.bookswap.data.source.network.MessageFirestoreSource
 import com.android.bookswap.data.source.network.UserFirestoreSource
 import com.android.bookswap.model.UserViewModel
@@ -68,7 +68,7 @@ class MainActivity : ComponentActivity() {
 
     // Create the data source objects
     val messageRepository = MessageFirestoreSource(db)
-    val bookRepository = BooksFirestoreRepository(db)
+    val bookRepository = BooksFirestoreSource(db)
     val userDataSource = UserFirestoreSource(db)
 
     // Initialize the geolocation
@@ -96,7 +96,8 @@ class MainActivity : ComponentActivity() {
     val navigationActions = NavigationActions(navController)
     val bookFilter = BookFilter()
     val userVM = UserViewModel(UUID.randomUUID(), userRepository)
-    val bookManagerViewModel = BookManagerViewModel(geolocation, bookRepository, user, bookFilter)
+    val bookManagerViewModel =
+        BookManagerViewModel(geolocation, bookRepository, userRepository, bookFilter)
 
     val currentUserUUID = UUID.fromString("550e8400-e29b-41d4-a716-446655440000")
     val otherUserUUID = UUID.fromString("550e8400-e29b-41d4-a716-446655440001")
@@ -226,15 +227,3 @@ class MainActivity : ComponentActivity() {
     }
   }
 }
-
-// Temporary user list for the map as it is not yet linked to the database.
-// Better to see how the map screen should look like at the end.
-// Need to be removed in the future.
-val user =
-    listOf(
-        DataUser(longitude = 0.04, latitude = 0.04, bookList = listOf(UUID(12345678L, 87654321L))),
-        DataUser(longitude = -0.08, latitude = -0.08, bookList = listOf(UUID(-848484, 848484))),
-        DataUser(
-            longitude = 0.0,
-            latitude = 0.0,
-            bookList = listOf(UUID(763879565731911, 5074118859109511))))

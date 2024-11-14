@@ -17,6 +17,7 @@ import com.android.bookswap.data.BookGenres
 import com.android.bookswap.data.BookLanguages
 import com.android.bookswap.data.DataBook
 import com.android.bookswap.data.DataUser
+import com.android.bookswap.data.UserBooksWithLocation
 import com.android.bookswap.model.map.BookManagerViewModel
 import com.android.bookswap.model.map.DefaultGeolocation
 import com.android.bookswap.ui.navigation.NavigationActions
@@ -32,11 +33,24 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
-class MapScreenTest {
-  private val longListBook =
-      List(20) {
+val longListBook =
+    List(20) {
+      DataBook(
+          uuid = UUID(2000, 2000),
+          title = "Book 1",
+          author = "Author 1",
+          description = "Description of Book 1",
+          rating = 5,
+          photo = "url_to_photo_1",
+          language = BookLanguages.ENGLISH,
+          isbn = "123-456-789",
+          genres = listOf(BookGenres.FICTION, BookGenres.NONFICTION))
+    }
+
+val books =
+    listOf(
         DataBook(
-            uuid = UUID(2000, 2000),
+            uuid = UUID(1000, 1000),
             title = "Book 1",
             author = "Author 1",
             description = "Description of Book 1",
@@ -44,48 +58,37 @@ class MapScreenTest {
             photo = "url_to_photo_1",
             language = BookLanguages.ENGLISH,
             isbn = "123-456-789",
-            genres = listOf(BookGenres.FICTION, BookGenres.NONFICTION))
-      }
+            genres = listOf(BookGenres.FICTION, BookGenres.HORROR)),
+        DataBook(
+            uuid = UUID(2000, 1000),
+            title = "Book 2",
+            author = "Author 2",
+            description = "Description of Book 2",
+            rating = 4,
+            photo = "url_to_photo_2",
+            language = BookLanguages.FRENCH,
+            isbn = "234-567-890",
+            genres = listOf(BookGenres.FICTION)))
 
-  private val books =
-      listOf(
-          DataBook(
-              uuid = UUID(1000, 1000),
-              title = "Book 1",
-              author = "Author 1",
-              description = "Description of Book 1",
-              rating = 5,
-              photo = "url_to_photo_1",
-              language = BookLanguages.ENGLISH,
-              isbn = "123-456-789",
-              genres = listOf(BookGenres.FICTION, BookGenres.HORROR)),
-          DataBook(
-              uuid = UUID(2000, 1000),
-              title = "Book 2",
-              author = "Author 2",
-              description = "Description of Book 2",
-              rating = 4,
-              photo = "url_to_photo_2",
-              language = BookLanguages.FRENCH,
-              isbn = "234-567-890",
-              genres = listOf(BookGenres.FICTION)))
+class MapScreenTest {
   private val user = listOf(DataUser(bookList = listOf(UUID(1000, 1000), UUID(2000, 1000))))
   private val userLongList = listOf(DataUser(bookList = listOf(UUID(2000, 2000))))
 
   private val userBooksWithLocationList =
-      listOf(UserBooksWithLocation(user[0].longitude, user[0].latitude, books))
+      listOf(UserBooksWithLocation(UUID.randomUUID(), user[0].longitude, user[0].latitude, books))
   private val userBooksWithLocationLongList =
       listOf(
-          UserBooksWithLocation(userLongList[0].longitude, userLongList[0].latitude, longListBook))
+          UserBooksWithLocation(
+              UUID.randomUUID(), userLongList[0].longitude, userLongList[0].latitude, longListBook))
 
-  private val userWithoutBooks = listOf(UserBooksWithLocation(0.0, 0.0, emptyList()))
+  private val userWithoutBooks =
+      listOf(UserBooksWithLocation(UUID.randomUUID(), 0.0, 0.0, emptyList()))
   @get:Rule val composeTestRule = createComposeRule()
 
-  private lateinit var mockBookManagerViewModel: BookManagerViewModel
+  private val mockBookManagerViewModel: BookManagerViewModel = mockk()
 
   @Before
   fun setup() {
-    mockBookManagerViewModel = mockk()
 
     every { mockBookManagerViewModel.filteredBooks } returns MutableStateFlow(books)
 
@@ -125,7 +128,9 @@ class MapScreenTest {
     composeTestRule.onAllNodesWithTag("mapDraggableMenuBookBoxStar").assertCountEquals(9)
     composeTestRule.onAllNodesWithTag("mapDraggableMenuBookBoxEmptyStar").assertCountEquals(1)
     composeTestRule.onAllNodesWithTag("mapDraggableMenuBookBoxTag").assertCountEquals(2)
-    composeTestRule.onAllNodesWithTag("mapDraggableMenuBookBoxDivider").assertCountEquals(2)
+    composeTestRule
+        .onAllNodesWithTag("mapDraggableMenuBookBoxDivider")
+        .assertCountEquals(books.size - 1)
 
     composeTestRule.onNodeWithTag("filterButton").assertIsDisplayed()
   }
@@ -175,7 +180,7 @@ class MapScreenTest {
     composeTestRule
         .onNodeWithTag("mapDraggableMenuNoBook")
         .assertIsDisplayed()
-        .assertTextContains("No books found")
+        .assertTextContains("No books to display")
   }
 
   @Test

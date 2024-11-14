@@ -2,10 +2,12 @@ package com.android.bookswap.ui.books.add
 
 import android.util.Log
 import android.widget.Toast
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -22,6 +24,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.TextStyle
@@ -48,46 +51,61 @@ fun AddISBNScreen(
       topBar = topAppBar,
       bottomBar = bottomAppBar,
       content = { pv ->
-        Box(modifier = Modifier.fillMaxSize().padding(pv)) {
-          var isbn by remember { mutableStateOf("") }
+        Box(
+            modifier =
+                Modifier.fillMaxSize()
+                    .padding(pv)
+                    .padding()
+                    .background(color = ColorVariable.BackGround)) {
+              var isbn by remember { mutableStateOf("") }
 
-          Column(
-              modifier = Modifier.fillMaxWidth().padding(top = 40.dp),
-              horizontalAlignment = Alignment.CenterHorizontally,
-              verticalArrangement = Arrangement.spacedBy(45.dp)) {
-                FieldComponent(
-                    modifier = Modifier.testTag("isbn_field"), labelText = "ISBN*", value = isbn) {
-                      if (it.all { c -> c.isDigit() } && it.length <= 13) {
-                        isbn = it
-                      }
-                    }
-                ButtonComponent(
-                    modifier = Modifier.testTag("isbn_searchButton"),
-                    onClick = {
-                      GoogleBookDataSource(context).getBookFromISBN(isbn) { result ->
-                        if (result.isFailure) {
-                          Toast.makeText(context, "Search unsuccessful", Toast.LENGTH_LONG).show()
-                          Log.e("AddBook", result.exceptionOrNull().toString())
-                        } else {
-                          booksRepository.addBook(
-                              result.getOrThrow(),
-                              { navigationActions.navigateTo(TopLevelDestinations.NEW_BOOK) },
-                              { error ->
-                                Log.e("AddBook", error.toString())
-                                Toast.makeText(context, error.message, Toast.LENGTH_LONG).show()
-                              })
+              Column(
+                  modifier = Modifier.fillMaxWidth().padding(top = 40.dp),
+                  horizontalAlignment = Alignment.CenterHorizontally,
+                  verticalArrangement = Arrangement.spacedBy(45.dp)) {
+                    FieldComponent(
+                        modifier = Modifier.testTag("isbn_field"),
+                        labelText = "ISBN*",
+                        value = isbn) {
+                          if (it.all { c -> c.isDigit() } && it.length <= 13) {
+                            isbn = it
+                          }
                         }
-                      }
-                    }) {
-                      Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text("Search")
-                        Icon(
-                            Icons.Filled.Search,
-                            contentDescription = "Search icon",
-                        )
-                      }
-                    }
-              }
-        }
+                    ButtonComponent(
+                        modifier = Modifier.testTag("isbn_searchButton"),
+                        onClick = {
+                          GoogleBookDataSource(context).getBookFromISBN(isbn) { result ->
+                            if (result.isFailure) {
+                              Toast.makeText(context, "Search unsuccessful", Toast.LENGTH_LONG)
+                                  .show()
+                              Log.e("AddBook", result.exceptionOrNull().toString())
+                            } else {
+                              booksRepository.addBook(
+                                  result.getOrThrow(),
+                                  callback = { res ->
+                                    if (res.isSuccess) {
+                                      navigationActions.navigateTo(TopLevelDestinations.NEW_BOOK)
+                                    } else {
+                                      val error = res.exceptionOrNull()!!
+                                      Log.e("AddBook", res.toString())
+                                      Toast.makeText(context, error.message, Toast.LENGTH_LONG)
+                                          .show()
+                                    }
+                                  })
+                            }
+                          }
+                        }) {
+                          Row(Modifier.fillMaxWidth()) {
+                            Text("Search", style = TextStyle(color = Color.White))
+                            Spacer(Modifier.weight(1f))
+                            Icon(
+                                Icons.Filled.Search,
+                                contentDescription = "Search icon",
+                                tint = Color.White,
+                            )
+                          }
+                        }
+                  }
+            }
       })
 }
