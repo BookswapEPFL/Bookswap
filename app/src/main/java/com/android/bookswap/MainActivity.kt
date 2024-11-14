@@ -46,6 +46,9 @@ import com.android.bookswap.ui.navigation.Route
 import com.android.bookswap.ui.navigation.Screen
 import com.android.bookswap.ui.profile.UserProfile
 import com.android.bookswap.ui.theme.BookSwapAppTheme
+import com.google.firebase.Firebase
+import com.google.firebase.auth.auth
+import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
 import java.util.UUID
 
@@ -95,7 +98,12 @@ class MainActivity : ComponentActivity() {
     val navController = rememberNavController()
     val navigationActions = NavigationActions(navController)
     val bookFilter = BookFilter()
+    //user part
+    val currentUser = Firebase.auth.currentUser
     val userVM = UserViewModel(UUID.randomUUID(), userRepository)
+    if(currentUser != null) {
+      userVM.getUserByGoogleUid(currentUser.uid) //This will scrap the user from the database
+    }
     val placeHolder =
         listOf(
             MessageBox(
@@ -125,7 +133,7 @@ class MainActivity : ComponentActivity() {
 
     NavHost(navController = navController, startDestination = startDestination) {
       navigation(startDestination = Screen.AUTH, route = Route.AUTH) {
-        composable(Screen.AUTH) { SignInScreen(navigationActions) }
+        composable(Screen.AUTH) { SignInScreen(navigationActions, userVM) }
       }
       navigation(startDestination = Screen.CHATLIST, route = Route.CHAT) {
         composable(Screen.CHATLIST) {

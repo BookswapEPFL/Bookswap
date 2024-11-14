@@ -40,6 +40,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.bookswap.R
+import com.android.bookswap.model.UserViewModel
 import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.navigation.TopLevelDestinations
 import com.android.bookswap.ui.theme.ColorVariable
@@ -54,21 +55,30 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
 @Composable
-fun SignInScreen(navigationActions: NavigationActions) { // Add this when navigation is
+fun SignInScreen(navigationActions: NavigationActions,userVM: UserViewModel) { // Add this when navigation is
   // implemented
   val context = LocalContext.current
   var googleUid = ""
+  if (Firebase.auth.currentUser != null) {
+    navigationActions.navigateTo(TopLevelDestinations.MAP)
+  }
 
   val launcher =
       rememberFirebaseAuthLauncher(
           onAuthComplete = { result ->
+            var nextScreen = TopLevelDestinations.MAP
             val googleUserName = result.user?.displayName ?: ""
             // TODO googleUserUid will be used for retrieving the corresponding DataUser
             // will be done in another class.
             googleUid = result.user?.uid ?: ""
+            userVM.getUserByGoogleUid(googleUid)
+            if (!userVM.isStored) {
+              userVM.updateGoogleUid(googleUid)
+              nextScreen = TopLevelDestinations.PROFILE
+            }
             Log.d("SignInScreen", "User signed in: $googleUserName")
             Toast.makeText(context, "Welcome $googleUserName!", Toast.LENGTH_LONG).show()
-            navigationActions.navigateTo(TopLevelDestinations.MAP)
+            navigationActions.navigateTo(nextScreen)
           },
           onAuthError = {
             Log.e("SignInScreen", "Failed to sign in: ${it.statusCode}")
