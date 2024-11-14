@@ -48,6 +48,23 @@ class UserFirestoreSource(private val db: FirebaseFirestore) : UsersRepository {
       }
     }
   }
+  /**
+   * Fetches the list of users from the Firestore collection If the task is successful, maps the
+   * Firestore documents to DataUser objects Calls OnSuccess with the list of users, or onFailure if
+   * the task fails
+   */
+  override fun getUser(googleUid: String, callback: (Result<DataUser>) -> Unit) {
+      db.collection(COLLECTION_NAME).whereEqualTo("googleUID", googleUid).get().addOnCompleteListener { task ->
+          if (task.isSuccessful) {
+              callback(
+                  Result.success(
+                      task.result?.firstNotNullOfOrNull { documentToUser(it).getOrNull() } ?: DataUser()))
+          } else {
+              callback(Result.failure(task.exception!!))
+          }
+      }
+  }
+
 
   /** Adds a new user to the Firestore collection */
   override fun addUser(dataUser: DataUser, callback: (Result<Unit>) -> Unit) {

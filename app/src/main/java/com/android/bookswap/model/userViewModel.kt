@@ -1,11 +1,19 @@
 package com.android.bookswap.model
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.android.bookswap.data.DataUser
 import com.android.bookswap.data.repository.UsersRepository
 import com.android.bookswap.data.source.network.UserFirestoreSource
 import com.google.firebase.firestore.FirebaseFirestore
 import java.util.UUID
+import java.util.concurrent.CountDownLatch
+/**
+ * ViewModel for the user data of the application.
+ *
+ * @param uuid UUID of the user
+ * @param repository Repository to fetch user data
+ */
 
 open class UserViewModel(
     var uuid: UUID,
@@ -68,4 +76,30 @@ open class UserViewModel(
       result.fold({ isStored = true }, { isStored = false })
     }
   }
+
+    fun addUser() {
+    userRepository.addUser(this.dataUser) { result ->
+      result.fold({ Log.d("UserViewModel", "User added successfully") }, { Log.e("UserViewModel", "Error adding user") })
+    }
+  }
+
+    fun getUserByGoogleUid(googleUid: String) {
+        userRepository.getUser(googleUid) { result ->
+            // If the user is found, update the dataUser and set isLoaded to true
+            result.onSuccess {
+                dataUser = it
+                isLoaded = true
+                isStored = true
+            }
+            //If the user is not found, set isLoaded to false
+            result.onFailure {
+                isLoaded = true
+            }
+        }
+    }
+
+    fun updateGoogleUid(googleUid: String) {
+        dataUser.googleUid = googleUid
+        updateUser(dataUser)
+    }
 }
