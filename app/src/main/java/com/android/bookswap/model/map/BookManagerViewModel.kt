@@ -5,9 +5,9 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.android.bookswap.data.DataBook
 import com.android.bookswap.data.DataUser
+import com.android.bookswap.data.UserBooksWithLocation
 import com.android.bookswap.data.repository.BooksRepository
 import com.android.bookswap.data.repository.UsersRepository
-import com.android.bookswap.ui.map.UserBooksWithLocation
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 
@@ -114,6 +114,7 @@ class BookManagerViewModel(
             val userBooksWithLocation =
                 userDistance.map { user ->
                   UserBooksWithLocation(
+                      userUUID = user.first.userUUID,
                       longitude = user.first.longitude,
                       latitude = user.first.latitude,
                       books =
