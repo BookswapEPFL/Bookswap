@@ -7,7 +7,6 @@ import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -47,7 +46,7 @@ import com.android.bookswap.model.map.BookFilter
 import com.android.bookswap.model.map.BookManagerViewModel
 import com.android.bookswap.model.map.DefaultGeolocation
 import com.android.bookswap.model.map.IGeolocation
-import com.android.bookswap.ui.components.BookDisplayComponent
+import com.android.bookswap.ui.components.BookListComponent
 import com.android.bookswap.ui.navigation.BOTTOM_NAV_HEIGHT
 import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.navigation.Screen
@@ -365,37 +364,7 @@ private fun DraggableMenu(listAllBooks: List<DataBook>) {
               modifier = Modifier.fillMaxWidth().testTag("mapDraggableMenuHandleDivider"),
               thickness = DIVIDER_THICKNESS_DP.dp,
               color = ColorVariable.Accent)
-          LazyColumn(userScrollEnabled = true, modifier = Modifier.fillMaxHeight()) {
-            if (listAllBooks.isEmpty()) {
-              item {
-                Text(
-                    text = "No books found",
-                    color = ColorVariable.Accent,
-                    fontSize = PRIMARY_TEXT_FONT_SP.sp,
-                    textAlign = androidx.compose.ui.text.style.TextAlign.Center,
-                    modifier =
-                        Modifier.padding(PADDING_HORIZONTAL_DP.dp)
-                            .fillMaxWidth()
-                            .align(Alignment.CenterHorizontally)
-                            .testTag("mapDraggableMenuNoBook"))
-              }
-            } else {
-              itemsIndexed(listAllBooks) { index, book ->
-                Spacer(modifier = Modifier.height(PADDING_VERTICAL_DP.dp))
-                BookDisplayComponent(
-                    modifier =
-                        Modifier.heightIn(min = MIN_BOX_BOOK_HEIGHT_DP.dp)
-                            .testTag("mapDraggableMenuBookBox${index}"),
-                    book = book)
-
-                // Divider below each item
-                HorizontalDivider(
-                    modifier = Modifier.fillMaxWidth().testTag("mapDraggableMenuBookBoxDivider"),
-                    thickness = DIVIDER_THICKNESS_DP.dp,
-                    color = ColorVariable.Accent)
-              }
-            }
-          }
+          BookListComponent(Modifier, listAllBooks)
         }
       }
 }
