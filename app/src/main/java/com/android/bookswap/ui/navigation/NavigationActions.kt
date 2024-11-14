@@ -90,10 +90,10 @@ open class NavigationActions(
    */
   open fun navigateTo(screen: String, otherUserUUID: String) {
     val route = "$screen/$otherUserUUID"
-      // Only navigate if the route is different from the current route
-      if (!isCurrentDestination(route)) {
-          navController.navigate(route)
-      }
+    // Only navigate if the route is different from the current route
+    if (!isCurrentDestination(route)) {
+      navController.navigate(route)
+    }
   }
 
   /**
