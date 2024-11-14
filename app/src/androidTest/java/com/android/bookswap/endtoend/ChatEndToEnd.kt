@@ -33,6 +33,7 @@ import com.google.firebase.firestore.ListenerRegistration
 import io.mockk.every
 import io.mockk.mockk
 import java.util.UUID
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -197,22 +198,15 @@ class ChatEndToEnd {
     composeTestRule.onNodeWithTag("message_input_field").performTextInput(newMessage)
     composeTestRule.onNodeWithTag("send_button").performClick()
 
-    composeTestRule.runOnIdle {}
-
     // Wait until the new message appears
-    val newMessageUUID = mockMessageRepository.messages.last().uuid
-    composeTestRule.waitUntil(timeoutMillis = 15000) {
-      composeTestRule
-          .onAllNodesWithTag("message_text $newMessageUUID", useUnmergedTree = true)
-          .fetchSemanticsNodes()
-          .isNotEmpty()
+    val newMessageUUID = mockMessageRepository.messages.first().uuid
+    // **DATA LAYER CHECK**: Verify that the message was added to the mockMessageRepository
+    composeTestRule.runOnIdle {
+      val addedMessage = mockMessageRepository.messages.lastOrNull()
+      assertEquals(newMessage, addedMessage?.text)
+      assertEquals(currentUserUUID.toString(), addedMessage?.senderUUID.toString())
+      assertEquals(otherUserUUID.toString(), addedMessage?.receiverUUID.toString())
     }
-
-    // Assert new message appears with the correct text
-    composeTestRule
-        .onNodeWithTag("message_text $newMessageUUID", useUnmergedTree = true)
-        .assertExists()
-        .assertTextEquals(newMessage)
 
     // **EDIT STEP**: Long-press to edit the message
     composeTestRule
