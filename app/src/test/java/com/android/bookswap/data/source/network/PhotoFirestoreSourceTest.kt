@@ -6,137 +6,119 @@ import androidx.test.core.app.ApplicationProvider
 import com.android.bookswap.R
 import com.android.bookswap.data.DataPhoto
 import com.google.android.gms.tasks.Tasks
-import com.google.firebase.FirebaseApp
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QuerySnapshot
-import java.util.UUID
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.verify
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.ArgumentMatchers
-import org.mockito.Mock
-import org.mockito.Mockito.`when`
-import org.mockito.MockitoAnnotations
-import org.mockito.kotlin.doAnswer
-import org.mockito.kotlin.verify
 import org.robolectric.RobolectricTestRunner
+import java.util.UUID
 
 @RunWith(RobolectricTestRunner::class)
 class PhotoFirestoreSourceTest {
-  @Mock private lateinit var mockFirestore: FirebaseFirestore
-  @Mock private lateinit var mockCollectionReference: CollectionReference
-  @Mock private lateinit var mockDocumentReference: DocumentReference
-  @Mock private lateinit var mockDocumentSnapshot: DocumentSnapshot
-  @Mock private lateinit var mockQuerySnapshot: QuerySnapshot
+  private val mockFirestore: FirebaseFirestore = mockk()
+  private val mockCollectionReference: CollectionReference = mockk()
+  private val mockDocumentReference: DocumentReference = mockk()
+  private val mockDocumentSnapshot: DocumentSnapshot = mockk()
+  private val mockQuerySnapshot: QuerySnapshot = mockk()
 
-  private lateinit var PhotoFirestoreSource: PhotoFirestoreSource
+  private val photoFirestoreSource = PhotoFirestoreSource(mockFirestore)
+
   private lateinit var testPhoto: DataPhoto
 
   @Before
-  fun setUp() {
-    MockitoAnnotations.openMocks(this)
-
-    // Initialize Firebase if necessary
-    if (FirebaseApp.getApps(ApplicationProvider.getApplicationContext()).isEmpty()) {
-      FirebaseApp.initializeApp(ApplicationProvider.getApplicationContext())
-    }
-
-    PhotoFirestoreSource = PhotoFirestoreSource(mockFirestore)
-
-    `when`(mockFirestore.collection(ArgumentMatchers.anyString()))
-        .thenReturn(mockCollectionReference)
-    `when`(mockCollectionReference.document(ArgumentMatchers.anyString()))
-        .thenReturn(mockDocumentReference)
-    `when`(mockCollectionReference.get()).thenReturn(Tasks.forResult(mockQuerySnapshot))
+  fun setup() {
+    every { mockFirestore.collection(any()) } returns mockCollectionReference
+    every { mockCollectionReference.document(any()) } returns mockDocumentReference
+    every { mockCollectionReference.get() } returns Tasks.forResult(mockQuerySnapshot)
 
     val context = ApplicationProvider.getApplicationContext<Context>()
     val bitmap = BitmapFactory.decodeResource(context.resources, R.drawable.etranger_test)
 
-    testPhoto =
-        DataPhoto(
+    testPhoto = DataPhoto(
             uuid = UUID.randomUUID(),
-            url = "", // Optional url field (don't know if it is really useful)
-            timestamp = System.currentTimeMillis(),
-            base64 = PhotoFirestoreSource.bitmapToBase64(bitmap))
+    url = "", // Optional url field (don't know if it is really useful)
+    timestamp = System.currentTimeMillis(),
+    base64 = photoFirestoreSource.bitmapToBase64(bitmap)
+    )
+
+    //Arrange snapshot
+    every { mockDocumentReference.get() } returns Tasks.forResult(mockDocumentSnapshot)
+    every { mockDocumentSnapshot.getString("uuid") } returns testPhoto.uuid.toString()
+    every { mockDocumentSnapshot.getString("url") } returns testPhoto.url
+    every { mockDocumentSnapshot.getLong("timestamp") } returns testPhoto.timestamp
+    every { mockDocumentSnapshot.getString("base64") } returns testPhoto.base64
   }
 
   @Test
-  fun getPhoto_callsFirestoreGet() {
-    // Arrange
-    `when`(mockDocumentReference.get()).thenReturn(Tasks.forResult(mockDocumentSnapshot))
-
-    `when`(mockDocumentSnapshot.getString("uuid")).thenReturn(testPhoto.uuid.toString())
-    `when`(mockDocumentSnapshot.getString("url")).thenReturn(testPhoto.url)
-    `when`(mockDocumentSnapshot.getLong("timestamp")).thenReturn(testPhoto.timestamp)
-    `when`(mockDocumentSnapshot.getString("base64")).thenReturn(testPhoto.base64)
+  fun `getPhoto call firestore get`() {
 
     // Act
-    PhotoFirestoreSource.getPhoto(
+    photoFirestoreSource.getPhoto(
         testPhoto.uuid,
         callback = { result ->
-          assert(result.isSuccess)
+          assertTrue(result.isSuccess)
           val photo = result.getOrThrow()
           // Assert that the fetched photo matches the expected values
-          assert(photo.uuid == testPhoto.uuid)
-          assert(photo.url == testPhoto.url)
-          assert(photo.timestamp == testPhoto.timestamp)
-          assert(photo.base64 == testPhoto.base64)
+          assertEquals(testPhoto.uuid, photo.uuid)
+          assertEquals(testPhoto.url, photo.url)
+          assertEquals(testPhoto.timestamp, photo.timestamp)
+          assertEquals(testPhoto.base64, photo.base64)
         })
 
     // Verify Firestore collection was called
-    verify(mockCollectionReference).document(testPhoto.uuid.toString())
+    verify { mockCollectionReference.document(testPhoto.uuid.toString()) }
+    verify { mockDocumentReference.get() }
   }
 
   @Test
-  fun addPhoto_callsFirestoreSet_andOnSuccess() {
+  fun `addPhoto call set and success`() {
     // Arrange
-    doAnswer { Tasks.forResult(null) }.`when`(mockDocumentReference).set(testPhoto)
+    every { mockDocumentReference.set(testPhoto) } returns Tasks.forResult(null)
 
     // Act
-    PhotoFirestoreSource.addPhoto(
+    photoFirestoreSource.addPhoto(
         testPhoto,
         callback = { result ->
           // Assert success callback
           assert(result.isSuccess)
         })
     // Verify Firestore set operation
-    verify(mockDocumentReference).set(testPhoto)
+    verify { mockDocumentReference.set(testPhoto) }
   }
 
   @Test
-  fun documentToPhoto_returnsDataPhoto_whenDocumentIsValid() {
-    // Arrange
-    `when`(mockDocumentSnapshot.getString("uuid")).thenReturn(testPhoto.uuid.toString())
-    `when`(mockDocumentSnapshot.getString("url")).thenReturn(testPhoto.url)
-    `when`(mockDocumentSnapshot.getLong("timestamp")).thenReturn(testPhoto.timestamp)
-    `when`(mockDocumentSnapshot.getString("base64")).thenReturn(testPhoto.base64)
-
+  fun `documentToPhoto is valid`() {
     // Act
-    val result = PhotoFirestoreSource.documentToPhoto(mockDocumentSnapshot)
+    val result = photoFirestoreSource.documentToPhoto(mockDocumentSnapshot)
 
     // Assert
-    assert(result != null)
-    assert(result?.uuid == testPhoto.uuid)
-    assert(result?.url == testPhoto.url)
-    assert(result?.timestamp == testPhoto.timestamp)
-    assert(result?.base64 == testPhoto.base64)
+    assertNotNull(result)
+    assertEquals(testPhoto.uuid, result!!.uuid)
+    assertEquals(testPhoto.url, result.url)
+    assertEquals(testPhoto.timestamp, result.timestamp)
+    assertEquals(testPhoto.base64, result.base64)
   }
 
   @Test
-  fun documentToPhoto_returnsNull_whenRequiredFieldIsMissing() {
+  fun `documentToPhoto returns null on error`() {
     // Arrange - Missing "base64" field
-    `when`(mockDocumentSnapshot.getString("uuid")).thenReturn(testPhoto.uuid.toString())
-    `when`(mockDocumentSnapshot.getString("url")).thenReturn(testPhoto.url)
-    `when`(mockDocumentSnapshot.getLong("timestamp")).thenReturn(testPhoto.timestamp)
-    `when`(mockDocumentSnapshot.getString("base64")).thenReturn(null)
+    every { mockDocumentSnapshot.getString("base64") } returns null
 
     // Act
-    val result = PhotoFirestoreSource.documentToPhoto(mockDocumentSnapshot)
+    val result = photoFirestoreSource.documentToPhoto(mockDocumentSnapshot)
 
     // Assert
-    assert(result == null) // Should return null due to missing "base64"
+    assertNull(result) // Should return null due to missing "base64"
   }
 }
