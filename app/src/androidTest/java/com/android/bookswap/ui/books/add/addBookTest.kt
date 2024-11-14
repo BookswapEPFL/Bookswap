@@ -38,18 +38,14 @@ class AddToBookTest {
 
   @Test
   fun testSaveButtonDisabledInitially() {
-    composeTestRule.setContent {
-         AddToBookScreen(mockBooksRepository)
-    }
+    composeTestRule.setContent { AddToBookScreen(mockBooksRepository) }
     // Check if the Save button is initially disabled
     composeTestRule.onNodeWithText("Save").assertIsNotEnabled()
   }
 
   @Test
   fun testSaveButtonEnabledWhenRequiredFieldsAreFilled() {
-    composeTestRule.setContent {
-      AddToBookScreen(mockBooksRepository)
-    }
+    composeTestRule.setContent { AddToBookScreen(mockBooksRepository) }
     // Fill in the Title and ISBN fields
     composeTestRule.onNodeWithText("Title").performTextInput("My Book Title")
     composeTestRule.onNodeWithText("ISBN").performTextInput("1234567890")
