@@ -60,8 +60,8 @@ class PhotoFirebaseStorageSource(private val storage: FirebaseStorage) :
         .addOnSuccessListener {
           // Get the download URL after successful upload
           storageRef.downloadUrl
-              .addOnSuccessListener { uri ->
-                callback(Result.success(uri.toString())) // Return the URL
+              .addOnSuccessListener { url ->
+                callback(Result.success(url.toString())) // Return the URL
               }
               .addOnFailureListener { e -> callback(Result.failure(e)) }
         }
