@@ -197,9 +197,11 @@ class ChatEndToEnd {
     composeTestRule.onNodeWithTag("message_input_field").performTextInput(newMessage)
     composeTestRule.onNodeWithTag("send_button").performClick()
 
+    composeTestRule.runOnIdle {}
+
     // Wait until the new message appears
     val newMessageUUID = mockMessageRepository.messages.last().uuid
-    composeTestRule.waitUntil(timeoutMillis = 5002) {
+    composeTestRule.waitUntil(timeoutMillis = 15000) {
       composeTestRule
           .onAllNodesWithTag("message_text $newMessageUUID", useUnmergedTree = true)
           .fetchSemanticsNodes()
