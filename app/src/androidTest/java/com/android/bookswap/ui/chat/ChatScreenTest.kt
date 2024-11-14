@@ -16,6 +16,7 @@ import androidx.compose.ui.test.performSemanticsAction
 import androidx.compose.ui.test.performTextClearance
 import androidx.compose.ui.test.performTextInput
 import com.android.bookswap.data.DataMessage
+import com.android.bookswap.data.DataUser
 import com.android.bookswap.data.MessageType
 import com.android.bookswap.data.repository.MessageRepository
 import com.android.bookswap.ui.navigation.NavigationActions
@@ -37,10 +38,16 @@ class ChatScreenTest {
   private val currentUserUUID = UUID.randomUUID()
   private val otherUserUUID = UUID.randomUUID()
   private lateinit var mockNavigationActions: NavigationActions
+  private val currentUser =
+      DataUser(
+          currentUserUUID, "Hello", "Jaime", "Oliver Pastor", "", "", 0.0, 0.0, "", emptyList(), "")
+  private val otherUser =
+      DataUser(otherUserUUID, "Hey", "Matias", "Salvade", "", "", 0.0, 0.0, "", emptyList(), "")
 
   @Before
   fun setUp() {
     mockNavigationActions = mockk()
+
     placeHolderData =
         List(6) {
               DataMessage(
@@ -87,8 +94,8 @@ class ChatScreenTest {
     composeTestRule.setContent {
       ChatScreen(
           messageRepository = mockMessageRepository,
-          currentUserUUID = currentUserUUID,
-          otherUserUUID = otherUserUUID,
+          currentUser = currentUser,
+          otherUser = otherUser,
           mockNavigationActions)
     }
     composeTestRule.onNodeWithTag("message_input_field").assertIsDisplayed()
@@ -103,8 +110,8 @@ class ChatScreenTest {
     composeTestRule.setContent {
       ChatScreen(
           messageRepository = mockMessageRepository,
-          currentUserUUID = currentUserUUID,
-          otherUserUUID = otherUserUUID,
+          currentUser = currentUser,
+          otherUser = otherUser,
           mockNavigationActions)
     }
     composeTestRule.onNodeWithTag("message_input_field").assertIsDisplayed()
@@ -137,15 +144,15 @@ class ChatScreenTest {
   }
 
   @Test
-  fun CheckLastMessageIsImage() {
+  fun checkLastMessageIsImage() {
     val mockMessageRepository =
         MockMessageFirestoreSource().apply { messages = placeHolderData.toMutableList() }
 
     composeTestRule.setContent {
       ChatScreen(
           messageRepository = mockMessageRepository,
-          currentUserUUID = currentUserUUID,
-          otherUserUUID = otherUserUUID,
+          currentUser = currentUser,
+          otherUser = otherUser,
           mockNavigationActions)
     }
 
@@ -163,8 +170,8 @@ class ChatScreenTest {
     composeTestRule.setContent {
       ChatScreen(
           messageRepository = mockMessageRepository,
-          currentUserUUID = currentUserUUID,
-          otherUserUUID = otherUserUUID,
+          currentUser = currentUser,
+          otherUser = otherUser,
           mockNavigationActions)
     }
     composeTestRule.onNodeWithTag("send_button").assertHasClickAction()
@@ -175,8 +182,8 @@ class ChatScreenTest {
     composeTestRule.setContent {
       ChatScreen(
           messageRepository = mockMessageRepository,
-          currentUserUUID = currentUserUUID,
-          otherUserUUID = otherUserUUID,
+          currentUser = currentUser,
+          otherUser = otherUser,
           mockNavigationActions)
     }
     val testInput = "Hello, World!"
@@ -192,8 +199,8 @@ class ChatScreenTest {
     composeTestRule.setContent {
       ChatScreen(
           messageRepository = mockMessageRepository,
-          currentUserUUID = currentUserUUID,
-          otherUserUUID = otherUserUUID,
+          currentUser = currentUser,
+          otherUser = otherUser,
           mockNavigationActions)
     }
 
@@ -215,14 +222,16 @@ class ChatScreenTest {
     composeTestRule.setContent {
       ChatScreen(
           messageRepository = mockMessageRepository,
-          currentUserUUID = currentUserUUID,
-          otherUserUUID = otherUserUUID,
+          currentUser = currentUser,
+          otherUser = otherUser,
           mockNavigationActions)
     }
 
     composeTestRule.onNodeWithTag("chatTopAppBar").assertIsDisplayed()
     composeTestRule.onNodeWithTag("chatName").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("chatName").assertTextEquals(otherUserUUID.toString())
+    composeTestRule
+        .onNodeWithTag("chatName")
+        .assertTextEquals(otherUser.firstName + " " + otherUser.lastName)
     composeTestRule.onNodeWithTag("profileIcon", useUnmergedTree = true).assertIsDisplayed()
   }
 
@@ -231,8 +240,8 @@ class ChatScreenTest {
     composeTestRule.setContent {
       ChatScreen(
           messageRepository = mockMessageRepository,
-          currentUserUUID = currentUserUUID,
-          otherUserUUID = otherUserUUID,
+          currentUser = currentUser,
+          otherUser = otherUser,
           navController = mockNavigationActions)
     }
 
@@ -271,8 +280,8 @@ class ChatScreenTest {
     composeTestRule.setContent {
       ChatScreen(
           messageRepository = mockMessageRepository,
-          currentUserUUID = currentUserUUID,
-          otherUserUUID = otherUserUUID,
+          currentUser = currentUser,
+          otherUser = otherUser,
           mockNavigationActions)
     }
 
@@ -315,8 +324,8 @@ class ChatScreenTest {
     composeTestRule.setContent {
       ChatScreen(
           messageRepository = mockMessageRepository,
-          currentUserUUID = currentUserUUID,
-          otherUserUUID = otherUserUUID,
+          currentUser = currentUser,
+          otherUser = otherUser,
           navController = mockNavigationActions)
     }
 
@@ -385,8 +394,8 @@ class ChatScreenTest {
     composeTestRule.setContent {
       ChatScreen(
           messageRepository = mockMessageRepository,
-          currentUserUUID = currentUserUUID,
-          otherUserUUID = otherUserUUID,
+          currentUser = currentUser,
+          otherUser = otherUser,
           mockNavigationActions)
     }
 
@@ -420,8 +429,8 @@ class ChatScreenTest {
     composeTestRule.setContent {
       ChatScreen(
           messageRepository = mockMessageRepository,
-          currentUserUUID = currentUserUUID,
-          otherUserUUID = otherUserUUID,
+          currentUser = currentUser,
+          otherUser = otherUser,
           mockNavigationActions)
     }
 

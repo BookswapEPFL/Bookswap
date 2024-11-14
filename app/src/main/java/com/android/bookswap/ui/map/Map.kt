@@ -43,9 +43,8 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.bookswap.data.DataBook
-import com.android.bookswap.data.DataUser
-import com.android.bookswap.data.repository.BooksRepository
 import com.android.bookswap.model.map.BookFilter
+import com.android.bookswap.model.map.BookManagerViewModel
 import com.android.bookswap.model.map.DefaultGeolocation
 import com.android.bookswap.model.map.IGeolocation
 import com.android.bookswap.ui.components.BookDisplayComponent
@@ -73,21 +72,16 @@ var SemanticsPropertyReceiver.cameraPosition by CameraPositionKey
  * This screen renders a GoogleMap that shows books locations as markers. Upon clicking a marker, it
  * displays a custom info window with the list of books at this location.
  *
- * @param listUser List of users [DataUser] to display on the map, will be replaced by a model that
- *   retrieves the users from the database.
- * @param navigationActions An instance of [NavigationActions] to handle navigation actions.
+ * @param bookManagerViewModel the view model that give the mapScreen the list of books to display
  * @param bookFilter An instance of [BookFilter] to filter the books displayed on the map.
- * @param booksRepository An instance of [BooksRepository] to retrieve the books from the database.
  * @param selectedUser An optional user, it will display the infoWindow related to this user. This
  *   user’s info window will be shown if it is bigger or equal to 0.
  * @param geolocation An instance of [IGeolocation] to get the user's current location.
  */
 @Composable
 fun MapScreen(
-    listUser: List<DataUser>,
+    bookManagerViewModel: BookManagerViewModel,
     navigationActions: NavigationActions,
-    bookFilter: BookFilter,
-    booksRepository: BooksRepository,
     selectedUser: Int = NO_USER_SELECTED,
     geolocation: IGeolocation = DefaultGeolocation(),
     topAppBar: @Composable () -> Unit = {},
@@ -95,49 +89,29 @@ fun MapScreen(
 ) {
   val cameraPositionState = rememberCameraPositionState()
   // Get the user's current location
-  val latitude by remember { geolocation.latitude }
-  val longitude by remember { geolocation.longitude }
-  // Start location updates
+  val latitude = geolocation.latitude.collectAsState()
+  val longitude = geolocation.longitude.collectAsState()
+  // Start location and books updates
   LaunchedEffect(Unit) {
+    bookManagerViewModel.startUpdatingBooks()
     geolocation.startLocationUpdates()
     cameraPositionState.position =
-        CameraPosition.fromLatLngZoom(LatLng(latitude, longitude), INIT_ZOOM)
+        CameraPosition.fromLatLngZoom(LatLng(latitude.value, longitude.value), INIT_ZOOM)
   }
-  // Stop location updates when the screen is disposed
-  DisposableEffect(Unit) { onDispose { geolocation.stopLocationUpdates() } }
+  // Stop location and books updates when the screen is disposed
+  DisposableEffect(Unit) {
+    onDispose {
+      geolocation.stopLocationUpdates()
+      bookManagerViewModel.stopUpdatingBooks()
+    }
+  }
 
   var mutableStateSelectedUser by remember { mutableStateOf(selectedUser) }
   var markerScreenPosition by remember { mutableStateOf<Offset?>(null) }
-  val userBooksList = remember { mutableStateListOf<UserBooksWithLocation>() }
 
-  // Fetch books
-  LaunchedEffect(Unit) {
-    booksRepository.getBook(
-        OnSucess = { books ->
-          listUser.forEach { user ->
-            userBooksList.add(
-                UserBooksWithLocation(
-                    user.longitude,
-                    user.latitude,
-                    books.filter { book -> book.uuid in user.bookList }))
-          }
-        },
-        onFailure = {})
-  }
+  val filteredBooks = bookManagerViewModel.filteredBooks.collectAsState()
 
-  val listAllBooks = userBooksList.flatMap { it.books }
-
-  // Filter the books based on the selected filters
-  val genresFilter by bookFilter.genresFilter.collectAsState()
-  val languagesFilter by bookFilter.languagesFilter.collectAsState()
-
-  val filteredBooks =
-      remember(genresFilter, languagesFilter, listAllBooks) { bookFilter.filterBooks(listAllBooks) }
-
-  val filteredUsers =
-      userBooksList.map {
-        it.copy(books = it.books.filter { book -> filteredBooks.contains(book) })
-      }
+  val filteredUsers = bookManagerViewModel.filteredUsers.collectAsState()
 
   // compute the position of the marker on the screen given the camera position and the marker's
   // position on the map
@@ -149,24 +123,24 @@ fun MapScreen(
     }
   }
 
-  if (mutableStateSelectedUser >= 0 && mutableStateSelectedUser < filteredUsers.size) {
+  if (mutableStateSelectedUser >= 0 && mutableStateSelectedUser < filteredUsers.value.size) {
     computePositionOfMarker(
         cameraPositionState,
         LatLng(
-            filteredUsers[mutableStateSelectedUser].latitude,
-            filteredUsers[mutableStateSelectedUser].longitude))
+            filteredUsers.value[mutableStateSelectedUser].latitude,
+            filteredUsers.value[mutableStateSelectedUser].longitude))
   }
 
   val coroutineScope = rememberCoroutineScope()
 
   // Recalculate marker screen position during camera movement
   LaunchedEffect(cameraPositionState.position) {
-    if (mutableStateSelectedUser >= 0 && mutableStateSelectedUser < filteredUsers.size) {
+    if (mutableStateSelectedUser >= 0 && mutableStateSelectedUser < filteredUsers.value.size) {
       computePositionOfMarker(
           cameraPositionState,
           LatLng(
-              filteredUsers[mutableStateSelectedUser].latitude,
-              filteredUsers[mutableStateSelectedUser].longitude))
+              filteredUsers.value[mutableStateSelectedUser].latitude,
+              filteredUsers.value[mutableStateSelectedUser].longitude))
     }
   }
 
@@ -188,14 +162,14 @@ fun MapScreen(
                   uiSettings = MapUiSettings(zoomControlsEnabled = false),
               ) {
                 // Marker for user's current location
-                if (!latitude.isNaN() && !longitude.isNaN()) {
+                if (!latitude.value.isNaN() && !longitude.value.isNaN()) {
                   Marker(
-                      state = MarkerState(position = LatLng(latitude, longitude)),
+                      state = MarkerState(position = LatLng(latitude.value, longitude.value)),
                       title = "Your Location",
                       icon =
                           BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE))
                 }
-                filteredUsers
+                filteredUsers.value
                     .filter {
                       !it.longitude.isNaN() && !it.latitude.isNaN() && it.books.isNotEmpty()
                     }
@@ -219,18 +193,18 @@ fun MapScreen(
               // Custom info window linked to the marker
               markerScreenPosition?.let { screenPos ->
                 if (mutableStateSelectedUser >= 0 &&
-                    mutableStateSelectedUser < filteredUsers.size &&
-                    filteredUsers[mutableStateSelectedUser].books.isNotEmpty()) {
+                    mutableStateSelectedUser < filteredUsers.value.size &&
+                    filteredUsers.value[mutableStateSelectedUser].books.isNotEmpty()) {
                   CustomInfoWindow(
                       modifier =
                           Modifier.offset {
                             IntOffset(screenPos.x.roundToInt(), screenPos.y.roundToInt())
                           },
-                      userBooks = filteredUsers[mutableStateSelectedUser].books)
+                      userBooks = filteredUsers.value[mutableStateSelectedUser].books)
                 }
               }
               // Draggable Bottom List
-              DraggableMenu(filteredBooks)
+              DraggableMenu(filteredBooks.value)
             }
       })
 }
