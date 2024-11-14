@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.defaultMinSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.ButtonDefaults
@@ -27,6 +28,8 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 
 private val BUTTON_CONTENT_PADDING = 8.dp
+private val BUTTON_HEIGHT = 56.dp
+private val BUTTON_MIN_WIDTH = BUTTON_HEIGHT * 3
 
 @Composable
 fun ButtonComponent(
@@ -56,7 +59,12 @@ fun ButtonComponent(
   Surface(
       onClick = onClick,
       modifier =
-          modifier.minimumInteractiveComponentSize().clip(shape).semantics { role = Role.Button },
+          modifier
+              .minimumInteractiveComponentSize()
+              .clip(shape)
+              .semantics { role = Role.Button }
+              .height(BUTTON_HEIGHT)
+              .defaultMinSize(minWidth = BUTTON_MIN_WIDTH),
       enabled = enabled,
       shape = shape,
       color = containerColor,
