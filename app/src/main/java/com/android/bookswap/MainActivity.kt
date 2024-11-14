@@ -101,6 +101,7 @@ class MainActivity : ComponentActivity() {
     val navigationActions = NavigationActions(navController)
 
     //user part
+    //Firebase.auth.signOut() //Uncomment this line to test the sign in screen
     val currentUser = Firebase.auth.currentUser
     val userVM = UserViewModel(UUID.randomUUID(), userRepository)
 
@@ -180,7 +181,7 @@ class MainActivity : ComponentActivity() {
     NavHost(navController = navController, startDestination = startDestination) {
       navigation(startDestination = Screen.AUTH, route = Route.AUTH) {
         composable(Screen.AUTH) { SignInScreen(navigationActions, userVM) }
-        composable(Screen.NEW_USER) { NewUserScreen(navigationActions) }
+        composable(Screen.NEW_USER) { NewUserScreen(navigationActions,userVM) }
       }
       navigation(startDestination = Screen.CHATLIST, route = Route.CHAT) {
         composable(Screen.CHATLIST) {

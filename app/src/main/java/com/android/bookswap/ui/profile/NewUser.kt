@@ -35,9 +35,12 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.android.bookswap.model.UserViewModel
 import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.navigation.Route
 import com.android.bookswap.ui.theme.ColorVariable
+import com.google.firebase.Firebase
+import com.google.firebase.auth.auth
 
 // Constants for magic numbers used in the UI layout
 private val CONTENT_PADDING = 16.dp
@@ -57,7 +60,7 @@ private val INFO_FONT_WEIGHT = FontWeight(400)
  * @param navigationActions: NavigationActions
  */
 @Composable
-fun NewUserScreen(navigationActions: NavigationActions) {
+fun NewUserScreen(navigationActions: NavigationActions,userVM: UserViewModel) {
   val email = remember { mutableStateOf("") }
   val phone = remember { mutableStateOf("") }
   val greeting = remember { mutableStateOf("") }
@@ -168,7 +171,15 @@ fun NewUserScreen(navigationActions: NavigationActions) {
         item {
           Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
             Button(
-                onClick = { navigationActions.navigateTo(Route.MAP) },
+                onClick = {
+                    userVM.updateUser(
+                        greeting = greeting.value,
+                        firstName = firstName.value,
+                        lastName = lastName.value,
+                        email = email.value,
+                        phone = phone.value,
+                        googleUid = Firebase.auth.currentUser?.uid ?: "")
+                    navigationActions.navigateTo(Route.MAP) },
                 colors = ButtonDefaults.buttonColors(ColorVariable.Primary),
                 modifier =
                     Modifier.width(BUTTON_WIDTH).height(BUTTON_HEIGHT).testTag("CreateButton")) {
