@@ -26,6 +26,9 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -42,6 +45,7 @@ import androidx.compose.ui.unit.sp
 import com.android.bookswap.R
 import com.android.bookswap.model.UserViewModel
 import com.android.bookswap.ui.navigation.NavigationActions
+import com.android.bookswap.ui.navigation.Screen
 import com.android.bookswap.ui.navigation.TopLevelDestinations
 import com.android.bookswap.ui.theme.ColorVariable
 import com.google.android.gms.auth.api.signin.GoogleSignIn
@@ -59,32 +63,40 @@ fun SignInScreen(navigationActions: NavigationActions,userVM: UserViewModel) { /
   // implemented
   val context = LocalContext.current
   var googleUid = ""
-  if (Firebase.auth.currentUser != null) {
-    navigationActions.navigateTo(TopLevelDestinations.MAP)
-  }
+    // Check if user is already signed in
+  LaunchedEffect(Unit) { if (Firebase.auth.currentUser != null) {
+              navigationActions.navigateTo(TopLevelDestinations.MAP)
+  } }
+
 
   val launcher =
       rememberFirebaseAuthLauncher(
           onAuthComplete = { result ->
-            var nextScreen = TopLevelDestinations.MAP
             val googleUserName = result.user?.displayName ?: ""
-            // TODO googleUserUid will be used for retrieving the corresponding DataUser
-            // will be done in another class.
             googleUid = result.user?.uid ?: ""
             userVM.getUserByGoogleUid(googleUid)
-            if (!userVM.isStored) {
-              userVM.updateGoogleUid(googleUid)
-              nextScreen = TopLevelDestinations.PROFILE
-            }
+            Log.d("SignInScreen", "isStored: ${userVM.isStored}")
             Log.d("SignInScreen", "User signed in: $googleUserName")
             Toast.makeText(context, "Welcome $googleUserName!", Toast.LENGTH_LONG).show()
-            navigationActions.navigateTo(nextScreen)
           },
           onAuthError = {
             Log.e("SignInScreen", "Failed to sign in: ${it.statusCode}")
             Toast.makeText(context, "Login Failed!", Toast.LENGTH_LONG).show()
           })
   val token = stringResource(R.string.default_web_client_id)
+
+    val isStored by userVM.isStored.collectAsState()
+
+    LaunchedEffect(isStored) {
+        when (isStored) {
+            true -> navigationActions.navigateTo(TopLevelDestinations.MAP)
+            false -> {
+                userVM.updateGoogleUid(googleUid)
+                navigationActions.navigateTo(Screen.NEW_USER)
+            }
+            null -> {} // Attendre que `isStored` soit défini
+        }
+    }
 
   Scaffold(
       modifier = Modifier.fillMaxSize().testTag("SignInScreen"),

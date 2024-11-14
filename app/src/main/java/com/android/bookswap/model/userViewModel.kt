@@ -1,11 +1,16 @@
 package com.android.bookswap.model
 
 import android.util.Log
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import com.android.bookswap.data.DataUser
 import com.android.bookswap.data.repository.UsersRepository
 import com.android.bookswap.data.source.network.UserFirestoreSource
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import java.util.UUID
 import java.util.concurrent.CountDownLatch
 /**
@@ -21,8 +26,10 @@ open class UserViewModel(
 ) : ViewModel() {
   private var dataUser = DataUser(uuid)
   private var isLoaded = false
-  var isStored = false
+    private val _isStored = MutableStateFlow<Boolean?>(null)
+    val isStored: StateFlow<Boolean?> = _isStored
   private val userRepository: UsersRepository = repository
+
 
   open fun getUser(force: Boolean = false): DataUser {
     if (!isLoaded || force) {
@@ -36,7 +43,7 @@ open class UserViewModel(
       result.onSuccess {
         dataUser = it
         isLoaded = true
-        isStored = true
+        _isStored.value = true
       }
     }
   }
@@ -73,7 +80,7 @@ open class UserViewModel(
     this.uuid = newDataUser.userUUID
     isLoaded = true
     userRepository.updateUser(dataUser) { result ->
-      result.fold({ isStored = true }, { isStored = false })
+      result.fold({ _isStored.value = true }, { _isStored.value = false })
     }
   }
 
@@ -89,11 +96,14 @@ open class UserViewModel(
             result.onSuccess {
                 dataUser = it
                 isLoaded = true
-                isStored = true
+                _isStored.value = true
+                Log.e("UserViewModel", "User found {${dataUser.firstName}}{${dataUser.lastName}}{${dataUser.userUUID}}")
             }
             //If the user is not found, set isLoaded to false
             result.onFailure {
-                isLoaded = true
+                Log.e("UserViewModel", "User not found")
+                isLoaded = false
+                _isStored.value = false
             }
         }
     }

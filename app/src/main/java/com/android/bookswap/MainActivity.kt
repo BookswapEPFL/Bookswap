@@ -96,9 +96,10 @@ class MainActivity : ComponentActivity() {
       startDestination: String = Route.AUTH,
       geolocation: IGeolocation = DefaultGeolocation()
   ) {
+    //navigation part
     val navController = rememberNavController()
     val navigationActions = NavigationActions(navController)
-    val bookFilter = BookFilter()
+
     //user part
     val currentUser = Firebase.auth.currentUser
     val userVM = UserViewModel(UUID.randomUUID(), userRepository)
@@ -106,7 +107,8 @@ class MainActivity : ComponentActivity() {
     if(currentUser != null) {
       userVM.getUserByGoogleUid(currentUser.uid) //This will scrap the user from the database
     }
-
+    //Book part
+      val bookFilter = BookFilter()
     val bookManagerViewModel =
         BookManagerViewModel(geolocation, bookRepository, userRepository, bookFilter)
 
