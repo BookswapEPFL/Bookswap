@@ -138,6 +138,7 @@ class ListChatScreenTest {
                 selectedItem = navigationActions.currentRoute())
           })
     }
+
     val messageNodes = composeTestRule.onAllNodesWithTag("chat_messageBox")
     assert(messageNodes.fetchSemanticsNodes().isNotEmpty())
     messageNodes.assertAll(hasClickAction())
