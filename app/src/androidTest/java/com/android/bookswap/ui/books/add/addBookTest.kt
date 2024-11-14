@@ -11,7 +11,6 @@ import androidx.compose.ui.test.performTextInput
 import androidx.navigation.compose.rememberNavController
 import com.android.bookswap.data.BookGenres
 import com.android.bookswap.data.BookLanguages
-import com.android.bookswap.data.DataBook
 import com.android.bookswap.data.repository.BooksRepository
 import com.android.bookswap.ui.navigation.NavigationActions
 import io.mockk.every
@@ -27,6 +26,7 @@ import org.junit.Test
 class AddToBookTest {
   @get:Rule val composeTestRule = createComposeRule()
   private val mockContext: Context = mockk()
+  private val mockBooksRepository: BooksRepository = mockk()
 
   @Before
   fun init() {
@@ -38,22 +38,14 @@ class AddToBookTest {
 
   @Test
   fun testSaveButtonDisabledInitially() {
-    composeTestRule.setContent {
-      val navController = rememberNavController()
-      val navigationActions = NavigationActions(navController)
-      AddToBookScreen(MockBooksRepository(), navigationActions)
-    }
+    composeTestRule.setContent { AddToBookScreen(mockBooksRepository) }
     // Check if the Save button is initially disabled
     composeTestRule.onNodeWithText("Save").assertIsNotEnabled()
   }
 
   @Test
   fun testSaveButtonEnabledWhenRequiredFieldsAreFilled() {
-    composeTestRule.setContent {
-      val navController = rememberNavController()
-      val navigationActions = NavigationActions(navController)
-      AddToBookScreen(MockBooksRepository(), navigationActions)
-    }
+    composeTestRule.setContent { AddToBookScreen(mockBooksRepository) }
     // Fill in the Title and ISBN fields
     composeTestRule.onNodeWithText("Title").performTextInput("My Book Title")
     composeTestRule.onNodeWithText("ISBN").performTextInput("1234567890")
@@ -147,75 +139,12 @@ class AddToBookTest {
     composeTestRule.setContent {
       val navController = rememberNavController()
       val navigationActions = NavigationActions(navController)
-      AddToBookScreen(MockBooksRepository(), navigationActions)
+      AddToBookScreen(mockBooksRepository)
     }
     // Fill in the ISBN field but leave the Title field empty
     composeTestRule.onNodeWithText("ISBN").performTextInput("1234567890")
 
     // Check if the Save button is still disabled
     composeTestRule.onNodeWithText("Save").assertIsNotEnabled()
-  }
-
-  class MockBooksRepository : BooksRepository {
-    private var isBookAdded = false
-    private var isBookFetched = false
-    private var isBookUpdated = false
-    private var isBookDeleted = false
-    private var shouldFail = false
-
-    override fun init(OnSucess: () -> Unit) {
-      if (!shouldFail) {
-        OnSucess()
-      }
-    }
-
-    override fun getNewUUID(): UUID {
-      return UUID.randomUUID()
-    }
-
-    override fun getBook(OnSucess: (List<DataBook>) -> Unit, onFailure: (Exception) -> Unit) {
-      if (!shouldFail) {
-        isBookFetched = true
-        OnSucess(emptyList()) // Simulate an empty list of books
-      } else {
-        onFailure(Exception("Failed to fetch books"))
-      }
-    }
-
-    override fun addBook(dataBook: DataBook, OnSucess: () -> Unit, onFailure: (Exception) -> Unit) {
-      if (!shouldFail) {
-        isBookAdded = true
-        OnSucess()
-      } else {
-        onFailure(Exception("Failed to add book"))
-      }
-    }
-
-    override fun updateBook(
-        dataBook: DataBook,
-        onSuccess: () -> Unit,
-        onFailure: (Exception) -> Unit
-    ) {
-      if (!shouldFail) {
-        isBookUpdated = true
-        onSuccess()
-      } else {
-        onFailure(Exception("Failed to update book"))
-      }
-    }
-
-    override fun deleteBooks(
-        uuid: UUID,
-        dataBook: DataBook,
-        onSuccess: () -> Unit,
-        onFailure: (Exception) -> Unit
-    ) {
-      if (!shouldFail) {
-        isBookDeleted = true
-        onSuccess()
-      } else {
-        onFailure(Exception("Failed to delete book"))
-      }
-    }
   }
 }

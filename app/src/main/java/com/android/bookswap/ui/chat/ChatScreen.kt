@@ -3,7 +3,6 @@ package com.android.bookswap.ui.chat
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -50,12 +49,13 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
-import com.android.bookswap.R
+import coil.compose.AsyncImage
 import com.android.bookswap.data.DataMessage
+import com.android.bookswap.data.DataUser
+import com.android.bookswap.data.MessageType
 import com.android.bookswap.data.repository.MessageRepository
 import com.android.bookswap.ui.components.BackButtonComponent
 import com.android.bookswap.ui.navigation.NavigationActions
@@ -70,8 +70,8 @@ import kotlinx.coroutines.delay
 @Composable
 fun ChatScreen(
     messageRepository: MessageRepository,
-    currentUserUUID: UUID, // To identify the current user for aligning messages
-    otherUserUUID: UUID,
+    currentUser: DataUser,
+    otherUser: DataUser,
     navController: NavigationActions
 ) {
   val context = LocalContext.current
@@ -90,8 +90,10 @@ fun ChatScreen(
               result
                   .getOrThrow()
                   .filter {
-                    (it.senderUUID == currentUserUUID && it.receiverUUID == otherUserUUID) ||
-                        (it.senderUUID == otherUserUUID && it.receiverUUID == currentUserUUID)
+                    (it.senderUUID == currentUser.userUUID &&
+                        it.receiverUUID == otherUser.userUUID) ||
+                        (it.senderUUID == otherUser.userUUID &&
+                            it.receiverUUID == currentUser.userUUID)
                   }
                   .sortedBy { it.timestamp }
           Log.d("ChatScreen", "Fetched messages: $messages")
@@ -107,7 +109,7 @@ fun ChatScreen(
       TopAppBar(
           title = {
             Text(
-                text = otherUserUUID.toString(),
+                text = otherUser.firstName + " " + otherUser.lastName,
                 style = MaterialTheme.typography.titleMedium,
                 color = ColorVariable.Accent,
                 modifier =
@@ -135,7 +137,7 @@ fun ChatScreen(
               items(messages) { message ->
                 MessageItem(
                     message = message,
-                    currentUserUUID = currentUserUUID,
+                    currentUserUUID = currentUser.userUUID,
                     onLongPress = { selectedMessage = message })
               }
             }
@@ -183,10 +185,11 @@ fun ChatScreen(
                       val messageId = messageRepository.getNewUUID()
                       val newMessage =
                           DataMessage(
+                              messageType = MessageType.TEXT,
                               uuid = messageId,
                               text = newMessageText.text,
-                              senderUUID = currentUserUUID,
-                              receiverUUID = otherUserUUID, // Ensure receiverId is set here
+                              senderUUID = currentUser.userUUID,
+                              receiverUUID = otherUser.userUUID, // Ensure receiverId is set here
                               timestamp = System.currentTimeMillis())
                       // Send the message
                       messageRepository.sendMessage(
@@ -329,28 +332,33 @@ fun MessageItem(message: DataMessage, currentUserUUID: UUID, onLongPress: () -> 
                     .widthIn(max = (LocalConfiguration.current.screenWidthDp.dp * 2 / 3))
                     .border(1.dp, ColorVariable.Accent, shape)
                     .combinedClickable(
-                        onClick = { if (message.uuid == imageTestMessageUUID) showPopup = true },
+                        onClick = {
+                          if (message.messageType == MessageType.IMAGE) showPopup = true
+                        },
                         onLongClick = { onLongPress() })
                     .testTag("message_item ${message.uuid}")) {
-              Column(modifier = Modifier.padding(16.dp)) {
-                if (message.uuid == imageTestMessageUUID) {
-                  Image(
-                      painter = painterResource(id = R.drawable.the_hobbit_cover),
-                      contentDescription = "Message Image",
-                      modifier = Modifier.testTag("hobbit"))
-                } else {
-                  Text(
-                      text = message.text,
-                      modifier = Modifier.testTag("message_text ${message.uuid}"),
-                      color = ColorVariable.Accent)
-                }
-                Text(
-                    text = formatTimestamp(message.timestamp),
-                    color = ColorVariable.AccentSecondary,
-                    style = MaterialTheme.typography.bodySmall,
-                    modifier =
-                        Modifier.align(Alignment.End).testTag("message_timestamp ${message.uuid}"))
-              }
+              Column(
+                  modifier =
+                      Modifier.padding(16.dp).testTag("message_item_column ${message.uuid}")) {
+                    if (message.uuid == imageTestMessageUUID) {
+                      AsyncImage(
+                          model = message.text,
+                          contentDescription = "Message Image",
+                          modifier = Modifier.testTag("hobbit"))
+                    } else {
+                      Text(
+                          text = message.text,
+                          modifier = Modifier.testTag("message_text ${message.uuid}"),
+                          color = ColorVariable.Accent)
+                    }
+                    Text(
+                        text = formatTimestamp(message.timestamp),
+                        color = ColorVariable.AccentSecondary,
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier =
+                            Modifier.align(Alignment.End)
+                                .testTag("message_timestamp ${message.uuid}"))
+                  }
             }
       }
 
@@ -366,6 +374,7 @@ fun MessageItem(message: DataMessage, currentUserUUID: UUID, onLongPress: () -> 
           Box(
               modifier =
                   Modifier.fillMaxSize()
+                      .testTag("popupImage")
                       .background(Color.Black.copy(alpha = 0.8f))
                       .clickable {
                         showPopup = false
@@ -383,8 +392,8 @@ fun MessageItem(message: DataMessage, currentUserUUID: UUID, onLongPress: () -> 
                                 scaleY = scale,
                                 translationX = offsetX,
                                 translationY = offsetY)) {
-                      Image(
-                          painter = painterResource(id = R.drawable.the_hobbit_cover),
+                      AsyncImage(
+                          model = message.text,
                           contentDescription = "Enlarged Image",
                           modifier =
                               Modifier.size(imagePopUp * scale)

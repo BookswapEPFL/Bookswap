@@ -16,10 +16,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MediumTopAppBar
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -30,53 +28,28 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.android.bookswap.data.repository.BooksRepository
 import com.android.bookswap.data.source.api.GoogleBookDataSource
-import com.android.bookswap.ui.components.BackButtonComponent
 import com.android.bookswap.ui.components.ButtonComponent
 import com.android.bookswap.ui.components.FieldComponent
 import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.navigation.TopLevelDestinations
-import com.android.bookswap.ui.profile.ProfileIcon
 import com.android.bookswap.ui.theme.ColorVariable
 
 /** This is the main screen for the chat feature. It displays the list of messages */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddISBNScreen(navigationActions: NavigationActions, booksRepository: BooksRepository) {
+fun AddISBNScreen(
+    navigationActions: NavigationActions,
+    booksRepository: BooksRepository,
+    topAppBar: @Composable () -> Unit = {},
+    bottomAppBar: @Composable () -> Unit = {}
+) {
   val context = LocalContext.current
   Scaffold(
-      topBar = {
-        MediumTopAppBar(
-            colors =
-                TopAppBarDefaults.topAppBarColors(
-                    containerColor = ColorVariable.BackGround,
-                ),
-            title = {
-              Box {
-                Row(
-                    horizontalArrangement = Arrangement.Center,
-                    modifier = Modifier.fillMaxWidth(0.85f)) {
-                      BackButtonComponent(navigationActions)
-                      Text(
-                          text = "Search ISBN",
-                          style =
-                              TextStyle(
-                                  fontSize = 30.sp,
-                                  lineHeight = 20.sp,
-                                  fontWeight = FontWeight(700),
-                                  color = ColorVariable.Accent,
-                                  letterSpacing = 0.3.sp,
-                              ),
-                          modifier = Modifier.padding(top = 4.dp))
-                    }
-              }
-            },
-            actions = { Box(modifier = Modifier.padding(top = 30.dp)) { ProfileIcon() } })
-      },
+      topBar = topAppBar,
+      bottomBar = bottomAppBar,
       content = { pv ->
         Box(
             modifier =
@@ -106,10 +79,15 @@ fun AddISBNScreen(navigationActions: NavigationActions, booksRepository: BooksRe
                             } else {
                               booksRepository.addBook(
                                   result.getOrThrow(),
-                                  { navigationActions.navigateTo(TopLevelDestinations.NEW_BOOK) },
-                                  { error ->
-                                    Log.e("AddBook", error.toString())
-                                    Toast.makeText(context, error.message, Toast.LENGTH_LONG).show()
+                                  callback = { res ->
+                                    if (res.isSuccess) {
+                                      navigationActions.navigateTo(TopLevelDestinations.NEW_BOOK)
+                                    } else {
+                                      val error = res.exceptionOrNull()!!
+                                      Log.e("AddBook", res.toString())
+                                      Toast.makeText(context, error.message, Toast.LENGTH_LONG)
+                                          .show()
+                                    }
                                   })
                             }
                           }
