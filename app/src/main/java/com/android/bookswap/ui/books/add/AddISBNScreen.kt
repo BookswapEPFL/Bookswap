@@ -1,7 +1,5 @@
 package com.android.bookswap.ui.books.add
 
-/// ## THIS LINE IS MARKED AS DELETED BY KTFMTCHECK ON GITHUB ACTION
-/// ## THIS LINE IS MARKED AS DELETED BY KTFMTCHECK ON GITHUB ACTION
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
