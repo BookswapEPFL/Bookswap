@@ -6,9 +6,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -44,14 +42,12 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.bookswap.data.DataBook
-import com.android.bookswap.data.DataUser
-import com.android.bookswap.data.repository.BooksRepository
 import com.android.bookswap.model.map.BookFilter
+import com.android.bookswap.model.map.BookManagerViewModel
 import com.android.bookswap.model.map.DefaultGeolocation
 import com.android.bookswap.model.map.IGeolocation
+import com.android.bookswap.ui.components.BookListComponent
 import com.android.bookswap.ui.navigation.BOTTOM_NAV_HEIGHT
-import com.android.bookswap.ui.navigation.BottomNavigationMenu
-import com.android.bookswap.ui.navigation.List_Navigation_Bar_Destinations
 import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.navigation.Screen
 import com.android.bookswap.ui.theme.ColorVariable
@@ -75,69 +71,46 @@ var SemanticsPropertyReceiver.cameraPosition by CameraPositionKey
  * This screen renders a GoogleMap that shows books locations as markers. Upon clicking a marker, it
  * displays a custom info window with the list of books at this location.
  *
- * @param listUser List of users [DataUser] to display on the map, will be replaced by a model that
- *   retrieves the users from the database.
- * @param navigationActions An instance of [NavigationActions] to handle navigation actions.
+ * @param bookManagerViewModel the view model that give the mapScreen the list of books to display
  * @param bookFilter An instance of [BookFilter] to filter the books displayed on the map.
- * @param booksRepository An instance of [BooksRepository] to retrieve the books from the database.
  * @param selectedUser An optional user, it will display the infoWindow related to this user. This
  *   user’s info window will be shown if it is bigger or equal to 0.
  * @param geolocation An instance of [IGeolocation] to get the user's current location.
  */
 @Composable
 fun MapScreen(
-    listUser: List<DataUser>,
+    bookManagerViewModel: BookManagerViewModel,
     navigationActions: NavigationActions,
-    bookFilter: BookFilter,
-    booksRepository: BooksRepository,
     selectedUser: Int = NO_USER_SELECTED,
-    geolocation: IGeolocation = DefaultGeolocation()
+    geolocation: IGeolocation = DefaultGeolocation(),
+    topAppBar: @Composable () -> Unit = {},
+    bottomAppBar: @Composable () -> Unit = {},
 ) {
   val cameraPositionState = rememberCameraPositionState()
   // Get the user's current location
-  val latitude by remember { geolocation.latitude }
-  val longitude by remember { geolocation.longitude }
-  // Start location updates
+  val latitude = geolocation.latitude.collectAsState()
+  val longitude = geolocation.longitude.collectAsState()
+  // Start location and books updates
   LaunchedEffect(Unit) {
+    bookManagerViewModel.startUpdatingBooks()
     geolocation.startLocationUpdates()
     cameraPositionState.position =
-        CameraPosition.fromLatLngZoom(LatLng(latitude, longitude), INIT_ZOOM)
+        CameraPosition.fromLatLngZoom(LatLng(latitude.value, longitude.value), INIT_ZOOM)
   }
-  // Stop location updates when the screen is disposed
-  DisposableEffect(Unit) { onDispose { geolocation.stopLocationUpdates() } }
+  // Stop location and books updates when the screen is disposed
+  DisposableEffect(Unit) {
+    onDispose {
+      geolocation.stopLocationUpdates()
+      bookManagerViewModel.stopUpdatingBooks()
+    }
+  }
 
   var mutableStateSelectedUser by remember { mutableStateOf(selectedUser) }
   var markerScreenPosition by remember { mutableStateOf<Offset?>(null) }
-  val userBooksList = remember { mutableStateListOf<UserBooksWithLocation>() }
 
-  // Fetch books
-  LaunchedEffect(Unit) {
-    booksRepository.getBook(
-        OnSucess = { books ->
-          listUser.forEach { user ->
-            userBooksList.add(
-                UserBooksWithLocation(
-                    user.longitude,
-                    user.latitude,
-                    books.filter { book -> book.uuid in user.bookList }))
-          }
-        },
-        onFailure = {})
-  }
+  val filteredBooks = bookManagerViewModel.filteredBooks.collectAsState()
 
-  val listAllBooks = userBooksList.flatMap { it.books }
-
-  // Filter the books based on the selected filters
-  val genresFilter by bookFilter.genresFilter.collectAsState()
-  val languagesFilter by bookFilter.languagesFilter.collectAsState()
-
-  val filteredBooks =
-      remember(genresFilter, languagesFilter, listAllBooks) { bookFilter.filterBooks(listAllBooks) }
-
-  val filteredUsers =
-      userBooksList.map {
-        it.copy(books = it.books.filter { book -> filteredBooks.contains(book) })
-      }
+  val filteredUsers = bookManagerViewModel.filteredUsers.collectAsState()
 
   // compute the position of the marker on the screen given the camera position and the marker's
   // position on the map
@@ -149,85 +122,89 @@ fun MapScreen(
     }
   }
 
-  if (mutableStateSelectedUser >= 0 && mutableStateSelectedUser < filteredUsers.size) {
+  if (mutableStateSelectedUser >= 0 && mutableStateSelectedUser < filteredUsers.value.size) {
     computePositionOfMarker(
         cameraPositionState,
         LatLng(
-            filteredUsers[mutableStateSelectedUser].latitude,
-            filteredUsers[mutableStateSelectedUser].longitude))
+            filteredUsers.value[mutableStateSelectedUser].latitude,
+            filteredUsers.value[mutableStateSelectedUser].longitude))
   }
 
   val coroutineScope = rememberCoroutineScope()
 
   // Recalculate marker screen position during camera movement
   LaunchedEffect(cameraPositionState.position) {
-    if (mutableStateSelectedUser >= 0 && mutableStateSelectedUser < filteredUsers.size) {
+    if (mutableStateSelectedUser >= 0 && mutableStateSelectedUser < filteredUsers.value.size) {
       computePositionOfMarker(
           cameraPositionState,
           LatLng(
-              filteredUsers[mutableStateSelectedUser].latitude,
-              filteredUsers[mutableStateSelectedUser].longitude))
+              filteredUsers.value[mutableStateSelectedUser].latitude,
+              filteredUsers.value[mutableStateSelectedUser].longitude))
     }
   }
 
   Scaffold(
       modifier = Modifier.testTag("mapScreen"),
-      bottomBar = {
-        BottomNavigationMenu(
-            onTabSelect = { destination -> navigationActions.navigateTo(destination) },
-            tabList = List_Navigation_Bar_Destinations,
-            selectedItem = navigationActions.currentRoute())
-      },
+      topBar = topAppBar,
+      bottomBar = bottomAppBar,
       content = { pd ->
-        GoogleMap(
-            onMapClick = { mutableStateSelectedUser = NO_USER_SELECTED },
-            modifier =
-                Modifier.fillMaxSize().padding(pd).testTag("mapGoogleMap").semantics {
-                  cameraPosition = cameraPositionState
-                },
-            cameraPositionState = cameraPositionState,
-            uiSettings = MapUiSettings(zoomControlsEnabled = false),
-        ) {
-          // Marker for user's current location
-          if (!latitude.isNaN() && !longitude.isNaN()) {
-            Marker(
-                state = MarkerState(position = LatLng(latitude, longitude)),
-                title = "Your Location",
-                icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE))
-          }
-          filteredUsers
-              .filter { !it.longitude.isNaN() && !it.latitude.isNaN() && it.books.isNotEmpty() }
-              .forEachIndexed { index, item ->
-                val markerState = MarkerState(position = LatLng(item.latitude, item.longitude))
+        Box(
+            Modifier.padding(
+                top = pd.calculateTopPadding(), bottom = pd.calculateBottomPadding())) {
+              GoogleMap(
+                  onMapClick = { mutableStateSelectedUser = NO_USER_SELECTED },
+                  modifier =
+                      Modifier.fillMaxSize().testTag("mapGoogleMap").semantics {
+                        cameraPosition = cameraPositionState
+                      },
+                  cameraPositionState = cameraPositionState,
+                  uiSettings = MapUiSettings(zoomControlsEnabled = false),
+              ) {
+                // Marker for user's current location
+                if (!latitude.value.isNaN() && !longitude.value.isNaN()) {
+                  Marker(
+                      state = MarkerState(position = LatLng(latitude.value, longitude.value)),
+                      title = "Your Location",
+                      icon =
+                          BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE))
+                }
+                filteredUsers.value
+                    .filter {
+                      !it.longitude.isNaN() && !it.latitude.isNaN() && it.books.isNotEmpty()
+                    }
+                    .forEachIndexed { index, item ->
+                      val markerState =
+                          MarkerState(position = LatLng(item.latitude, item.longitude))
 
-                Marker(
-                    state = markerState,
-                    onClick = {
-                      mutableStateSelectedUser = index
-                      coroutineScope.launch {
-                        computePositionOfMarker(cameraPositionState, markerState.position)
-                      }
-                      false
-                    })
+                      Marker(
+                          state = markerState,
+                          onClick = {
+                            mutableStateSelectedUser = index
+                            coroutineScope.launch {
+                              computePositionOfMarker(cameraPositionState, markerState.position)
+                            }
+                            false
+                          })
+                    }
               }
-        }
-        FilterButton { navigationActions.navigateTo(Screen.FILTER) }
+              FilterButton { navigationActions.navigateTo(Screen.FILTER) }
 
-        // Custom info window linked to the marker
-        markerScreenPosition?.let { screenPos ->
-          if (mutableStateSelectedUser >= 0 &&
-              mutableStateSelectedUser < filteredUsers.size &&
-              filteredUsers[mutableStateSelectedUser].books.isNotEmpty()) {
-            CustomInfoWindow(
-                modifier =
-                    Modifier.offset {
-                      IntOffset(screenPos.x.roundToInt(), screenPos.y.roundToInt())
-                    },
-                userBooks = filteredUsers[mutableStateSelectedUser].books)
-          }
-        }
-        // Draggable Bottom List
-        DraggableMenu(filteredBooks)
+              // Custom info window linked to the marker
+              markerScreenPosition?.let { screenPos ->
+                if (mutableStateSelectedUser >= 0 &&
+                    mutableStateSelectedUser < filteredUsers.value.size &&
+                    filteredUsers.value[mutableStateSelectedUser].books.isNotEmpty()) {
+                  CustomInfoWindow(
+                      modifier =
+                          Modifier.offset {
+                            IntOffset(screenPos.x.roundToInt(), screenPos.y.roundToInt())
+                          },
+                      userBooks = filteredUsers.value[mutableStateSelectedUser].books)
+                }
+              }
+              // Draggable Bottom List
+              DraggableMenu(filteredBooks.value)
+            }
       })
 }
 
@@ -334,7 +311,7 @@ private fun DraggableMenu(listAllBooks: List<DataBook>) {
 
   // State for menu drag offset
   val configuration = LocalConfiguration.current
-  val maxSheetOffsetY = configuration.screenHeightDp.dp - BOTTOM_NAV_HEIGHT
+  val maxSheetOffsetY = configuration.screenHeightDp.dp - BOTTOM_NAV_HEIGHT * 2
   var sheetOffsetY by remember {
     mutableStateOf((maxSheetOffsetY - HEIGHT_RETRACTED_DRAGGABLE_MENU_DP.dp) / 3 * 2)
   }
@@ -387,98 +364,7 @@ private fun DraggableMenu(listAllBooks: List<DataBook>) {
               modifier = Modifier.fillMaxWidth().testTag("mapDraggableMenuHandleDivider"),
               thickness = DIVIDER_THICKNESS_DP.dp,
               color = ColorVariable.Accent)
-          LazyColumn(userScrollEnabled = true, modifier = Modifier.fillMaxHeight()) {
-            if (listAllBooks.isEmpty()) {
-              item {
-                Text(
-                    text = "No books found",
-                    color = ColorVariable.Accent,
-                    fontSize = PRIMARY_TEXT_FONT_SP.sp,
-                    textAlign = androidx.compose.ui.text.style.TextAlign.Center,
-                    modifier =
-                        Modifier.padding(PADDING_HORIZONTAL_DP.dp)
-                            .fillMaxWidth()
-                            .align(Alignment.CenterHorizontally)
-                            .testTag("mapDraggableMenuNoBook"))
-              }
-            } else {
-              itemsIndexed(listAllBooks) { index, book ->
-                Spacer(modifier = Modifier.height(PADDING_VERTICAL_DP.dp))
-                Row(
-                    modifier =
-                        Modifier.heightIn(min = MIN_BOX_BOOK_HEIGHT_DP.dp)
-                            .testTag("mapDraggableMenuBookBox${index}")) {
-                      // Image Box
-                      Box(
-                          modifier =
-                              Modifier.height(IMAGE_HEIGHT_DP.dp)
-                                  .width(IMAGE_WIDTH_DP.dp)
-                                  .padding(
-                                      start = PADDING_HORIZONTAL_DP.dp,
-                                      end = PADDING_HORIZONTAL_DP.dp)
-                                  .testTag("mapDraggableMenuBookBoxImage")) {
-                            // Image of the books, will be added at a later date
-                            // We didn't discussed about how we will store the image or how we
-                            // will
-                            // encode them
-                            Box(
-                                modifier =
-                                    Modifier.fillMaxSize()
-                                        .background(Color.Gray) // Placeholder for the image
-                                )
-                          }
-
-                      // Column for text content
-                      Column(
-                          modifier =
-                              Modifier.padding(vertical = PADDING_VERTICAL_DP.dp)
-                                  .width(WIDTH_TITLE_BOX_DP.dp)
-                                  .testTag("mapDraggableMenuBookBoxMiddle")) {
-                            Text(
-                                text = book.title,
-                                color = ColorVariable.Accent,
-                                fontSize = PRIMARY_TEXT_FONT_SP.sp,
-                                modifier =
-                                    Modifier.padding(bottom = PADDING_VERTICAL_DP.dp)
-                                        .width(WIDTH_TITLE_BOX_DP.dp)
-                                        .testTag("mapDraggableMenuBookBoxTitle"))
-                            Text(
-                                text = book.author ?: "",
-                                color = ColorVariable.AccentSecondary,
-                                fontSize = SECONDARY_TEXT_FONT_SP.sp,
-                                modifier =
-                                    Modifier.width(WIDTH_TITLE_BOX_DP.dp)
-                                        .testTag("mapDraggableMenuBookBoxAuthor"))
-                          }
-                      Column(
-                          modifier = Modifier.fillMaxWidth().testTag("mapDraggableMenuBookRight")) {
-                            Row(
-                                modifier =
-                                    Modifier.fillMaxWidth()
-                                        .height(STAR_HEIGHT_DP.dp)
-                                        .testTag("mapDraggableMenuBookBoxRating")) {
-                                  // leave all stars empty if no rating
-                                  DisplayStarReview(book.rating ?: 0)
-                                }
-                            // text for the tags of the book, will be added at a later date
-                            // It isn't decided how we will handle the tag for the books
-                            Text(
-                                text = book.genres.joinToString(separator = ", ") { it.Genre },
-                                modifier =
-                                    Modifier.fillMaxWidth().testTag("mapDraggableMenuBookBoxTag"),
-                                fontSize = SECONDARY_TEXT_FONT_SP.sp,
-                                color = ColorVariable.AccentSecondary)
-                          }
-                    }
-
-                // Divider below each item
-                HorizontalDivider(
-                    modifier = Modifier.fillMaxWidth().testTag("mapDraggableMenuBookBoxDivider"),
-                    thickness = DIVIDER_THICKNESS_DP.dp,
-                    color = ColorVariable.Accent)
-              }
-            }
-          }
+          BookListComponent(Modifier, listAllBooks)
         }
       }
 }
@@ -516,9 +402,3 @@ private fun DisplayStarReview(rating: Int) {
     }
   }
 }
-
-data class UserBooksWithLocation(
-    val longitude: Double,
-    val latitude: Double,
-    val books: List<DataBook>
-)

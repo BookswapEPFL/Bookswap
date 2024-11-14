@@ -12,6 +12,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.firestore.util.Assert.fail
+import java.util.UUID
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -20,6 +21,7 @@ import org.mockito.ArgumentMatchers
 import org.mockito.Mock
 import org.mockito.Mockito.`when`
 import org.mockito.MockitoAnnotations
+import org.mockito.kotlin.any
 import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.verify
@@ -39,6 +41,7 @@ class UserFirestoreSourceTest {
 
   private val testUser =
       DataUser(
+          UUID.randomUUID(),
           "M.",
           "John",
           "Doe",
@@ -46,8 +49,7 @@ class UserFirestoreSourceTest {
           "+41223456789",
           0.0,
           0.0,
-          "dummyPic.png",
-          "dummyUUID0000")
+          "dummyPic.png")
 
   @Before
   fun setUp() {
@@ -64,6 +66,23 @@ class UserFirestoreSourceTest {
     `when`(mockCollectionReference.document(ArgumentMatchers.any()))
         .thenReturn(mockDocumentReference)
     `when`(mockCollectionReference.get()).thenReturn(Tasks.forResult(mockQuerySnapshot))
+
+    `when`(mockQuerySnapshot.documents).thenReturn(listOf(mockDocumentSnapshot))
+    `when`(mockDocumentSnapshot.getLong("userUUID.mostSignificantBits"))
+        .thenReturn(testUser.userUUID.mostSignificantBits)!!
+    `when`(mockDocumentSnapshot.getLong("userUUID.leastSignificantBits"))
+        .thenReturn(testUser.userUUID.leastSignificantBits)!!
+    `when`(mockDocumentSnapshot.getString("greeting")).thenReturn(testUser.greeting)
+    `when`(mockDocumentSnapshot.getString("firstName")).thenReturn(testUser.firstName)
+    `when`(mockDocumentSnapshot.getString("lastName")).thenReturn(testUser.lastName)
+    `when`(mockDocumentSnapshot.getString("email")).thenReturn(testUser.email)
+    `when`(mockDocumentSnapshot.getString("phoneNumber")).thenReturn(testUser.phoneNumber)
+    `when`(mockDocumentSnapshot.getDouble("latitude")).thenReturn(testUser.latitude)
+    `when`(mockDocumentSnapshot.getDouble("longitude")).thenReturn(testUser.longitude)
+    `when`(mockDocumentSnapshot.getString("profilePictureUrl"))
+        .thenReturn(testUser.profilePictureUrl)
+    `when`(mockDocumentSnapshot.get("bookList")).thenReturn(testUser.bookList)
+    `when`(mockDocumentSnapshot.getString("googleUid")).thenReturn(testUser.googleUid)
   }
 
   @After fun tearDown() {}
@@ -72,18 +91,6 @@ class UserFirestoreSourceTest {
 
   @Test
   fun getUsers() {
-    // Arrange
-    `when`(mockQuerySnapshot.documents).thenReturn(listOf(mockDocumentSnapshot))
-    `when`(mockDocumentSnapshot.getString("UUID")).thenReturn(testUser.userId)
-    `when`(mockDocumentSnapshot.getString("Greeting")).thenReturn(testUser.greeting)
-    `when`(mockDocumentSnapshot.getString("Firstname")).thenReturn(testUser.firstName)
-    `when`(mockDocumentSnapshot.getString("Lastname")).thenReturn(testUser.lastName)
-    `when`(mockDocumentSnapshot.getString("Email")).thenReturn(testUser.email)
-    `when`(mockDocumentSnapshot.getString("Phone")).thenReturn(testUser.phoneNumber)
-    `when`(mockDocumentSnapshot.getDouble("Latitude")).thenReturn(testUser.latitude)
-    `when`(mockDocumentSnapshot.getDouble("Longitude")).thenReturn(testUser.longitude)
-    `when`(mockDocumentSnapshot.getString("Picture")).thenReturn(testUser.profilePictureUrl)
-
     // Act
     userFirestoreSource.getUsers { result ->
       result.fold(
@@ -102,32 +109,22 @@ class UserFirestoreSourceTest {
   @Test
   fun getUser() {
     // Arrange
-    `when`(mockQuerySnapshot.documents).thenReturn(listOf(mockDocumentSnapshot))
-    `when`(mockCollectionReference.whereEqualTo(eq("UUID"), ArgumentMatchers.anyString()))
+    `when`(mockCollectionReference.whereEqualTo(eq("UUID"), ArgumentMatchers.any()))
         .thenReturn(mockQuery)
     `when`(mockQuery.get()).thenReturn(Tasks.forResult(mockQuerySnapshot))
-    `when`(mockDocumentSnapshot.getString("UUID")).thenReturn(testUser.userId)
-    `when`(mockDocumentSnapshot.getString("Greeting")).thenReturn(testUser.greeting)
-    `when`(mockDocumentSnapshot.getString("Firstname")).thenReturn(testUser.firstName)
-    `when`(mockDocumentSnapshot.getString("Lastname")).thenReturn(testUser.lastName)
-    `when`(mockDocumentSnapshot.getString("Email")).thenReturn(testUser.email)
-    `when`(mockDocumentSnapshot.getString("Phone")).thenReturn(testUser.phoneNumber)
-    `when`(mockDocumentSnapshot.getDouble("Latitude")).thenReturn(testUser.latitude)
-    `when`(mockDocumentSnapshot.getDouble("Longitude")).thenReturn(testUser.longitude)
-    `when`(mockDocumentSnapshot.getString("Picture")).thenReturn(testUser.profilePictureUrl)
 
     // Act
-    userFirestoreSource.getUser("dummyUUID0000") { result ->
+    userFirestoreSource.getUser(testUser.userUUID) { result ->
       result.fold(
           {
-            // Assert proper data transfert
+            // Assert proper data transfer
             assert(it.printFullname() == testUser.printFullname())
           },
           { fail("Should not fail!") })
     }
 
     // Verify Firestore collection was accessed
-    verify(mockCollectionReference).whereEqualTo(eq("UUID"), ArgumentMatchers.anyString())
+    verify(mockCollectionReference).whereEqualTo(eq("UUID"), any())
   }
 
   @Test
@@ -164,7 +161,7 @@ class UserFirestoreSourceTest {
     doAnswer { Tasks.forResult(null) }.`when`(mockDocumentReference).delete()
 
     // Act
-    userFirestoreSource.deleteUser(testUser.userId) { result ->
+    userFirestoreSource.deleteUser(testUser.userUUID) { result ->
       result.fold({ assert(true) }, { fail("Should not fail!") })
     }
 
@@ -174,17 +171,6 @@ class UserFirestoreSourceTest {
 
   @Test
   fun documentToUser_validDoc() {
-    // Arrange
-    `when`(mockDocumentSnapshot.getString("UUID")).thenReturn(testUser.userId)
-    `when`(mockDocumentSnapshot.getString("Greeting")).thenReturn(testUser.greeting)
-    `when`(mockDocumentSnapshot.getString("Firstname")).thenReturn(testUser.firstName)
-    `when`(mockDocumentSnapshot.getString("Lastname")).thenReturn(testUser.lastName)
-    `when`(mockDocumentSnapshot.getString("Email")).thenReturn(testUser.email)
-    `when`(mockDocumentSnapshot.getString("Phone")).thenReturn(testUser.phoneNumber)
-    `when`(mockDocumentSnapshot.getDouble("Latitude")).thenReturn(testUser.latitude)
-    `when`(mockDocumentSnapshot.getDouble("Longitude")).thenReturn(testUser.longitude)
-    `when`(mockDocumentSnapshot.getString("Picture")).thenReturn(testUser.profilePictureUrl)
-
     // Act
     val result = userFirestoreSource.documentToUser(mockDocumentSnapshot)
 
@@ -195,16 +181,7 @@ class UserFirestoreSourceTest {
 
   @Test
   fun documentToUser_invalidDoc() {
-    // Arrange
-    `when`(mockDocumentSnapshot.getString("UUID")).thenReturn(testUser.userId)
-    `when`(mockDocumentSnapshot.getString("Greeting")).thenReturn(null)
-    `when`(mockDocumentSnapshot.getString("Firstname")).thenReturn(testUser.firstName)
-    `when`(mockDocumentSnapshot.getString("Lastname")).thenReturn(testUser.lastName)
-    `when`(mockDocumentSnapshot.getString("Email")).thenReturn(testUser.email)
-    `when`(mockDocumentSnapshot.getString("Phone")).thenReturn(testUser.phoneNumber)
-    `when`(mockDocumentSnapshot.getDouble("Latitude")).thenReturn(testUser.latitude)
-    `when`(mockDocumentSnapshot.getDouble("Longitude")).thenReturn(testUser.longitude)
-    `when`(mockDocumentSnapshot.getString("Picture")).thenReturn(testUser.profilePictureUrl)
+    `when`(mockDocumentSnapshot.getString("greeting")).thenReturn(null)
 
     // Act
     val result = userFirestoreSource.documentToUser(mockDocumentSnapshot)

@@ -33,7 +33,7 @@ class PhotoFirestoreSource(private val db: FirebaseFirestore) : PhotoRepository 
    *
    * @return A new UUID.
    */
-  override fun getNewUid(): UUID {
+  override fun getNewUUID(): UUID {
     return UUID.randomUUID()
   }
 
@@ -55,22 +55,22 @@ class PhotoFirestoreSource(private val db: FirebaseFirestore) : PhotoRepository 
   /**
    * Fetches a specific photo from Firestore by UUID.
    *
-   * @param uid The UUID of the photo to fetch.
-   * @param onSuccess Callback function that receives the DataPhoto object on success.
-   * @param onFailure Callback function that receives an Exception on failure.
+   * @param uuid the UUID of the photo to fetch
+   * @param callback callback function that receives Result.success(DataPhoto) when operation
+   *   succeed of Result.failure(exception) if error
    */
-  override fun getPhoto(uid: UUID, onSuccess: (DataPhoto) -> Unit, onFailure: (Exception) -> Unit) {
-    db.collection(PHOTO_COLLECTION_PATH).document(uid.toString()).get().addOnCompleteListener { task
-      ->
+  override fun getPhoto(uuid: UUID, callback: (Result<DataPhoto>) -> Unit) {
+    db.collection(PHOTO_COLLECTION_PATH).document(uuid.toString()).get().addOnCompleteListener {
+        task ->
       if (task.isSuccessful) {
         val photo = task.result?.let { documentToPhoto(it) }
         if (photo != null) {
-          onSuccess(photo)
+          callback(Result.success(photo))
         } else {
-          onFailure(Exception("Photo not found or failed to convert"))
+          callback(Result.failure(Exception("Photo not found or failed to convert")))
         }
       } else {
-        task.exception?.let { onFailure(it) }
+        task.exception?.let { callback(Result.failure(it)) }
       }
     }
   }
@@ -105,25 +105,21 @@ class PhotoFirestoreSource(private val db: FirebaseFirestore) : PhotoRepository 
    * Uploads a photo to Firestore.
    *
    * @param dataPhoto The DataPhoto object to be added to Firestore.
-   * @param onSuccess Callback function that is called when the photo is successfully added.
-   * @param onFailure Callback function that is called when there is an error adding the photo.
+   * @param callback Callback function that is called when the photo is successfully added or error
+   *   otherwise.
    */
-  override fun addPhoto(
-      dataPhoto: DataPhoto,
-      onSuccess: () -> Unit,
-      onFailure: (Exception) -> Unit
-  ) {
-    Log.d("PhotoFirestoreRepository", "Attempting to add photo with UUID: ${dataPhoto.uid}")
+  override fun addPhoto(dataPhoto: DataPhoto, callback: (Result<Unit>) -> Unit) {
+    Log.d("PhotoFirestoreRepository", "Attempting to add photo with UUID: ${dataPhoto.uuid}")
 
     performFirestoreOperation(
-        db.collection(PHOTO_COLLECTION_PATH).document(dataPhoto.uid.toString()).set(dataPhoto),
+        db.collection(PHOTO_COLLECTION_PATH).document(dataPhoto.uuid.toString()).set(dataPhoto),
         {
-          Log.d("PhotoFirestoreRepository", "Photo added successfully with UUID: ${dataPhoto.uid}")
-          onSuccess()
+          Log.d("PhotoFirestoreRepository", "Photo added successfully with UUID: ${dataPhoto.uuid}")
+          callback(Result.success(Unit))
         },
         { e ->
           Log.e("PhotoFirestoreRepository", "Failed to add photo: ${e.message}", e)
-          onFailure(e)
+          callback(Result.failure(e))
         })
   }
 
@@ -135,12 +131,12 @@ class PhotoFirestoreSource(private val db: FirebaseFirestore) : PhotoRepository 
    */
   fun documentToPhoto(document: DocumentSnapshot): DataPhoto? {
     return try {
-      val uid = document.getString("uid") ?: return null
+      val uuid = UUID.fromString(document.getString("uuid")) ?: return null
       val url = document.getString("url") ?: ""
       val timestamp = document.getLong("timestamp") ?: System.currentTimeMillis()
       val base64 = document.getString("base64") ?: return null
 
-      DataPhoto(uid = uid, url = url, timestamp = timestamp, base64 = base64)
+      DataPhoto(uuid = uuid, url = url, timestamp = timestamp, base64 = base64)
     } catch (e: Exception) {
       Log.e("PhotoFirestoreRepository", "Error converting document to DataPhoto", e)
       null

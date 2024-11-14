@@ -8,7 +8,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import java.util.UUID
 
 open class UserViewModel(
-    var uuid: String = "ERROR_UUID",
+    var uuid: UUID,
     repository: UsersRepository = UserFirestoreSource(FirebaseFirestore.getInstance())
 ) : ViewModel() {
   private var dataUser = DataUser(uuid)
@@ -42,10 +42,12 @@ open class UserViewModel(
       latitude: Double = dataUser.latitude,
       longitude: Double = dataUser.longitude,
       picURL: String = dataUser.profilePictureUrl,
-      bookList: List<UUID> = dataUser.bookList
+      bookList: List<UUID> = dataUser.bookList,
+      googleUid: String = dataUser.googleUid
   ) {
     updateUser(
         DataUser(
+            uuid,
             greeting,
             firstName,
             lastName,
@@ -54,13 +56,13 @@ open class UserViewModel(
             latitude,
             longitude,
             picURL,
-            uuid,
-            bookList))
+            bookList,
+            googleUid))
   }
 
   fun updateUser(newDataUser: DataUser) {
     this.dataUser = newDataUser
-    this.uuid = newDataUser.userId
+    this.uuid = newDataUser.userUUID
     isLoaded = true
     userRepository.updateUser(dataUser) { result ->
       result.fold({ isStored = true }, { isStored = false })
