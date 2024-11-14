@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -24,10 +23,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import com.android.bookswap.data.repository.BooksRepository
 import com.android.bookswap.data.source.api.GoogleBookDataSource
@@ -53,10 +50,7 @@ fun AddISBNScreen(
       content = { pv ->
         Box(
             modifier =
-                Modifier.fillMaxSize()
-                    .padding(pv)
-                    .padding()
-                    .background(color = ColorVariable.BackGround)) {
+                Modifier.fillMaxSize().padding(pv).background(color = ColorVariable.BackGround)) {
               var isbn by remember { mutableStateOf("") }
 
               Column(
@@ -95,13 +89,11 @@ fun AddISBNScreen(
                             }
                           }
                         }) {
-                          Row(Modifier.fillMaxWidth()) {
-                            Text("Search", style = TextStyle(color = Color.White))
-                            Spacer(Modifier.weight(1f))
+                          Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text("Search")
                             Icon(
                                 Icons.Filled.Search,
                                 contentDescription = "Search icon",
-                                tint = Color.White,
                             )
                           }
                         }

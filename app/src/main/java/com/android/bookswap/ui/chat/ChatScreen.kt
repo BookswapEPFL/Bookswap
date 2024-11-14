@@ -20,16 +20,14 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardColors
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -44,9 +42,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
@@ -123,11 +123,11 @@ fun ChatScreen(
           navigationIcon = { BackButtonComponent(navController) },
           actions = {
             IconButton(onClick = { /* Handle profile icon click */}) {
-              Icon(
-                  imageVector = Icons.Default.Person,
-                  contentDescription = "Profile",
-                  modifier = Modifier.testTag("profileIcon").size(padding36),
-                  tint = ColorVariable.Accent)
+              AsyncImage(
+                  model = otherUser.profilePictureUrl,
+                  contentDescription = "Profile Picture",
+                  contentScale = ContentScale.Crop,
+                  modifier = Modifier.testTag("profileIcon").size(padding36).clip(CircleShape))
             }
           },
           colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
@@ -343,8 +343,8 @@ fun MessageItem(message: DataMessage, currentUserUUID: UUID, onLongPress: () -> 
               Column(
                   modifier =
                       Modifier.padding(16.dp).testTag("message_item_column ${message.uuid}")) {
-                    if (message.messageType == MessageType.IMAGE &&
-                        message.uuid != imageTestMessageUUID) {
+                    if (message.uuid != imageTestMessageUUID &&
+                        message.messageType == MessageType.IMAGE) {
                       AsyncImage(
                           model = message.text,
                           contentDescription = "Message Image",
@@ -353,7 +353,7 @@ fun MessageItem(message: DataMessage, currentUserUUID: UUID, onLongPress: () -> 
                       Image(
                           painter = painterResource(id = R.drawable.the_hobbit_cover),
                           contentDescription = "Hobbit",
-                          modifier = Modifier.testTag("hobbit"))
+                          modifier = Modifier.size(100.dp).testTag("hobbit"))
                     } else {
                       Text(
                           text = message.text,
@@ -405,23 +405,22 @@ fun MessageItem(message: DataMessage, currentUserUUID: UUID, onLongPress: () -> 
                         Image(
                             painter = painterResource(id = R.drawable.the_hobbit_cover),
                             contentDescription = "Hobbit",
-                            modifier = Modifier.testTag("hobbitBig"))
-                      } else {
-                        AsyncImage(
-                            model = message.text,
-                            contentDescription = "Enlarged Image",
-                            modifier =
-                                Modifier.size(imagePopUp * scale)
-                                    .pointerInput(Unit) {
-                                      detectTransformGestures { _, _, zoom, _ -> scale *= zoom }
-                                    }
-                                    .graphicsLayer(
-                                        scaleX = scale,
-                                        scaleY = scale,
-                                        translationX = offsetX,
-                                        translationY = offsetY)
-                                    .testTag("HobbitBig"))
-                      }
+                            modifier = Modifier.size(imagePopUp * scale))
+                      } else
+                          AsyncImage(
+                              model = message.text,
+                              contentDescription = "Enlarged Image",
+                              modifier =
+                                  Modifier.size(imagePopUp * scale)
+                                      .pointerInput(Unit) {
+                                        detectTransformGestures { _, _, zoom, _ -> scale *= zoom }
+                                      }
+                                      .graphicsLayer(
+                                          scaleX = scale,
+                                          scaleY = scale,
+                                          translationX = offsetX,
+                                          translationY = offsetY)
+                                      .testTag("HobbitBig"))
                     }
               }
         }
