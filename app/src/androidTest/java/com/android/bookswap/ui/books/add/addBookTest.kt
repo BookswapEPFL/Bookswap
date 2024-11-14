@@ -6,7 +6,6 @@ import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import androidx.navigation.compose.rememberNavController
@@ -41,7 +40,7 @@ class AddToBookTest {
   fun testSaveButtonDisabledInitially() {
     composeTestRule.setContent { AddToBookScreen(mockBooksRepository) }
     // Check if the Save button is initially disabled
-    composeTestRule.onNodeWithText("Save").assertIsNotEnabled()
+    composeTestRule.onNodeWithTag("save_button").assertIsNotEnabled()
   }
 
   @Test
@@ -143,9 +142,9 @@ class AddToBookTest {
       AddToBookScreen(mockBooksRepository)
     }
     // Fill in the ISBN field but leave the Title field empty
-    composeTestRule.onNodeWithText("ISBN").performTextInput("1234567890")
+    composeTestRule.onNodeWithTag("isbn_field").performTextInput("1234567890")
 
     // Check if the Save button is still disabled
-    composeTestRule.onNodeWithText("Save").assertIsNotEnabled()
+    composeTestRule.onNodeWithTag("save_button").assertIsNotEnabled()
   }
 }
