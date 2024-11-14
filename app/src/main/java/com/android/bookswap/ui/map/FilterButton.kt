@@ -16,12 +16,16 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.android.bookswap.ui.theme.ColorVariable
 
-// Constants
+/** Constants */
 private val PADDING_DP = 16.dp
 private val BUTTON_SIZE_DP = 40.dp
 private val ICON_SIZE_DP = 32.dp
 private val BUTTON_CORNER_RADIUS_DP = 50.dp
-
+/**
+ * A composable function that displays a filter button with an icon.
+ *
+ * @param onClick A lambda function to handle the button click event.
+ */
 @Composable
 fun FilterButton(onClick: () -> Unit) {
   Box(modifier = Modifier.padding(PADDING_DP)) {

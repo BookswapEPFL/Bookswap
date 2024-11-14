@@ -44,7 +44,10 @@ class Geolocation(private val activity: Activity) : IGeolocation {
         fastestInterval = 5000 // Fastest update interval in milliseconds
         priority = LocationRequest.PRIORITY_HIGH_ACCURACY
       }
-
+  /**
+   * Callback for receiving location updates. Updates the latitude and longitude state flows with
+   * the new location data.
+   */
   private val locationCallback =
       object : LocationCallback() {
         override fun onLocationResult(p0: LocationResult) {
@@ -72,14 +75,22 @@ class Geolocation(private val activity: Activity) : IGeolocation {
         ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_COARSE_LOCATION) ==
             PackageManager.PERMISSION_GRANTED
   }
-
+  /**
+   * Requests background location permissions. This method is required for accessing location data
+   * when the app is running in the background. It requests the `ACCESS_BACKGROUND_LOCATION`
+   * permission.
+   */
   @RequiresApi(Build.VERSION_CODES.Q)
   private fun requestBackgroundPermissions() {
     val permissions = arrayOf(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
     ActivityCompat.requestPermissions(
         activity, permissions, BACKGROUND_LOCATION_PERMISSION_REQUEST_CODE)
   }
-
+  /**
+   * Checks if the app has background location permissions.
+   *
+   * @return `true` if the `ACCESS_BACKGROUND_LOCATION` permission is granted, `false` otherwise.
+   */
   @RequiresApi(Build.VERSION_CODES.Q)
   private fun hasBackgroundPermissions(): Boolean {
     return ActivityCompat.checkSelfPermission(

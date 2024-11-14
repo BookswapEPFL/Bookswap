@@ -18,6 +18,14 @@ import androidx.compose.ui.window.DialogProperties
 import com.android.bookswap.data.DataUser
 import com.android.bookswap.ui.theme.BookSwapAppTheme
 
+/**
+ * Displays a dialog for editing the user's profile information.
+ *
+ * @param onDismiss Callback function to be invoked when the dialog is dismissed.
+ * @param onSave Callback function to be invoked when the save button is clicked, passing the
+ *   updated user data.
+ * @param dataUser The user data to be edited.
+ */
 @Composable
 fun EditProfileDialog(onDismiss: () -> Unit, onSave: (DataUser) -> Unit, dataUser: DataUser) {
 

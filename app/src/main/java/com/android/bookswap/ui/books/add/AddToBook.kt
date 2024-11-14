@@ -36,6 +36,18 @@ import com.android.bookswap.ui.theme.ColorVariable.Primary
 import com.android.bookswap.ui.theme.ColorVariable.Secondary
 import java.util.UUID
 
+/**
+ * Composable function to display the Add To Book screen.
+ *
+ * This screen allows users to input details about a book they want to add to the repository. It
+ * includes fields for the book's title, author, description, rating, ISBN, photo, language, and
+ * genre. The screen also includes a save button that validates the input and saves the book to the
+ * repository.
+ *
+ * @param repository The repository to which the book will be added.
+ * @param topAppBar A composable function to display the top app bar.
+ * @param bottomAppBar A composable function to display the bottom app bar.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddToBookScreen(
@@ -252,7 +264,25 @@ fun AddToBookScreen(
         }
       })
 }
-
+/**
+ * Creates a new DataBook instance after validating the input parameters.
+ *
+ * This function performs various validations on the input parameters such as UUID, title, author,
+ * rating, language, and ISBN. If any validation fails, it logs an error message and shows a Toast
+ * message to the user. If all validations pass, it returns a new DataBook instance.
+ *
+ * @param context The context for showing Toast messages.
+ * @param uuid The unique identifier for the book.
+ * @param title The title of the book.
+ * @param author The author of the book.
+ * @param description The description of the book.
+ * @param ratingStr The rating of the book as a string.
+ * @param photo The photo URL of the book.
+ * @param bookLanguageStr The language of the book as a string.
+ * @param isbn The ISBN of the book.
+ * @param genres The list of genres the book belongs to.
+ * @return A new DataBook instance if all validations pass, otherwise null.
+ */
 fun createDataBook(
     context: Context,
     uuid: UUID,

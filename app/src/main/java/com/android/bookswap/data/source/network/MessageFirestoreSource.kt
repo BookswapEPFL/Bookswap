@@ -14,10 +14,19 @@ import java.util.UUID
 const val COLLECTION_PATH = "messages"
 
 class MessageFirestoreSource(private val db: FirebaseFirestore) : MessageRepository {
+  /**
+   * Generates a new UUID.
+   *
+   * @return A randomly generated UUID.
+   */
   override fun getNewUUID(): UUID {
     return UUID.randomUUID()
   }
-
+  /**
+   * Initializes the message source.
+   *
+   * @param callback Callback to handle the result of the initialization.
+   */
   override fun init(callback: (Result<Unit>) -> Unit) {
     try {
       callback(Result.success(Unit))
@@ -26,7 +35,11 @@ class MessageFirestoreSource(private val db: FirebaseFirestore) : MessageReposit
       callback(Result.failure(e))
     }
   }
-
+  /**
+   * Fetches all messages from the Firestore collection.
+   *
+   * @param callback Callback to handle the result, which is a list of `DataMessage` objects.
+   */
   override fun getMessages(callback: (Result<List<DataMessage>>) -> Unit) {
     db.collection(COLLECTION_PATH).get().addOnCompleteListener { task ->
       if (task.isSuccessful) {
@@ -42,7 +55,12 @@ class MessageFirestoreSource(private val db: FirebaseFirestore) : MessageReposit
       }
     }
   }
-
+  /**
+   * Sends a message to the Firestore collection.
+   *
+   * @param message The `DataMessage` object containing the message details.
+   * @param callback Callback to handle the result of the send operation.
+   */
   override fun sendMessage(message: DataMessage, callback: (Result<Unit>) -> Unit) {
     val messageMap =
         mapOf(
@@ -64,7 +82,13 @@ class MessageFirestoreSource(private val db: FirebaseFirestore) : MessageReposit
           }
         }
   }
-
+  /**
+   * Deletes a message from the Firestore collection if it was sent within the last 15 minutes.
+   *
+   * @param messageUUID The UUID of the message to delete.
+   * @param callback Callback to handle the result of the delete operation.
+   * @param context The context used to show a Toast message if the deletion fails.
+   */
   override fun deleteMessage(
       messageUUID: UUID,
       callback: (Result<Unit>) -> Unit,
@@ -114,7 +138,13 @@ class MessageFirestoreSource(private val db: FirebaseFirestore) : MessageReposit
       }
     }
   }
-
+  /**
+   * Deletes all messages between two users from the Firestore collection.
+   *
+   * @param user1UUID The UUID of the first user.
+   * @param user2UUID The UUID of the second user.
+   * @param callback Callback to handle the result of the delete operation.
+   */
   override fun deleteAllMessages(
       user1UUID: UUID,
       user2UUID: UUID,
@@ -148,7 +178,13 @@ class MessageFirestoreSource(private val db: FirebaseFirestore) : MessageReposit
           }
         }
   }
-
+  /**
+   * Updates a message in the Firestore collection if it was sent within the last 15 minutes.
+   *
+   * @param message The `DataMessage` object containing the updated message details.
+   * @param callback Callback to handle the result of the update operation.
+   * @param context The context used to show a Toast message if the update fails.
+   */
   override fun updateMessage(
       message: DataMessage,
       callback: (Result<Unit>) -> Unit,
@@ -203,7 +239,14 @@ class MessageFirestoreSource(private val db: FirebaseFirestore) : MessageReposit
       }
     }
   }
-
+  /**
+   * Adds a listener for messages between two users in the Firestore collection.
+   *
+   * @param otherUserUUID The UUID of the other user.
+   * @param currentUserUUID The UUID of the current user.
+   * @param callback Callback to handle the result, which is a list of `DataMessage` objects.
+   * @return A `ListenerRegistration` object to remove the listener when no longer needed.
+   */
   override fun addMessagesListener(
       otherUserUUID: UUID,
       currentUserUUID: UUID,
@@ -239,7 +282,12 @@ class MessageFirestoreSource(private val db: FirebaseFirestore) : MessageReposit
         }
   }
 }
-
+/**
+ * Converts a Firestore document to a `DataMessage` object.
+ *
+ * @param document The Firestore document to convert.
+ * @return A `Result` containing the `DataMessage` object if successful, or an exception if failed.
+ */
 fun documentToMessage(document: DocumentSnapshot): Result<DataMessage> {
   return try {
     val type = MessageType.valueOf(document.getString("messageType")!!)

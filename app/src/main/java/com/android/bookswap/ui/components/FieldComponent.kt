@@ -11,6 +11,14 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import com.android.bookswap.ui.theme.ColorVariable
 
+/**
+ * A composable function that displays a custom OutlinedTextField with a label.
+ *
+ * @param labelText The text to be displayed as the label of the text field.
+ * @param value The current value of the text field.
+ * @param modifier The modifier to be applied to the text field.
+ * @param onValueChange A callback function to be invoked when the value of the text field changes.
+ */
 @Composable
 fun FieldComponent(
     labelText: String,

@@ -13,7 +13,11 @@ import androidx.core.content.ContextCompat
 import com.google.firebase.messaging.FirebaseMessaging
 
 class PermissionHandler(private val activity: ComponentActivity) {
-
+  /**
+   * Launcher for requesting notification permission.
+   *
+   * @RequiresApi(Build.VERSION_CODES.TIRAMISU)
+   */
   @RequiresApi(Build.VERSION_CODES.TIRAMISU)
   val requestPermissionLauncher: ActivityResultLauncher<String> =
       activity.registerForActivityResult(ActivityResultContracts.RequestPermission()) {
@@ -25,7 +29,13 @@ class PermissionHandler(private val activity: ComponentActivity) {
           showRationaleDialog()
         }
       }
-
+  /**
+   * Requests notification permission from the user.
+   *
+   * This function checks if the API level is 33 or higher (Android 13+). If the permission is
+   * already granted, it enables notifications. Otherwise, it directly requests the notification
+   * permission.
+   */
   fun askNotificationPermission() {
     // Check if the API level is 33 or higher (Android 13+)
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -38,31 +48,45 @@ class PermissionHandler(private val activity: ComponentActivity) {
         }
         // Case 2: No need to show rationale, directly request permission
         else -> {
-          // Directly request the notification permission
           requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
         }
       }
     }
   }
-
+  /**
+   * Enables notifications by initializing the FCM SDK.
+   *
+   * This function sets the `isAutoInitEnabled` property of the FirebaseMessaging instance to true,
+   * which allows the app to automatically initialize Firebase Cloud Messaging (FCM) and receive
+   * notifications. It also displays a Toast message to inform the user that notifications have been
+   * enabled.
+   */
   fun enableNotifications() {
     // Initialize FCM SDK
     FirebaseMessaging.getInstance().isAutoInitEnabled = true
     // Additional setup if needed
     Toast.makeText(activity, "Notifications have been enabled.", Toast.LENGTH_LONG).show()
   }
-
+  /**
+   * Informs the user that notifications are disabled.
+   *
+   * This function displays a Toast message to inform the user that notifications are disabled and
+   * they will not receive updates.
+   */
   fun informUserNotificationsDisabled() {
-    // Code to inform the user that notifications are disabled
-    // For example, you might show a Toast or a Snackbar
-    // This is a placeholder implementation
     Toast.makeText(
             activity,
             "Notifications are disabled. You will not receive updates.",
             Toast.LENGTH_LONG)
         .show()
   }
-
+  /**
+   * Shows a rationale dialog to the user explaining why notification permission is required.
+   *
+   * This function displays an AlertDialog with a message explaining the importance of notification
+   * permissions. If the user agrees, the permission request is launched again. If the user
+   * declines, the dialog is dismissed.
+   */
   @RequiresApi(Build.VERSION_CODES.TIRAMISU)
   private fun showRationaleDialog() {
     AlertDialog.Builder(activity)
@@ -70,13 +94,9 @@ class PermissionHandler(private val activity: ComponentActivity) {
         .setMessage(
             "To keep you informed about important updates, please allow notification permissions.")
         .setPositiveButton("OK") { _, _ ->
-          // Request the permission when the user agrees
           requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
         }
-        .setNegativeButton("No thanks") { dialog, _ ->
-          // Dismiss the dialog and continue without asking for permission
-          dialog.dismiss()
-        }
+        .setNegativeButton("No thanks") { dialog, _ -> dialog.dismiss() }
         .create()
         .show()
   }

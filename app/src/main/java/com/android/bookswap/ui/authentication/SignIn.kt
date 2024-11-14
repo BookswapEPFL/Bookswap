@@ -1,7 +1,5 @@
 package com.android.bookswap.ui.authentication
 
-// import com.android.bookswap.ui.navigation.NavigationActions
-// import com.android.bookswap.ui.navigation.TopLevelDestinations
 import android.content.Intent
 import android.util.Log
 import android.widget.Toast
@@ -53,6 +51,11 @@ import com.google.firebase.auth.auth
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
+/**
+ * Composable function for the SignIn screen.
+ *
+ * @param navigationActions Actions for navigating between screens.
+ */
 @Composable
 fun SignInScreen(navigationActions: NavigationActions) { // Add this when navigation is
   // implemented
@@ -139,7 +142,11 @@ fun SignInScreen(navigationActions: NavigationActions) { // Add this when naviga
         }
       })
 }
-
+/**
+ * Composable function for the Google Sign-In button.
+ *
+ * @param onSignInClick Lambda function to be executed when the button is clicked.
+ */
 @Composable
 fun GoogleSignInButton(onSignInClick: () -> Unit) {
   Button(
@@ -173,7 +180,13 @@ fun GoogleSignInButton(onSignInClick: () -> Unit) {
             }
       }
 }
-
+/**
+ * Remembers a Firebase authentication launcher for Google Sign-In.
+ *
+ * @param onAuthComplete Lambda function to be executed when authentication is complete.
+ * @param onAuthError Lambda function to be executed when authentication fails.
+ * @return A `ManagedActivityResultLauncher` for handling the Google Sign-In intent.
+ */
 @Composable
 fun rememberFirebaseAuthLauncher(
     onAuthComplete: (AuthResult) -> Unit,

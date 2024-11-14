@@ -9,6 +9,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 
+/** Object containing constants for different routes in the application. */
 object Route {
   const val CHAT = "Chat"
   const val PROFILE = "Profile"
@@ -16,7 +17,7 @@ object Route {
   const val NEWBOOK = "NewBook"
   const val AUTH = "Auth"
 }
-
+/** Object containing constants for different screens in the application. */
 object Screen {
   const val AUTH = "Auth Screen"
   const val CHATLIST = "ChatList Screen"

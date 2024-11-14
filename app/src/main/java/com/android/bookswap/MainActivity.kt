@@ -52,7 +52,13 @@ import java.util.UUID
 class MainActivity : ComponentActivity() {
 
   private lateinit var permissionHandler: PermissionHandler
-
+  /**
+   * Called when the activity is starting. This is where most initialization should go.
+   *
+   * @param savedInstanceState If the activity is being re-initialized after previously being shut
+   *   down then this Bundle contains the data it most recently supplied in
+   *   onSaveInstanceState(Bundle). Otherwise it is null.
+   */
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     // permissionHandler = PermissionHandler(this)
@@ -83,7 +89,15 @@ class MainActivity : ComponentActivity() {
           }
     }
   }
-
+  /**
+   * Composable function for the main BookSwap application.
+   *
+   * @param messageRepository The repository for handling messages.
+   * @param bookRepository The repository for handling books.
+   * @param userRepository The repository for handling users.
+   * @param startDestination The initial route for the navigation host.
+   * @param geolocation The geolocation service used in the app.
+   */
   @Composable
   fun BookSwapApp(
       messageRepository: MessageRepository,

@@ -68,6 +68,14 @@ import java.util.Locale
 import java.util.UUID
 import kotlinx.coroutines.delay
 
+/**
+ * Composable function to display the chat screen.
+ *
+ * @param messageRepository The repository to fetch and send messages.
+ * @param currentUser The current user data.
+ * @param otherUser The other user data.
+ * @param navController The navigation controller for handling navigation actions.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChatScreen(
@@ -282,7 +290,13 @@ fun ChatScreen(
     }
   }
 }
-
+/**
+ * Composable function to display a message item in the chat screen.
+ *
+ * @param message The message data to be displayed.
+ * @param currentUserUUID The UUID of the current user.
+ * @param onLongPress The callback function to be invoked on long press.
+ */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun MessageItem(message: DataMessage, currentUserUUID: UUID, onLongPress: () -> Unit) {
@@ -409,7 +423,15 @@ fun MessageItem(message: DataMessage, currentUserUUID: UUID, onLongPress: () -> 
         }
   }
 }
-
+/**
+ * Formats a timestamp into a readable string.
+ *
+ * If the timestamp corresponds to the current date, it returns the time in "HH:mm" format.
+ * Otherwise, it returns the date in "MMM dd, yyyy" format.
+ *
+ * @param timestamp The timestamp to be formatted.
+ * @return A formatted string representing the timestamp.
+ */
 fun formatTimestamp(timestamp: Long): String {
   val messageDate = Date(timestamp)
   val currentDate = Date()
@@ -423,7 +445,7 @@ fun formatTimestamp(timestamp: Long): String {
     dateTimeFormat.format(messageDate)
   }
 }
-
+/** UUID for a placeholder message used for testing image functionality. */
 val imageTestMessageUUID: UUID =
     UUID.fromString(
         "11111111-aa16-43d1-8c47-082ac787f755") // Placeholder message for testing image (adapted to

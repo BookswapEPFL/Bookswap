@@ -15,14 +15,19 @@ open class UserViewModel(
   private var isLoaded = false
   var isStored = false
   private val userRepository: UsersRepository = repository
-
+  /**
+   * Retrieves the user data.
+   *
+   * @param force if true, forces a fetch from the repository even if data is already loaded.
+   * @return the user data.
+   */
   open fun getUser(force: Boolean = false): DataUser {
     if (!isLoaded || force) {
       fetchUser()
     }
     return dataUser
   }
-
+  /** Fetches the user data from the repository. */
   private fun fetchUser() {
     userRepository.getUser(uuid) { result ->
       result.onSuccess {
@@ -32,7 +37,20 @@ open class UserViewModel(
       }
     }
   }
-
+  /**
+   * Updates the user data with the provided parameters.
+   *
+   * @param greeting the greeting message of the user.
+   * @param firstName the first name of the user.
+   * @param lastName the last name of the user.
+   * @param email the email address of the user.
+   * @param phone the phone number of the user.
+   * @param latitude the latitude of the user's location.
+   * @param longitude the longitude of the user's location.
+   * @param picURL the URL of the user's profile picture.
+   * @param bookList the list of book UUIDs associated with the user.
+   * @param googleUid the Google UID of the user.
+   */
   fun updateUser(
       greeting: String = dataUser.greeting,
       firstName: String = dataUser.firstName,
@@ -59,7 +77,11 @@ open class UserViewModel(
             bookList,
             googleUid))
   }
-
+  /**
+   * Updates the user data with the provided `DataUser` object.
+   *
+   * @param newDataUser the new user data to update.
+   */
   fun updateUser(newDataUser: DataUser) {
     this.dataUser = newDataUser
     this.uuid = newDataUser.userUUID

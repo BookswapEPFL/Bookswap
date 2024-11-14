@@ -15,6 +15,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.android.bookswap.ui.theme.ColorVariable
 
+/**
+ * A composable function that displays a customizable button.
+ *
+ * @param onClick The action to be performed when the button is clicked.
+ * @param modifier The modifier to be applied to the button.
+ * @param enabled Whether the button is enabled or not.
+ * @param content The content to be displayed inside the button.
+ */
 @Composable
 fun ButtonComponent(
     onClick: () -> Unit,
