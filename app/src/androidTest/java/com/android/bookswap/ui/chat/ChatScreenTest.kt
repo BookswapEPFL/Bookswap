@@ -403,25 +403,27 @@ class ChatScreenTest {
         .onNodeWithTag("column", useUnmergedTree = true)
         .performScrollToIndex(mockMessageRepository.messages.size - 1)
 
-    composeTestRule.onNodeWithTag("hobbit", useUnmergedTree = true).performClick()
+    composeTestRule
+        .onNodeWithTag("message_item_column $imageTestMessageUUID", useUnmergedTree = true)
+        .performClick()
 
     composeTestRule.waitUntil(timeoutMillis = 5000) {
       composeTestRule
-          .onAllNodesWithTag("HobbitBig", useUnmergedTree = true)
+          .onAllNodesWithTag("popupImage", useUnmergedTree = true)
           .fetchSemanticsNodes()
           .isNotEmpty()
     }
-    composeTestRule.onNodeWithTag("HobbitBig", useUnmergedTree = true).assertIsDisplayed()
+    composeTestRule.onNodeWithTag("popupImage", useUnmergedTree = true).assertIsDisplayed()
 
-    composeTestRule.onNodeWithTag("HobbitBig", useUnmergedTree = true).performClick()
+    composeTestRule.onNodeWithTag("popupImage", useUnmergedTree = true).performClick()
 
     composeTestRule.waitUntil(timeoutMillis = 5000) {
       composeTestRule
-          .onAllNodesWithTag("HobbitBig", useUnmergedTree = true)
+          .onAllNodesWithTag("popupImage", useUnmergedTree = true)
           .fetchSemanticsNodes()
           .isEmpty()
     }
-    composeTestRule.onNodeWithTag("HobbitBig", useUnmergedTree = true).assertDoesNotExist()
+    composeTestRule.onNodeWithTag("popupImage", useUnmergedTree = true).assertDoesNotExist()
   }
 
   @Test
