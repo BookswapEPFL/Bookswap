@@ -11,7 +11,7 @@ import androidx.compose.ui.test.performScrollToNode
 import com.android.bookswap.data.BookGenres
 import com.android.bookswap.data.BookLanguages
 import com.android.bookswap.data.DataBook
-import com.android.bookswap.data.source.network.BooksFirestoreRepository
+import com.android.bookswap.data.source.network.BooksFirestoreSource
 import com.android.bookswap.ui.navigation.NavigationActions
 import io.mockk.MockKAnnotations
 import io.mockk.every
@@ -23,7 +23,7 @@ import org.junit.Test
 
 class EditBookScreenTest {
 
-  @MockK private lateinit var booksRepository: BooksFirestoreRepository
+  @MockK private lateinit var booksRepository: BooksFirestoreSource
 
   @MockK private lateinit var navigationActions: NavigationActions
 

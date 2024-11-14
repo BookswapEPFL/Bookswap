@@ -248,7 +248,7 @@ fun AddToBookScreen(
                   if (book == null) {
                     Toast.makeText(context, "Invalid argument", Toast.LENGTH_SHORT).show()
                   } else {
-                    repository.addBook(book, OnSucess = {}, onFailure = {})
+                    repository.addBook(book, callback = {})
                   }
                 } else {
                   // Show a Toast message if title or ISBN is empty

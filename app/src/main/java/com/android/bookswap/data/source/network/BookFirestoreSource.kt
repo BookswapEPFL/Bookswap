@@ -18,10 +18,8 @@ import kotlinx.coroutines.flow.asStateFlow
 /**
  * A class that implements the BooksRepository interface using Firebase Firestore as the data
  * source.
- *
- * @param db The FirebaseFirestore instance used to interact with Firestore.
  */
-class BooksFirestoreRepository(private val db: FirebaseFirestore) : BooksRepository {
+class BooksFirestoreSource(private val db: FirebaseFirestore) : BooksRepository {
 
   // Name of the Firestore collection that stores books
   private val collectionBooks = "Books"
@@ -31,66 +29,63 @@ class BooksFirestoreRepository(private val db: FirebaseFirestore) : BooksReposit
 
   // Selected todo, i.e the todo for the detail view
   private val selectedBook_ = MutableStateFlow<DataBook?>(null)
-  open val selectedBook: StateFlow<DataBook?> = selectedBook_.asStateFlow()
-  // Use this code in editBookScreen and modify the editBookScreen structure if needed when
-  // incorporating in the app navigation
+  val selectedBook: StateFlow<DataBook?> = selectedBook_.asStateFlow()
+
   /**
-   * Initializes the repository by adding an auth state listener to Firebase Authentication. If the
-   * user is authenticated, it triggers the OnSuccess callback.
+   * Initializes the BooksFirestoreSource by adding an authentication state listener. Calls the
+   * provided onSuccess callback if the user is authenticated.
    *
-   * @param OnSucess The callback to be triggered when the user is authenticated.
+   * @param onSuccess A callback function to be invoked when the user is authenticated.
    */
-  override fun init(OnSucess: () -> Unit) {
+  override fun init(onSuccess: () -> Unit) {
     Firebase.auth.addAuthStateListener {
       if (it.currentUser != null) {
-        OnSucess()
+        onSuccess()
       }
     }
   }
   /**
-   * Generates and returns a new unique document ID for a book in Firestore.
+   * Generates a new UUID.
    *
-   * @return A new UUID.
+   * @return A randomly generated UUID.
    */
   override fun getNewUUID(): UUID {
     return UUID.randomUUID()
   }
   /**
-   * Fetches the list of books from the Firestore collection. If the task is successful, maps the
-   * Firestore documents to DataBook objects. Calls OnSuccess with the list of books, or onFailure
-   * if the task fails.
+   * Fetches the list of books from the Firestore collection.
    *
-   * @param OnSucess The callback to be triggered with the list of books on success.
-   * @param onFailure The callback to be triggered with the exception on failure.
+   * @param callback A callback function to handle the result of the Firestore query. The result is
+   *   a `Result` object containing a list of `DataBook` objects if the query is successful, or an
+   *   exception if it fails.
    */
-  override fun getBook(OnSucess: (List<DataBook>) -> Unit, onFailure: (Exception) -> Unit) {
+  override fun getBook(callback: (Result<List<DataBook>>) -> Unit) {
     db.collection(collectionBooks).get().addOnCompleteListener { task ->
       if (task.isSuccessful) {
         // Maps Firestore documents to DataBook objects or returns an empty list
         val books = task.result?.mapNotNull { document -> documentToBooks(document) } ?: emptyList()
-        OnSucess(books)
+        callback(Result.success(books))
       } else {
-        task.exception?.let { e -> onFailure(e) }
+        task.exception?.let { e -> callback(Result.failure(e)) }
       }
     }
   }
   /**
-   * Adds a new book to the Firestore collection. New verification and Log have been added to help
-   * debugging. Calls OnSuccess if the operation is successful, otherwise onFailure with the
-   * exception.
+   * Adds a new book to the Firestore collection.
    *
-   * @param dataBook The DataBook object to be added.
-   * @param OnSucess The callback to be triggered on success.
-   * @param onFailure The callback to be triggered with the exception on failure.
+   * @param dataBook The book data to be added.
+   * @param callback A callback function to handle the result of the Firestore operation. The result
+   *   is a `Result` object containing `Unit` if the operation is successful, or an exception if it
+   *   fails.
    */
-  override fun addBook(dataBook: DataBook, OnSucess: () -> Unit, onFailure: (Exception) -> Unit) {
+  override fun addBook(dataBook: DataBook, callback: (Result<Unit>) -> Unit) {
     // Check if essential fields are non-null before attempting to save
     if (dataBook.title.isBlank() ||
         dataBook.author.isNullOrBlank() ||
         dataBook.isbn.isNullOrBlank()) {
       val exception = IllegalArgumentException("Missing required book fields.")
       Log.e("BooksFirestoreRepository", "Failed to add book: ${exception.message}")
-      onFailure(exception)
+      callback(Result.failure(exception))
       return
     }
 
@@ -98,65 +93,50 @@ class BooksFirestoreRepository(private val db: FirebaseFirestore) : BooksReposit
 
     // Attempt to add book to Firestore
     performFirestoreOperation(
-        db.collection(collectionBooks).document(dataBook.uuid.toString()).set(dataBook),
-        {
-          Log.d("BooksFirestoreRepository", "Book added successfully: ${dataBook.title}")
-          OnSucess()
-        },
-        { e ->
-          Log.e("BooksFirestoreRepository", "Failed to add book: ${e.message}", e)
-          onFailure(e)
-        })
+        db.collection(collectionBooks).document(dataBook.uuid.toString()).set(dataBook)) { result ->
+          if (result.isSuccess)
+              Log.d("BooksFirestoreRepository", "Book added successfully: ${dataBook.title}")
+          else {
+            val error = result.exceptionOrNull()!!
+            Log.e("BooksFirestoreRepository", "Failed to add book: ${error.message}", error)
+          }
+          callback(result)
+        }
   }
   /**
-   * Updates an existing book in Firestore by replacing the document with the same uuid. Uses
-   * performFirestoreOperation to handle success and failure.
+   * Updates an existing book in the Firestore collection.
    *
-   * @param dataBook The DataBook object to be updated.
-   * @param onSuccess The callback to be triggered on success.
-   * @param onFailure The callback to be triggered with the exception on failure.
+   * @param dataBook The book data to be updated.
+   * @param callback A callback function to handle the result of the Firestore operation. The result
+   *   is a `Result` object containing `Unit` if the operation is successful, or an exception if it
+   *   fails.
    */
-  override fun updateBook(
-      dataBook: DataBook,
-      onSuccess: () -> Unit,
-      onFailure: (Exception) -> Unit
-  ) {
+  override fun updateBook(dataBook: DataBook, callback: (Result<Unit>) -> Unit) {
     performFirestoreOperation(
-        db.collection(collectionBooks).document(dataBook.uuid.toString()).set(dataBook),
-        onSuccess,
-        onFailure)
+        db.collection(collectionBooks).document(dataBook.uuid.toString()).set(dataBook), callback)
   }
   /**
-   * Deletes a book from Firestore by its title. Uses performFirestoreOperation to handle success
-   * and failure.
+   * Deletes a book from the Firestore collection.
    *
    * @param uuid The UUID of the book to be deleted.
-   * @param dataBook The DataBook object to be deleted.
-   * @param onSuccess The callback to be triggered on success.
-   * @param onFailure The callback to be triggered with the exception on failure.
+   * @param dataBook The book data to be deleted.
+   * @param callback A callback function to handle the result of the Firestore operation. The result
+   *   is a `Result` object containing `Unit` if the operation is successful, or an exception if it
+   *   fails.
    */
-  override fun deleteBooks(
-      uuid: UUID,
-      dataBook: DataBook,
-      onSuccess: () -> Unit,
-      onFailure: (Exception) -> Unit
-  ) {
+  override fun deleteBooks(uuid: UUID, dataBook: DataBook, callback: (Result<Unit>) -> Unit) {
     performFirestoreOperation(
-        db.collection(collectionBooks).document(dataBook.uuid.toString()).delete(),
-        onSuccess,
-        onFailure)
+        db.collection(collectionBooks).document(dataBook.uuid.toString()).delete(), callback)
   }
   /**
-   * Maps a Firestore document to a DataBook object. If any required field is missing, returns null
-   * to avoid incomplete objects.
+   * Converts a Firestore document to a DataBook object.
    *
-   * @param document The Firestore document to be mapped.
-   * @return The mapped DataBook object, or null if any required field is missing.
+   * @param document The Firestore document to be converted.
+   * @return A DataBook object if the conversion is successful, or null if it fails.
    */
   fun documentToBooks(document: DocumentSnapshot): DataBook? {
     return try {
-      val mostSignificantBits = document.getLong("uuid.mostSignificantBits") ?: return null
-      val leastSignificantBits = document.getLong("uuid.leastSignificantBits") ?: return null
+      val uuid = UUID.fromString(document.getString("uuid")) ?: return null
       val title = document.getString("title") ?: return null
       val author = document.getString("author")
       val description = document.getString("description")
@@ -174,37 +154,21 @@ class BooksFirestoreRepository(private val db: FirebaseFirestore) : BooksReposit
             }
           }
       DataBook(
-          UUID(mostSignificantBits, leastSignificantBits),
-          title,
-          author,
-          description,
-          rating?.toInt(),
-          photo,
-          languageBook,
-          isbn,
-          bookGenres)
+          uuid, title, author, description, rating?.toInt(), photo, languageBook, isbn, bookGenres)
     } catch (e: Exception) {
       null // Return null in case of any exception during the conversion
     }
   }
   /**
-   * Helper function to perform Firestore operations (add, update, delete). Executes the provided
-   * Firestore task and triggers success or failure callbacks.
-   *
-   * @param task The Firestore task to be executed.
-   * @param OnSucess The callback to be triggered on success.
-   * @param OnFailure The callback to be triggered with the exception on failure.
+   * Helper function to perform Firestore operations (add, update, delete) Executes the provided
+   * Firestore task and triggers success or failure callbacks
    */
-  private fun performFirestoreOperation(
-      task: Task<Void>,
-      OnSucess: () -> Unit,
-      OnFailure: (Exception) -> Unit
-  ) {
+  private fun performFirestoreOperation(task: Task<Void>, callback: (Result<Unit>) -> Unit) {
     task.addOnCompleteListener { result ->
       if (result.isSuccessful) {
-        OnSucess()
+        callback(Result.success(Unit))
       } else {
-        result.exception?.let { e -> OnFailure(e) }
+        result.exception?.let { e -> callback(Result.failure(e)) }
       }
     }
   }
