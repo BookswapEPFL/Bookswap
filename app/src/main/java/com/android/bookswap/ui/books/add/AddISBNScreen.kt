@@ -25,7 +25,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+/// ## THIS LINE IS MARKED AS DELETED BY KTFMTCHECK ON GITHUB ACTION
 import androidx.compose.ui.platform.LocalContext
+/// ## THIS LINE IS MARKED AS DELETED BY KTFMTCHECK ON GITHUB ACTION
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -80,8 +82,7 @@ fun AddISBNScreen(navigationActions: NavigationActions, booksRepository: BooksRe
             modifier =
                 Modifier.fillMaxSize()
                     .padding(pv)
-                    .padding()
-                    .background(color = ColorVariable.BackGround)) {
+					    .background(color = ColorVariable.BackGround)) {
               var isbn by remember { mutableStateOf("") }
 
               Column(
