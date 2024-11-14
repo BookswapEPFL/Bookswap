@@ -44,8 +44,12 @@ import com.android.bookswap.ui.navigation.List_Navigation_Bar_Destinations
 import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.navigation.Route
 import com.android.bookswap.ui.navigation.Screen
+import com.android.bookswap.ui.profile.NewUserScreen
 import com.android.bookswap.ui.profile.UserProfile
 import com.android.bookswap.ui.theme.BookSwapAppTheme
+import com.google.firebase.Firebase
+import com.google.firebase.auth.auth
+import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
 import java.util.UUID
 
@@ -92,17 +96,27 @@ class MainActivity : ComponentActivity() {
       startDestination: String = Route.AUTH,
       geolocation: IGeolocation = DefaultGeolocation()
   ) {
+    // navigation part
     val navController = rememberNavController()
     val navigationActions = NavigationActions(navController)
-    val bookFilter = BookFilter()
+
+    // user part
+    Firebase.auth.signOut() // Uncomment this line to test the sign in screen
+    val currentUser = Firebase.auth.currentUser
     val userVM = UserViewModel(UUID.randomUUID(), userRepository)
+
+    if (currentUser != null) {
+      userVM.getUserByGoogleUid(currentUser.uid) // This will scrap the user from the database
+    }
+    // Book part
+    val bookFilter = BookFilter()
     val bookManagerViewModel =
         BookManagerViewModel(geolocation, bookRepository, userRepository, bookFilter)
 
     val currentUserUUID = UUID.fromString("550e8400-e29b-41d4-a716-446655440000")
     val otherUserUUID = UUID.fromString("550e8400-e29b-41d4-a716-446655440001")
     val testUserUUID = UUID.fromString("550e8400-e29b-41d4-a716-446655440002")
-    val currentUser =
+    val currentUserPlaceholder =
         DataUser(
             currentUserUUID,
             "Mr.",
@@ -129,7 +143,6 @@ class MainActivity : ComponentActivity() {
             "https://www.shutterstock.com/image-photo/wonderful-epesses-fairtytale-village-middle-600nw-2174791585.jpg",
             emptyList(),
             "googleUid")
-
     val testUser =
         DataUser(
             testUserUUID,
@@ -143,6 +156,7 @@ class MainActivity : ComponentActivity() {
             "john_doe.jpg",
             emptyList(),
             "googleUid")
+
     val placeHolder =
         listOf(MessageBox(otherUser, message = "Welcome message for user124", date = "01.01.24")) +
             List(5) {
@@ -180,7 +194,8 @@ class MainActivity : ComponentActivity() {
 
     NavHost(navController = navController, startDestination = startDestination) {
       navigation(startDestination = Screen.AUTH, route = Route.AUTH) {
-        composable(Screen.AUTH) { SignInScreen(navigationActions) }
+        composable(Screen.AUTH) { SignInScreen(navigationActions, userVM) }
+        composable(Screen.NEW_USER) { NewUserScreen(navigationActions, userVM) }
       }
       navigation(startDestination = Screen.CHATLIST, route = Route.CHAT) {
         composable(Screen.CHATLIST) {
@@ -195,7 +210,7 @@ class MainActivity : ComponentActivity() {
           val user2 = placeHolder.firstOrNull { it.contact.userUUID == user2UUID }?.contact
 
           if (user2 != null) {
-            ChatScreen(messageRepository, currentUser, user2, navigationActions)
+            ChatScreen(messageRepository, currentUserPlaceholder, user2, navigationActions)
           } else {
             BookAdditionChoiceScreen(
                 navigationActions,
