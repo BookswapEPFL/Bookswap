@@ -25,6 +25,17 @@ interface UsersRepository {
   )
 
   /**
+   * Function to fetch a list of users from the repository.
+   *
+   * @param googleUid The unique identifier of the user
+   * @param callback callback function that receives the DataUser if success
+   */
+  fun getUser(
+      googleUid: String,
+      callback: (Result<DataUser>) -> Unit,
+  )
+
+  /**
    * Function to add a new user to the repository.
    *
    * @param dataUser The user data to be added.
