@@ -2,11 +2,8 @@ package com.android.bookswap.data
 
 import com.android.bookswap.data.repository.UsersRepository
 import com.android.bookswap.model.UserViewModel
-import io.mockk.Runs
-import io.mockk.andThenJust
 import io.mockk.every
 import io.mockk.mockk
-import io.mockk.verify
 import java.util.UUID
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
@@ -46,26 +43,18 @@ class DataUserTest {
     assertEquals("googleUid", standardUser.googleUid)
   }
   /**
-  @Test
-  fun viewModelFetch() {
-    val userVM = UserViewModel(standardUser.userUUID, mockUsersRepo)
-    assertTrue(!userVM.isStored.value!!)
-
-    every { mockUsersRepo.getUser(standardUser.userUUID, any()) } answers
-        {
-          secondArg<(Result<DataUser>) -> Unit>()(Result.success(standardUser))
-        } andThenJust
-        Runs
-
-    val result = userVM.getUser()
-
-    assertEquals(standardUser, result)
-    assertTrue(userVM.isStored.value!!)
-
-    // Verify that second calls does not fetch again
-    userVM.getUser()
-    verify(exactly = 1) { mockUsersRepo.getUser(uuid = any(), any()) }
-  }
+   * @Test fun viewModelFetch() { val userVM = UserViewModel(standardUser.userUUID, mockUsersRepo)
+   *   assertTrue(!userVM.isStored.value!!)
+   *
+   * every { mockUsersRepo.getUser(standardUser.userUUID, any()) } answers {
+   * secondArg<(Result<DataUser>) -> Unit>()(Result.success(standardUser)) } andThenJust Runs
+   *
+   * val result = userVM.getUser()
+   *
+   * assertEquals(standardUser, result) assertTrue(userVM.isStored.value!!)
+   *
+   * // Verify that second calls does not fetch again userVM.getUser() verify(exactly = 1) {
+   * mockUsersRepo.getUser(uuid = any(), any()) } }
    */
   @Test
   fun viewModelUpdateCorrectly() {
