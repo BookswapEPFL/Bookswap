@@ -31,18 +31,12 @@ import androidx.compose.ui.unit.sp
 import com.android.bookswap.data.DataBook
 import com.android.bookswap.ui.theme.ColorVariable
 
-val scaleFactor = 1
-val PADDING_HORIZONTAL_DP = 4.dp * scaleFactor
-val PADDING_VERTICAL_DP = 4.dp * scaleFactor
-val IMAGE_HEIGHT_DP = 82.dp * scaleFactor
-val IMAGE_WIDTH_DP = 72.dp * scaleFactor
+val PADDING_HORIZONTAL_DP = 4.dp
+val PADDING_VERTICAL_DP = 4.dp
+val IMAGE_HEIGHT_DP = 82.dp
+val IMAGE_WIDTH_DP = 72.dp
 val MAX_RATING = 5
-val PRIMARY_TEXT_FONT_SP = 22.sp * scaleFactor
-val SECONDARY_TEXT_FONT_SP = 16.sp * scaleFactor
-val STAR_HEIGHT_DP = 30.dp * scaleFactor
-val STAR_SIZE_DP = 26.dp * scaleFactor
-val STAR_INNER_SIZE_DP = STAR_SIZE_DP / 2
-val WIDTH_TITLE_BOX_DP = 150.dp
+val STAR_SIZE_DP = 26.dp
 
 @Composable
 fun BookDisplayComponent(modifier: Modifier = Modifier, book: DataBook) {
@@ -101,8 +95,8 @@ fun BookDisplayComponent(modifier: Modifier = Modifier, book: DataBook) {
           // Column for rating and genres
           Column(
               modifier =
-                  Modifier.requiredWidth(STAR_SIZE_DP * 5 + PADDING_HORIZONTAL_DP * 2)
-                      .width(STAR_SIZE_DP * 5 + PADDING_HORIZONTAL_DP * 2)
+                  Modifier.requiredWidth(STAR_SIZE_DP * MAX_RATING + PADDING_HORIZONTAL_DP * 2)
+                      .width(STAR_SIZE_DP * MAX_RATING + PADDING_HORIZONTAL_DP * 2)
                       .testTag("mapDraggableMenuBookRight"),
               horizontalAlignment = Alignment.CenterHorizontally) {
                 Row(
@@ -119,7 +113,6 @@ fun BookDisplayComponent(modifier: Modifier = Modifier, book: DataBook) {
                         Modifier.fillMaxWidth()
                             .clipToBounds()
                             .testTag("mapDraggableMenuBookBoxTag"),
-                    fontSize = SECONDARY_TEXT_FONT_SP,
                     overflow = TextOverflow.Ellipsis,
                     color = ColorVariable.AccentSecondary)
               }
@@ -143,21 +136,12 @@ private fun DisplayStarReview(rating: Int) {
   }
   for (i in rating + 1..MAX_RATING) {
     // Hollow star
-    // Icons.Outlined.Star doesn't work, it displays the
-    // Icons.Filled.Star
     Box(modifier = Modifier.width(STAR_SIZE_DP).testTag("mapDraggableMenuBookBoxEmptyStar")) {
       Icon(
           imageVector = Icons.TwoTone.Star,
           contentDescription = "Star Icon",
           tint = MaterialTheme.colorScheme.outline,
           modifier = Modifier.size(STAR_SIZE_DP))
-      /*
-         Icon(
-             imageVector = Icons.Filled.Star,
-             contentDescription = "Star Icon",
-             tint = ColorVariable.BackGround,
-             modifier = Modifier.size(STAR_INNER_SIZE_DP).align(Alignment.Center))
-      // */
     }
   }
 }

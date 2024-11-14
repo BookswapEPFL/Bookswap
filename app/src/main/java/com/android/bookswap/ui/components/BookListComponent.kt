@@ -31,10 +31,10 @@ fun BookListComponent(
       userScrollEnabled = true,
   ) {
     if (bookList.isEmpty()) {
-      item { Text(text = "No books to display") }
+      item { Text(text = "No books to display", Modifier.testTag("mapDraggableMenuNoBook")) }
     } else {
       itemsIndexed(bookList) { i, book ->
-        BookDisplayComponent(Modifier, book = book)
+        BookDisplayComponent(Modifier.testTag("mapDraggableMenuBookBox${i}"), book = book)
         if (i < bookList.size - 1) {
           HorizontalDivider(
               modifier = Modifier.testTag("mapDraggableMenuBookBoxDivider"),
