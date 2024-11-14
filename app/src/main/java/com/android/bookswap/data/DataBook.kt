@@ -5,7 +5,7 @@ import java.util.UUID
 /**
  * Represent a book with various properties
  *
- * @param uuid Internal id for the book
+ * @param uuid Internal uuid for the book
  * @param title Title of the book
  * @param author Author of the book
  * @param description Short description of the book

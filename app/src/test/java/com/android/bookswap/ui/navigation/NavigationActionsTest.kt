@@ -39,7 +39,7 @@ class NavigationActionsTest {
     verify(navHostController).navigate(eq(Route.MAP), any<(NavOptionsBuilder) -> Unit>())
 
     navigationActions.navigateTo(TopLevelDestinations.PROFILE)
-    verify(navHostController).navigate(eq(Route.PROFIL), any<(NavOptionsBuilder) -> Unit>())
+    verify(navHostController).navigate(eq(Route.PROFILE), any<(NavOptionsBuilder) -> Unit>())
 
     navigationActions.navigateTo(TopLevelDestinations.NEW_BOOK)
     verify(navHostController).navigate(eq(Route.NEWBOOK), any<(NavOptionsBuilder) -> Unit>())
