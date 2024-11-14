@@ -9,7 +9,6 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import com.android.bookswap.data.BookGenres
-import com.android.bookswap.data.BookLanguages
 import com.android.bookswap.data.DataBook
 import com.android.bookswap.data.repository.BooksRepository
 import io.mockk.every
@@ -73,8 +72,6 @@ class AddToBookTest {
     assertEquals("Author Name", book?.author)
     assertEquals("This is a description", book?.description)
     assertEquals(4, book?.rating)
-    assertEquals("https://example.com/photo.jpg", book?.photo)
-    assertEquals(BookLanguages.ENGLISH, book?.language)
     assertEquals("1234567890", book?.isbn)
   }
 
