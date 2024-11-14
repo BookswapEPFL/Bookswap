@@ -128,7 +128,9 @@ class MapScreenTest {
     composeTestRule.onAllNodesWithTag("mapDraggableMenuBookBoxStar").assertCountEquals(9)
     composeTestRule.onAllNodesWithTag("mapDraggableMenuBookBoxEmptyStar").assertCountEquals(1)
     composeTestRule.onAllNodesWithTag("mapDraggableMenuBookBoxTag").assertCountEquals(2)
-    composeTestRule.onAllNodesWithTag("mapDraggableMenuBookBoxDivider").assertCountEquals(2)
+    composeTestRule
+        .onAllNodesWithTag("mapDraggableMenuBookBoxDivider")
+        .assertCountEquals(books.size - 1)
 
     composeTestRule.onNodeWithTag("filterButton").assertIsDisplayed()
   }
@@ -178,7 +180,7 @@ class MapScreenTest {
     composeTestRule
         .onNodeWithTag("mapDraggableMenuNoBook")
         .assertIsDisplayed()
-        .assertTextContains("No books found")
+        .assertTextContains("No books to display")
   }
 
   @Test

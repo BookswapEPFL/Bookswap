@@ -17,6 +17,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
+/** End-to-end test for the navigation bar in the BookSwap app. */
 class NavigationBarEndToEnd {
   @get:Rule val composeTestRule = createComposeRule()
 
