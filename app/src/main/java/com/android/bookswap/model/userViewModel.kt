@@ -45,6 +45,10 @@ open class UserViewModel(
     }
   }
 
+  /**
+   * Update the user data with the given parameters. If no parameter is given, the data will not be
+   * updated.
+   */
   fun updateUser(
       greeting: String = dataUser.greeting,
       firstName: String = dataUser.firstName,
@@ -71,7 +75,11 @@ open class UserViewModel(
             bookList,
             googleUid))
   }
-
+  /**
+   * Update the user data with the given DataUser object.
+   *
+   * @param newDataUser New user data
+   */
   fun updateUser(newDataUser: DataUser) {
     this.dataUser = newDataUser
     this.uuid = newDataUser.userUUID
@@ -81,14 +89,9 @@ open class UserViewModel(
     }
   }
 
-  fun addUser() {
-    userRepository.addUser(this.dataUser) { result ->
-      result.fold(
-          { Log.d("UserViewModel", "User added successfully") },
-          { Log.e("UserViewModel", "Error adding user") })
-    }
-  }
-
+  /*
+   * Get the user by the googleUid
+   */
   fun getUserByGoogleUid(googleUid: String) {
     userRepository.getUser(googleUid) { result ->
       // If the user is found, update the dataUser and set isLoaded to true
@@ -108,7 +111,11 @@ open class UserViewModel(
       }
     }
   }
-
+  /**
+   * Update the googleUid of the user.
+   *
+   * @param googleUid New googleUid
+   */
   fun updateGoogleUid(googleUid: String) {
     dataUser.googleUid = googleUid
     updateUser(dataUser)
