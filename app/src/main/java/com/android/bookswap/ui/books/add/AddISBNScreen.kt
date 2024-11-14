@@ -47,83 +47,83 @@ import com.android.bookswap.ui.theme.ColorVariable
 fun AddISBNScreen(navigationActions: NavigationActions, booksRepository: BooksRepository) {
   val context = LocalContext.current
   Scaffold(
-	topBar = {
-	  MediumTopAppBar(
-		colors =
-		TopAppBarDefaults.topAppBarColors(
-		  containerColor = ColorVariable.BackGround,
-		),
-		title = {
-		  Box(modifier = Modifier) {
-			Row(
-			  horizontalArrangement = Arrangement.Center,
-			  modifier = Modifier.fillMaxWidth(0.85f)) {
-			  BackButtonComponent(navigationActions)
-			  Text(
-				text = "Search ISBN",
-				style =
-				TextStyle(
-				  fontSize = 30.sp,
-				  lineHeight = 20.sp,
-				  fontWeight = FontWeight(700),
-				  color = ColorVariable.Accent,
-				  letterSpacing = 0.3.sp,
-				),
-				modifier = Modifier.padding(top = 4.dp))
-			}
-		  }
-		},
-		actions = { Box(modifier = Modifier.padding(top = 30.dp)) { ProfileIcon() } })
-	},
-	content = { pv ->
-	  Box(
-		modifier =
-		Modifier.fillMaxSize()
-		  .padding(pv)
-		  .padding()
-		  .background(color = ColorVariable.BackGround)) {
-		var isbn by remember { mutableStateOf("") }
-		
-		Column(
-		  modifier = Modifier.fillMaxWidth().padding(top = 40.dp),
-		  horizontalAlignment = Alignment.CenterHorizontally,
-		  verticalArrangement = Arrangement.spacedBy(45.dp)) {
-		  FieldComponent(
-			modifier = Modifier.testTag("isbn_field"),
-			labelText = "ISBN*",
-			value = isbn) {
-			if (it.all { c -> c.isDigit() } && it.length <= 13) {
-			  isbn = it
-			}
-		  }
-		  ButtonComponent(
-			modifier = Modifier.testTag("isbn_searchButton"),
-			onClick = {
-			  GoogleBookDataSource(context).getBookFromISBN(isbn) { result ->
-				if (result.isFailure) {
-				  Toast.makeText(context, "Search unsuccessful", Toast.LENGTH_LONG)
-					.show()
-				  Log.e("AddBook", result.exceptionOrNull().toString())
-				} else {
-				  booksRepository.addBook(
-					result.getOrThrow(),
-					{ navigationActions.navigateTo(TopLevelDestinations.NEW_BOOK) },
-					{ error ->
-					  Log.e("AddBook", error.toString())
-					  Toast.makeText(context, error.message, Toast.LENGTH_LONG).show()
-					})
-				}
-			  }
-			}) {
-			Row(verticalAlignment = Alignment.CenterVertically) {
-			  Text("Search")
-			  Icon(
-				Icons.Filled.Search,
-				contentDescription = "Search icon",
-			  )
-			}
-		  }
-		}
-	  }
-	})
+      topBar = {
+        MediumTopAppBar(
+            colors =
+                TopAppBarDefaults.topAppBarColors(
+                    containerColor = ColorVariable.BackGround,
+                ),
+            title = {
+              Box(modifier = Modifier) {
+                Row(
+                    horizontalArrangement = Arrangement.Center,
+                    modifier = Modifier.fillMaxWidth(0.85f)) {
+                      BackButtonComponent(navigationActions)
+                      Text(
+                          text = "Search ISBN",
+                          style =
+                              TextStyle(
+                                  fontSize = 30.sp,
+                                  lineHeight = 20.sp,
+                                  fontWeight = FontWeight(700),
+                                  color = ColorVariable.Accent,
+                                  letterSpacing = 0.3.sp,
+                              ),
+                          modifier = Modifier.padding(top = 4.dp))
+                    }
+              }
+            },
+            actions = { Box(modifier = Modifier.padding(top = 30.dp)) { ProfileIcon() } })
+      },
+      content = { pv ->
+        Box(
+            modifier =
+                Modifier.fillMaxSize()
+                    .padding(pv)
+                    .padding()
+                    .background(color = ColorVariable.BackGround)) {
+              var isbn by remember { mutableStateOf("") }
+
+              Column(
+                  modifier = Modifier.fillMaxWidth().padding(top = 40.dp),
+                  horizontalAlignment = Alignment.CenterHorizontally,
+                  verticalArrangement = Arrangement.spacedBy(45.dp)) {
+                    FieldComponent(
+                        modifier = Modifier.testTag("isbn_field"),
+                        labelText = "ISBN*",
+                        value = isbn) {
+                          if (it.all { c -> c.isDigit() } && it.length <= 13) {
+                            isbn = it
+                          }
+                        }
+                    ButtonComponent(
+                        modifier = Modifier.testTag("isbn_searchButton"),
+                        onClick = {
+                          GoogleBookDataSource(context).getBookFromISBN(isbn) { result ->
+                            if (result.isFailure) {
+                              Toast.makeText(context, "Search unsuccessful", Toast.LENGTH_LONG)
+                                  .show()
+                              Log.e("AddBook", result.exceptionOrNull().toString())
+                            } else {
+                              booksRepository.addBook(
+                                  result.getOrThrow(),
+                                  { navigationActions.navigateTo(TopLevelDestinations.NEW_BOOK) },
+                                  { error ->
+                                    Log.e("AddBook", error.toString())
+                                    Toast.makeText(context, error.message, Toast.LENGTH_LONG).show()
+                                  })
+                            }
+                          }
+                        }) {
+                          Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text("Search")
+                            Icon(
+                                Icons.Filled.Search,
+                                contentDescription = "Search icon",
+                            )
+                          }
+                        }
+                  }
+            }
+      })
 }
