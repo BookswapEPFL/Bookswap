@@ -41,14 +41,28 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
+/** Minimum width for the field component. */
 private val FIELD_MIN_WIDTH = 280.dp
+
+/** Minimum height for the field component. */
 private val FIELD_MIN_HEIGHT = 56.dp
 
+/** Padding for the field component. */
 private val FIELD_PADDING = 8.dp
+
+/** Content padding for the field component. */
 private val FIELD_CONTENT_PADDING = 16.dp
 
+/** Duration for the animation in milliseconds. */
 private val ANIMATION_DURATION = 150
-
+/**
+ * A composable function that displays a field component with a label.
+ *
+ * @param labelText The text to be displayed as the label.
+ * @param value The current value of the field.
+ * @param modifier The modifier to be applied to the field.
+ * @param onValueChange A callback to be invoked when the value changes.
+ */
 @Composable
 fun FieldComponent(
     labelText: String,
@@ -62,7 +76,28 @@ fun FieldComponent(
       modifier = modifier,
       label = { Text(labelText) })
 }
-
+/**
+ * A composable function that displays a field component with various customization options.
+ *
+ * @param value The current value of the field.
+ * @param onValueChange A callback to be invoked when the value changes.
+ * @param modifier The modifier to be applied to the field.
+ * @param enabled Whether the field is enabled or not.
+ * @param readOnly Whether the field is read-only or not.
+ * @param textStyle The style to be applied to the text.
+ * @param label A composable function to display the label.
+ * @param placeholder A composable function to display the placeholder.
+ * @param isError Whether the field is in an error state.
+ * @param keyboardOptions The keyboard options to be applied to the field.
+ * @param keyboardActions The keyboard actions to be applied to the field.
+ * @param singleLine Whether the field is single line or not.
+ * @param maxLines The maximum number of lines for the field.
+ * @param minLines The minimum number of lines for the field.
+ * @param visualTransformation The visual transformation to be applied to the text.
+ * @param onTextLayout A callback to be invoked when the text layout changes.
+ * @param interactionSource The interaction source for the field.
+ * @param cursorBrush The brush to be used for the cursor.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FieldComponent(
@@ -178,7 +213,17 @@ fun FieldComponent(
             })
   }
 }
-
+/**
+ * Animates the border stroke of a field component based on its state.
+ *
+ * @param enabled Whether the field is enabled or not.
+ * @param isError Whether the field is in an error state.
+ * @param interactionSource The interaction source for the field.
+ * @param colors The colors to be used for the field.
+ * @param focusedBorderThickness The thickness of the border when the field is focused.
+ * @param unfocusedBorderThickness The thickness of the border when the field is unfocused.
+ * @return A state containing the animated border stroke.
+ */
 @Composable
 private fun animateBorderStrokeAsState(
     enabled: Boolean,
@@ -200,7 +245,15 @@ private fun animateBorderStrokeAsState(
   return rememberUpdatedState(
       BorderStroke(animatedThickness.value, SolidColor(indicatorColor.value)))
 }
-
+/**
+ * Determines the background color of the field component based on its state.
+ *
+ * @param enabled Whether the field is enabled or not.
+ * @param isError Whether the field is in an error state.
+ * @param isEmpty Whether the field is empty or not.
+ * @param colors The colors to be used for the field.
+ * @return A state containing the background color.
+ */
 @Composable
 internal fun backgroundColor(
     enabled: Boolean,
@@ -222,7 +275,15 @@ internal fun backgroundColor(
     rememberUpdatedState(targetValue)
   }
 }
-
+/**
+ * Determines the text color of the field component based on its state.
+ *
+ * @param enabled Whether the field is enabled or not.
+ * @param isError Whether the field is in an error state.
+ * @param interactionSource The interaction source for the field.
+ * @param colors The colors to be used for the field.
+ * @return A state containing the text color.
+ */
 @Composable
 internal fun textColor(
     enabled: Boolean,
@@ -240,7 +301,15 @@ internal fun textColor(
         else -> colors.unfocusedTextColor
       })
 }
-
+/**
+ * Determines the indicator color of the field component based on its state.
+ *
+ * @param enabled Whether the field is enabled or not.
+ * @param isError Whether the field is in an error state.
+ * @param interactionSource The interaction source for the field.
+ * @param colors The colors to be used for the field.
+ * @return A state containing the indicator color.
+ */
 @Composable
 internal fun indicatorColor(
     enabled: Boolean,

@@ -75,6 +75,15 @@ import java.util.Locale
 import java.util.UUID
 import kotlinx.coroutines.delay
 
+/**
+ * Composable function for the chat screen.
+ *
+ * @param messageRepository Repository for handling messages.
+ * @param currentUser The current user data.
+ * @param otherUser The other user data.
+ * @param navController Navigation actions for navigating between screens.
+ * @param photoStorage Repository for handling photo storage.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChatScreen(
@@ -339,7 +348,13 @@ fun ChatScreen(
     }
   }
 }
-
+/**
+ * Composable function to display a message item in the chat screen.
+ *
+ * @param message The message data to display.
+ * @param currentUserUUID The UUID of the current user.
+ * @param onLongPress Callback function to handle long press on the message item.
+ */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun MessageItem(message: DataMessage, currentUserUUID: UUID, onLongPress: () -> Unit) {
@@ -482,7 +497,13 @@ fun MessageItem(message: DataMessage, currentUserUUID: UUID, onLongPress: () -> 
         }
   }
 }
-
+/**
+ * Formats a timestamp into a readable string.
+ *
+ * @param timestamp The timestamp to format.
+ * @return A formatted string representing the timestamp. If the timestamp is from today, it returns
+ *   the time in "HH:mm" format. Otherwise, it returns the date in "MMM dd, yyyy" format.
+ */
 fun formatTimestamp(timestamp: Long): String {
   val messageDate = Date(timestamp)
   val currentDate = Date()

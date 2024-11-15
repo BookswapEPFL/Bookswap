@@ -79,9 +79,7 @@ fun ListChatScreen(
       bottomBar = bottomAppBar)
 }
 
-/*
-This function is used to display the message box
- */
+/** This function is used to display the message box */
 @Composable
 fun MessageBoxDisplay(message: MessageBox, onClick: () -> Unit = {}) {
   Row(

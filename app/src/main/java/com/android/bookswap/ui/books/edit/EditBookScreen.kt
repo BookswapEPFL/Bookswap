@@ -48,7 +48,13 @@ private val SCREEN_PADDING = 16.dp
 private val ELEMENT_SPACING = 8.dp
 private val BUTTON_SPACER_HEIGHT = 16.dp
 private const val COLUMN_WIDTH_RATIO = 0.9f // Column width as 90% of screen width
-
+/**
+ * Composable function to display the Edit Book screen.
+ *
+ * @param booksRepository The repository to interact with the book data.
+ * @param navigationActions The navigation actions to handle navigation events.
+ * @param book The book data to be edited.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditBookScreen(
