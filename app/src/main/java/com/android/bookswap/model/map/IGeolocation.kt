@@ -14,8 +14,19 @@ import kotlinx.coroutines.flow.MutableStateFlow
 interface IGeolocation {
   val latitude: MutableStateFlow<Double>
   val longitude: MutableStateFlow<Double>
-
+  /**
+   * Starts location updates.
+   *
+   * This function initiates the process of receiving location updates. It checks for the necessary
+   * location permissions and requests them if they are not granted. If the permissions are granted,
+   * it starts the location updates using the `FusedLocationProviderClient`.
+   */
   fun startLocationUpdates()
-
+  /**
+   * Stops location updates.
+   *
+   * This function stops the process of receiving location updates. It removes the location updates
+   * using the `FusedLocationProviderClient` and sets the `isRunning` state to false.
+   */
   fun stopLocationUpdates()
 }

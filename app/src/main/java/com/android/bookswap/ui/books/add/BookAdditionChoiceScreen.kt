@@ -31,6 +31,13 @@ import com.android.bookswap.R
 import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.theme.ColorVariable
 
+/**
+ * Composable function to display the screen for choosing how to add a book.
+ *
+ * @param navController The navigation actions to handle navigation events.
+ * @param topAppBar A composable function to display the top app bar.
+ * @param bottomAppBar A composable function to display the bottom app bar.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BookAdditionChoiceScreen(
@@ -78,7 +85,16 @@ fun BookAdditionChoiceScreen(
             }
       }
 }
-
+/**
+ * Composable function to display a button with an icon.
+ *
+ * @param text The text to display on the button.
+ * @param leftIcon The optional left icon to display on the button.
+ * @param leftIconPainter The optional left icon painter to display on the button.
+ * @param navController The navigation actions to handle navigation events.
+ * @param navDestination The destination to navigate to when the button is clicked.
+ * @param buttonWidth The width of the button.
+ */
 @Composable
 fun ButtonWithIcon(
     text: String,

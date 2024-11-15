@@ -30,13 +30,28 @@ import androidx.compose.ui.unit.dp
 import com.android.bookswap.data.DataBook
 import com.android.bookswap.ui.theme.ColorVariable
 
+/** Padding values for horizontal and vertical padding in dp. */
 val PADDING_HORIZONTAL_DP = 4.dp
 val PADDING_VERTICAL_DP = 4.dp
+
+/** Dimensions for the image in dp. */
 val IMAGE_HEIGHT_DP = 82.dp
 val IMAGE_WIDTH_DP = 72.dp
-val MAX_RATING = 5
-val STAR_SIZE_DP = 26.dp
 
+/** Maximum rating value. */
+val MAX_RATING = 5
+
+/** Size of the star icon in dp. */
+val STAR_SIZE_DP = 26.dp
+/**
+ * Composable function to display a book's information.
+ *
+ * This function displays a book's image, title, author, rating, and genres in a row layout. The
+ * image is currently a placeholder, and the actual image implementation will be added later.
+ *
+ * @param modifier Modifier to be applied to the component.
+ * @param book The book data to be displayed.
+ */
 @Composable
 fun BookDisplayComponent(modifier: Modifier = Modifier, book: DataBook) {
   Row(
@@ -118,7 +133,14 @@ fun BookDisplayComponent(modifier: Modifier = Modifier, book: DataBook) {
         }
       }
 }
-
+/**
+ * Displays a star rating for a book.
+ *
+ * This function displays filled stars for the given rating and hollow stars for the remaining up to
+ * the maximum rating. The stars are displayed in a row layout.
+ *
+ * @param rating The rating value to be displayed, ranging from 0 to MAX_RATING.
+ */
 @Composable
 private fun DisplayStarReview(rating: Int) {
   for (i in 1..rating) {

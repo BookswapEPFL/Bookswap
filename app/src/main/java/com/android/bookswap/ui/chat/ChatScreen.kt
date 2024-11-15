@@ -23,11 +23,14 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardColors
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -44,6 +47,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
@@ -60,6 +64,8 @@ import com.android.bookswap.data.DataMessage
 import com.android.bookswap.data.DataUser
 import com.android.bookswap.data.MessageType
 import com.android.bookswap.data.repository.MessageRepository
+import com.android.bookswap.data.repository.PhotoFirebaseStorageRepository
+import com.android.bookswap.model.PhotoRequester
 import com.android.bookswap.ui.components.BackButtonComponent
 import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.theme.ColorVariable
@@ -69,13 +75,23 @@ import java.util.Locale
 import java.util.UUID
 import kotlinx.coroutines.delay
 
+/**
+ * Composable function for the chat screen.
+ *
+ * @param messageRepository Repository for handling messages.
+ * @param currentUser The current user data.
+ * @param otherUser The other user data.
+ * @param navController Navigation actions for navigating between screens.
+ * @param photoStorage Repository for handling photo storage.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChatScreen(
     messageRepository: MessageRepository,
     currentUser: DataUser,
     otherUser: DataUser,
-    navController: NavigationActions
+    navController: NavigationActions,
+    photoStorage: PhotoFirebaseStorageRepository
 ) {
   val context = LocalContext.current
   var messages by remember { mutableStateOf(emptyList<DataMessage>()) }
@@ -85,6 +101,47 @@ fun ChatScreen(
   val padding8 = 8.dp
   val padding24 = 24.dp
   val padding36 = 36.dp
+  val photoReq =
+      PhotoRequester(context) { result ->
+        if (result.isSuccess) {
+          photoStorage.addPhotoToStorage(
+              photoId = UUID.randomUUID().toString(),
+              bitmap = result.getOrThrow().asAndroidBitmap(),
+              callback = { result ->
+                result
+                    .onSuccess { url ->
+                      messageRepository.sendMessage(
+                          message =
+                              DataMessage(
+                                  messageType = MessageType.IMAGE,
+                                  uuid = messageRepository.getNewUUID(),
+                                  text = url,
+                                  senderUUID = currentUser.userUUID,
+                                  receiverUUID = otherUser.userUUID,
+                                  timestamp = System.currentTimeMillis()),
+                          callback = { result ->
+                            if (result.isSuccess) {
+                              Log.d("ChatScreen", "Image stored successfully")
+                            } else {
+                              Toast.makeText(
+                                      context, "Image could not be stored.", Toast.LENGTH_LONG)
+                                  .show()
+                              Log.e("ChatScreen", "Image could not be stored.")
+                            }
+                          })
+                    }
+                    .onFailure { exception ->
+                      Log.e("ChatScreen", "Failed to store image: ${exception.message}")
+                    }
+              })
+        } else {
+          Toast.makeText(context, "Image could not be stored.", Toast.LENGTH_LONG).show()
+          Log.e("ChatScreen", "Image could not be stored.")
+        }
+      }
+
+  photoReq.Init()
+
   LaunchedEffect(Unit) {
     while (true) {
       messageRepository.getMessages { result ->
@@ -150,6 +207,14 @@ fun ChatScreen(
             modifier =
                 Modifier.fillMaxWidth().padding(top = padding8).background(ColorVariable.Primary),
             verticalAlignment = Alignment.CenterVertically) {
+              IconButton(
+                  onClick = { photoReq.requestPhoto() },
+                  modifier = Modifier.testTag("photo_button")) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = "Previous Image",
+                        tint = ColorVariable.Accent)
+                  }
               BasicTextField(
                   value = newMessageText,
                   onValueChange = { newMessageText = it },
@@ -283,7 +348,13 @@ fun ChatScreen(
     }
   }
 }
-
+/**
+ * Composable function to display a message item in the chat screen.
+ *
+ * @param message The message data to display.
+ * @param currentUserUUID The UUID of the current user.
+ * @param onLongPress Callback function to handle long press on the message item.
+ */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun MessageItem(message: DataMessage, currentUserUUID: UUID, onLongPress: () -> Unit) {
@@ -426,7 +497,13 @@ fun MessageItem(message: DataMessage, currentUserUUID: UUID, onLongPress: () -> 
         }
   }
 }
-
+/**
+ * Formats a timestamp into a readable string.
+ *
+ * @param timestamp The timestamp to format.
+ * @return A formatted string representing the timestamp. If the timestamp is from today, it returns
+ *   the time in "HH:mm" format. Otherwise, it returns the date in "MMM dd, yyyy" format.
+ */
 fun formatTimestamp(timestamp: Long): String {
   val messageDate = Date(timestamp)
   val currentDate = Date()
@@ -444,4 +521,4 @@ fun formatTimestamp(timestamp: Long): String {
 val imageTestMessageUUID: UUID =
     UUID.fromString(
         "11111111-aa16-43d1-8c47-082ac787f755") // Placeholder message for testing image (adapted to
-                                                // use UUID)
+// use UUID)
