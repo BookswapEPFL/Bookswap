@@ -136,7 +136,8 @@ class BooksFirestoreSource(private val db: FirebaseFirestore) : BooksRepository 
    */
   fun documentToBooks(document: DocumentSnapshot): DataBook? {
     return try {
-      val uuid = UUID.fromString(document.getString("uuid")) ?: return null
+      val mostSignificantBits = document.getLong("uuid.mostSignificantBits") ?: return null
+      val leastSignificantBits = document.getLong("uuid.leastSignificantBits") ?: return null
       val title = document.getString("title") ?: return null
       val author = document.getString("author")
       val description = document.getString("description")
@@ -154,7 +155,15 @@ class BooksFirestoreSource(private val db: FirebaseFirestore) : BooksRepository 
             }
           }
       DataBook(
-          uuid, title, author, description, rating?.toInt(), photo, languageBook, isbn, bookGenres)
+          UUID(mostSignificantBits, leastSignificantBits),
+          title,
+          author,
+          description,
+          rating?.toInt(),
+          photo,
+          languageBook,
+          isbn,
+          bookGenres)
     } catch (e: Exception) {
       null // Return null in case of any exception during the conversion
     }

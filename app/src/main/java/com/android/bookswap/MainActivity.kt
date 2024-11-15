@@ -21,6 +21,7 @@ import com.android.bookswap.data.repository.MessageRepository
 import com.android.bookswap.data.repository.UsersRepository
 import com.android.bookswap.data.source.network.BooksFirestoreSource
 import com.android.bookswap.data.source.network.MessageFirestoreSource
+import com.android.bookswap.data.source.network.PhotoFirebaseStorageSource
 import com.android.bookswap.data.source.network.UserFirestoreSource
 import com.android.bookswap.model.UserViewModel
 import com.android.bookswap.model.chat.PermissionHandler
@@ -44,9 +45,14 @@ import com.android.bookswap.ui.navigation.List_Navigation_Bar_Destinations
 import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.navigation.Route
 import com.android.bookswap.ui.navigation.Screen
+import com.android.bookswap.ui.profile.NewUserScreen
 import com.android.bookswap.ui.profile.UserProfile
 import com.android.bookswap.ui.theme.BookSwapAppTheme
+import com.google.firebase.Firebase
+import com.google.firebase.auth.auth
+import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.FirebaseStorage
 import java.util.UUID
 
 class MainActivity : ComponentActivity() {
@@ -71,11 +77,13 @@ class MainActivity : ComponentActivity() {
 
     // Initialize a Firebase Firestore database instance
     val db = FirebaseFirestore.getInstance()
+    val storage = FirebaseStorage.getInstance()
 
     // Create the data source objects
     val messageRepository = MessageFirestoreSource(db)
     val bookRepository = BooksFirestoreSource(db)
     val userDataSource = UserFirestoreSource(db)
+    val photoStorage = PhotoFirebaseStorageSource(storage)
 
     // Initialize the geolocation
     val geolocation = Geolocation(this)
@@ -85,7 +93,11 @@ class MainActivity : ComponentActivity() {
           modifier = Modifier.fillMaxSize().semantics { testTag = C.Tag.main_screen_container },
           color = MaterialTheme.colorScheme.background) {
             BookSwapApp(
-                messageRepository, bookRepository, userDataSource, geolocation = geolocation)
+                messageRepository,
+                bookRepository,
+                userDataSource,
+                photoStorage = photoStorage,
+                geolocation = geolocation)
           }
     }
   }
@@ -104,19 +116,30 @@ class MainActivity : ComponentActivity() {
       bookRepository: BooksRepository,
       userRepository: UsersRepository,
       startDestination: String = Route.AUTH,
+      photoStorage: PhotoFirebaseStorageSource,
       geolocation: IGeolocation = DefaultGeolocation()
   ) {
+    // navigation part
     val navController = rememberNavController()
     val navigationActions = NavigationActions(navController)
-    val bookFilter = BookFilter()
+
+    // user part
+    Firebase.auth.signOut() // Uncomment this line to test the sign in screen
+    val currentUser = Firebase.auth.currentUser
     val userVM = UserViewModel(UUID.randomUUID(), userRepository)
+
+    if (currentUser != null) {
+      userVM.getUserByGoogleUid(currentUser.uid) // This will scrap the user from the database
+    }
+    // Book part
+    val bookFilter = BookFilter()
     val bookManagerViewModel =
         BookManagerViewModel(geolocation, bookRepository, userRepository, bookFilter)
 
-    val currentUserUUID = UUID.fromString("550e8400-e29b-41d4-a716-446655440000")
-    val otherUserUUID = UUID.fromString("550e8400-e29b-41d4-a716-446655440001")
+    val currentUserUUID = UUID.fromString("77942cd7-8b99-41ba-a0a5-147214703434")
+    val otherUserUUID = UUID.fromString("7284fd9d-3edc-458b-93cd-2b0c4a8c0fc0")
     val testUserUUID = UUID.fromString("550e8400-e29b-41d4-a716-446655440002")
-    val currentUser =
+    val currentUserPlaceholder =
         DataUser(
             currentUserUUID,
             "Mr.",
@@ -143,7 +166,6 @@ class MainActivity : ComponentActivity() {
             "https://www.shutterstock.com/image-photo/wonderful-epesses-fairtytale-village-middle-600nw-2174791585.jpg",
             emptyList(),
             "googleUid")
-
     val testUser =
         DataUser(
             testUserUUID,
@@ -157,8 +179,14 @@ class MainActivity : ComponentActivity() {
             "john_doe.jpg",
             emptyList(),
             "googleUid")
+
     val placeHolder =
-        listOf(MessageBox(otherUser, message = "Welcome message for user124", date = "01.01.24")) +
+        listOf(
+            MessageBox(otherUser, message = "Welcome message for user124", date = "01.01.24"),
+            MessageBox(
+                currentUserPlaceholder,
+                message = "Welcome message for user123",
+                date = "01.01.24")) +
             List(5) {
               MessageBox(
                   DataUser(
@@ -194,7 +222,8 @@ class MainActivity : ComponentActivity() {
 
     NavHost(navController = navController, startDestination = startDestination) {
       navigation(startDestination = Screen.AUTH, route = Route.AUTH) {
-        composable(Screen.AUTH) { SignInScreen(navigationActions) }
+        composable(Screen.AUTH) { SignInScreen(navigationActions, userVM) }
+        composable(Screen.NEW_USER) { NewUserScreen(navigationActions, userVM) }
       }
       navigation(startDestination = Screen.CHATLIST, route = Route.CHAT) {
         composable(Screen.CHATLIST) {
@@ -209,7 +238,7 @@ class MainActivity : ComponentActivity() {
           val user2 = placeHolder.firstOrNull { it.contact.userUUID == user2UUID }?.contact
 
           if (user2 != null) {
-            ChatScreen(messageRepository, currentUser, user2, navigationActions)
+            ChatScreen(messageRepository, userVM.getUser(), user2, navigationActions, photoStorage)
           } else {
             BookAdditionChoiceScreen(
                 navigationActions,
@@ -239,7 +268,7 @@ class MainActivity : ComponentActivity() {
         composable(Screen.ADD_BOOK_MANUALLY) {
           AddToBookScreen(
               bookRepository,
-              topAppBar = { topAppBar(null) },
+              topAppBar = { topAppBar("Add your Book") },
               bottomAppBar = { bottomAppBar(this@navigation.route ?: "") })
         }
         composable(Screen.ADD_BOOK_SCAN) { /*Todo*/}
