@@ -24,6 +24,7 @@ import com.android.bookswap.data.DataUser
 import com.android.bookswap.data.MessageBox
 import com.android.bookswap.data.MessageType
 import com.android.bookswap.data.repository.MessageRepository
+import com.android.bookswap.data.repository.PhotoFirebaseStorageRepository
 import com.android.bookswap.ui.chat.ChatScreen
 import com.android.bookswap.ui.chat.ListChatScreen
 import com.android.bookswap.ui.chat.imageTestMessageUUID
@@ -43,12 +44,15 @@ class ChatEndToEnd {
 
   private lateinit var mockNavigationActions: NavigationActions
   private lateinit var mockMessageRepository: MockMessageRepository
+  private lateinit var mockPhotoStorage: PhotoFirebaseStorageRepository
   private val navigateToChatScreen = mutableStateOf(false)
   private val currentUserUUID = UUID.fromString("550e8400-e29b-41d4-a716-446655440002") // John Doe
   private val otherUserUUID = UUID.fromString("550e8400-e29b-41d4-a716-446655440001") // Other user
 
   @Before
   fun setup() {
+    mockPhotoStorage = mockk()
+
     // Initialize the mock message repository with placeholder messages
     mockMessageRepository = MockMessageRepository()
 
@@ -137,7 +141,9 @@ class ChatEndToEnd {
                     profilePictureUrl = "",
                     bookList = emptyList(),
                     googleUid = ""),
-            navController = mockNavigationActions)
+            navController = mockNavigationActions,
+            photoStorage = mockPhotoStorage,
+        )
       } else {
         ListChatScreen(
             placeHolderData =

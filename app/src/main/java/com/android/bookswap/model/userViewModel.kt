@@ -89,9 +89,7 @@ open class UserViewModel(
     }
   }
 
-  /*
-   * Get the user by the googleUid
-   */
+  /** Get the user by the googleUid */
   fun getUserByGoogleUid(googleUid: String) {
     userRepository.getUser(googleUid) { result ->
       // If the user is found, update the dataUser and set isLoaded to true

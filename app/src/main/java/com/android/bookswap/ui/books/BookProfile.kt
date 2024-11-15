@@ -40,6 +40,14 @@ import com.android.bookswap.data.DataBook
 import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.theme.ColorVariable
 
+/**
+ * Composable function to display the profile screen of a book.
+ *
+ * @param DataBook The data object containing book details.
+ * @param navController The navigation actions for navigating between screens.
+ * @param topAppBar A composable function to display the top app bar.
+ * @param bottomAppBar A composable function to display the bottom app bar.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BookProfileScreen(
@@ -195,7 +203,12 @@ fun BookProfileScreen(
             }
       }
 }
-
+/**
+ * Composable function to display a text with a specific style and test tag.
+ *
+ * @param text The text to be displayed.
+ * @param testTag The test tag for the text composable.
+ */
 @Composable
 fun ProfileText(text: String, testTag: String) {
   Text(

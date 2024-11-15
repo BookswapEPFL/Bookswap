@@ -13,7 +13,13 @@ import androidx.core.content.ContextCompat
 import com.google.firebase.messaging.FirebaseMessaging
 
 class PermissionHandler(private val activity: ComponentActivity) {
-
+  /**
+   * Launcher for requesting notification permission.
+   *
+   * This launcher is registered to handle the result of the permission request. If the permission
+   * is granted, notifications are enabled. If the permission is denied, the user is informed and a
+   * rationale dialog is shown.
+   */
   @RequiresApi(Build.VERSION_CODES.TIRAMISU)
   val requestPermissionLauncher: ActivityResultLauncher<String> =
       activity.registerForActivityResult(ActivityResultContracts.RequestPermission()) {
@@ -25,7 +31,13 @@ class PermissionHandler(private val activity: ComponentActivity) {
           showRationaleDialog()
         }
       }
-
+  /**
+   * Requests notification permission from the user.
+   *
+   * This function checks if the API level is 33 or higher (Android 13+). If the permission is
+   * already granted, it enables notifications. Otherwise, it directly requests the notification
+   * permission.
+   */
   fun askNotificationPermission() {
     // Check if the API level is 33 or higher (Android 13+)
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -44,14 +56,19 @@ class PermissionHandler(private val activity: ComponentActivity) {
       }
     }
   }
-
+  /** Enables notifications by initializing the FCM SDK and showing a confirmation message. */
   fun enableNotifications() {
     // Initialize FCM SDK
     FirebaseMessaging.getInstance().isAutoInitEnabled = true
     // Additional setup if needed
     Toast.makeText(activity, "Notifications have been enabled.", Toast.LENGTH_LONG).show()
   }
-
+  /**
+   * Informs the user that notifications are disabled.
+   *
+   * This function displays a Toast message to inform the user that notifications are disabled and
+   * they will not receive updates.
+   */
   fun informUserNotificationsDisabled() {
     // Code to inform the user that notifications are disabled
     // For example, you might show a Toast or a Snackbar
@@ -62,7 +79,12 @@ class PermissionHandler(private val activity: ComponentActivity) {
             Toast.LENGTH_LONG)
         .show()
   }
-
+  /**
+   * Shows a rationale dialog to the user explaining why notification permission is required.
+   *
+   * This dialog is displayed when the user denies the notification permission request. It provides
+   * an explanation and prompts the user to grant the permission.
+   */
   @RequiresApi(Build.VERSION_CODES.TIRAMISU)
   private fun showRationaleDialog() {
     AlertDialog.Builder(activity)

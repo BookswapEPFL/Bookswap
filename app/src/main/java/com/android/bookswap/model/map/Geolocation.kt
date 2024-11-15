@@ -44,7 +44,12 @@ class Geolocation(private val activity: Activity) : IGeolocation {
         fastestInterval = 5000 // Fastest update interval in milliseconds
         priority = LocationRequest.PRIORITY_HIGH_ACCURACY
       }
-
+  /**
+   * Callback for location updates.
+   *
+   * This callback is triggered whenever the location is updated. It updates the `latitude` and
+   * `longitude` state flows with the new location data.
+   */
   private val locationCallback =
       object : LocationCallback() {
         override fun onLocationResult(p0: LocationResult) {

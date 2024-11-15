@@ -21,7 +21,11 @@ private val PADDING_DP = 16.dp
 private val BUTTON_SIZE_DP = 40.dp
 private val ICON_SIZE_DP = 32.dp
 private val BUTTON_CORNER_RADIUS_DP = 50.dp
-
+/**
+ * A composable function that creates a filter button with an icon.
+ *
+ * @param onClick A lambda function to be executed when the button is clicked.
+ */
 @Composable
 fun FilterButton(onClick: () -> Unit) {
   Box(modifier = Modifier.padding(PADDING_DP)) {

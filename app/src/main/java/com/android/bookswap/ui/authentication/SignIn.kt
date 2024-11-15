@@ -58,6 +58,12 @@ import com.google.firebase.auth.auth
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
+/**
+ * Composable function for the SignIn screen.
+ *
+ * @param navigationActions Actions to navigate between screens.
+ * @param userVM ViewModel for user-related operations.
+ */
 @Composable
 fun SignInScreen(
     navigationActions: NavigationActions,
@@ -95,7 +101,6 @@ fun SignInScreen(
     when (isStored) {
       true -> navigationActions.navigateTo(TopLevelDestinations.MAP)
       false -> {
-        userVM.updateGoogleUid(googleUid)
         navigationActions.navigateTo(Screen.NEW_USER)
       }
       null -> {} // Attendre que `isStored` soit défini
@@ -165,7 +170,15 @@ fun SignInScreen(
         }
       })
 }
-
+/**
+ * Get the user by the googleUid.
+ *
+ * This function fetches the user data associated with the provided googleUid. If the user is found,
+ * it updates the dataUser and sets isLoaded to true. If the user is not found, it sets isLoaded to
+ * false.
+ *
+ * @param googleUid The Google UID of the user to fetch.
+ */
 @Composable
 fun GoogleSignInButton(onSignInClick: () -> Unit) {
   Button(
@@ -199,7 +212,17 @@ fun GoogleSignInButton(onSignInClick: () -> Unit) {
             }
       }
 }
-
+/**
+ * Remembers a Firebase authentication launcher for signing in with Google.
+ *
+ * This function creates and remembers a `ManagedActivityResultLauncher` that handles the Firebase
+ * authentication process using Google Sign-In. It launches the Google Sign-In intent, retrieves the
+ * Google account, and signs in with Firebase using the obtained credentials.
+ *
+ * @param onAuthComplete Callback function to be invoked when authentication is successful.
+ * @param onAuthError Callback function to be invoked when an authentication error occurs.
+ * @return A `ManagedActivityResultLauncher` for handling the Google Sign-In intent.
+ */
 @Composable
 fun rememberFirebaseAuthLauncher(
     onAuthComplete: (AuthResult) -> Unit,

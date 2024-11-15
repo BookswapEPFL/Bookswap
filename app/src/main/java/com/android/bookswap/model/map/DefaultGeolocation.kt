@@ -20,17 +20,32 @@ class DefaultGeolocation : IGeolocation {
   override val latitude = MutableStateFlow(0.0)
   override val longitude = MutableStateFlow(0.0)
   private val isRunning = mutableStateOf(false)
-
+  /**
+   * Starts location updates.
+   *
+   * This function sets the `isRunning` state to `true` and logs a message indicating that the
+   * default geolocation has started.
+   */
   override fun startLocationUpdates() {
     isRunning.value = true
     Log.d("DefaultGeolocation", "Using default geolocation start")
   }
-
+  /**
+   * Stops location updates.
+   *
+   * This function sets the `isRunning` state to `false` and logs a message indicating that the
+   * default geolocation has stopped.
+   */
   override fun stopLocationUpdates() {
     isRunning.value = false
     Log.d("DefaultGeolocation", "Using default geolocation stop")
   }
-
+  /**
+   * Updates the current location if location updates are running.
+   *
+   * @param latitude The new latitude value.
+   * @param longitude The new longitude value.
+   */
   fun moveLocation(latitude: Double, longitude: Double) {
     if (isRunning.value) {
       this.latitude.value = latitude

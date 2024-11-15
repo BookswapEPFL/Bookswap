@@ -77,13 +77,12 @@ fun NewUserScreen(navigationActions: NavigationActions, userVM: UserViewModel) {
   val firstNameError = remember { mutableStateOf<String?>(null) }
   val lastNameError = remember { mutableStateOf<String?>(null) }
 
-  // Fonctions de validation
   fun validateEmail(input: String): Boolean {
     return android.util.Patterns.EMAIL_ADDRESS.matcher(input).matches()
   }
 
   fun validatePhone(input: String): Boolean {
-    return input.matches(Regex("^\\+?\\d{10,15}$"))
+    return input.matches(Regex("^\\+?\\d{10,15}$")) // Matches phone numbers with 10 to 15 digits
   }
 
   fun validateNonEmpty(input: String): Boolean {
