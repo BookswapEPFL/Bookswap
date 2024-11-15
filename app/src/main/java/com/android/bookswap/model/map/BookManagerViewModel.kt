@@ -54,7 +54,13 @@ class BookManagerViewModel(
   val filteredUsers: StateFlow<List<UserBooksWithLocation>> = _filteredUsers.asStateFlow()
 
   private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
-
+  /**
+   * Starts updating books and user distances.
+   *
+   * This function launches a coroutine that continuously fetches books from the repository at a
+   * fixed interval defined by `REFRESH_TIME_DELAY`. It also initiates the computation of user
+   * distances and combines the flows to filter books based on user preferences.
+   */
   fun startUpdatingBooks() {
     scope.launch {
       while (true) {
@@ -65,12 +71,20 @@ class BookManagerViewModel(
     computeDistanceOfUsers()
     combineFlowsAndFilterBooks()
   }
-
+  /** Stops updating books by canceling the coroutine scope. */
   fun stopUpdatingBooks() {
     scope.cancel()
   }
 
-  // Fetch books and users from the repository and update `_allBooks` and `_allUsers`
+  /**
+   * Fetches books and users from the repository and updates the `_allBooks` and `_allUsers` state
+   * flows.
+   *
+   * This function attempts to fetch books and users from their respective repositories. It retries
+   * the fetch operation up to `MAXIMUM_RETRIES` times if it fails. If the fetch is successful, it
+   * updates the `_allBooks` and `_allUsers` state flows with the retrieved data. If all retries
+   * fail, it logs an error message.
+   */
   private suspend fun fetchBooksFromRepository() {
     var successBooks = false
     var successUsers = false
@@ -106,7 +120,14 @@ class BookManagerViewModel(
     }
   }
 
-  // Combine books and filter flows and apply filtering logic
+  /**
+   * Combines the flows of books, user distances, and book filters, and applies the filtering logic.
+   *
+   * This function launches a coroutine that combines the flows of all books, user distances, genres
+   * filter, and languages filter. It maps the user distances to `UserBooksWithLocation` objects,
+   * filters the books based on the selected genres and languages, and updates the `_filteredBooks`
+   * and `_filteredUsers` state flows with the filtered results.
+   */
   private fun combineFlowsAndFilterBooks() {
     scope.launch {
       combine(_allBooks, _allUserDistance, bookFilter.genresFilter, bookFilter.languagesFilter) {
@@ -132,7 +153,14 @@ class BookManagerViewModel(
           .collect()
     }
   }
-
+  /**
+   * Computes the distance of users from the current location.
+   *
+   * This function combines the flows of all users, current latitude, and current longitude,
+   * calculates the distance of each user from the current location using the provided
+   * `computingDistanceMethod`, sorts the users by distance, and updates the `_allUserDistance`
+   * state flow with the sorted results.
+   */
   private fun computeDistanceOfUsers() {
     scope.launch {
       combine(_allUsers, geolocation.latitude, geolocation.longitude) { users, latitude, longitude

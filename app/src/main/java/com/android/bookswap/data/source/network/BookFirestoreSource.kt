@@ -15,10 +15,13 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-// A class that implements the BooksRepository interface using Firebase Firestore as the data source
+/**
+ * Firestore implementation of the BooksRepository.
+ *
+ * @param db the Firestore database instance
+ */
 class BooksFirestoreSource(private val db: FirebaseFirestore) : BooksRepository {
 
-  // Name of the Firestore collection that stores books
   private val collectionBooks = "Books"
 
   private val books_ = MutableStateFlow<List<DataBook>>(emptyList())
@@ -27,9 +30,13 @@ class BooksFirestoreSource(private val db: FirebaseFirestore) : BooksRepository 
   // Selected todo, i.e the todo for the detail view
   private val selectedBook_ = MutableStateFlow<DataBook?>(null)
   val selectedBook: StateFlow<DataBook?> = selectedBook_.asStateFlow()
-  // Use this code in editBookScreen and modify the editBookScreen structure if needed when
-  // incorporating in the app navigation
 
+  /**
+   * Initializes the Firestore source by adding an authentication state listener. Calls the
+   * onSuccess callback if the user is authenticated.
+   *
+   * @param onSuccess Callback to be invoked when the user is authenticated.
+   */
   override fun init(onSuccess: () -> Unit) {
     Firebase.auth.addAuthStateListener {
       if (it.currentUser != null) {
@@ -37,11 +44,20 @@ class BooksFirestoreSource(private val db: FirebaseFirestore) : BooksRepository 
       }
     }
   }
-
+  /**
+   * Generates a new UUID.
+   *
+   * @return a randomly generated UUID
+   */
   override fun getNewUUID(): UUID {
     return UUID.randomUUID()
   }
-
+  /**
+   * Fetches the list of books from the Firestore database.
+   *
+   * @param callback Callback to be invoked with the result of the operation. The result is a list
+   *   of DataBook objects on success, or an exception on failure.
+   */
   override fun getBook(callback: (Result<List<DataBook>>) -> Unit) {
     db.collection(collectionBooks).get().addOnCompleteListener { task ->
       if (task.isSuccessful) {
@@ -53,7 +69,13 @@ class BooksFirestoreSource(private val db: FirebaseFirestore) : BooksRepository 
       }
     }
   }
-
+  /**
+   * Adds a new book to the Firestore database.
+   *
+   * @param dataBook The DataBook object containing the book details.
+   * @param callback Callback to be invoked with the result of the operation. The result is Unit on
+   *   success, or an exception on failure.
+   */
   override fun addBook(dataBook: DataBook, callback: (Result<Unit>) -> Unit) {
     // Check if essential fields are non-null before attempting to save
     if (dataBook.title.isBlank() ||
@@ -79,18 +101,36 @@ class BooksFirestoreSource(private val db: FirebaseFirestore) : BooksRepository 
           callback(result)
         }
   }
-
+  /**
+   * Updates an existing book in the Firestore database.
+   *
+   * @param dataBook The DataBook object containing the updated book details.
+   * @param callback Callback to be invoked with the result of the operation. The result is Unit on
+   *   success, or an exception on failure.
+   */
   override fun updateBook(dataBook: DataBook, callback: (Result<Unit>) -> Unit) {
     performFirestoreOperation(
         db.collection(collectionBooks).document(dataBook.uuid.toString()).set(dataBook), callback)
   }
-
+  /**
+   * Deletes a book from the Firestore database.
+   *
+   * @param uuid The UUID of the book to be deleted.
+   * @param dataBook The DataBook object containing the book details.
+   * @param callback Callback to be invoked with the result of the operation. The result is Unit on
+   *   success, or an exception on failure.
+   */
   override fun deleteBooks(uuid: UUID, dataBook: DataBook, callback: (Result<Unit>) -> Unit) {
     performFirestoreOperation(
         db.collection(collectionBooks).document(dataBook.uuid.toString()).delete(), callback)
   }
-  // Maps a Firestore document to a DataBook object
-  // If any required field is missing, returns null to avoid incomplete objects
+  /**
+   * Maps a Firestore document to a DataBook object. If any required field is missing, returns null
+   * to avoid incomplete objects.
+   *
+   * @param document The Firestore document to be converted.
+   * @return A DataBook object if all required fields are present, null otherwise.
+   */
   fun documentToBooks(document: DocumentSnapshot): DataBook? {
     return try {
       val mostSignificantBits = document.getLong("uuid.mostSignificantBits") ?: return null

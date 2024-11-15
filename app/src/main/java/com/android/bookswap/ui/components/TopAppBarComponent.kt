@@ -13,6 +13,13 @@ import com.android.bookswap.ui.theme.ColorVariable
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
+/**
+ * A composable function that displays a top app bar with a title, back button, and profile icon.
+ *
+ * @param modifier A [Modifier] for this composable.
+ * @param navigationActions An instance of [NavigationActions] to handle navigation events.
+ * @param title The title to be displayed in the top app bar. Defaults to the current route.
+ */
 fun TopAppBarComponent(
     modifier: Modifier = Modifier,
     navigationActions: NavigationActions,

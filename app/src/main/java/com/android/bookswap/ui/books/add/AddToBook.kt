@@ -35,7 +35,13 @@ import com.android.bookswap.ui.theme.ColorVariable.BackGround
 import java.util.UUID
 
 private const val HORIZONTAL_PADDING = 30
-
+/**
+ * Composable function to display the screen for adding a new book.
+ *
+ * @param repository The repository to interact with book data.
+ * @param topAppBar A composable function to display the top app bar.
+ * @param bottomAppBar A composable function to display the bottom app bar.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddToBookScreen(
@@ -206,7 +212,21 @@ fun AddToBookScreen(
             }
       })
 }
-
+/**
+ * Creates a DataBook instance after validating the input parameters.
+ *
+ * @param context The context for showing Toast messages.
+ * @param uuid The unique identifier for the book.
+ * @param title The title of the book.
+ * @param author The author of the book.
+ * @param description The description of the book.
+ * @param ratingStr The rating of the book as a string.
+ * @param photo The URL of the book's photo.
+ * @param bookLanguageStr The language of the book as a string.
+ * @param isbn The ISBN of the book.
+ * @param genres The list of genres the book belongs to.
+ * @return A DataBook instance if all validations pass, null otherwise.
+ */
 fun createDataBook(
     context: Context,
     uuid: UUID,

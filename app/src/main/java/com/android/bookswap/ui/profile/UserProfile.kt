@@ -29,6 +29,15 @@ import com.android.bookswap.model.UserViewModel
 import com.android.bookswap.ui.components.ButtonComponent
 import com.android.bookswap.ui.theme.*
 
+/**
+ * Composable function to display the user profile screen.
+ *
+ * @param userVM The ViewModel containing user data. Defaults to a new UserViewModel instance.
+ * @param topAppBar A composable function to display the top app bar. Defaults to an empty
+ *   composable.
+ * @param bottomAppBar A composable function to display the bottom app bar. Defaults to an empty
+ *   composable.
+ */
 @Composable
 fun UserProfile(
     userVM: UserViewModel = UserViewModel(java.util.UUID.randomUUID()),

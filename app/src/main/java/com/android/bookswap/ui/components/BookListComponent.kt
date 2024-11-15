@@ -16,7 +16,17 @@ import androidx.compose.ui.unit.Dp
 import com.android.bookswap.data.DataBook
 
 val DIVIDER_THICKNESS_DP = Dp.Hairline
-
+/**
+ * Displays a list of books in a lazy column.
+ *
+ * This composable function takes a list of `DataBook` objects and displays them in a scrollable
+ * column. If the list is empty, it shows a message indicating that there are no books to display.
+ * Each book is displayed using the `BookDisplayComponent` composable, and a horizontal divider is
+ * placed between each book item.
+ *
+ * @param modifier The modifier to be applied to the LazyColumn.
+ * @param bookList The list of `DataBook` objects to be displayed. Defaults to an empty list.
+ */
 @Composable
 fun BookListComponent(
     modifier: Modifier = Modifier,
