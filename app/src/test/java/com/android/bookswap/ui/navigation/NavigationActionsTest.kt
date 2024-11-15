@@ -15,12 +15,18 @@ import io.mockk.runs
 import io.mockk.verify
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.MatcherAssert.assertThat
+import org.junit.Before
 import org.junit.Test
 
 class NavigationActionsTest {
   private val navigationDestination: NavDestination = mockk()
   private val navHostController: NavHostController = mockk()
   private val navigationActions: NavigationActions = NavigationActions(navHostController)
+
+  @Before
+  fun setup() {
+    every { navHostController.currentDestination } returns navigationDestination
+  }
 
   @Test
   fun navigateToTopLevelDestination() {
