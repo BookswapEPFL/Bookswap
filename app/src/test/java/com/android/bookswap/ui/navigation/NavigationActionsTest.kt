@@ -25,6 +25,7 @@ class NavigationActionsTest {
 
   @Before
   fun setup() {
+    every { navigationDestination.route } returns "test"
     every { navHostController.currentDestination } returns navigationDestination
   }
 
