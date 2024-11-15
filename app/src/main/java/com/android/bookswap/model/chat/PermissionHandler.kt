@@ -15,7 +15,8 @@ import com.google.firebase.messaging.FirebaseMessaging
 class PermissionHandler(private val activity: ComponentActivity) {
 
   @RequiresApi(Build.VERSION_CODES.TIRAMISU)
-  val requestPermissionLauncher: ActivityResultLauncher<String> = activity.registerForActivityResult(ActivityResultContracts.RequestPermission()) {
+  val requestPermissionLauncher: ActivityResultLauncher<String> =
+      activity.registerForActivityResult(ActivityResultContracts.RequestPermission()) {
           isGranted: Boolean ->
         if (isGranted) {
           enableNotifications()
@@ -38,7 +39,7 @@ class PermissionHandler(private val activity: ComponentActivity) {
         // Case 2: No need to show rationale, directly request permission
         else -> {
           // Directly request the notification permission
-           requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+          requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
         }
       }
     }

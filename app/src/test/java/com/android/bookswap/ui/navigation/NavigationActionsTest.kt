@@ -24,7 +24,7 @@ class NavigationActionsTest {
 
   @Test
   fun navigateToTopLevelDestination() {
-    every { navHostController.navigate(any(), any<(NavOptionsBuilder) -> Unit>())} just runs
+    every { navHostController.navigate(any(), any<(NavOptionsBuilder) -> Unit>()) } just runs
     navigationActions.navigateTo(TopLevelDestinations.CHAT)
     verify { navHostController.navigate(Route.CHAT, any<(NavOptionsBuilder) -> Unit>()) }
 
@@ -40,7 +40,7 @@ class NavigationActionsTest {
 
   @Test
   fun navigateToScreen() {
-    every { navHostController.navigate(any<String>(), any(), any())} just runs
+    every { navHostController.navigate(any<String>(), any(), any()) } just runs
 
     navigationActions.navigateTo(Screen.MAP)
     verify { navHostController.navigate(Screen.MAP) }

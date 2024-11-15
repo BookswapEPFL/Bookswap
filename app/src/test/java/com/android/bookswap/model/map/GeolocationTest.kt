@@ -31,42 +31,53 @@ import org.robolectric.annotation.Config
 class GeolocationTest {
 
   private val mockActivity: Activity = mockk()
-    private val mockFusedLocationClient: FusedLocationProviderClient = mockk()
+  private val mockFusedLocationClient: FusedLocationProviderClient = mockk()
   private lateinit var geolocation: Geolocation
 
   @Before
   fun setup() {
     // Mock static method for FusedLocationProviderClient
     mockkStatic(LocationServices::class)
-    every { LocationServices.getFusedLocationProviderClient(mockActivity) } returns mockFusedLocationClient
+    every { LocationServices.getFusedLocationProviderClient(mockActivity) } returns
+        mockFusedLocationClient
 
-      mockkStatic(ActivityCompat::class)
-      every { ActivityCompat.checkSelfPermission(mockActivity, Manifest.permission.ACCESS_FINE_LOCATION) } returns PackageManager.PERMISSION_GRANTED
-      every { ActivityCompat.checkSelfPermission(mockActivity, Manifest.permission.ACCESS_COARSE_LOCATION) } returns PackageManager.PERMISSION_GRANTED
+    mockkStatic(ActivityCompat::class)
+    every {
+      ActivityCompat.checkSelfPermission(mockActivity, Manifest.permission.ACCESS_FINE_LOCATION)
+    } returns PackageManager.PERMISSION_GRANTED
+    every {
+      ActivityCompat.checkSelfPermission(mockActivity, Manifest.permission.ACCESS_COARSE_LOCATION)
+    } returns PackageManager.PERMISSION_GRANTED
 
-      geolocation =  Geolocation(mockActivity)
+    geolocation = Geolocation(mockActivity)
   }
 
   @Test
   fun `startLocationUpdates should request location updates if permissions are granted`() {
     // Mock the permission check to return true
-      every { mockActivity.checkPermission(Manifest.permission.ACCESS_BACKGROUND_LOCATION, any(), any()) } returns PackageManager.PERMISSION_GRANTED
+    every {
+      mockActivity.checkPermission(Manifest.permission.ACCESS_BACKGROUND_LOCATION, any(), any())
+    } returns PackageManager.PERMISSION_GRANTED
 
-      every { mockFusedLocationClient.requestLocationUpdates(any(), any(), Looper.getMainLooper()) } returns Tasks.forResult(null)
-      geolocation.startLocationUpdates()
+    every {
+      mockFusedLocationClient.requestLocationUpdates(any(), any(), Looper.getMainLooper())
+    } returns Tasks.forResult(null)
+    geolocation.startLocationUpdates()
 
-
-      verify { mockFusedLocationClient.requestLocationUpdates(any(), any(), Looper.getMainLooper()) }
+    verify { mockFusedLocationClient.requestLocationUpdates(any(), any(), Looper.getMainLooper()) }
     assertEquals(true, geolocation.isRunning.value)
   }
 
   @Config(sdk = [30])
   @Test
   fun `startLocationUpdates should request permissions if not granted`() {
-      every { ActivityCompat.checkSelfPermission(
-          mockActivity, Manifest.permission.ACCESS_FINE_LOCATION) } returns PackageManager.PERMISSION_DENIED
-      every { ActivityCompat.checkSelfPermission(
-          mockActivity, Manifest.permission.ACCESS_BACKGROUND_LOCATION) } returns PackageManager.PERMISSION_DENIED
+    every {
+      ActivityCompat.checkSelfPermission(mockActivity, Manifest.permission.ACCESS_FINE_LOCATION)
+    } returns PackageManager.PERMISSION_DENIED
+    every {
+      ActivityCompat.checkSelfPermission(
+          mockActivity, Manifest.permission.ACCESS_BACKGROUND_LOCATION)
+    } returns PackageManager.PERMISSION_DENIED
 
     // Mock ActivityCompat.requestPermissions (static method)
     mockkStatic(ActivityCompat::class)
@@ -90,14 +101,18 @@ class GeolocationTest {
   @Config(sdk = [30])
   @Test
   fun `startLocationUpdates should request background permissions if not granted`() {
-      every { ActivityCompat.checkSelfPermission(
-          mockActivity, Manifest.permission.ACCESS_BACKGROUND_LOCATION) } returns PackageManager.PERMISSION_DENIED
+    every {
+      ActivityCompat.checkSelfPermission(
+          mockActivity, Manifest.permission.ACCESS_BACKGROUND_LOCATION)
+    } returns PackageManager.PERMISSION_DENIED
 
     // Mock ActivityCompat.requestPermissions (static method)
     mockkStatic(ActivityCompat::class)
 
     every { ActivityCompat.requestPermissions(any(), any(), any()) } just Runs
-      every { mockFusedLocationClient.requestLocationUpdates(any(), any(), Looper.getMainLooper()) } returns Tasks.forResult(null)
+    every {
+      mockFusedLocationClient.requestLocationUpdates(any(), any(), Looper.getMainLooper())
+    } returns Tasks.forResult(null)
 
     geolocation.startLocationUpdates()
 
@@ -113,10 +128,13 @@ class GeolocationTest {
   @Config(sdk = [28])
   @Test
   fun `startLocationUpdates should request permissions If not granted API 28`() {
-      every { ActivityCompat.checkSelfPermission(
-          mockActivity, Manifest.permission.ACCESS_FINE_LOCATION) } returns PackageManager.PERMISSION_DENIED
-      every { ActivityCompat.checkSelfPermission(
-          mockActivity, Manifest.permission.ACCESS_BACKGROUND_LOCATION) } returns PackageManager.PERMISSION_DENIED
+    every {
+      ActivityCompat.checkSelfPermission(mockActivity, Manifest.permission.ACCESS_FINE_LOCATION)
+    } returns PackageManager.PERMISSION_DENIED
+    every {
+      ActivityCompat.checkSelfPermission(
+          mockActivity, Manifest.permission.ACCESS_BACKGROUND_LOCATION)
+    } returns PackageManager.PERMISSION_DENIED
 
     // Mock ActivityCompat.requestPermissions (static method)
     mockkStatic(ActivityCompat::class)
@@ -144,15 +162,20 @@ class GeolocationTest {
 
   @Test
   fun `stopLocationUpdates should remove location updates`() {
-      every { mockFusedLocationClient.requestLocationUpdates(any(), any(), Looper.getMainLooper()) } returns Tasks.forResult(null)
-      every { mockFusedLocationClient.removeLocationUpdates(any<LocationCallback>()) } returns Tasks.forResult(null)
-      every { mockActivity.checkPermission(Manifest.permission.ACCESS_BACKGROUND_LOCATION, any(), any()) } returns PackageManager.PERMISSION_GRANTED
+    every {
+      mockFusedLocationClient.requestLocationUpdates(any(), any(), Looper.getMainLooper())
+    } returns Tasks.forResult(null)
+    every { mockFusedLocationClient.removeLocationUpdates(any<LocationCallback>()) } returns
+        Tasks.forResult(null)
+    every {
+      mockActivity.checkPermission(Manifest.permission.ACCESS_BACKGROUND_LOCATION, any(), any())
+    } returns PackageManager.PERMISSION_GRANTED
 
-      geolocation.startLocationUpdates()
+    geolocation.startLocationUpdates()
     geolocation.stopLocationUpdates()
 
     // Verify that removeLocationUpdates was called with the correct callback
-      verify { mockFusedLocationClient.removeLocationUpdates(any<LocationCallback>()) }
+    verify { mockFusedLocationClient.removeLocationUpdates(any<LocationCallback>()) }
     assertEquals(false, geolocation.isRunning.value)
   }
 
@@ -164,15 +187,17 @@ class GeolocationTest {
 
   @Test
   fun `latitude and longitude should be updated in location callback`() {
-      every { mockActivity.checkPermission(Manifest.permission.ACCESS_BACKGROUND_LOCATION, any(), any()) } returns PackageManager.PERMISSION_GRANTED
+    every {
+      mockActivity.checkPermission(Manifest.permission.ACCESS_BACKGROUND_LOCATION, any(), any())
+    } returns PackageManager.PERMISSION_GRANTED
 
-      val mockLocation: Location = mockk()
-      every { mockLocation.latitude } returns 37.7749
-      every { mockLocation.longitude } returns -122.4194
+    val mockLocation: Location = mockk()
+    every { mockLocation.latitude } returns 37.7749
+    every { mockLocation.longitude } returns -122.4194
 
     // Mock LocationResult to return the mock location
     val mockLocationResult: LocationResult = mockk()
-      every { mockLocationResult.lastLocation } returns mockLocation
+    every { mockLocationResult.lastLocation } returns mockLocation
 
     val locationCallbackSlot = slot<LocationCallback>()
     mockkObject(mockFusedLocationClient)

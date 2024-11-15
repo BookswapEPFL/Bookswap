@@ -13,11 +13,11 @@ import com.google.firebase.firestore.util.Assert.fail
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import java.util.UUID
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
-import java.util.UUID
 
 @RunWith(RobolectricTestRunner::class)
 class UserFirestoreSourceTest {
@@ -55,21 +55,22 @@ class UserFirestoreSourceTest {
 
     every { mockQuerySnapshot.documents } returns listOf(mockDocumentSnapshot)
 
+    every { mockDocumentSnapshot.getLong("userUUID.mostSignificantBits") } returns
+        testUser.userUUID.mostSignificantBits
+    every { mockDocumentSnapshot.getLong("userUUID.leastSignificantBits") } returns
+        testUser.userUUID.leastSignificantBits
+    every { mockDocumentSnapshot.getString("greeting") } returns testUser.greeting
+    every { mockDocumentSnapshot.getString("firstName") } returns testUser.firstName
 
-    every { mockDocumentSnapshot.getLong("userUUID.mostSignificantBits") } returns testUser.userUUID.mostSignificantBits
-            every { mockDocumentSnapshot.getLong("userUUID.leastSignificantBits") } returns testUser.userUUID.leastSignificantBits
-            every { mockDocumentSnapshot.getString("greeting") } returns testUser.greeting
-            every { mockDocumentSnapshot.getString("firstName") } returns testUser.firstName
+    every { mockDocumentSnapshot.getString("lastName") } returns testUser.lastName
 
-            every { mockDocumentSnapshot.getString("lastName") } returns testUser.lastName
-
-            every { mockDocumentSnapshot.getString("email") } returns testUser.email
-            every { mockDocumentSnapshot.getString("phoneNumber") } returns testUser.phoneNumber
-            every { mockDocumentSnapshot.getDouble("latitude") } returns testUser.latitude
-            every { mockDocumentSnapshot.getDouble("longitude") } returns testUser.longitude
-            every { mockDocumentSnapshot.getString("profilePictureUrl") } returns testUser.profilePictureUrl
+    every { mockDocumentSnapshot.getString("email") } returns testUser.email
+    every { mockDocumentSnapshot.getString("phoneNumber") } returns testUser.phoneNumber
+    every { mockDocumentSnapshot.getDouble("latitude") } returns testUser.latitude
+    every { mockDocumentSnapshot.getDouble("longitude") } returns testUser.longitude
+    every { mockDocumentSnapshot.getString("profilePictureUrl") } returns testUser.profilePictureUrl
     every { mockDocumentSnapshot.get("bookList") } returns testUser.bookList
-  every { mockDocumentSnapshot.getString("googleUid") } returns testUser.googleUid
+    every { mockDocumentSnapshot.getString("googleUid") } returns testUser.googleUid
   }
 
   @Test
@@ -135,7 +136,6 @@ class UserFirestoreSourceTest {
 
     // Verify Firestore collection was accessed
     verify { mockDocumentReference.set(testUser) }
-
   }
 
   @Test

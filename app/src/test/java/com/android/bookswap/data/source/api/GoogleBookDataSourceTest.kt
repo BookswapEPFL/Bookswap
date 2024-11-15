@@ -11,38 +11,37 @@ import io.mockk.mockk
 import io.mockk.mockkStatic
 import io.mockk.spyk
 import io.mockk.verify
+import java.util.UUID
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
-import java.util.UUID
 
 @RunWith(RobolectricTestRunner::class)
 class GoogleBookDataSourceTest {
-    private lateinit var mockGoogleBookDataSource: GoogleBookDataSource
+  private lateinit var mockGoogleBookDataSource: GoogleBookDataSource
 
-    @Before
-    fun setup() {
-        val mockContext: Context = mockk()
-        val mockQueue: RequestQueue = mockk()
-        mockkStatic(Volley::class)
-        every { Volley.newRequestQueue(any()) } returns mockQueue
+  @Before
+  fun setup() {
+    val mockContext: Context = mockk()
+    val mockQueue: RequestQueue = mockk()
+    mockkStatic(Volley::class)
+    every { Volley.newRequestQueue(any()) } returns mockQueue
 
-        mockGoogleBookDataSource = spyk(GoogleBookDataSource(mockContext))
-    }
+    mockGoogleBookDataSource = spyk(GoogleBookDataSource(mockContext))
+  }
+
   @Test
   fun `ISBN input validation`() {
 
     val callback: (Result<DataBook>) -> Unit = mockk()
-      every { callback(any()) } answers {
-          assertTrue(firstArg<Result<DataBook>>().isFailure)
-      }
+    every { callback(any()) } answers { assertTrue(firstArg<Result<DataBook>>().isFailure) }
 
     mockGoogleBookDataSource.getBookFromISBN("01a3456789", callback)
     mockGoogleBookDataSource.getBookFromISBN("01234567890", callback)
 
-  verify(exactly = 2) { callback(any()) }
+    verify(exactly = 2) { callback(any()) }
   }
 
   @Test
@@ -93,8 +92,6 @@ class GoogleBookDataSourceTest {
             language = BookLanguages.ENGLISH,
             isbn = "9780435123437")
 
-
-
     assertBookEquals(dataBook, mockGoogleBookDataSource.parseISBNResponse(jsonBook).getOrNull())
   }
 
@@ -102,7 +99,7 @@ class GoogleBookDataSourceTest {
   fun `parseISBNResponse fail when json is wrong`() {
     val brokenJSON = "BROKEN JSON"
 
-      assertTrue(mockGoogleBookDataSource.parseISBNResponse(brokenJSON).isFailure)
+    assertTrue(mockGoogleBookDataSource.parseISBNResponse(brokenJSON).isFailure)
   }
 
   @Test
@@ -142,7 +139,7 @@ class GoogleBookDataSourceTest {
     """
             .trimIndent()
 
-      assertTrue(mockGoogleBookDataSource.parseISBNResponse(missingTitleJson).isFailure)
+    assertTrue(mockGoogleBookDataSource.parseISBNResponse(missingTitleJson).isFailure)
   }
 
   @Test

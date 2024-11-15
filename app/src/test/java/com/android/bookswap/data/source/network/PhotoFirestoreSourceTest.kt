@@ -14,6 +14,7 @@ import com.google.firebase.firestore.QuerySnapshot
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import java.util.UUID
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
@@ -22,7 +23,6 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
-import java.util.UUID
 
 @RunWith(RobolectricTestRunner::class)
 class PhotoFirestoreSourceTest {
@@ -45,14 +45,14 @@ class PhotoFirestoreSourceTest {
     val context = ApplicationProvider.getApplicationContext<Context>()
     val bitmap = BitmapFactory.decodeResource(context.resources, R.drawable.etranger_test)
 
-    testPhoto = DataPhoto(
+    testPhoto =
+        DataPhoto(
             uuid = UUID.randomUUID(),
-    url = "", // Optional url field (don't know if it is really useful)
-    timestamp = System.currentTimeMillis(),
-    base64 = photoFirestoreSource.bitmapToBase64(bitmap)
-    )
+            url = "", // Optional url field (don't know if it is really useful)
+            timestamp = System.currentTimeMillis(),
+            base64 = photoFirestoreSource.bitmapToBase64(bitmap))
 
-    //Arrange snapshot
+    // Arrange snapshot
     every { mockDocumentReference.get() } returns Tasks.forResult(mockDocumentSnapshot)
     every { mockDocumentSnapshot.getString("uuid") } returns testPhoto.uuid.toString()
     every { mockDocumentSnapshot.getString("url") } returns testPhoto.url
