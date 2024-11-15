@@ -1,4 +1,0 @@
-<paths>
-    <!-- creates a reference to the cache folder that the system maintains -->
-    <cache-path name="temporary_camera_images" path="/" />
-</paths>
