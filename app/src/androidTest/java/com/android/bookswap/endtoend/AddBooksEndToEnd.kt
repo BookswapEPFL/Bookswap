@@ -12,6 +12,7 @@ import com.android.bookswap.data.repository.BooksRepository
 import com.android.bookswap.data.repository.MessageRepository
 import com.android.bookswap.data.repository.UsersRepository
 import com.android.bookswap.data.source.api.GoogleBookDataSource
+import com.android.bookswap.data.source.network.PhotoFirebaseStorageSource
 import com.android.bookswap.ui.navigation.Route
 import io.mockk.every
 import io.mockk.just
@@ -30,20 +31,20 @@ class AddBooksEndToEnd {
   private lateinit var mockMessageRepository: MessageRepository
   private lateinit var mockBookRepository: BooksRepository
   private lateinit var mockUserRepository: UsersRepository
+  private lateinit var mockPhotoStorage: PhotoFirebaseStorageSource
 
   private lateinit var mockedBook: DataBook
 
   @Before
   fun setUp() {
-    // Mocks pour les dépendances du repository
+
     mockMessageRepository = mockk()
     mockBookRepository = mockk()
     mockUserRepository = mockk()
+    mockPhotoStorage = mockk()
 
-    // Configuration du mock pour `addBook`
     every { mockBookRepository.addBook(any(), any()) } just runs
 
-    // Mock de `DataBook`
     mockedBook =
         DataBook(
             uuid = UUID.randomUUID(),
@@ -55,7 +56,6 @@ class AddBooksEndToEnd {
             photo = "https://example.com/greatgatsby.jpg",
             language = BookLanguages.ENGLISH)
 
-    // Utilisation de `mockkConstructor` pour simuler le constructeur de `GoogleBookDataSource`
     mockkConstructor(GoogleBookDataSource::class)
     every { anyConstructed<GoogleBookDataSource>().getBookFromISBN("9780743273565", any()) } answers
         {
@@ -63,14 +63,14 @@ class AddBooksEndToEnd {
           callback(Result.success(mockedBook)) // Simulation de succès avec `mockedBook`
         }
 
-    // Configuration de l’interface de test
     composeTestRule.setContent {
       MainActivity()
           .BookSwapApp(
               mockMessageRepository,
               mockBookRepository,
               mockUserRepository,
-              startDestination = Route.NEWBOOK)
+              startDestination = Route.NEWBOOK,
+              photoStorage = mockPhotoStorage)
     }
   }
 
