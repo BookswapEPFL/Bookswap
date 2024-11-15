@@ -75,7 +75,17 @@ fun SignInScreen(navigationActions: NavigationActions) { // Add this when naviga
             Toast.makeText(context, "Login Failed!", Toast.LENGTH_LONG).show()
           })
   val token = stringResource(R.string.default_web_client_id)
+  val isStored by userVM.isStored.collectAsState()
 
+  LaunchedEffect(isStored) {
+    when (isStored) {
+      true -> navigationActions.navigateTo(TopLevelDestinations.MAP)
+      false -> {
+        navigationActions.navigateTo(Screen.NEW_USER)
+      }
+      null -> {} // Attendre que `isStored` soit défini
+    }
+  }
   Scaffold(
       modifier = Modifier.fillMaxSize().testTag("SignInScreen"),
       containerColor = ColorVariable.BackGround, // Set the background color
