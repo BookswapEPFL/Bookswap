@@ -1,0 +1,770 @@
+Index: app/src/test/java/com/android/bookswap/data/source/network/BooksFirestoreRepositoryTest.kt
+===================================================================
+diff --git a/app/src/test/java/com/android/bookswap/data/source/network/BooksFirestoreRepositoryTest.kt b/app/src/test/java/com/android/bookswap/data/source/network/BooksFirestoreRepositoryTest.kt
+deleted file mode 100644
+--- a/app/src/test/java/com/android/bookswap/data/source/network/BooksFirestoreRepositoryTest.kt	(revision a4b4ff9ce46b22bc5fa8333c2fadf00309ca528b)
++++ /dev/null	(revision a4b4ff9ce46b22bc5fa8333c2fadf00309ca528b)
+@@ -1,226 +0,0 @@
+-package com.android.bookswap.data.source.network
+-
+-import androidx.test.core.app.ApplicationProvider
+-import com.android.bookswap.data.BookLanguages
+-import com.android.bookswap.data.DataBook
+-import com.google.android.gms.tasks.Tasks
+-import com.google.firebase.FirebaseApp
+-import com.google.firebase.firestore.CollectionReference
+-import com.google.firebase.firestore.DocumentReference
+-import com.google.firebase.firestore.DocumentSnapshot
+-import com.google.firebase.firestore.FirebaseFirestore
+-import com.google.firebase.firestore.QuerySnapshot
+-import com.google.firebase.firestore.util.Assert.fail
+-import java.util.UUID
+-import org.junit.Before
+-import org.junit.Test
+-import org.junit.runner.RunWith
+-import org.mockito.ArgumentMatchers
+-import org.mockito.Mock
+-import org.mockito.Mockito.`when`
+-import org.mockito.MockitoAnnotations
+-import org.mockito.kotlin.doAnswer
+-import org.mockito.kotlin.verify
+-import org.robolectric.RobolectricTestRunner
+-
+-@RunWith(RobolectricTestRunner::class)
+-class BooksFirestoreRepositoryTest {
+-
+-  @Mock private lateinit var mockFirestore: FirebaseFirestore
+-  @Mock private lateinit var mockCollectionReference: CollectionReference
+-  @Mock private lateinit var mockDocumentReference: DocumentReference
+-  @Mock private lateinit var mockDocumentSnapshot: DocumentSnapshot
+-  @Mock private lateinit var mockQuerySnapshot: QuerySnapshot
+-
+-  private lateinit var booksFirestorerRepository: BooksFirestoreRepository
+-
+-  private val testBook =
+-      DataBook(
+-          uuid = UUID.randomUUID(),
+-          title = "Test Book",
+-          author = "Test Author",
+-          description = "Test Description",
+-          rating = 5,
+-          photo = null,
+-          language = BookLanguages.ENGLISH,
+-          isbn = "1234567890")
+-
+-  @Before
+-  fun setUp() {
+-    MockitoAnnotations.openMocks(this)
+-
+-    // Initialize Firebase if necessary
+-    if (FirebaseApp.getApps(ApplicationProvider.getApplicationContext()).isEmpty()) {
+-      FirebaseApp.initializeApp(ApplicationProvider.getApplicationContext())
+-    }
+-
+-    booksFirestorerRepository = BooksFirestoreRepository(mockFirestore)
+-
+-    `when`(mockFirestore.collection(ArgumentMatchers.any())).thenReturn(mockCollectionReference)
+-    `when`(mockCollectionReference.document(ArgumentMatchers.any()))
+-        .thenReturn(mockDocumentReference)
+-    `when`(mockCollectionReference.get()).thenReturn(Tasks.forResult(mockQuerySnapshot))
+-  }
+-
+-  @Test
+-  fun getbook_callsFirestoreGet() {
+-    // Arrange
+-    `when`(mockDocumentSnapshot.getString("title")).thenReturn(testBook.title)
+-    `when`(mockDocumentSnapshot.getString("author")).thenReturn(testBook.author)
+-    `when`(mockDocumentSnapshot.getString("description")).thenReturn(testBook.description)
+-    `when`(mockDocumentSnapshot.getLong("rating")).thenReturn(testBook.rating?.toLong())
+-    `when`(mockDocumentSnapshot.getString("photo")).thenReturn(null)
+-    `when`(mockDocumentSnapshot.getString("language")).thenReturn(testBook.language.name)
+-    `when`(mockDocumentSnapshot.getString("isbn")).thenReturn(testBook.isbn)
+-    `when`(mockDocumentSnapshot.getLong("uuid.mostSignificantBits"))
+-        .thenReturn(testBook.uuid.mostSignificantBits)
+-    `when`(mockDocumentSnapshot.getLong("uuid.leastSignificantBits"))
+-        .thenReturn(testBook.uuid.leastSignificantBits)
+-
+-    // Act
+-    booksFirestorerRepository.getBook(
+-        OnSucess = { books ->
+-          // Assert that the fetched books match the expected values
+-          assert(books.isNotEmpty())
+-          assert(books.first().title == testBook.title)
+-        },
+-        onFailure = { fail("Should not fail") })
+-
+-    // Verify that Firestore collection was called
+-    verify(mockCollectionReference).get()
+-  }
+-
+-  @Test
+-  fun deletebooks_shouldCallFirestoreDelete() {
+-    // Arrange
+-    doAnswer { Tasks.forResult(null) }.`when`(mockDocumentReference).delete()
+-
+-    // Act
+-    booksFirestorerRepository.deleteBooks(testBook.uuid, testBook, {}, {})
+-
+-    // Assert
+-    verify(mockDocumentReference).delete()
+-  }
+-
+-  @Test
+-  fun addBooks_callsFirestoreSet_andOnSuccess() {
+-    // Arrange
+-    doAnswer { Tasks.forResult(null) }.`when`(mockDocumentReference).set(testBook)
+-
+-    // Act
+-    booksFirestorerRepository.addBook(
+-        testBook,
+-        {
+-          // Assert success callback
+-          assert(true)
+-        },
+-        { fail("Should not fail") })
+-
+-    // Verify Firestore set operation
+-    verify(mockDocumentReference).set(testBook)
+-  }
+-
+-  @Test
+-  fun updatebook_callsFirestoreSet_andOnSuccess() {
+-    // Arrange
+-    doAnswer { Tasks.forResult(null) }.`when`(mockDocumentReference).set(testBook)
+-
+-    // Act
+-    booksFirestorerRepository.updateBook(
+-        testBook,
+-        {
+-          // Assert success callback
+-          assert(true)
+-        },
+-        { fail("Should not fail") })
+-
+-    // Verify Firestore update operation
+-    verify(mockDocumentReference).set(testBook)
+-  }
+-
+-  @Test
+-  fun documenttoBooks_returnsDataBook_whenDocumentIsValid() {
+-    // Arrange
+-    `when`(mockDocumentSnapshot.getString("title")).thenReturn(testBook.title)
+-    `when`(mockDocumentSnapshot.getString("author")).thenReturn(testBook.author)
+-    `when`(mockDocumentSnapshot.getString("description")).thenReturn(testBook.description)
+-    `when`(mockDocumentSnapshot.getLong("rating")).thenReturn(testBook.rating?.toLong())
+-    `when`(mockDocumentSnapshot.getString("photo")).thenReturn(null)
+-    `when`(mockDocumentSnapshot.getString("language")).thenReturn(testBook.language.name)
+-    `when`(mockDocumentSnapshot.getString("isbn")).thenReturn(testBook.isbn)
+-    `when`(mockDocumentSnapshot.getLong("uuid.mostSignificantBits"))
+-        .thenReturn(testBook.uuid.mostSignificantBits)
+-    `when`(mockDocumentSnapshot.getLong("uuid.leastSignificantBits"))
+-        .thenReturn(testBook.uuid.leastSignificantBits)
+-
+-    // Act
+-    val result = booksFirestorerRepository.documentToBooks(mockDocumentSnapshot)
+-
+-    // Assert
+-    assert(result != null)
+-    assert(result?.title == testBook.title)
+-    assert(result?.author == testBook.author)
+-    assert(result?.description == testBook.description)
+-    assert(result?.rating == testBook.rating)
+-    assert(result?.photo == testBook.photo)
+-    assert(result?.language?.name == testBook.language.name)
+-    assert(result?.isbn == testBook.isbn)
+-    assert(result?.uuid == testBook.uuid)
+-  }
+-
+-  @Test
+-  fun documenttoBooks_returnsNull_whenRequiredFieldIsMissing() {
+-    // Arrange - Missing "Title"
+-    `when`(mockDocumentSnapshot.getString("title")).thenReturn(null)
+-    `when`(mockDocumentSnapshot.getString("author")).thenReturn(testBook.author)
+-    `when`(mockDocumentSnapshot.getString("description")).thenReturn(testBook.description)
+-    `when`(mockDocumentSnapshot.getLong("rating")).thenReturn(testBook.rating?.toLong())
+-    `when`(mockDocumentSnapshot.getString("photo")).thenReturn(null)
+-    `when`(mockDocumentSnapshot.getString("language")).thenReturn(testBook.language.name)
+-    `when`(mockDocumentSnapshot.getString("isbn")).thenReturn(testBook.isbn)
+-    `when`(mockDocumentSnapshot.getLong("uuid.mostSignificantBits"))
+-        .thenReturn(testBook.uuid.mostSignificantBits)
+-    `when`(mockDocumentSnapshot.getLong("uuid.leastSignificantBits"))
+-        .thenReturn(testBook.uuid.leastSignificantBits)
+-    // Act
+-    val result = booksFirestorerRepository.documentToBooks(mockDocumentSnapshot)
+-
+-    // Assert
+-    assert(result == null)
+-  }
+-
+-  @Test
+-  fun documenttoBooks_returnsNull_whenLanguageIsInvalid() {
+-    // Arrange - Invalid language value
+-    `when`(mockDocumentSnapshot.getString("title")).thenReturn(testBook.title)
+-    `when`(mockDocumentSnapshot.getString("author")).thenReturn(testBook.author)
+-    `when`(mockDocumentSnapshot.getString("description")).thenReturn(testBook.description)
+-    `when`(mockDocumentSnapshot.getLong("rating")).thenReturn(testBook.rating?.toLong())
+-    `when`(mockDocumentSnapshot.getString("photo")).thenReturn(null)
+-    `when`(mockDocumentSnapshot.getString("language")).thenReturn("INVALID_LANGUAGE")
+-    `when`(mockDocumentSnapshot.getString("isbn")).thenReturn(testBook.isbn)
+-    `when`(mockDocumentSnapshot.getLong("uuid.mostSignificantBits"))
+-        .thenReturn(testBook.uuid.mostSignificantBits)
+-    `when`(mockDocumentSnapshot.getLong("uuid.leastSignificantBits"))
+-        .thenReturn(testBook.uuid.leastSignificantBits)
+-
+-    // Act
+-    val result = booksFirestorerRepository.documentToBooks(mockDocumentSnapshot)
+-
+-    // Assert
+-    assert(result == null) // Should return null due to invalid language
+-  }
+-  /**
+-   * @Test fun getNewUid_returnsUniqueDocumentId() { // Arrange val collectionBooks = "Books" val
+-   *   mockDocumentReference = mock(DocumentReference::class.java) val expectedUid =
+-   *   UUID.randomUUID().toString()
+-   *
+-   * // Mock Firestore to return a document with the desired ID
+-   * `when`(mockFirestore.collection(collectionBooks).document()).thenReturn(mockDocumentReference)
+-   * `when`(mockDocumentReference.id).thenReturn(expectedUid)
+-   *
+-   * // Act val uuid = booksFirestoreRepository.getNewUid()
+-   *
+-   * // Assert assert(uuid.toString() == expectedUid) // Ensure the ID matches the expected value }
+-   */
+-}
+Index: app/build.gradle.kts
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>import java.io.FileInputStream\nimport java.util.Properties\n\nplugins {\n    jacoco\n    alias(libs.plugins.androidApplication)\n    alias(libs.plugins.jetbrainsKotlinAndroid)\n    alias(libs.plugins.ktfmt)\n    alias(libs.plugins.sonar)\n    id(\"com.google.gms.google-services\")\n}\n\nandroid {\n    namespace = \"com.android.bookswap\"\n    compileSdk = 34\n\n    buildFeatures {\n        buildConfig = true\n    }\n    // Load the API key from local.properties\n    val localProperties = Properties()\n    val localPropertiesFile = rootProject.file(\"local.properties\")\n    if (localPropertiesFile.exists()) {\n        localProperties.load(FileInputStream(localPropertiesFile))\n    }\n\n    val mapsApiKey: String = localProperties.getProperty(\"MAPS_API_KEY\") ?: \"\"\n\n\n    defaultConfig {\n        applicationId = \"com.android.bookswap\"\n        minSdk = 28\n        targetSdk = 34\n        versionCode = 1\n        versionName = \"1.0\"\n\n        testInstrumentationRunner = \"androidx.test.runner.AndroidJUnitRunner\"\n        vectorDrawables {\n            useSupportLibrary = true\n        }\n        val openAiApiKey: String = localProperties.getProperty(\"OPENAI_API_KEY\") ?: \"\\\" placeHolder \\\" \"\n        manifestPlaceholders[\"MAPS_API_KEY\"] = mapsApiKey\n        manifestPlaceholders[\"OPENAI_API_KEY\"] = openAiApiKey\n        buildConfigField(\"String\", \"OPENAI_API_KEY\",  openAiApiKey)\n    }\n\n    buildTypes {\n        release {\n            signingConfig = null\n            isMinifyEnabled = false\n            proguardFiles(\n                getDefaultProguardFile(\"proguard-android-optimize.txt\"),\n                \"proguard-rules.pro\"\n            )\n        }\n\n        debug {\n            enableUnitTestCoverage = true\n            enableAndroidTestCoverage = true\n        }\n    }\n\n    testCoverage {\n        jacocoVersion = \"0.8.8\"\n    }\n\n    buildFeatures {\n        compose = true\n        buildConfig = true //Generate a com.android.bookswap.BuildConfig file\n    }\n\n    composeOptions {\n        kotlinCompilerExtensionVersion = \"1.4.2\"\n    }\n\n    compileOptions {\n        sourceCompatibility = JavaVersion.VERSION_11\n        targetCompatibility = JavaVersion.VERSION_11\n    }\n\n    kotlinOptions {\n        jvmTarget = \"11\"\n    }\n\n    packaging {\n        resources {\n            excludes += \"/META-INF/{AL2.0,LGPL2.1}\"\n            merges += \"META-INF/LICENSE.md\"\n            merges += \"META-INF/LICENSE-notice.md\"\n            excludes += \"META-INF/DEPENDENCIES\"\n        }\n    }\n\n    testOptions {\n        unitTests {\n            isIncludeAndroidResources = true\n            isReturnDefaultValues = true\n        }\n    }\n\n    // Robolectric needs to be run only in debug. But its tests are placed in the shared source set (test)\n    // The next lines transfers the src/test/* from shared to the testDebug one\n    //\n    // This prevent errors from occurring during unit tests\n    sourceSets.getByName(\"testDebug\") {\n        val test = sourceSets.getByName(\"test\")\n\n        java.setSrcDirs(test.java.srcDirs)\n        res.setSrcDirs(test.res.srcDirs)\n        resources.setSrcDirs(test.resources.srcDirs)\n    }\n\n    sourceSets.getByName(\"test\") {\n        java.setSrcDirs(emptyList<File>())\n        res.setSrcDirs(emptyList<File>())\n        resources.setSrcDirs(emptyList<File>())\n    }\n}\n\nsonar {\n    properties {\n        property(\"sonar.projectKey\", \"BookswapEPFL_Bookswap\")\n        property(\"sonar.projectName\", \"BookSwapApp\")\n        property(\"sonar.organization\", \"bookswapepfl\")\n        property(\"sonar.host.url\", \"https://sonarcloud.io\")\n        // Comma-separated paths to the various directories containing the *.xml JUnit report files. Each path may be absolute or relative to the project base directory.\n        property(\n            \"sonar.junit.reportPaths\",\n            \"${project.layout.buildDirectory.get()}/test-results/testDebugunitTest/\"\n        )\n        // Paths to xml files with Android Lint issues. If the main flavor is changed, this file will have to be changed too.\n        property(\n            \"sonar.androidLint.reportPaths\",\n            \"${project.layout.buildDirectory.get()}/reports/lint-results-debug.xml\"\n        )\n        // Paths to JaCoCo XML coverage report files.\n        property(\n            \"sonar.coverage.jacoco.xmlReportPaths\",\n            \"${project.layout.buildDirectory.get()}/reports/jacoco/jacocoTestReport/jacocoTestReport.xml\"\n        )\n    }\n}\n\n// When a library is used both by robolectric and connected tests, use this function\nfun DependencyHandlerScope.globalTestImplementation(dep: Any) {\n    androidTestImplementation(dep)\n    testImplementation(dep)\n}\n\ndependencies {\n    implementation(\"com.google.firebase:firebase-messaging:23.0.0\")\n    implementation(platform(\"com.google.firebase:firebase-bom:33.4.0\"))\n    implementation(\"com.google.firebase:firebase-auth\")\n    implementation(\"com.google.firebase:firebase-analytics\")\n    implementation(libs.google.play.services.location)\n    implementation(\"io.coil-kt:coil-compose:2.1.0\")\n    implementation(libs.androidx.core.ktx)\n    implementation(libs.androidx.appcompat)\n    implementation(libs.firebase.database.ktx)\n    implementation(libs.firebase.firestore)\n    implementation(libs.firebase.ui.auth)\n    implementation(libs.firebase.auth.ktx)\n    implementation(libs.firebase.auth)\n    implementation(libs.material)\n    implementation(libs.androidx.lifecycle.runtime.ktx)\n    implementation(platform(libs.compose.bom))\n    implementation(libs.androidx.espresso.intents)\n    implementation(libs.firebase.firestore.ktx)\n    implementation(libs.firebase.auth.ktx)\n    implementation(libs.androidx.navigation.compose)\n    implementation(libs.firebase.messaging.ktx)\n    implementation(libs.androidx.uiautomator)\n    testImplementation(libs.junit)\n    testImplementation(libs.mockito.core)\n    testImplementation(libs.mockito.kotlin)\n    testImplementation(libs.mockk)\n    testImplementation(libs.mockito.inline)\n    globalTestImplementation(libs.androidx.junit)\n    globalTestImplementation(libs.androidx.espresso.core)\n    androidTestImplementation(libs.mockk.android)\n\n    // Google Service and Maps\n    implementation(libs.play.services.maps)\n    implementation(libs.play.services.auth)\n\n    // Google Service and Maps\n    implementation(libs.play.services.maps)\n    implementation(libs.maps.compose)\n    implementation(libs.maps.compose.utils)\n\n    // ------------- Jetpack Compose ------------------\n    implementation(\"androidx.compose.material:material:1.7.1\")\n    val composeBom = platform(libs.compose.bom)\n    implementation(composeBom)\n    globalTestImplementation(composeBom)\n\n    implementation(libs.compose.ui)\n    implementation(libs.compose.ui.graphics)\n    // Material Design 3\n    implementation(libs.compose.material3)\n    // Integration with activities\n    implementation(libs.compose.activity)\n    // Integration with ViewModels\n    implementation(libs.compose.viewmodel)\n    // Android Studio Preview support\n    implementation(libs.compose.preview)\n    debugImplementation(libs.compose.tooling)\n    // UI Tests\n    globalTestImplementation(libs.compose.test.junit)\n    debugImplementation(libs.compose.test.manifest)\n\n    // --------- Kaspresso test framework ----------\n    globalTestImplementation(libs.kaspresso)\n    globalTestImplementation(libs.kaspresso.compose)\n\n    testImplementation(libs.mockito.core)\n    testImplementation(libs.mockito.inline)\n    testImplementation(libs.mockito.kotlin)\n    androidTestImplementation(libs.mockito.android)\n    androidTestImplementation(libs.mockito.kotlin)\n\n\n    // ----------       Robolectric     ------------\n    testImplementation(libs.robolectric)\n\n    implementation(libs.volley) //HTTP request\n    implementation(libs.okhttp)\n\n    implementation(\"org.apache.httpcomponents:httpclient:4.5.14\")\n    implementation(\"org.apache.httpcomponents:httpcore:4.4.13\")\n    implementation(libs.json) //JSON parser\n    implementation(\"androidx.appcompat:appcompat:1.6.1\")\n    implementation(\"androidx.vectordrawable:vectordrawable:1.1.0\")\n\n\n}\n\ntasks.withType<Test> {\n    // Configure Jacoco for each tests\n    configure<JacocoTaskExtension> {\n        isIncludeNoLocationClasses = true\n        excludes = listOf(\"jdk.internal.*\")\n    }\n}\n\ntasks.register(\"jacocoTestReport\", JacocoReport::class) {\n    mustRunAfter(\"testDebugUnitTest\", \"connectedDebugAndroidTest\")\n\n    reports {\n        xml.required = true\n        html.required = true\n    }\n\n    val fileFilter = listOf(\n        \"**/R.class\",\n        \"**/R$*.class\",\n        \"**/BuildConfig.*\",\n        \"**/Manifest*.*\",\n        \"**/*Test*.*\",\n        \"android/**/*.*\",\n    )\n\n    val debugTree = fileTree(\"${project.layout.buildDirectory.get()}/tmp/kotlin-classes/debug\") {\n        exclude(fileFilter)\n    }\n\n    val mainSrc = \"${project.layout.projectDirectory}/src/main/java\"\n    sourceDirectories.setFrom(files(mainSrc))\n    classDirectories.setFrom(files(debugTree))\n    executionData.setFrom(fileTree(project.layout.buildDirectory.get()) {\n        include(\"outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec\")\n        include(\"outputs/code_coverage/debugAndroidTest/connected/*/coverage.ec\")\n    })\n\n    doLast {\n        val reportFile = reports.xml.outputLocation.asFile.get()\n        val newContent = reportFile.readText().replace(\"<line[^>]+nr=\\\"65535\\\"[^>]*>\".toRegex(), \"\")\n        reportFile.writeText(newContent)\n\n        logger.quiet(\"Wrote summarized jacoco test coverage report xml to ${reportFile.absolutePath}\")\n    }\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/build.gradle.kts b/app/build.gradle.kts
+--- a/app/build.gradle.kts	(revision a4b4ff9ce46b22bc5fa8333c2fadf00309ca528b)
++++ b/app/build.gradle.kts	(date 1731601372292)
+@@ -169,7 +169,6 @@
+     implementation(libs.firebase.auth.ktx)
+     implementation(libs.androidx.navigation.compose)
+     implementation(libs.firebase.messaging.ktx)
+-    implementation(libs.androidx.uiautomator)
+     testImplementation(libs.junit)
+     testImplementation(libs.mockito.core)
+     testImplementation(libs.mockito.kotlin)
+Index: app/src/main/java/com/android/bookswap/data/UserBooksWithLocation.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/android/bookswap/data/UserBooksWithLocation.kt b/app/src/main/java/com/android/bookswap/data/UserBooksWithLocation.kt
+new file mode 100644
+--- /dev/null	(date 1731601322983)
++++ b/app/src/main/java/com/android/bookswap/data/UserBooksWithLocation.kt	(date 1731601322983)
+@@ -0,0 +1,18 @@
++package com.android.bookswap.data
++
++import java.util.UUID
++
++/**
++ * Represents a user's book collection along with their geographical location.
++ *
++ * @property userUUID Unique identifier for the user.
++ * @property longitude The user's longitude coordinate.
++ * @property latitude The user's latitude coordinate.
++ * @property books List of books associated with the user.
++ */
++data class UserBooksWithLocation(
++    val userUUID: UUID,
++    val longitude: Double,
++    val latitude: Double,
++    val books: List<DataBook>
++)
+Index: app/src/test/java/com/android/bookswap/utils/BookUtils.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/test/java/com/android/bookswap/utils/BookUtils.kt b/app/src/test/java/com/android/bookswap/utils/BookUtils.kt
+new file mode 100644
+--- /dev/null	(date 1731601318500)
++++ b/app/src/test/java/com/android/bookswap/utils/BookUtils.kt	(date 1731601318500)
+@@ -0,0 +1,15 @@
++package com.android.bookswap.utils
++
++import com.android.bookswap.data.DataBook
++import org.junit.Assert.assertEquals
++
++/**
++ * Assert that two books are identical (uuid can be checked or not)
++ *
++ * @param expected the expected result
++ * @param result the result
++ * @param strict true if the two books should have the same UUID
++ */
++fun assertBookEquals(expected: DataBook, result: DataBook?, strict: Boolean = false) {
++  assertEquals(expected, if (strict) result else result?.copy(uuid = expected.uuid))
++}
+Index: app/src/main/java/com/android/bookswap/ui/profile/NewUser.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/android/bookswap/ui/profile/NewUser.kt b/app/src/main/java/com/android/bookswap/ui/profile/NewUser.kt
+new file mode 100644
+--- /dev/null	(date 1731601318498)
++++ b/app/src/main/java/com/android/bookswap/ui/profile/NewUser.kt	(date 1731601318498)
+@@ -0,0 +1,186 @@
++package com.android.bookswap.ui.profile
++
++import androidx.compose.foundation.background
++import androidx.compose.foundation.layout.Arrangement
++import androidx.compose.foundation.layout.Box
++import androidx.compose.foundation.layout.Column
++import androidx.compose.foundation.layout.PaddingValues
++import androidx.compose.foundation.layout.fillMaxSize
++import androidx.compose.foundation.layout.fillMaxWidth
++import androidx.compose.foundation.layout.height
++import androidx.compose.foundation.layout.padding
++import androidx.compose.foundation.layout.size
++import androidx.compose.foundation.layout.width
++import androidx.compose.foundation.lazy.LazyColumn
++import androidx.compose.foundation.text.KeyboardOptions
++import androidx.compose.material.icons.Icons
++import androidx.compose.material.icons.filled.AccountCircle
++import androidx.compose.material3.Button
++import androidx.compose.material3.ButtonDefaults
++import androidx.compose.material3.Card
++import androidx.compose.material3.Icon
++import androidx.compose.material3.IconButton
++import androidx.compose.material3.OutlinedTextField
++import androidx.compose.material3.Text
++import androidx.compose.runtime.Composable
++import androidx.compose.runtime.mutableStateOf
++import androidx.compose.runtime.remember
++import androidx.compose.ui.Alignment
++import androidx.compose.ui.Modifier
++import androidx.compose.ui.graphics.Color
++import androidx.compose.ui.platform.testTag
++import androidx.compose.ui.text.TextStyle
++import androidx.compose.ui.text.font.FontWeight
++import androidx.compose.ui.text.input.KeyboardType
++import androidx.compose.ui.text.style.TextAlign
++import androidx.compose.ui.unit.dp
++import androidx.compose.ui.unit.sp
++import com.android.bookswap.ui.navigation.NavigationActions
++import com.android.bookswap.ui.navigation.Route
++import com.android.bookswap.ui.theme.ColorVariable
++
++// Constants for magic numbers used in the UI layout
++private val CONTENT_PADDING = 16.dp
++private val ICON_SIZE = 80.dp
++private val TEXT_PADDING = PaddingValues(8.dp, 4.dp)
++private val BUTTON_WIDTH = 200.dp
++private val BUTTON_HEIGHT = 50.dp
++private val WELCOME_FONT_SIZE = 40.sp
++private val INFO_FONT_SIZE = 18.sp
++private val WELCOME_FONT_WEIGHT = FontWeight(600)
++private val INFO_FONT_WEIGHT = FontWeight(400)
++
++/**
++ * NewUserScreen is the screen where the user can create a new account by filling in his personal
++ * information
++ *
++ * @param navigationActions: NavigationActions
++ */
++@Composable
++fun NewUserScreen(navigationActions: NavigationActions) {
++  val email = remember { mutableStateOf("") }
++  val phone = remember { mutableStateOf("") }
++  val greeting = remember { mutableStateOf("") }
++  val firstName = remember { mutableStateOf("") }
++  val lastName = remember { mutableStateOf("") }
++
++  LazyColumn(
++      contentPadding = PaddingValues(CONTENT_PADDING),
++      modifier =
++          Modifier.fillMaxSize()
++              .background(color = ColorVariable.BackGround)
++              .testTag("chat_messageList")) {
++        item {
++          // The welcome text
++          Text(
++              "Welcome",
++              modifier = Modifier.testTag("welcomeTxt").fillMaxWidth(),
++              style =
++                  TextStyle(
++                      color = ColorVariable.Accent,
++                      fontWeight = WELCOME_FONT_WEIGHT,
++                      textAlign = TextAlign.Center,
++                      fontSize = WELCOME_FONT_SIZE,
++                  ))
++        }
++        item {
++          // The personal information text
++          Text(
++              "Please fill in your personal information to start BookSwapping",
++              modifier = Modifier.testTag("personalInfoTxt").fillMaxWidth(),
++              style =
++                  TextStyle(
++                      color = ColorVariable.Accent,
++                      fontWeight = INFO_FONT_WEIGHT,
++                      textAlign = TextAlign.Center,
++                      fontSize = INFO_FONT_SIZE,
++                  ))
++        }
++        item {
++          // The card containing the form to fill in the personal information
++          Card(
++              Modifier.testTag("editProfileContainer").background(ColorVariable.BackGround),
++              colors =
++                  androidx.compose.material3.CardDefaults.cardColors()
++                      .copy(containerColor = ColorVariable.BackGround)) {
++                Column(
++                    Modifier.fillMaxWidth()
++                        .padding(CONTENT_PADDING)
++                        .background(ColorVariable.BackGround),
++                    Arrangement.Center,
++                    Alignment.CenterHorizontally) {
++                      IconButton(
++                          onClick = { /* TODO */},
++                          modifier = Modifier.size(ICON_SIZE).testTag("profilPics")) {
++                            Icon(
++                                imageVector = Icons.Default.AccountCircle,
++                                contentDescription = "profile picture",
++                                tint = ColorVariable.Accent,
++                                modifier = Modifier.size(ICON_SIZE))
++                          }
++                      OutlinedTextField(
++                          greeting.value,
++                          { greeting.value = it },
++                          Modifier.testTag("greetingTF").fillMaxWidth().padding(TEXT_PADDING),
++                          label = { Text("Greeting") },
++                          placeholder = { Text("Mr.", Modifier, Color.Gray) },
++                          keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
++                          singleLine = true)
++
++                      OutlinedTextField(
++                          firstName.value,
++                          { firstName.value = it },
++                          Modifier.testTag("firstnameTF").fillMaxWidth().padding(TEXT_PADDING),
++                          label = { Text("Firstname") },
++                          placeholder = { Text("John", Modifier, Color.Gray) },
++                          keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
++                          singleLine = true)
++
++                      OutlinedTextField(
++                          lastName.value,
++                          { lastName.value = it },
++                          Modifier.testTag("lastnameTF").fillMaxWidth().padding(TEXT_PADDING),
++                          label = { Text("Lastname") },
++                          placeholder = { Text("Doe", Modifier, Color.Gray) },
++                          keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
++                          singleLine = true)
++
++                      OutlinedTextField(
++                          email.value,
++                          { email.value = it },
++                          Modifier.testTag("emailTF").fillMaxWidth().padding(TEXT_PADDING),
++                          label = { Text("Email") },
++                          placeholder = { Text("John.Doe@example.com", Modifier, Color.Gray) },
++                          keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
++                          singleLine = true)
++
++                      OutlinedTextField(
++                          phone.value,
++                          { phone.value = it },
++                          Modifier.testTag("phoneTF").fillMaxWidth().padding(TEXT_PADDING),
++                          label = { Text("Phone") },
++                          placeholder = { Text("+4122345678", Modifier, Color.Gray) },
++                          keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
++                          singleLine = true)
++                    }
++              }
++        }
++        item {
++          Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
++            Button(
++                onClick = { navigationActions.navigateTo(Route.MAP) },
++                colors = ButtonDefaults.buttonColors(ColorVariable.Primary),
++                modifier =
++                    Modifier.width(BUTTON_WIDTH).height(BUTTON_HEIGHT).testTag("CreateButton")) {
++                  Text(
++                      text = "Create",
++                      textAlign = TextAlign.Center,
++                      style =
++                          TextStyle(
++                              color = ColorVariable.BackGround,
++                          ))
++                }
++          }
++        }
++      }
++}
+Index: app/src/test/java/com/android/bookswap/data/source/network/BooksFirestoreSourceTest.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/test/java/com/android/bookswap/data/source/network/BooksFirestoreSourceTest.kt b/app/src/test/java/com/android/bookswap/data/source/network/BooksFirestoreSourceTest.kt
+new file mode 100644
+--- /dev/null	(date 1731601318495)
++++ b/app/src/test/java/com/android/bookswap/data/source/network/BooksFirestoreSourceTest.kt	(date 1731601318495)
+@@ -0,0 +1,157 @@
++package com.android.bookswap.data.source.network
++
++import com.android.bookswap.data.BookLanguages
++import com.android.bookswap.data.DataBook
++import com.android.bookswap.utils.assertBookEquals
++import com.google.android.gms.tasks.Tasks
++import com.google.firebase.firestore.CollectionReference
++import com.google.firebase.firestore.DocumentReference
++import com.google.firebase.firestore.DocumentSnapshot
++import com.google.firebase.firestore.FirebaseFirestore
++import com.google.firebase.firestore.QuerySnapshot
++import io.mockk.every
++import io.mockk.mockk
++import io.mockk.verify
++import java.util.UUID
++import org.junit.Assert.*
++import org.junit.Before
++import org.junit.Test
++import org.junit.runner.RunWith
++import org.robolectric.RobolectricTestRunner
++
++@RunWith(RobolectricTestRunner::class)
++class BooksFirestoreSourceTest {
++
++  private val mockFirestore: FirebaseFirestore = mockk()
++  private val mockCollectionReference: CollectionReference = mockk()
++  private val mockDocumentReference: DocumentReference = mockk()
++  private val mockDocumentSnapshot: DocumentSnapshot = mockk()
++  private val mockQuerySnapshot: QuerySnapshot = mockk()
++
++  private val testBook =
++      DataBook(
++          uuid = UUID.randomUUID(),
++          title = "Test Book",
++          author = "Test Author",
++          description = "Test Description",
++          rating = 5,
++          photo = "http://example.com/photo.jpg",
++          language = BookLanguages.ENGLISH,
++          isbn = "1234567890")
++
++  @Before
++  fun setUp() {
++    every { mockFirestore.collection(any()) }.returns(mockCollectionReference)
++    every { mockCollectionReference.document(any()) }.returns(mockDocumentReference)
++    every { mockCollectionReference.get() }.returns(Tasks.forResult(mockQuerySnapshot))
++
++    // Mock of snapshot
++    every { mockDocumentSnapshot.getString("title") }.returns(testBook.title)
++    every { mockDocumentSnapshot.getString("author") }.returns(testBook.author)
++    every { mockDocumentSnapshot.getString("description") }.returns(testBook.description)
++    every { mockDocumentSnapshot.getLong("rating") }.returns(testBook.rating?.toLong())
++    every { mockDocumentSnapshot.getString("photo") }.returns(testBook.photo)
++    every { mockDocumentSnapshot.getString("language") }.returns(testBook.language.name)
++    every { mockDocumentSnapshot.getString("isbn") }.returns(testBook.isbn)
++    every { mockDocumentSnapshot.getString("uuid") }.returns(testBook.uuid.toString())
++    every { mockDocumentSnapshot.get("genres") }.returns(emptyList<String>())
++  }
++
++  @Test
++  fun `book get returns correct result`() {
++    val bookSource = BooksFirestoreSource(mockFirestore)
++    bookSource.getBook(
++        callback = { result ->
++          assertTrue(result.isSuccess)
++          val books = result.getOrThrow()
++          // Assert that the fetched books match the expected values
++          assertTrue(books.isNotEmpty())
++          assertBookEquals(books.first(), testBook, true)
++        })
++
++    // Verify that Firestore collection was called
++    verify { mockCollectionReference.get() }
++  }
++
++  @Test
++  fun `delete call firestore delete`() {
++    val bookSource = BooksFirestoreSource(mockFirestore)
++
++    // Arrange
++    every { mockDocumentReference.delete() }.returns(Tasks.forResult(null))
++
++    // Act
++    bookSource.deleteBooks(testBook.uuid, testBook) {}
++
++    // Assert
++    verify { mockDocumentReference.delete() }
++  }
++
++  @Test
++  fun `book set is success`() {
++    val bookSource = BooksFirestoreSource(mockFirestore)
++
++    // Arrange
++    every { mockDocumentReference.set(testBook) }.returns(Tasks.forResult(null))
++
++    // Act
++    bookSource.addBook(testBook) { result -> assertTrue(result.isSuccess) }
++
++    // Verify Firestore set operation
++    verify { mockDocumentReference.set(testBook) }
++  }
++
++  @Test
++  fun `book update success`() {
++    val bookSource = BooksFirestoreSource(mockFirestore)
++
++    // Arrange
++    every { mockDocumentReference.set(testBook) }.returns(Tasks.forResult(null))
++
++    // Act
++    bookSource.updateBook(testBook) { result -> assertTrue(result.isSuccess) }
++
++    // Verify Firestore update operation
++    verify { mockDocumentReference.set(testBook) }
++  }
++
++  @Test
++  fun `documentToBooks is valid`() {
++    val bookSource = BooksFirestoreSource(mockFirestore)
++
++    // Act
++    val result = bookSource.documentToBooks(mockDocumentSnapshot)
++
++    // Assert
++    assertNotNull(result)
++    assertBookEquals(testBook, result)
++  }
++
++  @Test
++  fun `documentToBooks null when missing value`() {
++    // Arrange - Missing "Title"
++    val bookSource = BooksFirestoreSource(mockFirestore)
++
++    every { mockDocumentSnapshot.getString("title") }.returns(null)
++
++    // Act
++    val result = bookSource.documentToBooks(mockDocumentSnapshot)
++
++    // Assert
++    assertNull(result)
++  }
++
++  @Test
++  fun `documentToBooks null when invalid value`() {
++    // Arrange - Invalid language value
++    val bookSource = BooksFirestoreSource(mockFirestore)
++
++    every { mockDocumentSnapshot.getString("language") }.returns("INVALID_LANGUAGE")
++
++    // Act
++    val result = bookSource.documentToBooks(mockDocumentSnapshot)
++
++    // Assert
++    assertNull(result) // Should return null due to invalid language
++  }
++}
+Index: app/src/androidTest/java/com/android/bookswap/ui/profile/NewUserScreenTest.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/androidTest/java/com/android/bookswap/ui/profile/NewUserScreenTest.kt b/app/src/androidTest/java/com/android/bookswap/ui/profile/NewUserScreenTest.kt
+new file mode 100644
+--- /dev/null	(date 1731601318493)
++++ b/app/src/androidTest/java/com/android/bookswap/ui/profile/NewUserScreenTest.kt	(date 1731601318493)
+@@ -0,0 +1,93 @@
++package com.android.bookswap.ui.profile
++
++import androidx.compose.ui.test.assertHasClickAction
++import androidx.compose.ui.test.assertIsDisplayed
++import androidx.compose.ui.test.assertTextContains
++import androidx.compose.ui.test.assertTextEquals
++import androidx.compose.ui.test.junit4.createComposeRule
++import androidx.compose.ui.test.onNodeWithTag
++import androidx.compose.ui.test.performClick
++import com.android.bookswap.ui.navigation.NavigationActions
++import com.android.bookswap.ui.navigation.Route
++import io.mockk.mockk
++import io.mockk.verify
++import org.junit.Before
++import org.junit.Rule
++import org.junit.Test
++
++class NewUserScreenTest {
++  @get:Rule val composeTestRule = createComposeRule()
++  private lateinit var navigationActions: NavigationActions
++
++  @Before
++  fun setUp() {
++    navigationActions = mockk(relaxed = true)
++  }
++
++  @Test
++  fun allComponentsAreDisplayedWithCorrectTexts() {
++    composeTestRule.setContent { NewUserScreen(navigationActions) }
++    composeTestRule
++        .onNodeWithTag("welcomeTxt")
++        .assertExists()
++        .assertIsDisplayed()
++        .assertTextEquals("Welcome")
++
++    composeTestRule
++        .onNodeWithTag("personalInfoTxt")
++        .assertExists()
++        .assertIsDisplayed()
++        .assertTextEquals("Please fill in your personal information to start BookSwapping")
++
++    composeTestRule
++        .onNodeWithTag("profilPics")
++        .assertExists()
++        .assertIsDisplayed()
++        .assertHasClickAction()
++
++    composeTestRule
++        .onNodeWithTag("greetingTF")
++        .assertExists()
++        .assertIsDisplayed()
++        .assertTextContains("Greeting")
++
++    composeTestRule
++        .onNodeWithTag("firstnameTF")
++        .assertExists()
++        .assertIsDisplayed()
++        .assertTextContains("Firstname")
++
++    composeTestRule
++        .onNodeWithTag("lastnameTF")
++        .assertExists()
++        .assertIsDisplayed()
++        .assertTextContains("Lastname")
++
++    composeTestRule
++        .onNodeWithTag("emailTF")
++        .assertExists()
++        .assertIsDisplayed()
++        .assertTextContains("Email")
++
++    composeTestRule
++        .onNodeWithTag("phoneTF")
++        .assertExists()
++        .assertIsDisplayed()
++        .assertTextContains("Phone")
++
++    composeTestRule
++        .onNodeWithTag("CreateButton")
++        .assertExists()
++        .assertIsDisplayed()
++        .assertTextEquals("Create")
++        .assertHasClickAction()
++  }
++
++  @Test
++  fun clickOnCreateButtonNavigatesToMap() {
++    composeTestRule.setContent { NewUserScreen(navigationActions) }
++
++    composeTestRule.onNodeWithTag("CreateButton").performClick()
++    verify { navigationActions.navigateTo(Route.MAP) }
++  }
++}

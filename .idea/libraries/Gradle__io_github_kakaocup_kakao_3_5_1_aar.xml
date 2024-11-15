@@ -1,0 +1,14 @@
+<component name="libraryTable">
+  <library name="Gradle: io.github.kakaocup:kakao:3.5.1@aar" external-system-id="GRADLE">
+    <CLASSES>
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-3/1203ca5c3f893f293f8496244eab4c50/transformed/kakao-3.5.1/AndroidManifest.xml" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-3/1203ca5c3f893f293f8496244eab4c50/transformed/kakao-3.5.1/jars/classes.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.github.kakaocup/kakao/3.5.1/dae6b7bf616f0f6a2fc2f00f6499d70de2af0ed7/kakao-3.5.1-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.github.kakaocup/kakao/3.5.1/437cac17223629f853c6c8e10622e8ecbdb5882c/kakao-3.5.1-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

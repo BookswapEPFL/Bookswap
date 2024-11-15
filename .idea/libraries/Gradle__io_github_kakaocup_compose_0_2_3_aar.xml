@@ -1,0 +1,14 @@
+<component name="libraryTable">
+  <library name="Gradle: io.github.kakaocup:compose:0.2.3@aar" external-system-id="GRADLE">
+    <CLASSES>
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-3/b88ac8857799901b97b2a6e930acba10/transformed/compose-0.2.3/AndroidManifest.xml" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-3/b88ac8857799901b97b2a6e930acba10/transformed/compose-0.2.3/jars/classes.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.github.kakaocup/compose/0.2.3/978fc4e99e9d11790d63bf9465989065f4808958/compose-0.2.3-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.github.kakaocup/compose/0.2.3/71291d7cc761cf480df07763987db164faac13d3/compose-0.2.3-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

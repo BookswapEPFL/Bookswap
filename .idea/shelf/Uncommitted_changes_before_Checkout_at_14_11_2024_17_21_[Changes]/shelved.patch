@@ -1,0 +1,217 @@
+Index: app/src/main/java/com/android/bookswap/data/source/PhotoManagement.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.android.bookswap.data.source\n\nimport android.app.Activity\nimport android.content.Intent\nimport android.graphics.Bitmap\nimport android.net.Uri\nimport android.provider.MediaStore\n\nimport com.google.firebase.firestore.FirebaseFirestore\nimport com.google.firebase.storage.FirebaseStorage\nimport java.io.File\nimport java.io.FileOutputStream\nimport java.util.UUID\n\nval REQUEST_IMAGE_CAPTURE = 1\n/*\nfun openCamera(activity: Activity) {\n    val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)\n    if (takePictureIntent.resolveActivity(activity.packageManager) != null) {\n        activity.startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE)\n    }\n}\n\n// Override onActivityResult to get the image\nfun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {\n    if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == Activity.RESULT_OK) {\n        val imageBitmap = data?.extras?.get(\"data\") as Bitmap\n        val imageUri = getImageUriFromBitmap(imageBitmap)\n\n        uploadPhotoToFirebaseStorage(imageUri, onSuccess = { downloadUrl ->\n            savePhotoUrlToFirestore(downloadUrl,\n                onSuccess = { println(\"Photo saved successfully!\") },\n                onFailure = { error -> println(\"Firestore Error: ${error.message}\") }\n            )\n        },\n            onFailure = { error -> println(\"Storage Error: ${error.message}\") }\n        )\n    }\n}\nfun getImageUriFromBitmap(context: Bitmap, bitmap: Bitmap): Uri {\n    val cacheDir = File(context.cacheDir, \"images\")\n    val tempFile = File.createTempFile(\"temp_image\", \".jpg\", cacheDir)\n    val outputStream = FileOutputStream(tempFile)\n    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)\n    outputStream.flush()\n    outputStream.close()\n    return Uri.fromFile(tempFile)\n}\nfun uploadPhotoToFirebaseStorage(photoUri: Uri, onSuccess: (String) -> Unit, onFailure: (Exception) -> Unit) {\n    val fileName = \"photos/${UUID.randomUUID()}.jpg\"\n    val storageRef = FirebaseStorage.getInstance().reference.child(fileName)\n\n    storageRef.putFile(photoUri)\n        .addOnSuccessListener {\n            storageRef.downloadUrl.addOnSuccessListener { uri ->\n                onSuccess(uri.toString())\n            }\n        }\n        .addOnFailureListener { exception ->\n            onFailure(exception)\n        }\n}\nfun savePhotoUrlToFirestore(photoUrl: String, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {\n    val firestore = FirebaseFirestore.getInstance()\n    val photoData = mapOf(\"photoUrl\" to photoUrl)\n\n    firestore.collection(\"photos\")\n        .add(photoData)\n        .addOnSuccessListener {\n            onSuccess()\n        }\n        .addOnFailureListener { exception ->\n            onFailure(exception)\n        }\n}*/
+===================================================================
+diff --git a/app/src/main/java/com/android/bookswap/data/source/PhotoManagement.kt b/app/src/main/java/com/android/bookswap/data/source/PhotoManagement.kt
+--- a/app/src/main/java/com/android/bookswap/data/source/PhotoManagement.kt	
++++ b/app/src/main/java/com/android/bookswap/data/source/PhotoManagement.kt	
+@@ -1,17 +1,5 @@
+ package com.android.bookswap.data.source
+ 
+-import android.app.Activity
+-import android.content.Intent
+-import android.graphics.Bitmap
+-import android.net.Uri
+-import android.provider.MediaStore
+-
+-import com.google.firebase.firestore.FirebaseFirestore
+-import com.google.firebase.storage.FirebaseStorage
+-import java.io.File
+-import java.io.FileOutputStream
+-import java.util.UUID
+-
+ val REQUEST_IMAGE_CAPTURE = 1
+ /*
+ fun openCamera(activity: Activity) {
+@@ -72,4 +60,4 @@
+         .addOnFailureListener { exception ->
+             onFailure(exception)
+         }
+-}*/
+\ No newline at end of file
++}*/
+Index: app/src/androidTest/java/com/android/bookswap/ui/bookAddition/BookAdditionChoiceScreenTest.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/androidTest/java/com/android/bookswap/ui/bookAddition/BookAdditionChoiceScreenTest.kt b/app/src/androidTest/java/com/android/bookswap/ui/books/add/BookAdditionChoiceScreenTest.kt
+rename from app/src/androidTest/java/com/android/bookswap/ui/bookAddition/BookAdditionChoiceScreenTest.kt
+rename to app/src/androidTest/java/com/android/bookswap/ui/books/add/BookAdditionChoiceScreenTest.kt
+--- a/app/src/androidTest/java/com/android/bookswap/ui/bookAddition/BookAdditionChoiceScreenTest.kt	
++++ b/app/src/androidTest/java/com/android/bookswap/ui/books/add/BookAdditionChoiceScreenTest.kt	
+@@ -1,11 +1,10 @@
+-package com.android.bookswap.ui.bookAddition
++package com.android.bookswap.ui.books.add
+ 
+ import androidx.compose.ui.test.assertHasClickAction
+ import androidx.compose.ui.test.assertIsDisplayed
+ import androidx.compose.ui.test.junit4.createComposeRule
+ import androidx.compose.ui.test.onNodeWithTag
+ import androidx.navigation.compose.rememberNavController
+-import com.android.bookswap.ui.books.add.BookAdditionChoiceScreen
+ import com.android.bookswap.ui.navigation.NavigationActions
+ import io.mockk.mockk
+ import org.junit.Before
+Index: app/src/androidTest/java/com/android/bookswap/ui/book/BookProfileScreenTest.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/androidTest/java/com/android/bookswap/ui/book/BookProfileScreenTest.kt b/app/src/androidTest/java/com/android/bookswap/ui/books/BookProfileScreenTest.kt
+rename from app/src/androidTest/java/com/android/bookswap/ui/book/BookProfileScreenTest.kt
+rename to app/src/androidTest/java/com/android/bookswap/ui/books/BookProfileScreenTest.kt
+--- a/app/src/androidTest/java/com/android/bookswap/ui/book/BookProfileScreenTest.kt	
++++ b/app/src/androidTest/java/com/android/bookswap/ui/books/BookProfileScreenTest.kt	
+@@ -1,4 +1,4 @@
+-package com.android.bookswap.ui.book
++package com.android.bookswap.ui.books
+ 
+ import androidx.compose.ui.test.assertHasClickAction
+ import androidx.compose.ui.test.assertIsDisplayed
+@@ -11,7 +11,6 @@
+ import com.android.bookswap.data.BookGenres
+ import com.android.bookswap.data.BookLanguages
+ import com.android.bookswap.data.DataBook
+-import com.android.bookswap.ui.books.BookProfileScreen
+ import com.android.bookswap.ui.navigation.NavigationActions
+ import io.mockk.mockk
+ import java.util.UUID
+Index: app/src/androidTest/java/com/android/bookswap/ui/book/addBookTest.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/androidTest/java/com/android/bookswap/ui/book/addBookTest.kt b/app/src/androidTest/java/com/android/bookswap/ui/books/add/addBookTest.kt
+rename from app/src/androidTest/java/com/android/bookswap/ui/book/addBookTest.kt
+rename to app/src/androidTest/java/com/android/bookswap/ui/books/add/addBookTest.kt
+--- a/app/src/androidTest/java/com/android/bookswap/ui/book/addBookTest.kt	
++++ b/app/src/androidTest/java/com/android/bookswap/ui/books/add/addBookTest.kt	
+@@ -1,4 +1,4 @@
+-package com.android.bookswap.ui.book
++package com.android.bookswap.ui.books.add
+ 
+ import android.content.Context
+ import android.widget.Toast
+@@ -11,10 +11,7 @@
+ import androidx.navigation.compose.rememberNavController
+ import com.android.bookswap.data.BookGenres
+ import com.android.bookswap.data.BookLanguages
+-import com.android.bookswap.data.DataBook
+ import com.android.bookswap.data.repository.BooksRepository
+-import com.android.bookswap.ui.books.add.AddToBookScreen
+-import com.android.bookswap.ui.books.add.createDataBook
+ import com.android.bookswap.ui.navigation.NavigationActions
+ import io.mockk.every
+ import io.mockk.mockk
+@@ -29,6 +26,7 @@
+ class AddToBookTest {
+   @get:Rule val composeTestRule = createComposeRule()
+   private val mockContext: Context = mockk()
++  private val mockBooksRepository: BooksRepository = mockk()
+ 
+   @Before
+   fun init() {
+@@ -40,22 +38,14 @@
+ 
+   @Test
+   fun testSaveButtonDisabledInitially() {
+-    composeTestRule.setContent {
+-      val navController = rememberNavController()
+-      val navigationActions = NavigationActions(navController)
+-      AddToBookScreen(MockBooksRepository(), navigationActions)
+-    }
++    composeTestRule.setContent { AddToBookScreen(mockBooksRepository) }
+     // Check if the Save button is initially disabled
+     composeTestRule.onNodeWithText("Save").assertIsNotEnabled()
+   }
+ 
+   @Test
+   fun testSaveButtonEnabledWhenRequiredFieldsAreFilled() {
+-    composeTestRule.setContent {
+-      val navController = rememberNavController()
+-      val navigationActions = NavigationActions(navController)
+-      AddToBookScreen(MockBooksRepository(), navigationActions)
+-    }
++    composeTestRule.setContent { AddToBookScreen(mockBooksRepository) }
+     // Fill in the Title and ISBN fields
+     composeTestRule.onNodeWithText("Title").performTextInput("My Book Title")
+     composeTestRule.onNodeWithText("ISBN").performTextInput("1234567890")
+@@ -149,7 +139,7 @@
+     composeTestRule.setContent {
+       val navController = rememberNavController()
+       val navigationActions = NavigationActions(navController)
+-      AddToBookScreen(MockBooksRepository(), navigationActions)
++      AddToBookScreen(mockBooksRepository)
+     }
+     // Fill in the ISBN field but leave the Title field empty
+     composeTestRule.onNodeWithText("ISBN").performTextInput("1234567890")
+@@ -157,67 +147,4 @@
+     // Check if the Save button is still disabled
+     composeTestRule.onNodeWithText("Save").assertIsNotEnabled()
+   }
+-
+-  class MockBooksRepository : BooksRepository {
+-    private var isBookAdded = false
+-    private var isBookFetched = false
+-    private var isBookUpdated = false
+-    private var isBookDeleted = false
+-    private var shouldFail = false
+-
+-    override fun init(OnSucess: () -> Unit) {
+-      if (!shouldFail) {
+-        OnSucess()
+-      }
+-    }
+-
+-    override fun getNewUid(): UUID {
+-      return UUID.randomUUID()
+-    }
+-
+-    override fun getBook(OnSucess: (List<DataBook>) -> Unit, onFailure: (Exception) -> Unit) {
+-      if (!shouldFail) {
+-        isBookFetched = true
+-        OnSucess(emptyList()) // Simulate an empty list of books
+-      } else {
+-        onFailure(Exception("Failed to fetch books"))
+-      }
+-    }
+-
+-    override fun addBook(dataBook: DataBook, OnSucess: () -> Unit, onFailure: (Exception) -> Unit) {
+-      if (!shouldFail) {
+-        isBookAdded = true
+-        OnSucess()
+-      } else {
+-        onFailure(Exception("Failed to add book"))
+-      }
+-    }
+-
+-    override fun updateBook(
+-        dataBook: DataBook,
+-        OnSucess: () -> Unit,
+-        onFailure: (Exception) -> Unit
+-    ) {
+-      if (!shouldFail) {
+-        isBookUpdated = true
+-        OnSucess()
+-      } else {
+-        onFailure(Exception("Failed to update book"))
+-      }
+-    }
+-
+-    override fun deleteBooks(
+-        id: String,
+-        dataBook: DataBook,
+-        OnSucess: () -> Unit,
+-        onFailure: (Exception) -> Unit
+-    ) {
+-      if (!shouldFail) {
+-        isBookDeleted = true
+-        OnSucess()
+-      } else {
+-        onFailure(Exception("Failed to delete book"))
+-      }
+-    }
+-  }
+ }

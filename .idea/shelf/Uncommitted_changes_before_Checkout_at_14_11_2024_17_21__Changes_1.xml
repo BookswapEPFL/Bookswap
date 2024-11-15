@@ -1,0 +1,14 @@
+<changelist name="Uncommitted_changes_before_Checkout_at_14_11_2024_17_21_[Changes]1" date="1731601326616" recycled="true" deleted="true">
+  <option name="PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_14_11_2024_17_21_[Changes]1/shelved.patch" />
+  <option name="DESCRIPTION" value="Uncommitted changes before Checkout at 14/11/2024 17:21 [Changes]" />
+  <binary>
+    <option name="BEFORE_PATH" />
+    <option name="AFTER_PATH" value="app/src/main/res/drawable/etranger_test.jpg" />
+    <option name="SHELVED_PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_14_11_2024_17_21_[Changes]1/etranger_test.jpg" />
+  </binary>
+  <binary>
+    <option name="BEFORE_PATH" />
+    <option name="AFTER_PATH" value="app/src/main/res/drawable/the_hobbit_cover.jpg" />
+    <option name="SHELVED_PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_14_11_2024_17_21_[Changes]1/the_hobbit_cover.jpg" />
+  </binary>
+</changelist>

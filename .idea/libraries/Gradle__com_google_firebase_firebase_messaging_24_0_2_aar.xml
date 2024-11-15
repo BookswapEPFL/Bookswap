@@ -1,0 +1,16 @@
+<component name="libraryTable">
+  <library name="Gradle: com.google.firebase:firebase-messaging:24.0.2@aar" external-system-id="GRADLE">
+    <ANNOTATIONS>
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-3/9f5d89317142c30c7ed39bc136653b41/transformed/firebase-messaging-24.0.2/annotations.zip!/" />
+    </ANNOTATIONS>
+    <CLASSES>
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-3/9f5d89317142c30c7ed39bc136653b41/transformed/firebase-messaging-24.0.2/AndroidManifest.xml" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-3/9f5d89317142c30c7ed39bc136653b41/transformed/firebase-messaging-24.0.2/res" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-3/9f5d89317142c30c7ed39bc136653b41/transformed/firebase-messaging-24.0.2/jars/classes.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.google.firebase/firebase-messaging/24.0.2/b592df51104392e98055956b13193f3d21bb6a56/firebase-messaging-24.0.2-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

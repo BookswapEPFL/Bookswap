@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="Gradle: com.kaspersky.android-components:kaspresso-compose-support:1.5.5@aar" external-system-id="GRADLE">
+    <CLASSES>
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-3/bfa48016c1cb365f4a1100758f228407/transformed/kaspresso-compose-support-1.5.5/AndroidManifest.xml" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-3/bfa48016c1cb365f4a1100758f228407/transformed/kaspresso-compose-support-1.5.5/jars/classes.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.kaspersky.android-components/kaspresso-compose-support/1.5.5/6756090900cf59b41ea13fbd1d9f41c5f6914f3/kaspresso-compose-support-1.5.5-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

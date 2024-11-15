@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="Gradle: com.kaspersky.android-components:kautomator:1.5.5@aar" external-system-id="GRADLE">
+    <CLASSES>
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-3/1772ae2d2e0f80279e532b59f18be94e/transformed/kautomator-1.5.5/AndroidManifest.xml" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-3/1772ae2d2e0f80279e532b59f18be94e/transformed/kautomator-1.5.5/jars/classes.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.kaspersky.android-components/kautomator/1.5.5/69a9395357b085cef7cfd99294c956871ad58b85/kautomator-1.5.5-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

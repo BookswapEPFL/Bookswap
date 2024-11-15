@@ -1,0 +1,63 @@
+Index: app/src/main/java/com/android/bookswap/model/chat/PermissionHandler.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.android.bookswap.model.chat\n\nimport android.Manifest\nimport android.content.pm.PackageManager\nimport android.os.Build\nimport android.widget.Toast\nimport androidx.activity.ComponentActivity\nimport androidx.activity.result.ActivityResultLauncher\nimport androidx.activity.result.contract.ActivityResultContracts\nimport androidx.annotation.RequiresApi\nimport androidx.appcompat.app.AlertDialog\nimport androidx.core.content.ContextCompat\nimport com.google.firebase.messaging.FirebaseMessaging\n\nclass PermissionHandler(private val activity: ComponentActivity) {\n\n  @RequiresApi(Build.VERSION_CODES.TIRAMISU)\n  val requestPermissionLauncher: ActivityResultLauncher<String> =\n      activity.registerForActivityResult(ActivityResultContracts.RequestPermission()) {\n          isGranted: Boolean ->\n        if (isGranted) {\n          enableNotifications()\n        } else {\n          informUserNotificationsDisabled()\n          showRationaleDialog()\n        }\n      }\n\n  fun askNotificationPermission() {\n    // Check if the API level is 33 or higher (Android 13+)\n    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {\n      when {\n        // Case 1: Permission already granted\n        ContextCompat.checkSelfPermission(activity, Manifest.permission.POST_NOTIFICATIONS) ==\n            PackageManager.PERMISSION_GRANTED -> {\n          // FCM SDK (and your app) can post notifications.\n          enableNotifications()\n        }\n        // Case 2: No need to show rationale, directly request permission\n        else -> {\n          // Directly request the notification permission\n          requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)\n        }\n      }\n    }\n  }\n\n  fun enableNotifications() {\n    // Initialize FCM SDK\n    FirebaseMessaging.getInstance().isAutoInitEnabled = true\n    // Additional setup if needed\n    Toast.makeText(activity, \"Notifications have been enabled.\", Toast.LENGTH_LONG).show()\n  }\n\n  fun informUserNotificationsDisabled() {\n    // Code to inform the user that notifications are disabled\n    // For example, you might show a Toast or a Snackbar\n    // This is a placeholder implementation\n    Toast.makeText(\n            activity,\n            \"Notifications are disabled. You will not receive updates.\",\n            Toast.LENGTH_LONG)\n        .show()\n  }\n\n  @RequiresApi(Build.VERSION_CODES.TIRAMISU)\n  private fun showRationaleDialog() {\n    AlertDialog.Builder(activity)\n        .setTitle(\"Notification Permission Required\")\n        .setMessage(\n            \"To keep you informed about important updates, please allow notification permissions.\")\n        .setPositiveButton(\"OK\") { _, _ ->\n          // Request the permission when the user agrees\n          requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)\n        }\n        .setNegativeButton(\"No thanks\") { dialog, _ ->\n          // Dismiss the dialog and continue without asking for permission\n          dialog.dismiss()\n        }\n        .create()\n        .show()\n  }\n}\n
+===================================================================
+diff --git a/app/src/main/java/com/android/bookswap/model/chat/PermissionHandler.kt b/app/src/main/java/com/android/bookswap/model/chat/PermissionHandler.kt
+--- a/app/src/main/java/com/android/bookswap/model/chat/PermissionHandler.kt	
++++ b/app/src/main/java/com/android/bookswap/model/chat/PermissionHandler.kt	
+@@ -3,6 +3,7 @@
+ import android.Manifest
+ import android.content.pm.PackageManager
+ import android.os.Build
++import android.widget.Button
+ import android.widget.Toast
+ import androidx.activity.ComponentActivity
+ import androidx.activity.result.ActivityResultLauncher
+@@ -10,6 +11,7 @@
+ import androidx.annotation.RequiresApi
+ import androidx.appcompat.app.AlertDialog
+ import androidx.core.content.ContextCompat
++import com.android.bookswap.R
+ import com.google.firebase.messaging.FirebaseMessaging
+ 
+ class PermissionHandler(private val activity: ComponentActivity) {
+@@ -63,21 +65,21 @@
+         .show()
+   }
+ 
+-  @RequiresApi(Build.VERSION_CODES.TIRAMISU)
+-  private fun showRationaleDialog() {
+-    AlertDialog.Builder(activity)
+-        .setTitle("Notification Permission Required")
+-        .setMessage(
+-            "To keep you informed about important updates, please allow notification permissions.")
+-        .setPositiveButton("OK") { _, _ ->
+-          // Request the permission when the user agrees
+-          requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+-        }
+-        .setNegativeButton("No thanks") { dialog, _ ->
+-          // Dismiss the dialog and continue without asking for permission
+-          dialog.dismiss()
+-        }
+-        .create()
+-        .show()
+-  }
++    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
++    private fun showRationaleDialog() {
++        AlertDialog.Builder(activity)
++            .setTitle("Notification Permission Required")
++            .setMessage(
++                "To keep you informed about important updates, please allow notification permissions.")
++            .setPositiveButton("OK") { _, _ ->
++                // Request the permission when the user agrees
++                requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
++            }
++            .setNegativeButton("No thanks") { dialog, _ ->
++                // Dismiss the dialog and continue without asking for permission
++                dialog.dismiss()
++            }
++            .create()
++            .show()
++    }
+ }
