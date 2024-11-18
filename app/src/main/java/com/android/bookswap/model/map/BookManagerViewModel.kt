@@ -54,9 +54,10 @@ class BookManagerViewModel(
   val filteredUsers: StateFlow<List<UserBooksWithLocation>> = _filteredUsers.asStateFlow()
 
   private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
+    private var updateBooksJob: Job? = null
 
   fun startUpdatingBooks() {
-    scope.launch {
+      updateBooksJob = scope.launch {
       while (true) {
         fetchBooksFromRepository()
         delay(REFRESH_TIME_DELAY)
@@ -67,7 +68,7 @@ class BookManagerViewModel(
   }
 
   fun stopUpdatingBooks() {
-    scope.cancel()
+      updateBooksJob?.cancel()
   }
 
   // Fetch books and users from the repository and update `_allBooks` and `_allUsers`
