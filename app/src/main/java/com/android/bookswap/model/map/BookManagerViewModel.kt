@@ -54,21 +54,22 @@ class BookManagerViewModel(
   val filteredUsers: StateFlow<List<UserBooksWithLocation>> = _filteredUsers.asStateFlow()
 
   private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
-    private var updateBooksJob: Job? = null
+  private var updateBooksJob: Job? = null
 
   fun startUpdatingBooks() {
-      updateBooksJob = scope.launch {
-      while (true) {
-        fetchBooksFromRepository()
-        delay(REFRESH_TIME_DELAY)
-      }
-    }
+    updateBooksJob =
+        scope.launch {
+          while (true) {
+            fetchBooksFromRepository()
+            delay(REFRESH_TIME_DELAY)
+          }
+        }
     computeDistanceOfUsers()
     combineFlowsAndFilterBooks()
   }
 
   fun stopUpdatingBooks() {
-      updateBooksJob?.cancel()
+    updateBooksJob?.cancel()
   }
 
   // Fetch books and users from the repository and update `_allBooks` and `_allUsers`
@@ -116,16 +117,18 @@ class BookManagerViewModel(
               _,
               _ ->
             val userBooksWithLocation =
-                userDistance.map { user ->
-                  UserBooksWithLocation(
-                      userUUID = user.first.userUUID,
-                      longitude = user.first.longitude,
-                      latitude = user.first.latitude,
-                      books =
-                          bookFilter.filterBooks(books).filter { book ->
-                            book.uuid in user.first.bookList
-                          })
-                }
+                userDistance
+                    .map { user ->
+                      UserBooksWithLocation(
+                          userUUID = user.first.userUUID,
+                          longitude = user.first.longitude,
+                          latitude = user.first.latitude,
+                          books =
+                              bookFilter.filterBooks(books).filter { book ->
+                                book.uuid in user.first.bookList
+                              })
+                    }
+                    .filter { it.books.isNotEmpty() }
 
             _filteredBooks.value = userBooksWithLocation.flatMap { it.books }
             _filteredUsers.value = userBooksWithLocation
