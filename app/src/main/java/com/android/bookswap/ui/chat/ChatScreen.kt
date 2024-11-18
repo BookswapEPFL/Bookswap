@@ -66,6 +66,7 @@ import com.android.bookswap.data.MessageType
 import com.android.bookswap.data.repository.MessageRepository
 import com.android.bookswap.data.repository.PhotoFirebaseStorageRepository
 import com.android.bookswap.model.PhotoRequester
+import com.android.bookswap.model.chat.OfflineMessageStorage
 import com.android.bookswap.ui.components.BackButtonComponent
 import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.theme.ColorVariable
@@ -91,7 +92,8 @@ fun ChatScreen(
     currentUser: DataUser,
     otherUser: DataUser,
     navController: NavigationActions,
-    photoStorage: PhotoFirebaseStorageRepository
+    photoStorage: PhotoFirebaseStorageRepository,
+    messageStorage: OfflineMessageStorage
 ) {
   val context = LocalContext.current
   var messages by remember { mutableStateOf(emptyList<DataMessage>()) }
@@ -144,6 +146,16 @@ fun ChatScreen(
 
   LaunchedEffect(Unit) {
     while (true) {
+        messageStorage.retrieveMessagesFromFirestore { result: Result<List<DataMessage>> ->
+            if (result.isSuccess) {
+                for (message in result.getOrThrow()) {
+                    messageStorage.addMessage(message)
+                }
+                messageStorage.setMessages()
+            } else {
+                Log.e("ChatScreen", "Error retrieving messages: ${result.exceptionOrNull()}")
+            }
+        }
       messageRepository.getMessages { result ->
         if (result.isSuccess) {
           messages =
@@ -158,6 +170,7 @@ fun ChatScreen(
                   .sortedBy { it.timestamp }
           Log.d("ChatScreen", "Fetched messages: $messages")
         } else {
+          messages = messageStorage.getMessagesFromText()
           Log.e("ChatScreen", "Failed to fetch messages: ${result.exceptionOrNull()?.message}")
         }
       }

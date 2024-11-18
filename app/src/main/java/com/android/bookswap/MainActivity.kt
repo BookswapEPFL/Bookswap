@@ -24,6 +24,7 @@ import com.android.bookswap.data.source.network.MessageFirestoreSource
 import com.android.bookswap.data.source.network.PhotoFirebaseStorageSource
 import com.android.bookswap.data.source.network.UserFirestoreSource
 import com.android.bookswap.model.UserViewModel
+import com.android.bookswap.model.chat.OfflineMessageStorage
 import com.android.bookswap.model.chat.PermissionHandler
 import com.android.bookswap.model.map.BookFilter
 import com.android.bookswap.model.map.BookManagerViewModel
@@ -78,6 +79,7 @@ class MainActivity : ComponentActivity() {
     val bookRepository = BooksFirestoreSource(db)
     val userDataSource = UserFirestoreSource(db)
     val photoStorage = PhotoFirebaseStorageSource(storage)
+    val messageStorage = OfflineMessageStorage("", db)
 
     // Initialize the geolocation
     val geolocation = Geolocation(this)
@@ -87,10 +89,11 @@ class MainActivity : ComponentActivity() {
           modifier = Modifier.fillMaxSize().semantics { testTag = C.Tag.main_screen_container },
           color = MaterialTheme.colorScheme.background) {
             BookSwapApp(
-                messageRepository,
-                bookRepository,
-                userDataSource,
+                messageRepository = messageRepository,
+                bookRepository = bookRepository,
+                userRepository = userDataSource,
                 photoStorage = photoStorage,
+                messageStorage = messageStorage,
                 geolocation = geolocation)
           }
     }
@@ -103,6 +106,7 @@ class MainActivity : ComponentActivity() {
       userRepository: UsersRepository,
       startDestination: String = Route.AUTH,
       photoStorage: PhotoFirebaseStorageSource,
+      messageStorage: OfflineMessageStorage,
       geolocation: IGeolocation = DefaultGeolocation()
   ) {
     // navigation part
@@ -224,7 +228,7 @@ class MainActivity : ComponentActivity() {
           val user2 = placeHolder.firstOrNull { it.contact.userUUID == user2UUID }?.contact
 
           if (user2 != null) {
-            ChatScreen(messageRepository, userVM.getUser(), user2, navigationActions, photoStorage)
+            ChatScreen(messageRepository, userVM.getUser(), user2, navigationActions, photoStorage, messageStorage)
           } else {
             BookAdditionChoiceScreen(
                 navigationActions,
