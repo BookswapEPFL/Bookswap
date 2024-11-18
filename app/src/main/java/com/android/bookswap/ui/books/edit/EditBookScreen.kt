@@ -274,11 +274,19 @@ fun EditBookScreen(
                                 photo = photo,
                                 bookLanguageStr = language,
                                 isbn = book.isbn,
-                                genres = genres)
+                                genres = genres,
+                                userId = book.userId,
+                            )
 
                         booksRepository.updateBook(
                             updatedBook!!,
-                            onSuccess = { navigationActions.goBack() },
+                            onSuccess = {
+                                // Fetch the updated book data from Firestore
+                                //booksRepository.getBook(updatedBook.uuid) { updatedBookFromFirestore ->
+                                    //createdBook.value = updatedBookFromFirestore
+                                    navigationActions.goBack()
+                                    //}
+                                },
                             onFailure = {
                               Toast.makeText(context, "Failed to update book.", Toast.LENGTH_SHORT)
                                   .show()

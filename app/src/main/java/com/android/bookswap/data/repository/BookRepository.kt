@@ -21,6 +21,9 @@ interface BooksRepository {
   // - onFailure: A callback function that receives an exception if the operation fails.
   fun getBook(OnSucess: (List<DataBook>) -> Unit, onFailure: (Exception) -> Unit)
 
+  // Function to fetch a specific book from the repository by UUID.
+  fun getBook(uuid: UUID, OnSucess: (DataBook) -> Unit, onFailure: (Exception) -> Unit)
+
   // Function to add a new book to the repository.
   // Parameters:
   // - dataBook: The book data to be added.

@@ -24,7 +24,7 @@ data class DataBook(
     val language: BookLanguages,
     val isbn: String?,
     val genres: List<BookGenres> = emptyList(),
-    var userId: String
+    var userId: UUID // better then string
 )
 
 /** All supported book language type */

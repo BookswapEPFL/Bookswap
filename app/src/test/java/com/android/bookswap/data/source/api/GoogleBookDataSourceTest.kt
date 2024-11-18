@@ -16,6 +16,7 @@ import org.mockito.Mockito.anyString
 import org.mockito.Mockito.`when`
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.capture
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
@@ -39,16 +40,17 @@ class GoogleBookDataSourceTest {
 
   @Test
   fun `ISBN input validation`() {
+    val userId = UUID.randomUUID()
     val mockGoogleBookDataSource: GoogleBookDataSource = mock()
 
     val callback: (Result<DataBook>) -> Unit = mock()
     `when`(
             mockGoogleBookDataSource.getBookFromISBN(
-                anyString(), ArgumentMatchers.any(callback::class.java) ?: callback))
+                anyString(), eq(userId), ArgumentMatchers.any(callback::class.java) ?: callback))
         .thenCallRealMethod()
 
-    mockGoogleBookDataSource.getBookFromISBN("01a3456789", callback)
-    mockGoogleBookDataSource.getBookFromISBN("01234567890", callback)
+    mockGoogleBookDataSource.getBookFromISBN("01a3456789", userId, callback)
+    mockGoogleBookDataSource.getBookFromISBN("01234567890", userId, callback)
     verify(callback, times(2)).invoke(capture(resultDataBookCaptor))
 
     assert(resultDataBookCaptor.value.isFailure)
@@ -100,22 +102,25 @@ class GoogleBookDataSourceTest {
             rating = null,
             photo = "image2",
             language = BookLanguages.ENGLISH,
-            isbn = "9780435123437")
+            isbn = "9780435123437",
+            userId = UUID.randomUUID()
+            )
 
     val mockGoogleBookDataSource: GoogleBookDataSource = mock()
-    `when`(mockGoogleBookDataSource.parseISBNResponse(jsonBook)).thenCallRealMethod()
+    `when`(mockGoogleBookDataSource.parseISBNResponse(jsonBook, dataBook.userId)).thenCallRealMethod()
 
-    assertBookEquals(dataBook, mockGoogleBookDataSource.parseISBNResponse(jsonBook).getOrNull())
+    assertBookEquals(dataBook, mockGoogleBookDataSource.parseISBNResponse(jsonBook, dataBook.userId).getOrNull())
   }
 
   @Test
   fun `parseISBNResponse fail when json is wrong`() {
+    val userID = UUID.randomUUID()
     val brokenJSON = "BROKEN JSON"
 
     val mockGoogleBookDataSource: GoogleBookDataSource = mock()
-    `when`(mockGoogleBookDataSource.parseISBNResponse(brokenJSON)).thenCallRealMethod()
+    `when`(mockGoogleBookDataSource.parseISBNResponse(brokenJSON, userID)).thenCallRealMethod()
 
-    assertTrue(mockGoogleBookDataSource.parseISBNResponse(brokenJSON).isFailure)
+    assertTrue(mockGoogleBookDataSource.parseISBNResponse(brokenJSON, userID).isFailure)
   }
 
   @Test
@@ -155,10 +160,11 @@ class GoogleBookDataSourceTest {
     """
             .trimIndent()
 
+    val userId = UUID.randomUUID()
     val mockGoogleBookDataSource: GoogleBookDataSource = mock()
-    `when`(mockGoogleBookDataSource.parseISBNResponse(missingTitleJson)).thenCallRealMethod()
+    `when`(mockGoogleBookDataSource.parseISBNResponse(missingTitleJson, userId)).thenCallRealMethod()
 
-    assertTrue(mockGoogleBookDataSource.parseISBNResponse(missingTitleJson).isFailure)
+    assertTrue(mockGoogleBookDataSource.parseISBNResponse(missingTitleJson, userId).isFailure)
   }
 
   @Test
@@ -226,13 +232,15 @@ class GoogleBookDataSourceTest {
             rating = null,
             photo = null,
             language = BookLanguages.OTHER,
-            isbn = "9780435123437")
+            isbn = "9780435123437",
+            userId = UUID.randomUUID()
+            )
 
     val mockGoogleBookDataSource: GoogleBookDataSource = mock()
-    `when`(mockGoogleBookDataSource.parseISBNResponse(anyString())).thenCallRealMethod()
+    `when`(mockGoogleBookDataSource.parseISBNResponse(anyString(), eq(dataBook.userId))).thenCallRealMethod()
 
-    assertBookEquals(dataBook, mockGoogleBookDataSource.parseISBNResponse(fieldsEmpty).getOrNull())
-    assertBookEquals(dataBook, mockGoogleBookDataSource.parseISBNResponse(listEmpty).getOrNull())
+    assertBookEquals(dataBook, mockGoogleBookDataSource.parseISBNResponse(fieldsEmpty, dataBook.userId).getOrNull())
+    assertBookEquals(dataBook, mockGoogleBookDataSource.parseISBNResponse(listEmpty, dataBook.userId).getOrNull())
   }
 
   /**

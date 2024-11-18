@@ -41,7 +41,8 @@ class AddToBookTest {
     composeTestRule.setContent {
       val navController = rememberNavController()
       val navigationActions = NavigationActions(navController)
-      AddToBookScreen(MockBooksRepository(), navigationActions)
+      val userId = UUID.randomUUID()
+      AddToBookScreen(MockBooksRepository(), navigationActions, userId)
     }
     // Check if the Save button is initially disabled
     composeTestRule.onNodeWithText("Save").assertIsNotEnabled()
@@ -52,7 +53,8 @@ class AddToBookTest {
     composeTestRule.setContent {
       val navController = rememberNavController()
       val navigationActions = NavigationActions(navController)
-      AddToBookScreen(MockBooksRepository(), navigationActions)
+      val userId = UUID.randomUUID()
+      AddToBookScreen(MockBooksRepository(), navigationActions, userId)
     }
     // Fill in the Title and ISBN fields
     composeTestRule.onNodeWithText("Title").performTextInput("My Book Title")
@@ -76,7 +78,9 @@ class AddToBookTest {
             photo = "https://example.com/photo.jpg",
             bookLanguageStr = "ENGLISH",
             isbn = "1234567890",
-            genres = listOf(BookGenres.TRAVEL))
+            genres = listOf(BookGenres.TRAVEL),
+            userId = UUID.randomUUID(),
+        )
 
     // Assert the book is created correctly
     assertEquals("My Book", book?.title)
@@ -102,7 +106,9 @@ class AddToBookTest {
             photo = "https://example.com/photo.jpg",
             bookLanguageStr = "ENGLISH",
             isbn = "1234567890",
-            genres = listOf(BookGenres.TRAVEL))
+            genres = listOf(BookGenres.TRAVEL),
+            userId = UUID.randomUUID(),
+        )
 
     // Assert that the book is null due to invalid title
     assertNull(book)
@@ -119,7 +125,9 @@ class AddToBookTest {
             photo = "https://example.com/photo.jpg",
             bookLanguageStr = "ENGLISH",
             isbn = "1234567890",
-            genres = listOf(BookGenres.TRAVEL))
+            genres = listOf(BookGenres.TRAVEL),
+            userId = UUID.randomUUID(),
+        )
 
     // Assert that the book is null due to invalid rating
     assertNull(book)
@@ -136,7 +144,9 @@ class AddToBookTest {
             photo = "https://example.com/photo.jpg",
             bookLanguageStr = "INVALID_LANGUAGE",
             isbn = "1234567890",
-            genres = listOf(BookGenres.TRAVEL))
+            genres = listOf(BookGenres.TRAVEL),
+            userId = UUID.randomUUID(),
+        )
 
     // Assert that the book is null due to invalid language
     assertNull(book)
@@ -147,7 +157,8 @@ class AddToBookTest {
     composeTestRule.setContent {
       val navController = rememberNavController()
       val navigationActions = NavigationActions(navController)
-      AddToBookScreen(MockBooksRepository(), navigationActions)
+      val userId = UUID.randomUUID()
+      AddToBookScreen(MockBooksRepository(), navigationActions, userId)
     }
     // Fill in the ISBN field but leave the Title field empty
     composeTestRule.onNodeWithText("ISBN").performTextInput("1234567890")
@@ -181,6 +192,15 @@ class AddToBookTest {
         onFailure(Exception("Failed to fetch books"))
       }
     }
+
+      override fun getBook(uuid: UUID, OnSucess: (DataBook) -> Unit, onFailure: (Exception) -> Unit) {
+        if (!shouldFail) {
+            isBookFetched = true
+            OnSucess(DataBook(UUID.randomUUID(), "Title", "Author", "Description", 5, "photo", BookLanguages.ENGLISH, "isbn", listOf(BookGenres.FANTASY), UUID.randomUUID()))
+        } else {
+            onFailure(Exception("Failed to fetch book"))
+        }
+      }
 
     override fun addBook(dataBook: DataBook, OnSucess: () -> Unit, onFailure: (Exception) -> Unit) {
       if (!shouldFail) {

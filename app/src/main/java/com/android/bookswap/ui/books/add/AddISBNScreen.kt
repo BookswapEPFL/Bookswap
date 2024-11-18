@@ -42,11 +42,16 @@ import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.navigation.TopLevelDestinations
 import com.android.bookswap.ui.profile.ProfileIcon
 import com.android.bookswap.ui.theme.ColorVariable
+import java.util.UUID
 
 /** This is the main screen for the chat feature. It displays the list of messages */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddISBNScreen(navigationActions: NavigationActions, booksRepository: BooksRepository) {
+fun AddISBNScreen(
+    navigationActions: NavigationActions,
+    booksRepository: BooksRepository,
+    userId: UUID
+) {
   val context = LocalContext.current
   Scaffold(
       topBar = {
@@ -101,7 +106,7 @@ fun AddISBNScreen(navigationActions: NavigationActions, booksRepository: BooksRe
                     ButtonComponent(
                         modifier = Modifier.testTag("isbn_searchButton"),
                         onClick = {
-                          GoogleBookDataSource(context).getBookFromISBN(isbn) { result ->
+                          GoogleBookDataSource(context).getBookFromISBN(isbn, userId) { result ->
                             if (result.isFailure) {
                               Toast.makeText(context, "Search unsuccessful", Toast.LENGTH_LONG)
                                   .show()

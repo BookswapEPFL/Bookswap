@@ -1,12 +1,17 @@
 package com.android.bookswap
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTag
@@ -14,9 +19,13 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
+import com.android.bookswap.data.BookGenres
+import com.android.bookswap.data.BookLanguages
+import com.android.bookswap.data.DataBook
 import com.android.bookswap.data.DataUser
 import com.android.bookswap.data.source.network.BooksFirestoreRepository
 import com.android.bookswap.data.source.network.MessageFirestoreSource
+import com.android.bookswap.model.UserViewModel
 import com.android.bookswap.model.chat.MessageBox
 import com.android.bookswap.model.chat.PermissionHandler
 import com.android.bookswap.model.map.BookFilter
@@ -24,10 +33,11 @@ import com.android.bookswap.model.map.DefaultGeolocation
 import com.android.bookswap.model.map.Geolocation
 import com.android.bookswap.model.map.IGeolocation
 import com.android.bookswap.resources.C
-import com.android.bookswap.ui.authentication.SignInScreen
+import com.android.bookswap.ui.books.BookProfileScreen
 import com.android.bookswap.ui.books.add.AddISBNScreen
 import com.android.bookswap.ui.books.add.AddToBookScreen
 import com.android.bookswap.ui.books.add.BookAdditionChoiceScreen
+import com.android.bookswap.ui.books.edit.EditBookScreen
 import com.android.bookswap.ui.chat.ChatScreen
 import com.android.bookswap.ui.chat.ListChatScreen
 import com.android.bookswap.ui.map.FilterMapScreen
@@ -80,6 +90,14 @@ class MainActivity : ComponentActivity() {
     val navController = rememberNavController()
     val navigationActions = NavigationActions(navController)
     val bookFilter = BookFilter()
+    val createdBook: MutableState<DataBook?> = remember {
+      mutableStateOf(null)
+    } // Explicit MutableState declaration
+
+    // TEST USER WILL BE CHANGED ACCORINGLY BY THEO:
+    val userViewModel = UserViewModel(UUID.randomUUID())
+    val userid = userViewModel.getUser().userUUID
+
     val placeHolder =
         listOf(
             MessageBox(
@@ -92,10 +110,50 @@ class MainActivity : ComponentActivity() {
                   message = "Test message $it test for the feature of ellipsis in the message",
                   date = "01.01.24")
             }
+    // Create a sample book and set it for editing only once
+    LaunchedEffect(Unit) {
+      val sampleBook =
+          DataBook(
+              uuid = UUID.randomUUID(),
+              title = "Test Book Jaime",
+              author = "Sample Author",
+              description = "Test for Jaime",
+              rating = 5,
+              photo = "sample_photo_url",
+              language = BookLanguages.ENGLISH,
+              isbn = "123456789",
+              genres = listOf(BookGenres.FANTASY),
+              userId = userid)
+      Log.d(
+          "MainActivity", "Attempting to add book in MainActivity") // Add this line before addBook
+
+      bookRepository.addBook(
+          sampleBook,
+          OnSucess = {
+            createdBook.value = sampleBook
+            Log.d("BookSwapApp", "Book added successfully: ${sampleBook.uuid}")
+          },
+          onFailure = { e ->
+            Log.e("BookSwapApp", "Error adding book: $e")
+            createdBook.value = sampleBook // Temporarily set book locally if Firestore fails
+          })
+    }
 
     NavHost(navController = navController, startDestination = startDestination) {
       navigation(startDestination = Screen.AUTH, route = Route.AUTH) {
-        composable(Screen.AUTH) { SignInScreen(navigationActions) }
+        composable(Screen.AUTH) {
+          createdBook.value?.let {
+            // Navigate to EditBookScreen only after the book is created
+            BookProfileScreen(it.uuid,bookRepository, navigationActions, userid)
+          }
+        }
+          composable("${Screen.EDIT_BOOK}/{bookId}") {
+              //val bookId = backStackEntry.arguments?.getString("bookId") ?: return@composable
+              // Navigate to the EditBookScreen with the extracted bookId
+              createdBook.value?.let {
+                EditBookScreen(bookRepository, navigationActions, it)
+              }
+          }
       }
       navigation(startDestination = Screen.CHATLIST, route = Route.CHAT) {
         composable(Screen.CHATLIST) { ListChatScreen(placeHolder, navigationActions) }
@@ -123,11 +181,13 @@ class MainActivity : ComponentActivity() {
           AddToBookScreen(
               bookRepository,
               navigationActions,
-              user.get(0).userId //just for now !!SHOULD BE CHANGED TO THE CORRECT USER ID!!
-          )
+              userid // just for now !!SHOULD BE CHANGED TO THE CORRECT USER ID!!
+              )
         }
         composable(Screen.ADD_BOOK_SCAN) { /*Todo*/}
-        composable(Screen.ADD_BOOK_ISBN) { AddISBNScreen(navigationActions, bookRepository) }
+        composable(Screen.ADD_BOOK_ISBN) {
+          AddISBNScreen(navigationActions, bookRepository, userid)
+        }
       }
     }
   }

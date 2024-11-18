@@ -43,7 +43,8 @@ class BooksFirestoreRepositoryTest {
           rating = 5,
           photo = "http://example.com/photo.jpg",
           language = BookLanguages.ENGLISH,
-          isbn = "1234567890")
+          isbn = "1234567890",
+          userId = UUID.randomUUID())
 
   @Before
   fun setUp() {
