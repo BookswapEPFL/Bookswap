@@ -228,7 +228,13 @@ class MainActivity : ComponentActivity() {
           val user2 = placeHolder.firstOrNull { it.contact.userUUID == user2UUID }?.contact
 
           if (user2 != null) {
-            ChatScreen(messageRepository, userVM.getUser(), user2, navigationActions, photoStorage, messageStorage)
+            ChatScreen(
+                messageRepository,
+                userVM.getUser(),
+                user2,
+                navigationActions,
+                photoStorage,
+                messageStorage)
           } else {
             BookAdditionChoiceScreen(
                 navigationActions,

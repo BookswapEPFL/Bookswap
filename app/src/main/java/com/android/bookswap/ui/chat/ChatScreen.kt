@@ -146,16 +146,16 @@ fun ChatScreen(
 
   LaunchedEffect(Unit) {
     while (true) {
-        messageStorage.retrieveMessagesFromFirestore { result: Result<List<DataMessage>> ->
-            if (result.isSuccess) {
-                for (message in result.getOrThrow()) {
-                    messageStorage.addMessage(message)
-                }
-                messageStorage.setMessages()
-            } else {
-                Log.e("ChatScreen", "Error retrieving messages: ${result.exceptionOrNull()}")
-            }
+      messageStorage.retrieveMessagesFromFirestore { result: Result<List<DataMessage>> ->
+        if (result.isSuccess) {
+          for (message in result.getOrThrow()) {
+            messageStorage.addMessage(message)
+          }
+          messageStorage.setMessages()
+        } else {
+          Log.e("ChatScreen", "Error retrieving messages: ${result.exceptionOrNull()}")
         }
+      }
       messageRepository.getMessages { result ->
         if (result.isSuccess) {
           messages =
