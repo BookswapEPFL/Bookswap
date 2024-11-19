@@ -12,6 +12,11 @@ import androidx.compose.ui.unit.dp
 import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.theme.ColorVariable
 
+/**
+ * Composable function for a back button component.
+ *
+ * @param navActions Navigation actions to handle the back button click.
+ */
 @Composable
 fun BackButtonComponent(navActions: NavigationActions) {
   IconButton(onClick = { navActions.goBack() }, modifier = Modifier.testTag("backButton")) {

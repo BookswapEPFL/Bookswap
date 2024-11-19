@@ -1,57 +1,47 @@
 package com.android.bookswap.data.source.api
 
+import android.content.Context
 import com.android.bookswap.data.BookLanguages
 import com.android.bookswap.data.DataBook
 import com.android.bookswap.utils.assertBookEquals
+import com.android.volley.RequestQueue
+import com.android.volley.toolbox.Volley
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.mockkStatic
+import io.mockk.spyk
+import io.mockk.verify
 import java.util.UUID
-import org.junit.After
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.ArgumentCaptor
-import org.mockito.ArgumentMatchers
-import org.mockito.Captor
-import org.mockito.Mockito.anyString
-import org.mockito.Mockito.`when`
-import org.mockito.MockitoAnnotations
-import org.mockito.kotlin.capture
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.times
-import org.mockito.kotlin.verify
 import org.robolectric.RobolectricTestRunner
 
 @RunWith(RobolectricTestRunner::class)
 class GoogleBookDataSourceTest {
-
-  private lateinit var mockitoClosable: AutoCloseable
-  @Captor private lateinit var resultDataBookCaptor: ArgumentCaptor<Result<DataBook>>
+  private lateinit var mockGoogleBookDataSource: GoogleBookDataSource
 
   @Before
-  fun init() {
-    mockitoClosable = MockitoAnnotations.openMocks(this)
-  }
+  fun setup() {
+    val mockContext: Context = mockk()
+    val mockQueue: RequestQueue = mockk()
+    mockkStatic(Volley::class)
+    every { Volley.newRequestQueue(any()) } returns mockQueue
 
-  @After
-  fun close() {
-    mockitoClosable.close()
+    mockGoogleBookDataSource = spyk(GoogleBookDataSource(mockContext))
   }
 
   @Test
   fun `ISBN input validation`() {
-    val mockGoogleBookDataSource: GoogleBookDataSource = mock()
 
-    val callback: (Result<DataBook>) -> Unit = mock()
-    `when`(
-            mockGoogleBookDataSource.getBookFromISBN(
-                anyString(), ArgumentMatchers.any(callback::class.java) ?: callback))
-        .thenCallRealMethod()
+    val callback: (Result<DataBook>) -> Unit = mockk()
+    every { callback(any()) } answers { assertTrue(firstArg<Result<DataBook>>().isFailure) }
 
     mockGoogleBookDataSource.getBookFromISBN("01a3456789", callback)
     mockGoogleBookDataSource.getBookFromISBN("01234567890", callback)
-    verify(callback, times(2)).invoke(capture(resultDataBookCaptor))
 
-    assert(resultDataBookCaptor.value.isFailure)
+    verify(exactly = 2) { callback(any()) }
   }
 
   @Test
@@ -102,18 +92,12 @@ class GoogleBookDataSourceTest {
             language = BookLanguages.ENGLISH,
             isbn = "9780435123437")
 
-    val mockGoogleBookDataSource: GoogleBookDataSource = mock()
-    `when`(mockGoogleBookDataSource.parseISBNResponse(jsonBook)).thenCallRealMethod()
-
     assertBookEquals(dataBook, mockGoogleBookDataSource.parseISBNResponse(jsonBook).getOrNull())
   }
 
   @Test
   fun `parseISBNResponse fail when json is wrong`() {
     val brokenJSON = "BROKEN JSON"
-
-    val mockGoogleBookDataSource: GoogleBookDataSource = mock()
-    `when`(mockGoogleBookDataSource.parseISBNResponse(brokenJSON)).thenCallRealMethod()
 
     assertTrue(mockGoogleBookDataSource.parseISBNResponse(brokenJSON).isFailure)
   }
@@ -154,9 +138,6 @@ class GoogleBookDataSourceTest {
       }
     """
             .trimIndent()
-
-    val mockGoogleBookDataSource: GoogleBookDataSource = mock()
-    `when`(mockGoogleBookDataSource.parseISBNResponse(missingTitleJson)).thenCallRealMethod()
 
     assertTrue(mockGoogleBookDataSource.parseISBNResponse(missingTitleJson).isFailure)
   }
@@ -227,9 +208,6 @@ class GoogleBookDataSourceTest {
             photo = null,
             language = BookLanguages.OTHER,
             isbn = "9780435123437")
-
-    val mockGoogleBookDataSource: GoogleBookDataSource = mock()
-    `when`(mockGoogleBookDataSource.parseISBNResponse(anyString())).thenCallRealMethod()
 
     assertBookEquals(dataBook, mockGoogleBookDataSource.parseISBNResponse(fieldsEmpty).getOrNull())
     assertBookEquals(dataBook, mockGoogleBookDataSource.parseISBNResponse(listEmpty).getOrNull())

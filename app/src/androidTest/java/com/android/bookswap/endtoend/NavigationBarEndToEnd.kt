@@ -7,6 +7,7 @@ import com.android.bookswap.MainActivity
 import com.android.bookswap.data.repository.BooksRepository
 import com.android.bookswap.data.repository.UsersRepository
 import com.android.bookswap.data.source.network.MessageFirestoreSource
+import com.android.bookswap.data.source.network.PhotoFirebaseStorageSource
 import com.android.bookswap.ui.navigation.Route
 import com.google.firebase.firestore.FirebaseFirestore
 import io.mockk.every
@@ -22,9 +23,11 @@ class NavigationBarEndToEnd {
 
   private lateinit var mockBookRepository: BooksRepository
   private lateinit var mockUserRepository: UsersRepository
+  private lateinit var mockPhotoStorage: PhotoFirebaseStorageSource
 
   @Before
   fun setUp() {
+    mockPhotoStorage = mockk()
     mockBookRepository = mockk()
     every { mockBookRepository.getBook(any()) } just runs
     mockUserRepository = mockk()
@@ -35,7 +38,12 @@ class NavigationBarEndToEnd {
 
       val messageRepository = MessageFirestoreSource(db)
       MainActivity()
-          .BookSwapApp(messageRepository, mockBookRepository, mockUserRepository, Route.MAP)
+          .BookSwapApp(
+              messageRepository,
+              mockBookRepository,
+              mockUserRepository,
+              Route.MAP,
+              mockPhotoStorage)
     }
   }
 

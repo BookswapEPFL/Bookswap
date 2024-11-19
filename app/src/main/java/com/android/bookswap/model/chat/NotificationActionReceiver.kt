@@ -25,7 +25,12 @@ class NotificationActionReceiver : BroadcastReceiver() {
       }
     }
   }
-
+  /**
+   * Handles the request code based on the action.
+   *
+   * @param context the Context in which the receiver is running.
+   * @param action the action string received from the notification.
+   */
   private fun requestCode(context: Context, action: String) {
     // Implement the logic to handle the request code based on the action
     Toast.makeText(context, "Action: $action", Toast.LENGTH_SHORT).show()

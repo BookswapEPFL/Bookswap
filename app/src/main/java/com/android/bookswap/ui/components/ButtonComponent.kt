@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.defaultMinSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.ButtonDefaults
@@ -26,8 +27,24 @@ import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 
+/** Padding for the button content. */
 private val BUTTON_CONTENT_PADDING = 8.dp
 
+/** Height of the button. */
+private val BUTTON_HEIGHT = 56.dp
+
+/** Minimum width of the button, calculated as three times the button height. */
+private val BUTTON_MIN_WIDTH = BUTTON_HEIGHT * 3
+/**
+ * A composable function that creates a custom button component.
+ *
+ * @param onClick The callback to be invoked when the button is clicked.
+ * @param modifier The modifier to be applied to the button.
+ * @param enabled Whether the button is enabled or not.
+ * @param border The border to be applied to the button.
+ * @param interactionSource The interaction source representing the stream of interaction events.
+ * @param content The content to be displayed inside the button.
+ */
 @Composable
 fun ButtonComponent(
     onClick: () -> Unit,
@@ -56,7 +73,12 @@ fun ButtonComponent(
   Surface(
       onClick = onClick,
       modifier =
-          modifier.minimumInteractiveComponentSize().clip(shape).semantics { role = Role.Button },
+          modifier
+              .minimumInteractiveComponentSize()
+              .clip(shape)
+              .semantics { role = Role.Button }
+              .height(BUTTON_HEIGHT)
+              .defaultMinSize(minWidth = BUTTON_MIN_WIDTH),
       enabled = enabled,
       shape = shape,
       color = containerColor,
