@@ -26,6 +26,9 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -40,7 +43,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.bookswap.R
+import com.android.bookswap.model.UserViewModel
 import com.android.bookswap.ui.navigation.NavigationActions
+import com.android.bookswap.ui.navigation.Screen
 import com.android.bookswap.ui.navigation.TopLevelDestinations
 import com.android.bookswap.ui.theme.ColorVariable
 import com.google.android.gms.auth.api.signin.GoogleSignIn
@@ -53,23 +58,54 @@ import com.google.firebase.auth.auth
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
+/**
+ * Composable function for the SignIn screen.
+ *
+ * @param navigationActions Actions to navigate between screens.
+ * @param userVM ViewModel for user-related operations.
+ */
 @Composable
-fun SignInScreen(navigationActions: NavigationActions) { // Add this when navigation is
+fun SignInScreen(
+    navigationActions: NavigationActions,
+    userVM: UserViewModel
+) { // Add this when navigation is
   // implemented
   val context = LocalContext.current
+  var googleUid = ""
+  // Check if user is already signed in
+  LaunchedEffect(Unit) {
+    if (Firebase.auth.currentUser != null) {
+      navigationActions.navigateTo(TopLevelDestinations.MAP)
+    }
+  }
 
   val launcher =
       rememberFirebaseAuthLauncher(
           onAuthComplete = { result ->
-            Log.d("SignInScreen", "User signed in: ${result.user?.displayName}")
-            Toast.makeText(context, "Login successful!", Toast.LENGTH_LONG).show()
-            navigationActions.navigateTo(TopLevelDestinations.MAP)
+            val googleUserName = result.user?.displayName ?: ""
+            googleUid = result.user?.uid ?: ""
+            userVM.getUserByGoogleUid(googleUid)
+            Log.d("SignInScreen", "isStored: ${userVM.isStored}")
+            Log.d("SignInScreen", "User signed in: $googleUserName")
+            Toast.makeText(context, "Welcome $googleUserName!", Toast.LENGTH_LONG).show()
           },
           onAuthError = {
             Log.e("SignInScreen", "Failed to sign in: ${it.statusCode}")
             Toast.makeText(context, "Login Failed!", Toast.LENGTH_LONG).show()
           })
   val token = stringResource(R.string.default_web_client_id)
+
+  val isStored by userVM.isStored.collectAsState()
+
+  LaunchedEffect(isStored) {
+    when (isStored) {
+      true -> navigationActions.navigateTo(TopLevelDestinations.MAP)
+      false -> {
+        navigationActions.navigateTo(Screen.NEW_USER)
+      }
+      null -> {} // Attendre que `isStored` soit défini
+    }
+  }
 
   Scaffold(
       modifier = Modifier.fillMaxSize().testTag("SignInScreen"),
@@ -134,7 +170,15 @@ fun SignInScreen(navigationActions: NavigationActions) { // Add this when naviga
         }
       })
 }
-
+/**
+ * Get the user by the googleUid.
+ *
+ * This function fetches the user data associated with the provided googleUid. If the user is found,
+ * it updates the dataUser and sets isLoaded to true. If the user is not found, it sets isLoaded to
+ * false.
+ *
+ * @param googleUid The Google UID of the user to fetch.
+ */
 @Composable
 fun GoogleSignInButton(onSignInClick: () -> Unit) {
   Button(
@@ -168,7 +212,17 @@ fun GoogleSignInButton(onSignInClick: () -> Unit) {
             }
       }
 }
-
+/**
+ * Remembers a Firebase authentication launcher for signing in with Google.
+ *
+ * This function creates and remembers a `ManagedActivityResultLauncher` that handles the Firebase
+ * authentication process using Google Sign-In. It launches the Google Sign-In intent, retrieves the
+ * Google account, and signs in with Firebase using the obtained credentials.
+ *
+ * @param onAuthComplete Callback function to be invoked when authentication is successful.
+ * @param onAuthError Callback function to be invoked when an authentication error occurs.
+ * @return A `ManagedActivityResultLauncher` for handling the Google Sign-In intent.
+ */
 @Composable
 fun rememberFirebaseAuthLauncher(
     onAuthComplete: (AuthResult) -> Unit,

@@ -15,8 +15,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -30,33 +28,29 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.times
 import com.android.bookswap.R
-import com.android.bookswap.ui.components.BackButtonComponent
-import com.android.bookswap.ui.navigation.BottomNavigationMenu
-import com.android.bookswap.ui.navigation.List_Navigation_Bar_Destinations
 import com.android.bookswap.ui.navigation.NavigationActions
-import com.android.bookswap.ui.profile.ProfileIcon
 import com.android.bookswap.ui.theme.ColorVariable
 
+/**
+ * Composable function to display the screen for choosing how to add a book.
+ *
+ * @param navController The navigation actions to handle navigation events.
+ * @param topAppBar A composable function to display the top app bar.
+ * @param bottomAppBar A composable function to display the bottom app bar.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BookAdditionChoiceScreen(navController: NavigationActions) {
+fun BookAdditionChoiceScreen(
+    navController: NavigationActions,
+    topAppBar: @Composable () -> Unit = {},
+    bottomAppBar: @Composable () -> Unit = {},
+) {
   val columnPadding = 16.dp
   val buttonWidth = (LocalConfiguration.current.screenWidthDp.dp * (0.75f))
   Scaffold(
       modifier = Modifier.testTag("addBookChoiceScreen"),
-      topBar = {
-        TopAppBar(
-            title = { Text("Book Addition Choice", color = ColorVariable.BackGround) },
-            navigationIcon = { BackButtonComponent(navController) },
-            actions = { ProfileIcon() },
-            colors = TopAppBarDefaults.topAppBarColors(containerColor = ColorVariable.BackGround))
-      },
-      bottomBar = {
-        BottomNavigationMenu(
-            onTabSelect = { destination -> navController.navigateTo(destination) },
-            tabList = List_Navigation_Bar_Destinations,
-            selectedItem = navController.currentRoute())
-      }) { innerPadding ->
+      topBar = topAppBar,
+      bottomBar = bottomAppBar) { innerPadding ->
         Column(
             modifier =
                 Modifier.padding(innerPadding)
@@ -91,7 +85,16 @@ fun BookAdditionChoiceScreen(navController: NavigationActions) {
             }
       }
 }
-
+/**
+ * Composable function to display a button with an icon.
+ *
+ * @param text The text to display on the button.
+ * @param leftIcon The optional left icon to display on the button.
+ * @param leftIconPainter The optional left icon painter to display on the button.
+ * @param navController The navigation actions to handle navigation events.
+ * @param navDestination The destination to navigate to when the button is clicked.
+ * @param buttonWidth The width of the button.
+ */
 @Composable
 fun ButtonWithIcon(
     text: String,

@@ -109,9 +109,9 @@ class ISBNAddTest : TestCase() {
 
     // Mock call to repository
     val mockBooksRepository: BooksRepository = mockk()
-    every { mockBooksRepository.addBook(matchDataBook(dataBook), any(), any()) } answers
+    every { mockBooksRepository.addBook(matchDataBook(dataBook), any()) } answers
         {
-          secondArg<() -> Unit>()()
+          secondArg<(Result<Unit>) -> Unit>()(Result.success(Unit))
         } andThenJust
         Runs
 
@@ -130,7 +130,7 @@ class ISBNAddTest : TestCase() {
       anyConstructed<GoogleBookDataSource>()
           .getBookFromISBN(dataBook.isbn!!, dataBook.userId, any())
     } // Api is called
-    verify { mockBooksRepository.addBook(matchDataBook(dataBook), any(), any()) } // Book is added
+    verify { mockBooksRepository.addBook(matchDataBook(dataBook), any()) } // Book is added
     verify {
       mockNavigationActions.navigateTo(any(TopLevelDestination::class))
     } // Navigation is called when book is added
@@ -188,9 +188,9 @@ class ISBNAddTest : TestCase() {
 
     // Mock failed call to repository
     val mockBooksRepository: BooksRepository = mockk()
-    every { mockBooksRepository.addBook(matchDataBook(dataBook), any(), any()) } answers
+    every { mockBooksRepository.addBook(matchDataBook(dataBook), any()) } answers
         {
-          thirdArg<(Exception) -> Unit>()(Exception("Error message"))
+          secondArg<(Result<Unit>) -> Unit>()(Result.failure(Exception("Error message")))
         } andThenJust
         Runs
 
@@ -209,7 +209,7 @@ class ISBNAddTest : TestCase() {
           .getBookFromISBN(dataBook.isbn!!, dataBook.userId, any())
     } // Api is called
     verify {
-      mockBooksRepository.addBook(matchDataBook(dataBook), any(), any())
+      mockBooksRepository.addBook(matchDataBook(dataBook), any())
     } // Book repository is called
     verify { toastMock.show() } // Error is displayed
   }

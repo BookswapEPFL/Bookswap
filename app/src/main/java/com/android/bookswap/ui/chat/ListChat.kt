@@ -4,7 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -21,25 +20,19 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.android.bookswap.model.chat.MessageBox
-import com.android.bookswap.ui.navigation.BottomNavigationMenu
-import com.android.bookswap.ui.navigation.List_Navigation_Bar_Destinations
+import com.android.bookswap.data.MessageBox
 import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.navigation.Screen
-import com.android.bookswap.ui.profile.ProfileIcon
 import com.android.bookswap.ui.theme.ColorVariable
 
 /** This is the main screen for the chat feature. It displays the list of messages */
@@ -47,34 +40,13 @@ import com.android.bookswap.ui.theme.ColorVariable
 @Composable
 fun ListChatScreen(
     placeHolderData: List<MessageBox> = emptyList(),
-    navigationActions: NavigationActions
+    navigationActions: NavigationActions,
+    topAppBar: @Composable () -> Unit = {},
+    bottomAppBar: @Composable () -> Unit = {},
 ) {
   Scaffold(
       modifier = Modifier.testTag("chat_listScreen"),
-      topBar = {
-        TopAppBar(
-            colors =
-                TopAppBarDefaults.smallTopAppBarColors(
-                    containerColor = ColorVariable.BackGround,
-                ),
-            title = {
-              Box(
-                  modifier = Modifier.fillMaxSize().testTag("chat_messageScreenTitle"),
-                  contentAlignment = Alignment.Center) {
-                    Text(
-                        text = "Messages",
-                        style =
-                            TextStyle(
-                                fontSize = 30.sp,
-                                lineHeight = 20.sp,
-                                fontWeight = FontWeight(700),
-                                color = ColorVariable.Accent,
-                                letterSpacing = 0.3.sp,
-                            ))
-                  }
-            },
-            actions = { ProfileIcon() })
-      },
+      topBar = topAppBar,
       content = { pv ->
         LazyColumn(
             contentPadding = pv,
@@ -97,24 +69,17 @@ fun ListChatScreen(
                 items(placeHolderData.size) { message ->
                   MessageBoxDisplay(placeHolderData[message]) {
                     navigationActions.navigateTo(
-                        Screen.CHAT, "user123", placeHolderData[message].contactName)
+                        Screen.CHAT, placeHolderData[message].contact.userUUID.toString())
                   }
                   MessageDivider()
                 }
               }
             }
       },
-      bottomBar = {
-        BottomNavigationMenu(
-            onTabSelect = { destination -> navigationActions.navigateTo(destination) },
-            tabList = List_Navigation_Bar_Destinations,
-            selectedItem = navigationActions.currentRoute())
-      })
+      bottomBar = bottomAppBar)
 }
 
-/*
-This function is used to display the message box
- */
+/** This function is used to display the message box */
 @Composable
 fun MessageBoxDisplay(message: MessageBox, onClick: () -> Unit = {}) {
   Row(
@@ -136,7 +101,7 @@ fun MessageBoxDisplay(message: MessageBox, onClick: () -> Unit = {}) {
               modifier = Modifier.fillMaxWidth(),
               horizontalArrangement = Arrangement.SpaceBetween) {
                 Text(
-                    text = message.contactName,
+                    text = message.contact.firstName + " " + message.contact.lastName,
                     fontWeight = FontWeight.Medium,
                     fontSize = 18.sp,
                     color = ColorVariable.Accent,

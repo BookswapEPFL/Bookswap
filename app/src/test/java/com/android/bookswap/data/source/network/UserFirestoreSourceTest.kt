@@ -1,10 +1,8 @@
 package com.android.bookswap.data.source.network
 
 import android.util.Log
-import androidx.test.core.app.ApplicationProvider
 import com.android.bookswap.data.DataUser
 import com.google.android.gms.tasks.Tasks
-import com.google.firebase.FirebaseApp
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
@@ -12,32 +10,26 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.firestore.util.Assert.fail
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.verify
 import java.util.UUID
-import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.ArgumentMatchers
-import org.mockito.Mock
-import org.mockito.Mockito.`when`
-import org.mockito.MockitoAnnotations
-import org.mockito.kotlin.any
-import org.mockito.kotlin.doAnswer
-import org.mockito.kotlin.eq
-import org.mockito.kotlin.verify
 import org.robolectric.RobolectricTestRunner
 
 @RunWith(RobolectricTestRunner::class)
 class UserFirestoreSourceTest {
 
-  @Mock private lateinit var mockFirestore: FirebaseFirestore
-  @Mock private lateinit var mockCollectionReference: CollectionReference
-  @Mock private lateinit var mockDocumentReference: DocumentReference
-  @Mock private lateinit var mockDocumentSnapshot: DocumentSnapshot
-  @Mock private lateinit var mockQuerySnapshot: QuerySnapshot
-  @Mock private lateinit var mockQuery: Query
+  private val mockFirestore: FirebaseFirestore = mockk()
+  private val mockCollectionReference: CollectionReference = mockk()
+  private val mockDocumentReference: DocumentReference = mockk()
+  private val mockDocumentSnapshot: DocumentSnapshot = mockk()
+  private val mockQuerySnapshot: QuerySnapshot = mockk()
+  private val mockQuery: Query = mockk()
 
-  private lateinit var userFirestoreSource: UserFirestoreSource
+  private val userFirestoreSource: UserFirestoreSource = UserFirestoreSource(mockFirestore)
 
   private val testUser =
       DataUser(
@@ -53,39 +45,36 @@ class UserFirestoreSourceTest {
 
   @Before
   fun setUp() {
-    MockitoAnnotations.openMocks(this)
 
-    // Initialize Firebase if necessary
-    if (FirebaseApp.getApps(ApplicationProvider.getApplicationContext()).isEmpty()) {
-      FirebaseApp.initializeApp(ApplicationProvider.getApplicationContext())
-    }
+    userFirestoreSource
 
-    userFirestoreSource = UserFirestoreSource(mockFirestore)
+    every { mockFirestore.collection(any()) } returns mockCollectionReference
+    every { mockCollectionReference.document() } returns mockDocumentReference
+    every { mockCollectionReference.get() } returns Tasks.forResult(mockQuerySnapshot)
+    every { mockCollectionReference.document(any()) } returns mockDocumentReference
 
-    `when`(mockFirestore.collection(ArgumentMatchers.any())).thenReturn(mockCollectionReference)
-    `when`(mockCollectionReference.document(ArgumentMatchers.any()))
-        .thenReturn(mockDocumentReference)
-    `when`(mockCollectionReference.get()).thenReturn(Tasks.forResult(mockQuerySnapshot))
+    every { mockQuerySnapshot.documents } returns listOf(mockDocumentSnapshot)
+
+    every { mockDocumentSnapshot.getLong("userUUID.mostSignificantBits") } returns
+        testUser.userUUID.mostSignificantBits
+    every { mockDocumentSnapshot.getLong("userUUID.leastSignificantBits") } returns
+        testUser.userUUID.leastSignificantBits
+    every { mockDocumentSnapshot.getString("greeting") } returns testUser.greeting
+    every { mockDocumentSnapshot.getString("firstName") } returns testUser.firstName
+
+    every { mockDocumentSnapshot.getString("lastName") } returns testUser.lastName
+
+    every { mockDocumentSnapshot.getString("email") } returns testUser.email
+    every { mockDocumentSnapshot.getString("phoneNumber") } returns testUser.phoneNumber
+    every { mockDocumentSnapshot.getDouble("latitude") } returns testUser.latitude
+    every { mockDocumentSnapshot.getDouble("longitude") } returns testUser.longitude
+    every { mockDocumentSnapshot.getString("profilePictureUrl") } returns testUser.profilePictureUrl
+    every { mockDocumentSnapshot.get("bookList") } returns testUser.bookList
+    every { mockDocumentSnapshot.getString("googleUid") } returns testUser.googleUid
   }
-
-  @After fun tearDown() {}
-
-  @Test fun init() {}
 
   @Test
   fun getUsers() {
-    // Arrange
-    `when`(mockQuerySnapshot.documents).thenReturn(listOf(mockDocumentSnapshot))
-    `when`(mockDocumentSnapshot.getString("UUID")).thenReturn(testUser.userUUID.toString())
-    `when`(mockDocumentSnapshot.getString("Greeting")).thenReturn(testUser.greeting)
-    `when`(mockDocumentSnapshot.getString("Firstname")).thenReturn(testUser.firstName)
-    `when`(mockDocumentSnapshot.getString("Lastname")).thenReturn(testUser.lastName)
-    `when`(mockDocumentSnapshot.getString("Email")).thenReturn(testUser.email)
-    `when`(mockDocumentSnapshot.getString("Phone")).thenReturn(testUser.phoneNumber)
-    `when`(mockDocumentSnapshot.getDouble("Latitude")).thenReturn(testUser.latitude)
-    `when`(mockDocumentSnapshot.getDouble("Longitude")).thenReturn(testUser.longitude)
-    `when`(mockDocumentSnapshot.getString("Picture")).thenReturn(testUser.profilePictureUrl)
-
     // Act
     userFirestoreSource.getUsers { result ->
       result.fold(
@@ -98,25 +87,14 @@ class UserFirestoreSourceTest {
     }
 
     // Verify Firestore collection was accessed
-    verify(mockCollectionReference).get()
+    verify { mockCollectionReference.get() }
   }
 
   @Test
   fun getUser() {
     // Arrange
-    `when`(mockQuerySnapshot.documents).thenReturn(listOf(mockDocumentSnapshot))
-    `when`(mockCollectionReference.whereEqualTo(eq("UUID"), ArgumentMatchers.any()))
-        .thenReturn(mockQuery)
-    `when`(mockQuery.get()).thenReturn(Tasks.forResult(mockQuerySnapshot))
-    `when`(mockDocumentSnapshot.getString("UUID")).thenReturn(testUser.userUUID.toString())
-    `when`(mockDocumentSnapshot.getString("Greeting")).thenReturn(testUser.greeting)
-    `when`(mockDocumentSnapshot.getString("Firstname")).thenReturn(testUser.firstName)
-    `when`(mockDocumentSnapshot.getString("Lastname")).thenReturn(testUser.lastName)
-    `when`(mockDocumentSnapshot.getString("Email")).thenReturn(testUser.email)
-    `when`(mockDocumentSnapshot.getString("Phone")).thenReturn(testUser.phoneNumber)
-    `when`(mockDocumentSnapshot.getDouble("Latitude")).thenReturn(testUser.latitude)
-    `when`(mockDocumentSnapshot.getDouble("Longitude")).thenReturn(testUser.longitude)
-    `when`(mockDocumentSnapshot.getString("Picture")).thenReturn(testUser.profilePictureUrl)
+    every { mockCollectionReference.whereEqualTo("UUID", any()) } returns mockQuery
+    every { mockQuery.get() } returns Tasks.forResult(mockQuerySnapshot)
 
     // Act
     userFirestoreSource.getUser(testUser.userUUID) { result ->
@@ -129,13 +107,13 @@ class UserFirestoreSourceTest {
     }
 
     // Verify Firestore collection was accessed
-    verify(mockCollectionReference).whereEqualTo(eq("UUID"), any())
+    verify { mockCollectionReference.whereEqualTo("UUID", any()) }
   }
 
   @Test
   fun addUser() {
     // Arrange
-    doAnswer { Tasks.forResult(null) }.`when`(mockDocumentReference).set(testUser)
+    every { mockDocumentReference.set(testUser) } returns Tasks.forResult(null)
 
     // Act
     userFirestoreSource.addUser(testUser) { result ->
@@ -143,13 +121,13 @@ class UserFirestoreSourceTest {
     }
 
     // Verify Firestore collection was accessed
-    verify(mockDocumentReference).set(testUser)
+    verify { mockDocumentReference.set(testUser) }
   }
 
   @Test
   fun updateUser() {
     // Arrange
-    doAnswer { Tasks.forResult(null) }.`when`(mockDocumentReference).set(testUser)
+    every { mockDocumentReference.set(testUser) } returns Tasks.forResult(null)
 
     // Act
     userFirestoreSource.updateUser(testUser) { result ->
@@ -157,13 +135,13 @@ class UserFirestoreSourceTest {
     }
 
     // Verify Firestore collection was accessed
-    verify(mockDocumentReference).set(testUser)
+    verify { mockDocumentReference.set(testUser) }
   }
 
   @Test
   fun deleteUser() {
     // Arrange
-    doAnswer { Tasks.forResult(null) }.`when`(mockDocumentReference).delete()
+    every { mockDocumentReference.delete() } returns Tasks.forResult(null)
 
     // Act
     userFirestoreSource.deleteUser(testUser.userUUID) { result ->
@@ -171,22 +149,11 @@ class UserFirestoreSourceTest {
     }
 
     // Verify Firestore collection was accessed
-    verify(mockDocumentReference).delete()
+    verify { mockDocumentReference.delete() }
   }
 
   @Test
   fun documentToUser_validDoc() {
-    // Arrange
-    `when`(mockDocumentSnapshot.getString("UUID")).thenReturn(testUser.userUUID.toString())
-    `when`(mockDocumentSnapshot.getString("Greeting")).thenReturn(testUser.greeting)
-    `when`(mockDocumentSnapshot.getString("Firstname")).thenReturn(testUser.firstName)
-    `when`(mockDocumentSnapshot.getString("Lastname")).thenReturn(testUser.lastName)
-    `when`(mockDocumentSnapshot.getString("Email")).thenReturn(testUser.email)
-    `when`(mockDocumentSnapshot.getString("Phone")).thenReturn(testUser.phoneNumber)
-    `when`(mockDocumentSnapshot.getDouble("Latitude")).thenReturn(testUser.latitude)
-    `when`(mockDocumentSnapshot.getDouble("Longitude")).thenReturn(testUser.longitude)
-    `when`(mockDocumentSnapshot.getString("Picture")).thenReturn(testUser.profilePictureUrl)
-
     // Act
     val result = userFirestoreSource.documentToUser(mockDocumentSnapshot)
 
@@ -197,16 +164,7 @@ class UserFirestoreSourceTest {
 
   @Test
   fun documentToUser_invalidDoc() {
-    // Arrange
-    `when`(mockDocumentSnapshot.getString("UUID")).thenReturn(testUser.userUUID.toString())
-    `when`(mockDocumentSnapshot.getString("Greeting")).thenReturn(null)
-    `when`(mockDocumentSnapshot.getString("Firstname")).thenReturn(testUser.firstName)
-    `when`(mockDocumentSnapshot.getString("Lastname")).thenReturn(testUser.lastName)
-    `when`(mockDocumentSnapshot.getString("Email")).thenReturn(testUser.email)
-    `when`(mockDocumentSnapshot.getString("Phone")).thenReturn(testUser.phoneNumber)
-    `when`(mockDocumentSnapshot.getDouble("Latitude")).thenReturn(testUser.latitude)
-    `when`(mockDocumentSnapshot.getDouble("Longitude")).thenReturn(testUser.longitude)
-    `when`(mockDocumentSnapshot.getString("Picture")).thenReturn(testUser.profilePictureUrl)
+    every { mockDocumentSnapshot.getString("greeting") } returns null
 
     // Act
     val result = userFirestoreSource.documentToUser(mockDocumentSnapshot)

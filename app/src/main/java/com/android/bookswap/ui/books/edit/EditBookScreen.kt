@@ -38,7 +38,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.android.bookswap.data.BookGenres
 import com.android.bookswap.data.DataBook
-import com.android.bookswap.data.source.network.BooksFirestoreRepository
+import com.android.bookswap.data.source.network.BooksFirestoreSource
 import com.android.bookswap.ui.books.add.createDataBook
 import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.theme.ColorVariable
@@ -48,11 +48,17 @@ private val SCREEN_PADDING = 16.dp
 private val ELEMENT_SPACING = 8.dp
 private val BUTTON_SPACER_HEIGHT = 16.dp
 private const val COLUMN_WIDTH_RATIO = 0.9f // Column width as 90% of screen width
-
+/**
+ * Composable function to display the Edit Book screen.
+ *
+ * @param booksRepository The repository to interact with the book data.
+ * @param navigationActions The navigation actions to handle navigation events.
+ * @param book The book data to be edited.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditBookScreen(
-    booksRepository: BooksFirestoreRepository,
+    booksRepository: BooksFirestoreSource,
     navigationActions: NavigationActions,
     book: DataBook
 ) {
@@ -280,16 +286,17 @@ fun EditBookScreen(
 
                         booksRepository.updateBook(
                             updatedBook!!,
-                            onSuccess = {
-                                // Fetch the updated book data from Firestore
-                                //booksRepository.getBook(updatedBook.uuid) { updatedBookFromFirestore ->
-                                    //createdBook.value = updatedBookFromFirestore
-                                    navigationActions.goBack()
-                                    //}
-                                },
-                            onFailure = {
-                              Toast.makeText(context, "Failed to update book.", Toast.LENGTH_SHORT)
-                                  .show()
+                            callback = { result ->
+                              if (result.isSuccess) {
+                                  // Fetch the updated book data from Firestore
+                                  //booksRepository.getBook(updatedBook.uuid) { updatedBookFromFirestore ->
+                                  //createdBook.value = updatedBookFromFirestore
+                                navigationActions.goBack()
+                              } else {
+                                Toast.makeText(
+                                        context, "Failed to update book.", Toast.LENGTH_SHORT)
+                                    .show()
+                              }
                             })
                       } catch (e: Exception) {
                         Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
@@ -308,10 +315,13 @@ fun EditBookScreen(
                       booksRepository.deleteBooks(
                           book.uuid,
                           book,
-                          onSuccess = { navigationActions.goBack() },
-                          onFailure = {
-                            Toast.makeText(context, "Failed to delete book.", Toast.LENGTH_SHORT)
-                                .show()
+                          callback = { result ->
+                            if (result.isSuccess) {
+                              navigationActions.goBack()
+                            } else {
+                              Toast.makeText(context, "Failed to delete book.", Toast.LENGTH_SHORT)
+                                  .show()
+                            }
                           })
                     },
                     modifier = Modifier.fillMaxWidth().testTag("bookDelete"),

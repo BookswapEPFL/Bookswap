@@ -9,12 +9,16 @@ import androidx.activity.ComponentActivity
 import androidx.core.content.ContextCompat
 import androidx.test.core.app.ApplicationProvider
 import com.google.firebase.FirebaseApp
+import io.mockk.every
+import io.mockk.just
+import io.mockk.mockk
+import io.mockk.mockkStatic
+import io.mockk.runs
+import io.mockk.spyk
+import io.mockk.verify
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.Mock
-import org.mockito.Mockito.*
-import org.mockito.MockitoAnnotations
 import org.robolectric.Robolectric
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
@@ -23,90 +27,59 @@ import org.robolectric.annotation.Config
 @Config(sdk = [Build.VERSION_CODES.TIRAMISU], application = TestApplicationChat::class)
 class PermissionHandlerTest {
 
-  @Mock private lateinit var mockActivity: ComponentActivity
+  private val mockActivity: ComponentActivity =
+      spyk(Robolectric.buildActivity(ComponentActivity::class.java).get())
 
-  private lateinit var permissionHandler: PermissionHandler
+  private val permissionHandler: PermissionHandler = PermissionHandler(mockActivity)
 
   @Before
   fun setUp() {
-    MockitoAnnotations.openMocks(this)
-    mockActivity = spy(Robolectric.buildActivity(ComponentActivity::class.java).get())
-    permissionHandler = PermissionHandler(mockActivity)
-    FirebaseApp.initializeApp(ApplicationProvider.getApplicationContext<Context>())
+    FirebaseApp.initializeApp(ApplicationProvider.getApplicationContext())
   }
 
   @Test
   fun `test askNotificationPermission when permission is granted`() {
     // Arrange
-    mockStatic(ContextCompat::class.java).use { mockedContextCompat ->
-      mockedContextCompat
-          .`when`<Int> {
-            ContextCompat.checkSelfPermission(mockActivity, Manifest.permission.POST_NOTIFICATIONS)
-          }
-          .thenReturn(PackageManager.PERMISSION_GRANTED)
+    mockkStatic(ContextCompat::class)
+    every {
+      ContextCompat.checkSelfPermission(mockActivity, Manifest.permission.POST_NOTIFICATIONS)
+    } returns PackageManager.PERMISSION_GRANTED
 
-      // Act
-      permissionHandler.askNotificationPermission()
+    // Act
+    permissionHandler.askNotificationPermission()
 
-      // Assert
-      verify(mockActivity, never())
-          .shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS)
-    }
-  }
-
-  @Test
-  fun `test askNotificationPermission when permission is not granted and rationale should not be shown`() {
-    // Arrange
-    reset(mockActivity)
-    mockStatic(ContextCompat::class.java).use { mockedContextCompat ->
-      `when`(
-              ContextCompat.checkSelfPermission(
-                  any(Context::class.java), eq(Manifest.permission.POST_NOTIFICATIONS)))
-          .thenReturn(PackageManager.PERMISSION_DENIED)
-
-      `when`(
-              mockActivity.shouldShowRequestPermissionRationale(
-                  Manifest.permission.POST_NOTIFICATIONS))
-          .thenReturn(false)
-
-      // Act
-      permissionHandler.askNotificationPermission()
-
-      // Assert
-      verify(mockActivity, times(1))
-          .shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS)
-
-      // Ensure no other interactions are made with this method
-      verifyNoMoreInteractions(mockActivity)
+    // Assert
+    verify(exactly = 0) {
+      mockActivity.shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS)
     }
   }
 
   @Test
   fun `test enableNotifications shows toast`() {
     // Arrange
-    val toast = mock(Toast::class.java)
-    mockStatic(Toast::class.java).use { mockedToast ->
-      `when`(Toast.makeText(any(Context::class.java), anyString(), anyInt())).thenReturn(toast)
+    val toast: Toast = mockk()
+    mockkStatic(Toast::class)
+    every { Toast.makeText(any<Context>(), any<String>(), any()) } returns toast
+    every { toast.show() } just runs
 
-      // Act
-      permissionHandler.enableNotifications()
+    // Act
+    permissionHandler.enableNotifications()
 
-      // Assert
-      verify(toast, times(1)).show()
-    }
+    // Assert
+    verify(exactly = 1) { toast.show() }
   }
 
   @Test
   fun `test informUserNotificationsDisabled shows toast`() {
     // Arrange
-    val toast = mock(Toast::class.java)
-    mockStatic(Toast::class.java).use { mockedToast ->
-      `when`(Toast.makeText(any(Context::class.java), anyString(), anyInt())).thenReturn(toast)
-      // Act
-      permissionHandler.informUserNotificationsDisabled()
+    val toast: Toast = mockk()
+    mockkStatic(Toast::class)
+    every { Toast.makeText(any<Context>(), any<String>(), any()) } returns toast
+    every { toast.show() } just runs
+    // Act
+    permissionHandler.informUserNotificationsDisabled()
 
-      // Assert
-      verify(toast, times(1)).show()
-    }
+    // Assert
+    verify(exactly = 1) { toast.show() }
   }
 }

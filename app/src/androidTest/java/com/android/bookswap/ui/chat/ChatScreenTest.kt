@@ -16,7 +16,10 @@ import androidx.compose.ui.test.performSemanticsAction
 import androidx.compose.ui.test.performTextClearance
 import androidx.compose.ui.test.performTextInput
 import com.android.bookswap.data.DataMessage
+import com.android.bookswap.data.DataUser
+import com.android.bookswap.data.MessageType
 import com.android.bookswap.data.repository.MessageRepository
+import com.android.bookswap.data.repository.PhotoFirebaseStorageRepository
 import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.theme.ColorVariable
 import com.google.firebase.firestore.ListenerRegistration
@@ -33,16 +36,25 @@ class ChatScreenTest {
   @get:Rule val composeTestRule = createComposeRule()
   private lateinit var placeHolderData: List<DataMessage>
   private lateinit var mockMessageRepository: MessageRepository
+  private lateinit var mockPhotoStorage: PhotoFirebaseStorageRepository
   private val currentUserUUID = UUID.randomUUID()
   private val otherUserUUID = UUID.randomUUID()
   private lateinit var mockNavigationActions: NavigationActions
+  private val currentUser =
+      DataUser(
+          currentUserUUID, "Hello", "Jaime", "Oliver Pastor", "", "", 0.0, 0.0, "", emptyList(), "")
+  private val otherUser =
+      DataUser(otherUserUUID, "Hey", "Matias", "Salvade", "", "", 0.0, 0.0, "", emptyList(), "")
 
   @Before
   fun setUp() {
+    mockPhotoStorage = mockk()
     mockNavigationActions = mockk()
+
     placeHolderData =
         List(6) {
               DataMessage(
+                  messageType = MessageType.TEXT,
                   uuid = UUID.randomUUID(),
                   senderUUID = currentUserUUID,
                   receiverUUID = otherUserUUID,
@@ -52,6 +64,7 @@ class ChatScreenTest {
             .toMutableList()
     (placeHolderData as MutableList<DataMessage>).add(
         DataMessage(
+            messageType = MessageType.IMAGE,
             uuid = imageTestMessageUUID,
             senderUUID = currentUserUUID,
             receiverUUID = otherUserUUID,
@@ -84,9 +97,10 @@ class ChatScreenTest {
     composeTestRule.setContent {
       ChatScreen(
           messageRepository = mockMessageRepository,
-          currentUserUUID = currentUserUUID,
-          otherUserUUID = otherUserUUID,
-          mockNavigationActions)
+          currentUser = currentUser,
+          otherUser = otherUser,
+          mockNavigationActions,
+          photoStorage = mockPhotoStorage)
     }
     composeTestRule.onNodeWithTag("message_input_field").assertIsDisplayed()
     composeTestRule.onNodeWithTag("send_button").assertIsDisplayed()
@@ -100,9 +114,10 @@ class ChatScreenTest {
     composeTestRule.setContent {
       ChatScreen(
           messageRepository = mockMessageRepository,
-          currentUserUUID = currentUserUUID,
-          otherUserUUID = otherUserUUID,
-          mockNavigationActions)
+          currentUser = currentUser,
+          otherUser = otherUser,
+          mockNavigationActions,
+          photoStorage = mockPhotoStorage)
     }
     composeTestRule.onNodeWithTag("message_input_field").assertIsDisplayed()
     composeTestRule.onNodeWithTag("send_button").assertIsDisplayed()
@@ -134,16 +149,17 @@ class ChatScreenTest {
   }
 
   @Test
-  fun CheckLastMessageIsImage() {
+  fun checkLastMessageIsImage() {
     val mockMessageRepository =
         MockMessageFirestoreSource().apply { messages = placeHolderData.toMutableList() }
 
     composeTestRule.setContent {
       ChatScreen(
           messageRepository = mockMessageRepository,
-          currentUserUUID = currentUserUUID,
-          otherUserUUID = otherUserUUID,
-          mockNavigationActions)
+          currentUser = currentUser,
+          otherUser = otherUser,
+          mockNavigationActions,
+          photoStorage = mockPhotoStorage)
     }
 
     composeTestRule
@@ -160,9 +176,10 @@ class ChatScreenTest {
     composeTestRule.setContent {
       ChatScreen(
           messageRepository = mockMessageRepository,
-          currentUserUUID = currentUserUUID,
-          otherUserUUID = otherUserUUID,
-          mockNavigationActions)
+          currentUser = currentUser,
+          otherUser = otherUser,
+          mockNavigationActions,
+          photoStorage = mockPhotoStorage)
     }
     composeTestRule.onNodeWithTag("send_button").assertHasClickAction()
   }
@@ -172,9 +189,10 @@ class ChatScreenTest {
     composeTestRule.setContent {
       ChatScreen(
           messageRepository = mockMessageRepository,
-          currentUserUUID = currentUserUUID,
-          otherUserUUID = otherUserUUID,
-          mockNavigationActions)
+          currentUser = currentUser,
+          otherUser = otherUser,
+          mockNavigationActions,
+          photoStorage = mockPhotoStorage)
     }
     val testInput = "Hello, World!"
     composeTestRule.onNodeWithTag("message_input_field").performTextInput(testInput)
@@ -189,9 +207,10 @@ class ChatScreenTest {
     composeTestRule.setContent {
       ChatScreen(
           messageRepository = mockMessageRepository,
-          currentUserUUID = currentUserUUID,
-          otherUserUUID = otherUserUUID,
-          mockNavigationActions)
+          currentUser = currentUser,
+          otherUser = otherUser,
+          mockNavigationActions,
+          photoStorage = mockPhotoStorage)
     }
 
     val testInput = "Hello, World!"
@@ -212,14 +231,17 @@ class ChatScreenTest {
     composeTestRule.setContent {
       ChatScreen(
           messageRepository = mockMessageRepository,
-          currentUserUUID = currentUserUUID,
-          otherUserUUID = otherUserUUID,
-          mockNavigationActions)
+          currentUser = currentUser,
+          otherUser = otherUser,
+          mockNavigationActions,
+          photoStorage = mockPhotoStorage)
     }
 
     composeTestRule.onNodeWithTag("chatTopAppBar").assertIsDisplayed()
     composeTestRule.onNodeWithTag("chatName").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("chatName").assertTextEquals(otherUserUUID.toString())
+    composeTestRule
+        .onNodeWithTag("chatName")
+        .assertTextEquals(otherUser.firstName + " " + otherUser.lastName)
     composeTestRule.onNodeWithTag("profileIcon", useUnmergedTree = true).assertIsDisplayed()
   }
 
@@ -228,9 +250,10 @@ class ChatScreenTest {
     composeTestRule.setContent {
       ChatScreen(
           messageRepository = mockMessageRepository,
-          currentUserUUID = currentUserUUID,
-          otherUserUUID = otherUserUUID,
-          navController = mockNavigationActions)
+          currentUser = currentUser,
+          otherUser = otherUser,
+          navController = mockNavigationActions,
+          photoStorage = mockPhotoStorage)
     }
 
     composeTestRule.waitForIdle()
@@ -268,9 +291,10 @@ class ChatScreenTest {
     composeTestRule.setContent {
       ChatScreen(
           messageRepository = mockMessageRepository,
-          currentUserUUID = currentUserUUID,
-          otherUserUUID = otherUserUUID,
-          mockNavigationActions)
+          currentUser = currentUser,
+          otherUser = otherUser,
+          mockNavigationActions,
+          photoStorage = mockPhotoStorage)
     }
 
     val message = placeHolderData.first()
@@ -312,9 +336,10 @@ class ChatScreenTest {
     composeTestRule.setContent {
       ChatScreen(
           messageRepository = mockMessageRepository,
-          currentUserUUID = currentUserUUID,
-          otherUserUUID = otherUserUUID,
-          navController = mockNavigationActions)
+          currentUser = currentUser,
+          otherUser = otherUser,
+          navController = mockNavigationActions,
+          photoStorage = mockPhotoStorage)
     }
 
     val message = placeHolderData.first()
@@ -382,34 +407,37 @@ class ChatScreenTest {
     composeTestRule.setContent {
       ChatScreen(
           messageRepository = mockMessageRepository,
-          currentUserUUID = currentUserUUID,
-          otherUserUUID = otherUserUUID,
-          mockNavigationActions)
+          currentUser = currentUser,
+          otherUser = otherUser,
+          mockNavigationActions,
+          photoStorage = mockPhotoStorage)
     }
 
     composeTestRule
         .onNodeWithTag("column", useUnmergedTree = true)
         .performScrollToIndex(mockMessageRepository.messages.size - 1)
 
-    composeTestRule.onNodeWithTag("hobbit", useUnmergedTree = true).performClick()
+    composeTestRule
+        .onNodeWithTag("message_item_column $imageTestMessageUUID", useUnmergedTree = true)
+        .performClick()
 
     composeTestRule.waitUntil(timeoutMillis = 5000) {
       composeTestRule
-          .onAllNodesWithTag("HobbitBig", useUnmergedTree = true)
+          .onAllNodesWithTag("popupImage", useUnmergedTree = true)
           .fetchSemanticsNodes()
           .isNotEmpty()
     }
-    composeTestRule.onNodeWithTag("HobbitBig", useUnmergedTree = true).assertIsDisplayed()
+    composeTestRule.onNodeWithTag("popupImage", useUnmergedTree = true).assertIsDisplayed()
 
-    composeTestRule.onNodeWithTag("HobbitBig", useUnmergedTree = true).performClick()
+    composeTestRule.onNodeWithTag("popupImage", useUnmergedTree = true).performClick()
 
     composeTestRule.waitUntil(timeoutMillis = 5000) {
       composeTestRule
-          .onAllNodesWithTag("HobbitBig", useUnmergedTree = true)
+          .onAllNodesWithTag("popupImage", useUnmergedTree = true)
           .fetchSemanticsNodes()
           .isEmpty()
     }
-    composeTestRule.onNodeWithTag("HobbitBig", useUnmergedTree = true).assertDoesNotExist()
+    composeTestRule.onNodeWithTag("popupImage", useUnmergedTree = true).assertDoesNotExist()
   }
 
   @Test
@@ -417,9 +445,10 @@ class ChatScreenTest {
     composeTestRule.setContent {
       ChatScreen(
           messageRepository = mockMessageRepository,
-          currentUserUUID = currentUserUUID,
-          otherUserUUID = otherUserUUID,
-          mockNavigationActions)
+          currentUser = currentUser,
+          otherUser = otherUser,
+          mockNavigationActions,
+          photoStorage = mockPhotoStorage)
     }
 
     val uiColors =

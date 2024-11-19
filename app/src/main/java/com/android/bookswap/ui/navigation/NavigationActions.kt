@@ -11,7 +11,7 @@ import androidx.navigation.NavHostController
 
 object Route {
   const val CHAT = "Chat"
-  const val PROFIL = "Profil"
+  const val PROFILE = "Profile"
   const val MAP = "Map"
   const val NEWBOOK = "NewBook"
   const val AUTH = "Auth"
@@ -28,7 +28,9 @@ object Screen {
   const val ADD_BOOK_ISBN = "AddBookISBN Screen"
   const val SETTINGS = "Settings Screen"
   const val FILTER = "Filter Screen"
-  const val EDIT_BOOK = "EditBook Screen"
+    const val EDIT_BOOK = "EditBook Screen"
+    const val PROFILE = "Profile Screen"
+  const val NEW_USER = "New User Screen"
 }
 
 data class TopLevelDestination(val route: String, val icon: ImageVector, val textId: String)
@@ -42,7 +44,7 @@ object TopLevelDestinations {
           route = Route.NEWBOOK, icon = Icons.Outlined.AddCircle, textId = "New Book")
   val PROFILE =
       TopLevelDestination(
-          route = Route.PROFIL, icon = Icons.Outlined.AccountCircle, textId = "Profile")
+          route = Route.PROFILE, icon = Icons.Outlined.AccountCircle, textId = "Profile")
 }
 /** List of top level destinations that are shown in the bottom navigation bar */
 val List_Navigation_Bar_Destinations =
@@ -60,20 +62,23 @@ open class NavigationActions(
    */
   open fun navigateTo(destination: TopLevelDestination) {
 
-    navController.navigate(destination.route) {
-      // Pop up to the start destination of the graph to
-      // avoid building up a large stack of destinations
-      popUpTo(navController.graph.findStartDestination().id) {
-        saveState = true
-        inclusive = true
-      }
+    // Only navigate if the route is different from the current route
+    if (!isCurrentDestination(destination.route)) {
+      navController.navigate(destination.route) {
+        // Pop up to the start destination of the graph to
+        // avoid building up a large stack of destinations
+        popUpTo(navController.graph.findStartDestination().id) {
+          saveState = true
+          inclusive = true
+        }
 
-      // Avoid multiple copies of the same destination when reelecting same item
-      launchSingleTop = true
+        // Avoid multiple copies of the same destination when reelecting same item
+        launchSingleTop = true
 
-      // Restore state when reelecting a previously selected item
-      if (destination.route != Route.AUTH) {
-        restoreState = true
+        // Restore state when reelecting a previously selected item
+        if (destination.route != Route.AUTH) {
+          restoreState = true
+        }
       }
     }
   }
@@ -82,16 +87,15 @@ open class NavigationActions(
    * Navigate to the specified screen with optional parameters.
    *
    * @param screen The screen to navigate to
-   * @param user1 The first user parameter
-   * @param user2 The second user parameter
+   * @param user1 The first user to pass to the screen
+   * @param user2 The second user to pass to the screen
    */
-  open fun navigateTo(screen: String, user1: String? = null, user2: String? = null) {
-    val route =
-        when (screen) {
-          Screen.CHAT -> "$screen/$user1/$user2"
-          else -> screen
-        }
-    navController.navigate(route)
+  open fun navigateTo(screen: String, otherUserUUID: String) {
+    val route = "$screen/$otherUserUUID"
+    // Only navigate if the route is different from the current route
+    if (!isCurrentDestination(route)) {
+      navController.navigate(route)
+    }
   }
 
   open fun navigateTo(screen: String, id: String? = null) {
@@ -108,7 +112,10 @@ open class NavigationActions(
    * @param screen The screen to navigate to
    */
   open fun navigateTo(screen: String) {
-    navController.navigate(screen)
+    // Only navigate if the route is different from the current route
+    if (!isCurrentDestination(screen)) {
+      navController.navigate(screen)
+    }
   }
 
   /** Navigate back to the previous screen. */
@@ -123,5 +130,12 @@ open class NavigationActions(
    */
   open fun currentRoute(): String {
     return navController.currentDestination?.route ?: ""
+  }
+
+  private fun isCurrentDestination(route: String): Boolean {
+    // Retrieve the current route and check if it starts with the same route name (as checking
+    // equality of the route name didn't worked)
+    val currentRoute = currentRoute()
+    return currentRoute.startsWith(route)
   }
 }

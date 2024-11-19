@@ -23,8 +23,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -35,7 +33,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
@@ -52,9 +49,24 @@ import com.android.bookswap.ui.navigation.Screen
 import com.android.bookswap.ui.theme.ColorVariable
 import java.util.UUID
 
+/**
+ * Composable function to display the profile screen of a book.
+ *
+ * @param DataBook The data object containing book details.
+ * @param navController The navigation actions for navigating between screens.
+ * @param topAppBar A composable function to display the top app bar.
+ * @param bottomAppBar A composable function to display the bottom app bar.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BookProfileScreen(bookId: UUID, booksRepository: BooksRepository, navController: NavigationActions, currentUserId: UUID) {
+fun BookProfileScreen(
+    bookId: UUID,
+    booksRepository: BooksRepository,
+    navController: NavigationActions,
+    topAppBar: @Composable () -> Unit = {},
+    bottomAppBar: @Composable () -> Unit = {},
+    currentUserId: UUID
+) {
   val columnPadding = 8.dp
   val pictureWidth = (LocalConfiguration.current.screenWidthDp.dp * (0.60f))
   val pictureHeight = pictureWidth * 1.41f
@@ -83,18 +95,8 @@ fun BookProfileScreen(bookId: UUID, booksRepository: BooksRepository, navControl
     }
   Scaffold(
       modifier = Modifier.testTag("bookProfileScreen"),
-      topBar = {
-        TopAppBar(
-            title = { Text("Book Profile", color = Color.Transparent) },
-            navigationIcon = { BackButtonComponent(navController) },
-            colors = TopAppBarDefaults.topAppBarColors(containerColor = ColorVariable.BackGround))
-      },
-      bottomBar = {
-        BottomNavigationMenu(
-            onTabSelect = { destination -> navController.navigateTo(destination) },
-            tabList = List_Navigation_Bar_Destinations,
-            selectedItem = navController.currentRoute())
-      }) { innerPadding ->
+      topBar = topAppBar,
+      bottomBar = bottomAppBar) { innerPadding ->
       when {
           isLoading -> {
               // Display a loading indicator
@@ -305,7 +307,12 @@ fun BookProfileScreen(bookId: UUID, booksRepository: BooksRepository, navControl
       }
   }
 }
-
+/**
+ * Composable function to display a text with a specific style and test tag.
+ *
+ * @param text The text to be displayed.
+ * @param testTag The test tag for the text composable.
+ */
 @Composable
 fun ProfileText(text: String, testTag: String) {
   Text(

@@ -1,6 +1,6 @@
 package com.android.bookswap.model.map
 
-import androidx.compose.runtime.MutableState
+import kotlinx.coroutines.flow.MutableStateFlow
 
 /**
  * Interface for providing geolocation data, with basic location management functionality.
@@ -12,10 +12,21 @@ import androidx.compose.runtime.MutableState
  * the use of mock or fake data sources.
  */
 interface IGeolocation {
-  val latitude: MutableState<Double>
-  val longitude: MutableState<Double>
-
+  val latitude: MutableStateFlow<Double>
+  val longitude: MutableStateFlow<Double>
+  /**
+   * Starts location updates.
+   *
+   * This function initiates the process of receiving location updates. It checks for the necessary
+   * location permissions and requests them if they are not granted. If the permissions are granted,
+   * it starts the location updates using the `FusedLocationProviderClient`.
+   */
   fun startLocationUpdates()
-
+  /**
+   * Stops location updates.
+   *
+   * This function stops the process of receiving location updates. It removes the location updates
+   * using the `FusedLocationProviderClient` and sets the `isRunning` state to false.
+   */
   fun stopLocationUpdates()
 }

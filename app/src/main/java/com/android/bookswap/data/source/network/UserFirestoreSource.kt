@@ -48,6 +48,31 @@ class UserFirestoreSource(private val db: FirebaseFirestore) : UsersRepository {
       }
     }
   }
+  /**
+   * Fetches the list of users from the Firestore collection If the task is successful, maps the
+   * Firestore documents to DataUser objects Calls OnSuccess with the list of users, or onFailure if
+   * the task fails
+   */
+  override fun getUser(googleUid: String, callback: (Result<DataUser>) -> Unit) {
+    db.collection(COLLECTION_NAME)
+        .whereEqualTo("googleUid", googleUid)
+        .get()
+        .addOnCompleteListener { task ->
+          if (task.isSuccessful) {
+            Log.d("TAG_USR_GET_BY_GUID", "usr count: ${task.result?.size()}")
+            val user = task.result?.firstNotNullOfOrNull { documentToUser(it).getOrNull() }
+            if (user != null) {
+              callback(Result.success(user))
+            } else {
+              callback(
+                  Result.failure(
+                      NoSuchElementException("No user found with googleUID: $googleUid")))
+            }
+          } else {
+            callback(Result.failure(task.exception ?: Exception("Unknown error occurred")))
+          }
+        }
+  }
 
   /** Adds a new user to the Firestore collection */
   override fun addUser(dataUser: DataUser, callback: (Result<Unit>) -> Unit) {
@@ -83,18 +108,35 @@ class UserFirestoreSource(private val db: FirebaseFirestore) : UsersRepository {
   fun documentToUser(document: DocumentSnapshot): Result<DataUser> {
 
     return try {
-      val userUUID = UUID.fromString(document.getString("UUID")!!)
-      val greeting = document.getString("Greeting")!!
-      val firstname = document.getString("Firstname")!!
-      val lastname = document.getString("Lastname")!!
-      val email = document.getString("Email")!!
-      val phoneNumber = document.getString("Phone")!!
-      val latitude = document.getDouble("Latitude")!!
-      val longitude = document.getDouble("Longitude")!!
-      val profilePicture = document.getString("Picture")!!
+      val mostSignificantBits = document.getLong("userUUID.mostSignificantBits")!!
+      val leastSignificantBits = document.getLong("userUUID.leastSignificantBits")!!
+      val greeting = document.getString("greeting")!!
+      val firstname = document.getString("firstName")!!
+      val lastname = document.getString("lastName")!!
+      val email = document.getString("email")!!
+      val phoneNumber = document.getString("phoneNumber")!!
+      val latitude = document.getDouble("latitude")!!
+      val longitude = document.getDouble("longitude")!!
+      val profilePicture = document.getString("profilePictureUrl")!!
+      val googleUid = document.getString("googleUid")!!
+      Log.d("TAG_DOC2USR", "GUID: $googleUid")
+      val bookList =
+          (document.get("bookList") as List<Map<String, Long>>).map { bookMap ->
+            val mostSigBits = bookMap["mostSignificantBits"]
+            val leastSigBits = bookMap["leastSignificantBits"]
+            if (mostSigBits != null && leastSigBits != null) {
+              UUID(mostSigBits, leastSigBits)
+            } else {
+              null
+            }
+          }
+      if (bookList.any { it == null }) {
+        throw IllegalArgumentException("Book list contains null UUIDs")
+      }
+
       Result.success(
           DataUser(
-              userUUID,
+              UUID(mostSignificantBits, leastSignificantBits),
               greeting,
               firstname,
               lastname,
@@ -103,7 +145,8 @@ class UserFirestoreSource(private val db: FirebaseFirestore) : UsersRepository {
               latitude,
               longitude,
               profilePicture,
-          ))
+              bookList.filterNotNull(),
+              googleUid))
     } catch (e: Exception) {
       Log.e("FirestoreSource", "Error converting document to User: ${e.message}")
       Result.failure(e)

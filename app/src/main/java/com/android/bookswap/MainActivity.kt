@@ -23,12 +23,20 @@ import com.android.bookswap.data.BookGenres
 import com.android.bookswap.data.BookLanguages
 import com.android.bookswap.data.DataBook
 import com.android.bookswap.data.DataUser
-import com.android.bookswap.data.source.network.BooksFirestoreRepository
+import com.android.bookswap.data.MessageBox
+import com.android.bookswap.data.repository.BooksRepository
+import com.android.bookswap.data.repository.MessageRepository
+import com.android.bookswap.data.repository.UsersRepository
+import com.android.bookswap.data.source.network.BooksFirestoreSource
 import com.android.bookswap.data.source.network.MessageFirestoreSource
 import com.android.bookswap.model.UserViewModel
 import com.android.bookswap.model.chat.MessageBox
+import com.android.bookswap.data.source.network.PhotoFirebaseStorageSource
+import com.android.bookswap.data.source.network.UserFirestoreSource
+import com.android.bookswap.model.UserViewModel
 import com.android.bookswap.model.chat.PermissionHandler
 import com.android.bookswap.model.map.BookFilter
+import com.android.bookswap.model.map.BookManagerViewModel
 import com.android.bookswap.model.map.DefaultGeolocation
 import com.android.bookswap.model.map.Geolocation
 import com.android.bookswap.model.map.IGeolocation
@@ -40,13 +48,22 @@ import com.android.bookswap.ui.books.add.BookAdditionChoiceScreen
 import com.android.bookswap.ui.books.edit.EditBookScreen
 import com.android.bookswap.ui.chat.ChatScreen
 import com.android.bookswap.ui.chat.ListChatScreen
+import com.android.bookswap.ui.components.TopAppBarComponent
 import com.android.bookswap.ui.map.FilterMapScreen
 import com.android.bookswap.ui.map.MapScreen
+import com.android.bookswap.ui.navigation.BottomNavigationMenu
+import com.android.bookswap.ui.navigation.List_Navigation_Bar_Destinations
 import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.navigation.Route
 import com.android.bookswap.ui.navigation.Screen
+import com.android.bookswap.ui.profile.NewUserScreen
+import com.android.bookswap.ui.profile.UserProfile
 import com.android.bookswap.ui.theme.BookSwapAppTheme
+import com.google.firebase.Firebase
+import com.google.firebase.auth.auth
+import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.FirebaseStorage
 import java.util.UUID
 
 class MainActivity : ComponentActivity() {
@@ -57,150 +74,214 @@ class MainActivity : ComponentActivity() {
     super.onCreate(savedInstanceState)
     // permissionHandler = PermissionHandler(this)
     // permissionHandler.askNotificationPermission()
+    setContent { BookSwapApp() }
+  }
 
-    // Initialize Firebase Firestore
+  @Composable
+  fun BookSwapApp() {
+
+    // Initialize a Firebase Firestore database instance
     val db = FirebaseFirestore.getInstance()
+    val storage = FirebaseStorage.getInstance()
 
-    // Create the MessageFirestoreSource object
+    // Create the data source objects
     val messageRepository = MessageFirestoreSource(db)
-    val bookRepository = BooksFirestoreRepository(db)
+    val bookRepository = BooksFirestoreSource(db)
+    val userDataSource = UserFirestoreSource(db)
+    val photoStorage = PhotoFirebaseStorageSource(storage)
 
     // Initialize the geolocation
     val geolocation = Geolocation(this)
-
-    setContent {
-      BookSwapAppTheme {
-        // A surface container using the 'background' color from the theme
-        Surface(
-            modifier = Modifier.fillMaxSize().semantics { testTag = C.Tag.main_screen_container },
-            color = MaterialTheme.colorScheme.background) {
-              BookSwapApp(messageRepository, bookRepository, geolocation = geolocation)
-            }
-      }
+    BookSwapAppTheme {
+      // A surface container using the 'background' color from the theme
+      Surface(
+          modifier = Modifier.fillMaxSize().semantics { testTag = C.Tag.main_screen_container },
+          color = MaterialTheme.colorScheme.background) {
+            BookSwapApp(
+                messageRepository,
+                bookRepository,
+                userDataSource,
+                photoStorage = photoStorage,
+                geolocation = geolocation)
+          }
     }
   }
 
   @Composable
   fun BookSwapApp(
-      messageRepository: MessageFirestoreSource,
-      bookRepository: BooksFirestoreRepository,
+      messageRepository: MessageRepository,
+      bookRepository: BooksRepository,
+      userRepository: UsersRepository,
       startDestination: String = Route.AUTH,
+      photoStorage: PhotoFirebaseStorageSource,
       geolocation: IGeolocation = DefaultGeolocation()
   ) {
+    // navigation part
     val navController = rememberNavController()
     val navigationActions = NavigationActions(navController)
-    val bookFilter = BookFilter()
-    val createdBook: MutableState<DataBook?> = remember {
-      mutableStateOf(null)
-    } // Explicit MutableState declaration
 
-    // TEST USER WILL BE CHANGED ACCORINGLY BY THEO:
-    val userViewModel = UserViewModel(UUID.randomUUID())
-    val userid = userViewModel.getUser().userUUID
+    // user part
+    Firebase.auth.signOut() // Uncomment this line to test the sign in screen
+    val currentUser = Firebase.auth.currentUser
+    val userVM = UserViewModel(UUID.randomUUID(), userRepository)
+
+    if (currentUser != null) {
+      userVM.getUserByGoogleUid(currentUser.uid) // This will scrap the user from the database
+    }
+    // Book part
+    val bookFilter = BookFilter()
+    val bookManagerViewModel =
+        BookManagerViewModel(geolocation, bookRepository, userRepository, bookFilter)
+
+    val currentUserUUID = UUID.fromString("77942cd7-8b99-41ba-a0a5-147214703434")
+    val otherUserUUID = UUID.fromString("7284fd9d-3edc-458b-93cd-2b0c4a8c0fc0")
+    val testUserUUID = UUID.fromString("550e8400-e29b-41d4-a716-446655440002")
+    val currentUserPlaceholder =
+        DataUser(
+            currentUserUUID,
+            "Mr.",
+            "Jaime",
+            "Oliver Pastor",
+            "",
+            "",
+            42.5717,
+            0.5471,
+            "https://media.istockphoto.com/id/693813718/photo/the-fortress-of-jaca-soain.jpg?s=612x612&w=0&k=20&c=MdnKl1VJIKQRwGdrGwBFx_L00vS8UVphR9J-nS6J90c=",
+            emptyList(),
+            "googleUid")
+
+    val otherUser =
+        DataUser(
+            otherUserUUID,
+            "Mr.",
+            "Théo",
+            "Schlaeppi",
+            "",
+            "",
+            46.3,
+            6.43,
+            "https://www.shutterstock.com/image-photo/wonderful-epesses-fairtytale-village-middle-600nw-2174791585.jpg",
+            emptyList(),
+            "googleUid")
+    val testUser =
+        DataUser(
+            testUserUUID,
+            "Mr.",
+            "John",
+            "Doe",
+            "john.doe@hotmail.com",
+            "+41999999999",
+            0.0,
+            0.0,
+            "john_doe.jpg",
+            emptyList(),
+            "googleUid")
 
     val placeHolder =
         listOf(
+            MessageBox(otherUser, message = "Welcome message for user124", date = "01.01.24"),
             MessageBox(
-                contactName = "user124",
-                message = "Welcome message for user124",
+                currentUserPlaceholder,
+                message = "Welcome message for user123",
                 date = "01.01.24")) +
-            List(6) {
+            List(5) {
               MessageBox(
-                  contactName = "Contact ${it + 1}",
+                  DataUser(
+                      UUID.randomUUID(),
+                      "Hello",
+                      "First ${it + 1}",
+                      "Last ${it + 1}",
+                      "",
+                      "",
+                      0.0,
+                      0.0,
+                      "",
+                      emptyList(),
+                      "googleUid"),
                   message = "Test message $it test for the feature of ellipsis in the message",
                   date = "01.01.24")
-            }
-    // Create a sample book and set it for editing only once
-    LaunchedEffect(Unit) {
-      val sampleBook =
-          DataBook(
-              uuid = UUID.randomUUID(),
-              title = "Test Book Jaime",
-              author = "Sample Author",
-              description = "Test for Jaime",
-              rating = 5,
-              photo = "sample_photo_url",
-              language = BookLanguages.ENGLISH,
-              isbn = "123456789",
-              genres = listOf(BookGenres.FANTASY),
-              userId = userid)
-      Log.d(
-          "MainActivity", "Attempting to add book in MainActivity") // Add this line before addBook
-
-      bookRepository.addBook(
-          sampleBook,
-          OnSucess = {
-            createdBook.value = sampleBook
-            Log.d("BookSwapApp", "Book added successfully: ${sampleBook.uuid}")
-          },
-          onFailure = { e ->
-            Log.e("BookSwapApp", "Error adding book: $e")
-            createdBook.value = sampleBook // Temporarily set book locally if Firestore fails
-          })
-    }
+            } +
+            listOf(MessageBox(testUser, message = "Welcome message for test", date = "01.01.24"))
+    val topAppBar =
+        @Composable { s: String? ->
+          TopAppBarComponent(
+              modifier = Modifier,
+              navigationActions = navigationActions,
+              title = s ?: navigationActions.currentRoute())
+        }
+    val bottomAppBar =
+        @Composable { s: String? ->
+          BottomNavigationMenu(
+              onTabSelect = { destination -> navigationActions.navigateTo(destination) },
+              tabList = List_Navigation_Bar_Destinations,
+              selectedItem = s ?: "")
+        }
 
     NavHost(navController = navController, startDestination = startDestination) {
       navigation(startDestination = Screen.AUTH, route = Route.AUTH) {
-        composable(Screen.AUTH) {
-          createdBook.value?.let {
-            // Navigate to EditBookScreen only after the book is created
-            BookProfileScreen(it.uuid,bookRepository, navigationActions, userid)
-          }
-        }
-          composable("${Screen.EDIT_BOOK}/{bookId}") {
-              //val bookId = backStackEntry.arguments?.getString("bookId") ?: return@composable
-              // Navigate to the EditBookScreen with the extracted bookId
-              createdBook.value?.let {
-                EditBookScreen(bookRepository, navigationActions, it)
-              }
-          }
+        composable(Screen.AUTH) { SignInScreen(navigationActions, userVM) }
+        composable(Screen.NEW_USER) { NewUserScreen(navigationActions, userVM) }
       }
       navigation(startDestination = Screen.CHATLIST, route = Route.CHAT) {
-        composable(Screen.CHATLIST) { ListChatScreen(placeHolder, navigationActions) }
-        composable("${Screen.CHAT}/{user1}/{user2}") { backStackEntry ->
-          val user1 = backStackEntry.arguments?.getString("user1") ?: ""
-          val user2 = backStackEntry.arguments?.getString("user2") ?: ""
-          ChatScreen(
-              messageRepository, UUID.fromString(user1), UUID.fromString(user2), navigationActions)
+        composable(Screen.CHATLIST) {
+          ListChatScreen(
+              placeHolder,
+              navigationActions,
+              topAppBar = { topAppBar("Messages") },
+              bottomAppBar = { bottomAppBar(this@navigation.route ?: "") })
+        }
+        composable("${Screen.CHAT}/{user2}") { backStackEntry ->
+          val user2UUID = UUID.fromString(backStackEntry.arguments?.getString("user2"))
+          val user2 = placeHolder.firstOrNull { it.contact.userUUID == user2UUID }?.contact
+
+          if (user2 != null) {
+            ChatScreen(messageRepository, userVM.getUser(), user2, navigationActions, photoStorage)
+          } else {
+            BookAdditionChoiceScreen(
+                navigationActions,
+                topAppBar = { topAppBar("Add a Book") },
+                bottomAppBar = { bottomAppBar(this@navigation.route ?: "") })
+          }
         }
       }
       navigation(startDestination = Screen.MAP, route = Route.MAP) {
         composable(Screen.MAP) {
           MapScreen(
-              user,
+              bookManagerViewModel,
               navigationActions = navigationActions,
-              bookFilter = bookFilter,
-              bookRepository,
-              geolocation = geolocation)
+              geolocation = geolocation,
+              topAppBar = { topAppBar("Map") },
+              bottomAppBar = { bottomAppBar(this@navigation.route ?: "") })
         }
         composable(Screen.FILTER) { FilterMapScreen(navigationActions, bookFilter) }
       }
       navigation(startDestination = Screen.NEWBOOK, route = Route.NEWBOOK) {
-        composable(Screen.NEWBOOK) { BookAdditionChoiceScreen(navigationActions) }
+        composable(Screen.NEWBOOK) {
+          BookAdditionChoiceScreen(
+              navigationActions,
+              topAppBar = { topAppBar("Add a Book") },
+              bottomAppBar = { bottomAppBar(this@navigation.route ?: "") })
+        }
         composable(Screen.ADD_BOOK_MANUALLY) {
           AddToBookScreen(
               bookRepository,
-              navigationActions,
-              userid // just for now !!SHOULD BE CHANGED TO THE CORRECT USER ID!!
-              )
+              topAppBar = { topAppBar("Add your Book") },
+              bottomAppBar = { bottomAppBar(this@navigation.route ?: "") },
+              userId = currentUserUUID)
         }
         composable(Screen.ADD_BOOK_SCAN) { /*Todo*/}
         composable(Screen.ADD_BOOK_ISBN) {
-          AddISBNScreen(navigationActions, bookRepository, userid)
+          AddISBNScreen(
+              navigationActions,
+              bookRepository,
+              topAppBar = { topAppBar(null) },
+              bottomAppBar = { bottomAppBar(this@navigation.route ?: "") },
+              userid)
         }
+      }
+      navigation(startDestination = Screen.PROFILE, route = Route.PROFILE) {
+        composable(Screen.PROFILE) { UserProfile(userVM) }
       }
     }
   }
 }
-
-// Temporary user list for the map as it is not yet linked to the database.
-// Better to see how the map screen should look like at the end.
-// Need to be removed in the future.
-val user =
-    listOf(
-        DataUser(
-            bookList =
-                listOf(
-                    UUID(12345678L, 87654321L),
-                    UUID(-848484, 848484),
-                    UUID(763879565731911, 5074118859109511))))

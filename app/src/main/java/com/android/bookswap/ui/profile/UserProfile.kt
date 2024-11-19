@@ -11,10 +11,8 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.sharp.ArrowBack
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.rounded.AccountCircle
 import androidx.compose.material3.*
@@ -31,9 +29,21 @@ import com.android.bookswap.model.UserViewModel
 import com.android.bookswap.ui.components.ButtonComponent
 import com.android.bookswap.ui.theme.*
 
-@OptIn(ExperimentalMaterial3Api::class)
+/**
+ * Composable function to display the user profile screen.
+ *
+ * @param userVM The ViewModel containing user data. Defaults to a new UserViewModel instance.
+ * @param topAppBar A composable function to display the top app bar. Defaults to an empty
+ *   composable.
+ * @param bottomAppBar A composable function to display the bottom app bar. Defaults to an empty
+ *   composable.
+ */
 @Composable
-fun UserProfile(userVM: UserViewModel) {
+fun UserProfile(
+    userVM: UserViewModel = UserViewModel(java.util.UUID.randomUUID()),
+    topAppBar: @Composable () -> Unit = {},
+    bottomAppBar: @Composable () -> Unit = {}
+) {
 
   var user = userVM.getUser()
   var showEditProfile by remember { mutableStateOf(false) }
@@ -67,81 +77,65 @@ fun UserProfile(userVM: UserViewModel) {
     needRecompose = false
   }
 
-  BookSwapAppTheme() {
-
-    // Scaffold to provide basic UI structure with a top app bar
-    Scaffold(
-        modifier = Modifier.testTag("profileScreenContainer"),
-        topBar = {
-          TopAppBar(
-              modifier = Modifier.testTag("profileTopAppBar"),
-              // Title of the screen
-              title = { Text("Your Profile", modifier = Modifier.testTag("profileTitleTxt")) },
-              // Icon button for navigation (currently no action defined)
-              navigationIcon = {
-                IconButton(modifier = Modifier.size(32.dp), onClick = {}) {
-                  Icon(
-                      imageVector = Icons.AutoMirrored.Sharp.ArrowBack,
-                      contentDescription = "",
-                      modifier = Modifier.size(30.dp))
-                }
-              })
-        }) {
-          // Column layout to stack input fields vertically with spacing
-          Row(
-              modifier = Modifier.padding(it).consumeWindowInsets(it).fillMaxWidth(),
-              horizontalArrangement = Arrangement.spacedBy(5f.dp)) {
-                Column(modifier = Modifier.fillMaxWidth(0.25f)) {
-                  Box {
-                    IconButton(
-                        onClick = { /*TODO: Edit profile picture*/},
-                        modifier = Modifier.aspectRatio(1f)) {
-                          Box(
-                              modifier =
-                                  Modifier.padding(2.5f.dp)
-                                      .border(3.5f.dp, Color(0xFFA98467), CircleShape)) {
-                                Image(
-                                    imageVector = Icons.Rounded.AccountCircle,
-                                    contentDescription = "",
-                                    modifier = Modifier.fillMaxSize().scale(1.2f).clipToBounds(),
-                                    colorFilter = ColorFilter.tint(Color(0xFF6C584C)))
-                              }
-                          Box(
-                              modifier = Modifier.fillMaxSize().padding(0f.dp),
-                              contentAlignment = Alignment.TopEnd) {
-                                Image(
-                                    imageVector = Icons.Outlined.Edit,
-                                    contentDescription = "",
-                                    colorFilter = ColorFilter.tint(Color(0xFFAAAAAA)))
-                              }
-                        }
-                  }
-                }
-                Column(Modifier.fillMaxHeight().fillMaxWidth(), Arrangement.spacedBy(8.dp)) {
-                  // Full name text
-                  Text(
-                      text = "${user.greeting} ${user.firstName} ${user.lastName}",
-                      modifier = Modifier.testTag("fullNameTxt"))
-
-                  // Email text
-                  Text(text = user.email, modifier = Modifier.testTag("emailTxt"))
-
-                  // Phone number text
-                  Text(text = user.phoneNumber, modifier = Modifier.testTag("phoneNumberTxt"))
-
-                  // User address
-                  Text(
-                      text = "${user.latitude}, ${user.longitude}",
-                      modifier = Modifier.testTag("addressTxt"))
-
-                  // Edit Button
-                  ButtonComponent({ showEditProfile = true }, Modifier.testTag("editProfileBtn")) {
-                    Text("Edit Profile")
-                  }
+  // Scaffold to provide basic UI structure with a top app bar
+  Scaffold(
+      modifier = Modifier.testTag("profileScreenContainer"),
+      topBar = topAppBar,
+      bottomBar = bottomAppBar) {
+        // Column layout to stack input fields vertically with spacing
+        Row(
+            modifier = Modifier.padding(it).consumeWindowInsets(it).fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(5f.dp)) {
+              Column(modifier = Modifier.fillMaxWidth(0.25f)) {
+                Box {
+                  IconButton(
+                      onClick = { /*TODO: Edit profile picture*/},
+                      modifier = Modifier.aspectRatio(1f)) {
+                        Box(
+                            modifier =
+                                Modifier.padding(2.5f.dp)
+                                    .border(3.5f.dp, Color(0xFFA98467), CircleShape)) {
+                              Image(
+                                  imageVector = Icons.Rounded.AccountCircle,
+                                  contentDescription = "",
+                                  modifier = Modifier.fillMaxSize().scale(1.2f).clipToBounds(),
+                                  colorFilter = ColorFilter.tint(Color(0xFF6C584C)))
+                            }
+                        Box(
+                            modifier = Modifier.fillMaxSize().padding(0f.dp),
+                            contentAlignment = Alignment.TopEnd) {
+                              Image(
+                                  imageVector = Icons.Outlined.Edit,
+                                  contentDescription = "",
+                                  colorFilter = ColorFilter.tint(Color(0xFFAAAAAA)))
+                            }
+                      }
                 }
               }
-        }
-  }
+              Column(Modifier.fillMaxHeight().fillMaxWidth(), Arrangement.spacedBy(8.dp)) {
+                // Full name text
+                Text(
+                    text = "${user.greeting} ${user.firstName} ${user.lastName}",
+                    modifier = Modifier.testTag("fullNameTxt"))
+
+                // Email text
+                Text(text = user.email, modifier = Modifier.testTag("emailTxt"))
+
+                // Phone number text
+                Text(text = user.phoneNumber, modifier = Modifier.testTag("phoneNumberTxt"))
+
+                // User address
+                Text(
+                    text = "${user.latitude}, ${user.longitude}",
+                    modifier = Modifier.testTag("addressTxt"))
+
+                // Edit Button
+                ButtonComponent({ showEditProfile = true }, Modifier.testTag("editProfileBtn")) {
+                  Text("Edit Profile")
+                }
+              }
+            }
+      }
 }
 
 // @Preview(showBackground = true, widthDp = 540, heightDp = 1110)
