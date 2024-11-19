@@ -54,10 +54,12 @@ class BookManagerViewModel(
   val filteredUsers: StateFlow<List<UserBooksWithLocation>> = _filteredUsers.asStateFlow()
 
   private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
-  private var updateBooksJob: Job? = null
+  private var fetchBooksFromRepository: Job? = null
+  private var computeDistanceOfUsersJob: Job? = null
+  private var combineFlowsAndFilterBooksJob: Job? = null
 
   fun startUpdatingBooks() {
-    updateBooksJob =
+    fetchBooksFromRepository =
         scope.launch {
           while (true) {
             fetchBooksFromRepository()
@@ -69,7 +71,9 @@ class BookManagerViewModel(
   }
 
   fun stopUpdatingBooks() {
-    updateBooksJob?.cancel()
+    fetchBooksFromRepository?.cancel()
+    computeDistanceOfUsersJob?.cancel()
+    combineFlowsAndFilterBooksJob?.cancel()
   }
 
   // Fetch books and users from the repository and update `_allBooks` and `_allUsers`
@@ -110,45 +114,50 @@ class BookManagerViewModel(
 
   // Combine books and filter flows and apply filtering logic
   private fun combineFlowsAndFilterBooks() {
-    scope.launch {
-      combine(_allBooks, _allUserDistance, bookFilter.genresFilter, bookFilter.languagesFilter) {
-              books,
-              userDistance,
-              _,
-              _ ->
-            val userBooksWithLocation =
-                userDistance
-                    .map { user ->
-                      UserBooksWithLocation(
-                          userUUID = user.first.userUUID,
-                          longitude = user.first.longitude,
-                          latitude = user.first.latitude,
-                          books =
-                              bookFilter.filterBooks(books).filter { book ->
-                                book.uuid in user.first.bookList
-                              })
-                    }
-                    .filter { it.books.isNotEmpty() }
+    combineFlowsAndFilterBooksJob =
+        scope.launch {
+          combine(
+                  _allBooks,
+                  _allUserDistance,
+                  bookFilter.genresFilter,
+                  bookFilter.languagesFilter) { books, userDistance, _, _ ->
+                    val userBooksWithLocation =
+                        userDistance
+                            .map { user ->
+                              UserBooksWithLocation(
+                                  userUUID = user.first.userUUID,
+                                  longitude = user.first.longitude,
+                                  latitude = user.first.latitude,
+                                  books =
+                                      bookFilter.filterBooks(books).filter { book ->
+                                        book.uuid in user.first.bookList
+                                      })
+                            }
+                            .filter { it.books.isNotEmpty() }
 
-            _filteredBooks.value = userBooksWithLocation.flatMap { it.books }
-            _filteredUsers.value = userBooksWithLocation
-          }
-          .collect()
-    }
+                    _filteredBooks.value = userBooksWithLocation.flatMap { it.books }
+                    _filteredUsers.value = userBooksWithLocation
+                  }
+              .collect()
+        }
   }
 
   private fun computeDistanceOfUsers() {
-    scope.launch {
-      combine(_allUsers, geolocation.latitude, geolocation.longitude) { users, latitude, longitude
-            ->
-            val userDistance =
-                users.map { user ->
-                  user to
-                      computingDistanceMethod(latitude, longitude, user.latitude, user.longitude)
-                }
-            userDistance.sortedBy { it.second }
-          }
-          .collect { sortedUserDistance -> _allUserDistance.value = sortedUserDistance }
-    }
+    computeDistanceOfUsersJob =
+        scope.launch {
+          combine(_allUsers, geolocation.latitude, geolocation.longitude) {
+                  users,
+                  latitude,
+                  longitude ->
+                val userDistance =
+                    users.map { user ->
+                      user to
+                          computingDistanceMethod(
+                              latitude, longitude, user.latitude, user.longitude)
+                    }
+                userDistance.sortedBy { it.second }
+              }
+              .collect { sortedUserDistance -> _allUserDistance.value = sortedUserDistance }
+        }
   }
 }
