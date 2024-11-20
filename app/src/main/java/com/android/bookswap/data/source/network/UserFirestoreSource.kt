@@ -130,8 +130,25 @@ class UserFirestoreSource(private val db: FirebaseFirestore) : UsersRepository {
               null
             }
           }
+        val contactListRaw = document.get("contactList") as List<*>
+        val contactList = contactListRaw.mapNotNull { item ->
+            when (item) {
+                is String -> UUID.fromString(item)  // if contactList items are stored as strings
+                is Map<*, *> -> {
+                    val mostSigBits = (item["mostSignificantBits"] as Long?)
+                    val leastSigBits = (item["leastSignificantBits"] as Long?)
+                    if (mostSigBits != null && leastSigBits != null) {
+                        UUID(mostSigBits, leastSigBits)
+                    } else {
+                        null
+                    }
+                }
+                else -> null
+            }
+        }
       if (bookList.any { it == null }) {
         throw IllegalArgumentException("Book list contains null UUIDs")
+
       }
 
       Result.success(
@@ -146,7 +163,8 @@ class UserFirestoreSource(private val db: FirebaseFirestore) : UsersRepository {
               longitude,
               profilePicture,
               bookList.filterNotNull(),
-              googleUid))
+              googleUid,
+              contactList))
     } catch (e: Exception) {
       Log.e("FirestoreSource", "Error converting document to User: ${e.message}")
       Result.failure(e)

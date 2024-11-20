@@ -59,11 +59,12 @@ open class UserViewModel(
       longitude: Double = dataUser.longitude,
       picURL: String = dataUser.profilePictureUrl,
       bookList: List<UUID> = dataUser.bookList,
-      googleUid: String = dataUser.googleUid
+      googleUid: String = dataUser.googleUid,
+      contactList: List<UUID> = dataUser.contactList
   ) {
     updateUser(
         DataUser(
-            uuid,
+            dataUser.userUUID,
             greeting,
             firstName,
             lastName,
@@ -73,7 +74,8 @@ open class UserViewModel(
             longitude,
             picURL,
             bookList,
-            googleUid))
+            googleUid,
+            contactList))
   }
   /**
    * Update the user data with the given DataUser object.

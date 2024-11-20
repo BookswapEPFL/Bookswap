@@ -16,6 +16,7 @@ import java.util.UUID
  * @param profilePictureUrl URL of the user's profile picture
  * @param bookList List of UUIDs representing the user's books
  * @param googleUid Google UID of the user
+ * @param contactList List of UUIDs representing the user's contacts
  */
 data class DataUser(
     var userUUID: UUID = UUID.randomUUID(),
@@ -28,7 +29,8 @@ data class DataUser(
     var longitude: Double = 0.0,
     var profilePictureUrl: String = "",
     var bookList: List<UUID> = emptyList(),
-    var googleUid: String = ""
+    var googleUid: String = "",
+    var contactList: List<UUID> = emptyList()
 ) {
   /**
    * Returns the full name of the user in the format: "greeting firstName lastName".
