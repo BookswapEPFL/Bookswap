@@ -153,7 +153,9 @@ class ISBNAddTest : TestCase() {
     // Mock call to repository
     val mockBooksRepository: BooksRepository = mockk()
 
-    composeTestRule.setContent { AddISBNScreen(mockNavigationActions, mockBooksRepository, userId = userid) }
+    composeTestRule.setContent {
+      AddISBNScreen(mockNavigationActions, mockBooksRepository, userId = userid)
+    }
 
     composeTestRule.onNodeWithTag("isbn_field").performTextInput("BAD_ISBN")
     composeTestRule.onNodeWithTag("isbn_searchButton").performClick()

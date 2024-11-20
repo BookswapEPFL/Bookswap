@@ -79,7 +79,7 @@ class BooksFirestoreSource(private val db: FirebaseFirestore) : BooksRepository 
     Log.d(
         "BooksFirestoreRepository",
         "UUID: $uuid") // Most Significant Bits: $mostSigBits, Least Significant Bits:
-                       // $leastSigBits")
+    // $leastSigBits")
 
     db.collection(collectionBooks).document(uuid.toString()).get().addOnCompleteListener { task ->
       if (task.isSuccessful) {
