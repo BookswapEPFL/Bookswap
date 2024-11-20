@@ -24,6 +24,7 @@ import com.android.bookswap.data.source.network.MessageFirestoreSource
 import com.android.bookswap.data.source.network.PhotoFirebaseStorageSource
 import com.android.bookswap.data.source.network.UserFirestoreSource
 import com.android.bookswap.model.UserViewModel
+import com.android.bookswap.model.chat.ContactViewModel
 import com.android.bookswap.model.chat.PermissionHandler
 import com.android.bookswap.model.map.BookFilter
 import com.android.bookswap.model.map.BookManagerViewModel
@@ -117,6 +118,8 @@ class MainActivity : ComponentActivity() {
     if (currentUser != null) {
       userVM.getUserByGoogleUid(currentUser.uid) // This will scrap the user from the database
     }
+      //Message part
+      val contactViewModel = ContactViewModel(userVM,userRepository,messageRepository)
     // Book part
     val bookFilter = BookFilter()
     val bookManagerViewModel =
@@ -214,10 +217,10 @@ class MainActivity : ComponentActivity() {
       navigation(startDestination = Screen.CHATLIST, route = Route.CHAT) {
         composable(Screen.CHATLIST) {
           ListChatScreen(
-              placeHolder,
               navigationActions,
               topAppBar = { topAppBar("Messages") },
-              bottomAppBar = { bottomAppBar(this@navigation.route ?: "") })
+              bottomAppBar = { bottomAppBar(this@navigation.route ?: "") },
+              contactViewModel = contactViewModel)
         }
         composable("${Screen.CHAT}/{user2}") { backStackEntry ->
           val user2UUID = UUID.fromString(backStackEntry.arguments?.getString("user2"))
@@ -254,6 +257,7 @@ class MainActivity : ComponentActivity() {
         composable(Screen.ADD_BOOK_MANUALLY) {
           AddToBookScreen(
               bookRepository,
+                userVM,
               topAppBar = { topAppBar("Add your Book") },
               bottomAppBar = { bottomAppBar(this@navigation.route ?: "") })
         }
@@ -262,6 +266,7 @@ class MainActivity : ComponentActivity() {
           AddISBNScreen(
               navigationActions,
               bookRepository,
+                userVM,
               topAppBar = { topAppBar(null) },
               bottomAppBar = { bottomAppBar(this@navigation.route ?: "") })
         }
