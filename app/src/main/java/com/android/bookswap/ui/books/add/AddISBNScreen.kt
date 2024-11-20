@@ -28,11 +28,13 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.android.bookswap.data.repository.BooksRepository
 import com.android.bookswap.data.source.api.GoogleBookDataSource
+import com.android.bookswap.model.UserViewModel
 import com.android.bookswap.ui.components.ButtonComponent
 import com.android.bookswap.ui.components.FieldComponent
 import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.navigation.TopLevelDestinations
 import com.android.bookswap.ui.theme.ColorVariable
+import java.util.UUID
 
 /** This is the main screen for the chat feature. It displays the list of messages */
 @OptIn(ExperimentalMaterial3Api::class)
@@ -40,10 +42,12 @@ import com.android.bookswap.ui.theme.ColorVariable
 fun AddISBNScreen(
     navigationActions: NavigationActions,
     booksRepository: BooksRepository,
+    userVM: UserViewModel = UserViewModel(UUID.randomUUID()),
     topAppBar: @Composable () -> Unit = {},
     bottomAppBar: @Composable () -> Unit = {}
 ) {
   val context = LocalContext.current
+  val user = userVM.getUser()
   Scaffold(
       topBar = topAppBar,
       bottomBar = bottomAppBar,
@@ -78,6 +82,9 @@ fun AddISBNScreen(
                                   result.getOrThrow(),
                                   callback = { res ->
                                     if (res.isSuccess) {
+                                        val newBookList = user.bookList + result.getOrNull()?.uuid!!
+                                      userVM.updateUser(bookList = newBookList)
+                                        Toast.makeText(context, "${result.getOrNull()?.title} added", Toast.LENGTH_LONG).show()
                                       navigationActions.navigateTo(TopLevelDestinations.NEW_BOOK)
                                     } else {
                                       val error = res.exceptionOrNull()!!
