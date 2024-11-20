@@ -11,7 +11,6 @@ import androidx.compose.ui.test.performTextInput
 import androidx.navigation.compose.rememberNavController
 import com.android.bookswap.data.BookGenres
 import com.android.bookswap.data.BookLanguages
-import com.android.bookswap.data.DataBook
 import com.android.bookswap.data.repository.BooksRepository
 import com.android.bookswap.ui.navigation.NavigationActions
 import io.mockk.every
@@ -43,7 +42,7 @@ class AddToBookTest {
       val navController = rememberNavController()
       val navigationActions = NavigationActions(navController)
       val userId = UUID.randomUUID()
-      AddToBookScreen(mockBooksRepository, navigationActions, userId)
+      AddToBookScreen(mockBooksRepository, userId = userId)
     }
     // Check if the Save button is initially disabled
     composeTestRule.onNodeWithTag("save_button").assertIsNotEnabled()
@@ -55,7 +54,7 @@ class AddToBookTest {
       val navController = rememberNavController()
       val navigationActions = NavigationActions(navController)
       val userId = UUID.randomUUID()
-      AddToBookScreen(MockBooksRepository(), navigationActions, userId)
+      AddToBookScreen(mockBooksRepository, userId = userId)
     }
     // Fill in the Title and ISBN fields
     composeTestRule.onNodeWithTag("title_field").performTextInput("My Book Title")
@@ -159,7 +158,7 @@ class AddToBookTest {
       val navController = rememberNavController()
       val navigationActions = NavigationActions(navController)
       val userId = UUID.randomUUID()
-      AddToBookScreen(mockBooksRepository, navigationActions, userId)
+      AddToBookScreen(mockBooksRepository, userId = userId)
     }
     // Fill in the ISBN field but leave the Title field empty
     composeTestRule.onNodeWithTag("isbn_field").performTextInput("1234567890")

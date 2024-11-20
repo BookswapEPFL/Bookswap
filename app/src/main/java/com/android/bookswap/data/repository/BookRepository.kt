@@ -26,10 +26,10 @@ interface BooksRepository {
    */
   fun getBook(callback: (Result<List<DataBook>>) -> Unit)
 
-    // Function to fetch a specific book from the repository by UUID.
-    fun getBook(uuid: UUID, OnSucess: (DataBook) -> Unit, onFailure: (Exception) -> Unit)
+  // Function to fetch a specific book from the repository by UUID.
+  fun getBook(uuid: UUID, OnSucess: (DataBook) -> Unit, onFailure: (Exception) -> Unit)
 
-    /**
+  /**
    * Function to add a new book to the repository
    *
    * @param dataBook The book data to be added

@@ -288,9 +288,10 @@ fun EditBookScreen(
                             updatedBook!!,
                             callback = { result ->
                               if (result.isSuccess) {
-                                  // Fetch the updated book data from Firestore
-                                  //booksRepository.getBook(updatedBook.uuid) { updatedBookFromFirestore ->
-                                  //createdBook.value = updatedBookFromFirestore
+                                // Fetch the updated book data from Firestore
+                                // booksRepository.getBook(updatedBook.uuid) {
+                                // updatedBookFromFirestore ->
+                                // createdBook.value = updatedBookFromFirestore
                                 navigationActions.goBack()
                               } else {
                                 Toast.makeText(

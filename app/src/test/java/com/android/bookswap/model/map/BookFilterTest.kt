@@ -22,8 +22,7 @@ class BookFilterTest {
               language = BookLanguages.ENGLISH,
               isbn = null,
               genres = listOf(BookGenres.FANTASY),
-              userId = UUID.randomUUID()
-              ),
+              userId = UUID.randomUUID()),
           DataBook(
               uuid = UUID.randomUUID(),
               title = "Book 2",
@@ -34,8 +33,7 @@ class BookFilterTest {
               language = BookLanguages.FRENCH,
               isbn = null,
               genres = listOf(BookGenres.FICTION),
-              userId = UUID.randomUUID()
-          ),
+              userId = UUID.randomUUID()),
           DataBook(
               uuid = UUID.randomUUID(),
               title = "Book 3",
@@ -46,8 +44,7 @@ class BookFilterTest {
               language = BookLanguages.GERMAN,
               isbn = null,
               genres = listOf(BookGenres.SCIENCEFICTION, BookGenres.AUTOBIOGRAPHY),
-              userId = UUID.randomUUID())
-      )
+              userId = UUID.randomUUID()))
 
   @Before fun setUp() {}
 

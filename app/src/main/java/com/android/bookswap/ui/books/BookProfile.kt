@@ -33,6 +33,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
@@ -41,9 +42,6 @@ import androidx.compose.ui.unit.dp
 import com.android.bookswap.R
 import com.android.bookswap.data.DataBook
 import com.android.bookswap.data.repository.BooksRepository
-import com.android.bookswap.ui.components.BackButtonComponent
-import com.android.bookswap.ui.navigation.BottomNavigationMenu
-import com.android.bookswap.ui.navigation.List_Navigation_Bar_Destinations
 import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.navigation.Screen
 import com.android.bookswap.ui.theme.ColorVariable
@@ -77,235 +75,201 @@ fun BookProfileScreen(
 
   // State to hold the book data and loading status
   val (dataBook, setDataBook) = remember { mutableStateOf<DataBook?>(null) }
-    val (isLoading, setLoading) = remember { mutableStateOf(true) }
-    val (error, setError) = remember { mutableStateOf<Exception?>(null) }
-    // Fetch the book data
-    LaunchedEffect(bookId) {
-        booksRepository.getBook(
-            uuid = bookId,
-            OnSucess = { book ->
-                setDataBook(book)
-                setLoading(false)
-            },
-            onFailure = { exception ->
-                setError(exception)
-                setLoading(false)
-            }
-        )
-    }
+  val (isLoading, setLoading) = remember { mutableStateOf(true) }
+  val (error, setError) = remember { mutableStateOf<Exception?>(null) }
+  // Fetch the book data
+  LaunchedEffect(bookId) {
+    booksRepository.getBook(
+        uuid = bookId,
+        OnSucess = { book ->
+          setDataBook(book)
+          setLoading(false)
+        },
+        onFailure = { exception ->
+          setError(exception)
+          setLoading(false)
+        })
+  }
   Scaffold(
       modifier = Modifier.testTag("bookProfileScreen"),
       topBar = topAppBar,
       bottomBar = bottomAppBar) { innerPadding ->
-      when {
+        when {
           isLoading -> {
-              // Display a loading indicator
-              Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                  CircularProgressIndicator()
-              }
+            // Display a loading indicator
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+              CircularProgressIndicator()
+            }
           }
-
           error != null -> {
-              // Display an error message
-              Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                  Text(text = "Error loading book details: ${error.message}", color = Color.Red)
-              }
+            // Display an error message
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+              Text(text = "Error loading book details: ${error.message}", color = Color.Red)
+            }
           }
-
           dataBook != null -> {
-              // Render the book details UI
-              LazyColumn(
-                  modifier =
-                  Modifier.fillMaxSize()
-                      .padding(innerPadding)
-                      .background(ColorVariable.BackGround)
-                      .testTag("bookProfileScroll"),
-                  verticalArrangement = Arrangement.spacedBy(columnPadding),
-                  horizontalAlignment = Alignment.CenterHorizontally
-              ) {
+            // Render the book details UI
+            LazyColumn(
+                modifier =
+                    Modifier.fillMaxSize()
+                        .padding(innerPadding)
+                        .background(ColorVariable.BackGround)
+                        .testTag("bookProfileScroll"),
+                verticalArrangement = Arrangement.spacedBy(columnPadding),
+                horizontalAlignment = Alignment.CenterHorizontally) {
                   item {
-                      Text(
-                          text = dataBook.title,
-                          modifier = Modifier.testTag("bookTitle").padding(columnPadding),
-                          color = ColorVariable.Accent,
-                          style = MaterialTheme.typography.titleLarge
-                      )
+                    Text(
+                        text = dataBook.title,
+                        modifier = Modifier.testTag("bookTitle").padding(columnPadding),
+                        color = ColorVariable.Accent,
+                        style = MaterialTheme.typography.titleLarge)
                   }
                   item {
-                      Text(
-                          text = dataBook.author ?: "Author Unknown",
-                          modifier = Modifier.testTag("bookAuthor"),
-                          color = ColorVariable.AccentSecondary,
-                          style = MaterialTheme.typography.titleMedium
-                      )
+                    Text(
+                        text = dataBook.author ?: "Author Unknown",
+                        modifier = Modifier.testTag("bookAuthor"),
+                        color = ColorVariable.AccentSecondary,
+                        style = MaterialTheme.typography.titleMedium)
                   }
 
                   item { Spacer(modifier = Modifier.height(columnPadding)) }
 
                   // Conditionally display the "Edit Book" button if the current user owns the book
                   if (dataBook.userId == currentUserId) {
-                      item {
-                          androidx.compose.material3.Button(
-                              onClick = {
-                                  navController.navigateTo(
-                                      Screen.EDIT_BOOK,
-                                      dataBook.uuid.toString()
-                                  )
-                              },
-                              modifier = Modifier.padding(8.dp)
-                          ) {
-                              Text("Edit Book")
+                    item {
+                      androidx.compose.material3.Button(
+                          onClick = {
+                            navController.navigateTo(Screen.EDIT_BOOK, dataBook.uuid.toString())
+                          },
+                          modifier = Modifier.padding(8.dp)) {
+                            Text("Edit Book")
                           }
-                      }
+                    }
                   }
 
                   item { Spacer(modifier = Modifier.height(columnPadding)) }
 
                   item {
-                      Box(
-                          modifier =
-                          Modifier.size(pictureWidth, pictureHeight)
-                              .background(ColorVariable.BackGround)
-                      ) {
+                    Box(
+                        modifier =
+                            Modifier.size(pictureWidth, pictureHeight)
+                                .background(ColorVariable.BackGround)) {
                           Image(
                               painter = painterResource(id = images[currentImageIndex]),
                               contentDescription = imagesDescription[currentImageIndex],
                               modifier =
-                              Modifier.height(pictureHeight)
-                                  .fillMaxWidth()
-                                  .testTag(
-                                      "bookProfileImage ${imagesDescription[currentImageIndex]}"
-                                  )
-                          )
-                      }
+                                  Modifier.height(pictureHeight)
+                                      .fillMaxWidth()
+                                      .testTag(
+                                          "bookProfileImage ${imagesDescription[currentImageIndex]}"))
+                        }
                   }
                   item {
-                      Row(
-                          modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
-                          verticalAlignment = Alignment.CenterVertically,
-                          horizontalArrangement = Arrangement.SpaceBetween
-                      ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween) {
                           IconButton(
                               onClick = {
-                                  currentImageIndex =
-                                      (currentImageIndex - 1 + images.size) % images.size
+                                currentImageIndex =
+                                    (currentImageIndex - 1 + images.size) % images.size
                               },
                               modifier =
-                              Modifier.height(buttonsHeight).testTag("bookProfileImageLeft")
-                          ) {
-                              Icon(
-                                  imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                  contentDescription = "Previous Image",
-                                  tint = ColorVariable.Accent
-                              )
-                          }
+                                  Modifier.height(buttonsHeight).testTag("bookProfileImageLeft")) {
+                                Icon(
+                                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                    contentDescription = "Previous Image",
+                                    tint = ColorVariable.Accent)
+                              }
                           Text(
                               text = imagesDescription[currentImageIndex],
                               color = ColorVariable.AccentSecondary,
-                              modifier = Modifier.padding(horizontal = 8.dp)
-                          )
+                              modifier = Modifier.padding(horizontal = 8.dp))
                           IconButton(
                               onClick = {
-                                  currentImageIndex = (currentImageIndex + 1) % images.size
+                                currentImageIndex = (currentImageIndex + 1) % images.size
                               },
                               modifier =
-                              Modifier.height(buttonsHeight).testTag("bookProfileImageRight")
-                          ) {
-                              Icon(
-                                  imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-                                  contentDescription = "Next Image",
-                                  tint = ColorVariable.Accent
-                              )
-                          }
-                      }
+                                  Modifier.height(buttonsHeight).testTag("bookProfileImageRight")) {
+                                Icon(
+                                    imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                                    contentDescription = "Next Image",
+                                    tint = ColorVariable.Accent)
+                              }
+                        }
                   }
                   item { Spacer(modifier = Modifier.height(columnPadding)) }
                   item {
-                      dataBook.rating?.let {
-                          Text(
-                              text = "Rating: $it/5",
-                              color = ColorVariable.Accent,
-                              style = MaterialTheme.typography.bodyMedium,
-                              modifier = Modifier.padding(vertical = 8.dp)
-                                  .testTag("bookProfileRating")
-                          )
-                      }
-                  }
-                  item { Spacer(modifier = Modifier.height(columnPadding)) }
-                  item {
+                    dataBook.rating?.let {
                       Text(
-                          text = "Synopsis",
-                          color = ColorVariable.Accent,
-                          style = MaterialTheme.typography.titleSmall,
-                          modifier =
-                          Modifier.padding(vertical = 8.dp).testTag("bookProfileSynopsisTitle")
-                      )
-                  }
-                  item {
-                      Text(
-                          text = dataBook.description ?: "No description available",
+                          text = "Rating: $it/5",
                           color = ColorVariable.Accent,
                           style = MaterialTheme.typography.bodyMedium,
-                          modifier = Modifier.padding(vertical = 8.dp)
-                              .testTag("bookProfileSynopsis"),
-                          textAlign = TextAlign.Center
-                      )
+                          modifier = Modifier.padding(vertical = 8.dp).testTag("bookProfileRating"))
+                    }
                   }
                   item { Spacer(modifier = Modifier.height(columnPadding)) }
                   item {
-                      Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)) {
-                          Column(modifier = Modifier.weight(1f)) {
-                              ProfileText(
-                                  text = "Language: ${dataBook.language.languageCode}",
-                                  testTag = "bookProfileLanguage"
-                              )
-                              ProfileText(text = "Genres:", testTag = "bookProfileGenresTitle")
-                              dataBook.genres.forEach { genre ->
-                                  Text(
-                                      text = "- ${genre.Genre}",
-                                      color = ColorVariable.AccentSecondary,
-                                      style = MaterialTheme.typography.bodyMedium,
-                                      modifier =
-                                      Modifier.padding(top = 2.dp, start = 16.dp)
-                                          .testTag("bookProfileGenre${genre.Genre}")
-                                  )
-                              }
-                              ProfileText(
-                                  text = "ISBN: ${dataBook.isbn ?: "ISBN doesn't exist or is not available"}",
-                                  testTag = "bookProfileISBN"
-                              )
-                          }
-
-                          VerticalDivider(color = ColorVariable.Accent, thickness = 1.dp)
-
-                          Column(modifier = Modifier.weight(1f)) {
-                              ProfileText(
-                                  text = "Date of Publication: [Temporary Date]",
-                                  testTag = "bookProfileDate"
-                              )
-                              ProfileText(
-                                  text = "Volume: [Temporary Volume]",
-                                  testTag = "bookProfileVolume"
-                              )
-                              ProfileText(
-                                  text = "Issue: [Temporary Issue]",
-                                  testTag = "bookProfileIssue"
-                              )
-                              ProfileText(
-                                  text = "Editorial: [Temporary Editorial]",
-                                  testTag = "bookProfileEditorial"
-                              )
-                              ProfileText(
-                                  text = "Place of Edition: [Temporary Place]",
-                                  testTag = "bookProfileEditionPlace"
-                              )
-                          }
-                      }
+                    Text(
+                        text = "Synopsis",
+                        color = ColorVariable.Accent,
+                        style = MaterialTheme.typography.titleSmall,
+                        modifier =
+                            Modifier.padding(vertical = 8.dp).testTag("bookProfileSynopsisTitle"))
                   }
-              }
+                  item {
+                    Text(
+                        text = dataBook.description ?: "No description available",
+                        color = ColorVariable.Accent,
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.padding(vertical = 8.dp).testTag("bookProfileSynopsis"),
+                        textAlign = TextAlign.Center)
+                  }
+                  item { Spacer(modifier = Modifier.height(columnPadding)) }
+                  item {
+                    Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)) {
+                      Column(modifier = Modifier.weight(1f)) {
+                        ProfileText(
+                            text = "Language: ${dataBook.language.languageCode}",
+                            testTag = "bookProfileLanguage")
+                        ProfileText(text = "Genres:", testTag = "bookProfileGenresTitle")
+                        dataBook.genres.forEach { genre ->
+                          Text(
+                              text = "- ${genre.Genre}",
+                              color = ColorVariable.AccentSecondary,
+                              style = MaterialTheme.typography.bodyMedium,
+                              modifier =
+                                  Modifier.padding(top = 2.dp, start = 16.dp)
+                                      .testTag("bookProfileGenre${genre.Genre}"))
+                        }
+                        ProfileText(
+                            text =
+                                "ISBN: ${dataBook.isbn ?: "ISBN doesn't exist or is not available"}",
+                            testTag = "bookProfileISBN")
+                      }
+
+                      VerticalDivider(color = ColorVariable.Accent, thickness = 1.dp)
+
+                      Column(modifier = Modifier.weight(1f)) {
+                        ProfileText(
+                            text = "Date of Publication: [Temporary Date]",
+                            testTag = "bookProfileDate")
+                        ProfileText(
+                            text = "Volume: [Temporary Volume]", testTag = "bookProfileVolume")
+                        ProfileText(text = "Issue: [Temporary Issue]", testTag = "bookProfileIssue")
+                        ProfileText(
+                            text = "Editorial: [Temporary Editorial]",
+                            testTag = "bookProfileEditorial")
+                        ProfileText(
+                            text = "Place of Edition: [Temporary Place]",
+                            testTag = "bookProfileEditionPlace")
+                      }
+                    }
+                  }
+                }
           }
+        }
       }
-  }
 }
 /**
  * Composable function to display a text with a specific style and test tag.
@@ -319,7 +283,5 @@ fun ProfileText(text: String, testTag: String) {
       text = text,
       color = ColorVariable.Accent,
       style = MaterialTheme.typography.bodyMedium,
-      modifier = Modifier.padding(vertical = 8.dp).testTag(testTag)
-  )
+      modifier = Modifier.padding(vertical = 8.dp).testTag(testTag))
 }
-

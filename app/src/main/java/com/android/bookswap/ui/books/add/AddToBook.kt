@@ -197,7 +197,8 @@ fun AddToBookScreen(
                               photo,
                               language,
                               isbn,
-                              listOf(selectedGenre!!))
+                              listOf(selectedGenre!!),
+                              userId)
                       if (book == null) {
                         Log.e("AddToBookScreen", "Invalid argument")
                         Toast.makeText(context, "Invalid argument", Toast.LENGTH_SHORT).show()

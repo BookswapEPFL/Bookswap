@@ -52,7 +52,7 @@ class ISBNAddTest : TestCase() {
       val mockNavigationActions: NavigationActions = mockk()
       val mockBooksRepository: BooksRepository = mockk()
       val userId = UUID.randomUUID()
-      AddISBNScreen(mockNavigationActions, mockBooksRepository, userId)
+      AddISBNScreen(mockNavigationActions, mockBooksRepository, userId = userId)
     }
 
     val isbnField = composeTestRule.onNodeWithTag("isbn_field")
@@ -71,7 +71,7 @@ class ISBNAddTest : TestCase() {
       val mockNavigationActions: NavigationActions = mockk()
       val mockBooksRepository: BooksRepository = mockk()
       val userId = UUID.randomUUID()
-      AddISBNScreen(mockNavigationActions, mockBooksRepository, userId)
+      AddISBNScreen(mockNavigationActions, mockBooksRepository, userId = userId)
     }
     val isbnField = composeTestRule.onNodeWithTag("isbn_field")
 
@@ -120,7 +120,7 @@ class ISBNAddTest : TestCase() {
     every { mockNavigationActions.navigateTo(any(TopLevelDestination::class)) } just Runs
 
     composeTestRule.setContent {
-      AddISBNScreen(mockNavigationActions, mockBooksRepository, dataBook.userId)
+      AddISBNScreen(mockNavigationActions, mockBooksRepository, userId = dataBook.userId)
     }
 
     composeTestRule.onNodeWithTag("isbn_field").performTextInput(dataBook.isbn!!)
@@ -153,7 +153,7 @@ class ISBNAddTest : TestCase() {
     // Mock call to repository
     val mockBooksRepository: BooksRepository = mockk()
 
-    composeTestRule.setContent { AddISBNScreen(mockNavigationActions, mockBooksRepository, userid) }
+    composeTestRule.setContent { AddISBNScreen(mockNavigationActions, mockBooksRepository, userId = userid) }
 
     composeTestRule.onNodeWithTag("isbn_field").performTextInput("BAD_ISBN")
     composeTestRule.onNodeWithTag("isbn_searchButton").performClick()
@@ -198,7 +198,7 @@ class ISBNAddTest : TestCase() {
     val mockNavigationActions: NavigationActions = mockk()
 
     composeTestRule.setContent {
-      AddISBNScreen(mockNavigationActions, mockBooksRepository, dataBook.userId)
+      AddISBNScreen(mockNavigationActions, mockBooksRepository, userId = dataBook.userId)
     }
 
     composeTestRule.onNodeWithTag("isbn_field").performTextInput(dataBook.isbn!!)

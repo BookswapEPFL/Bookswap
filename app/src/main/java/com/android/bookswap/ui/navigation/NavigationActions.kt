@@ -28,8 +28,8 @@ object Screen {
   const val ADD_BOOK_ISBN = "AddBookISBN Screen"
   const val SETTINGS = "Settings Screen"
   const val FILTER = "Filter Screen"
-    const val EDIT_BOOK = "EditBook Screen"
-    const val PROFILE = "Profile Screen"
+  const val EDIT_BOOK = "EditBook Screen"
+  const val PROFILE = "Profile Screen"
   const val NEW_USER = "New User Screen"
 }
 
@@ -91,20 +91,30 @@ open class NavigationActions(
    * @param user2 The second user to pass to the screen
    */
   open fun navigateTo(screen: String, otherUserUUID: String) {
-    val route = "$screen/$otherUserUUID"
-    // Only navigate if the route is different from the current route
-    if (!isCurrentDestination(route)) {
+    if (screen == Screen.CHAT.toString()) {
+      val route = "$screen/$otherUserUUID"
+      // Only navigate if the route is different from the current route
+      if (!isCurrentDestination(route)) {
+        navController.navigate(route)
+      }
+    } else {
+      val route =
+          when (screen) {
+            Screen.EDIT_BOOK -> "$screen/$otherUserUUID"
+            else -> screen
+          }
       navController.navigate(route)
     }
   }
 
+  /*
   open fun navigateTo(screen: String, id: String? = null) {
     val route = when (screen) {
       Screen.EDIT_BOOK -> "$screen/$id"
       else -> screen
     }
     navController.navigate(route)
-  }
+  }*/
 
   /**
    * Navigate to the specified screen.

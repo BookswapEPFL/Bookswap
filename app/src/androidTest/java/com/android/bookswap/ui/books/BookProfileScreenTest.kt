@@ -22,88 +22,104 @@ import org.junit.Test
 
 class BookProfileScreenTest {
 
-    @get:Rule val composeTestRule = createComposeRule()
-    private lateinit var mockNavController: NavigationActions
-    private lateinit var mockBookRepo: BooksRepository
-    private val testBookId = UUID.randomUUID()
-    private val currentUserId = UUID.randomUUID()
+  @get:Rule val composeTestRule = createComposeRule()
+  private lateinit var mockNavController: NavigationActions
+  private lateinit var mockBookRepo: BooksRepository
+  private val testBookId = UUID.randomUUID()
+  private val currentUserId = UUID.randomUUID()
 
-    private val testBook = DataBook(
-        uuid = testBookId,
-        title = "Historia de España",
-        author = "Jose Ignacio Pastor Iglesias",
-        description = "Recuento de la historia de España desde los primeros pobladores hasta la actualidad.",
-        rating = 9,
-        photo = null,
-        language = BookLanguages.SPANISH,
-        isbn = "978-84-09025-23-5",
-        genres = listOf(BookGenres.HISTORICAL, BookGenres.NONFICTION, BookGenres.BIOGRAPHY),
-        userId = currentUserId
-    )
+  private val testBook =
+      DataBook(
+          uuid = testBookId,
+          title = "Historia de España",
+          author = "Jose Ignacio Pastor Iglesias",
+          description =
+              "Recuento de la historia de España desde los primeros pobladores hasta la actualidad.",
+          rating = 9,
+          photo = null,
+          language = BookLanguages.SPANISH,
+          isbn = "978-84-09025-23-5",
+          genres = listOf(BookGenres.HISTORICAL, BookGenres.NONFICTION, BookGenres.BIOGRAPHY),
+          userId = currentUserId)
 
-    @Before
-    fun setUp() {
-        mockNavController = mockk()
-        mockBookRepo = mockk()
+  @Before
+  fun setUp() {
+    mockNavController = mockk()
+    mockBookRepo = mockk()
 
-        // Mocking the getBook call to return the test book
-        coEvery { mockBookRepo.getBook(testBookId, any(), any()) } answers {
-            val onSuccess = it.invocation.args[1] as (DataBook) -> Unit
-            onSuccess(testBook)
+    // Mocking the getBook call to return the test book
+    coEvery { mockBookRepo.getBook(testBookId, any(), any()) } answers
+        {
+          val onSuccess = it.invocation.args[1] as (DataBook) -> Unit
+          onSuccess(testBook)
         }
+  }
+
+  @Test
+  fun hasRequiredComponents() {
+    composeTestRule.setContent {
+      val navController = rememberNavController()
+      val navigationActions = NavigationActions(navController)
+      BookProfileScreen(
+          bookId = testBookId,
+          booksRepository = mockBookRepo,
+          navController = navigationActions,
+          currentUserId = currentUserId)
     }
 
-    @Test
-    fun hasRequiredComponents() {
-        composeTestRule.setContent {
-            val navController = rememberNavController()
-            val navigationActions = NavigationActions(navController)
-            BookProfileScreen(bookId = testBookId, booksRepository = mockBookRepo, navController = navigationActions, currentUserId = currentUserId)
-        }
+    composeTestRule.onNodeWithTag("bookTitle").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("bookAuthor").assertIsDisplayed()
+    composeTestRule
+        .onNodeWithTag("bookProfileScroll")
+        .performScrollToNode(hasTestTag("bookProfileEditionPlace"))
+    composeTestRule.onNodeWithTag("bookProfileLanguage").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("bookProfileGenresTitle").assertIsDisplayed()
+    testBook.genres.forEach { genre ->
+      composeTestRule.onNodeWithTag("bookProfileGenre${genre.Genre}").assertIsDisplayed()
+    }
+    composeTestRule.onNodeWithTag("bookProfileISBN").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("bookProfileDate").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("bookProfileVolume").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("bookProfileIssue").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("bookProfileEditorial").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("bookProfileEditionPlace").assertIsDisplayed()
+  }
 
-        composeTestRule.onNodeWithTag("bookTitle").assertIsDisplayed()
-        composeTestRule.onNodeWithTag("bookAuthor").assertIsDisplayed()
-        composeTestRule.onNodeWithTag("bookProfileScroll").performScrollToNode(hasTestTag("bookProfileEditionPlace"))
-        composeTestRule.onNodeWithTag("bookProfileLanguage").assertIsDisplayed()
-        composeTestRule.onNodeWithTag("bookProfileGenresTitle").assertIsDisplayed()
-        testBook.genres.forEach { genre ->
-            composeTestRule.onNodeWithTag("bookProfileGenre${genre.Genre}").assertIsDisplayed()
-        }
-        composeTestRule.onNodeWithTag("bookProfileISBN").assertIsDisplayed()
-        composeTestRule.onNodeWithTag("bookProfileDate").assertIsDisplayed()
-        composeTestRule.onNodeWithTag("bookProfileVolume").assertIsDisplayed()
-        composeTestRule.onNodeWithTag("bookProfileIssue").assertIsDisplayed()
-        composeTestRule.onNodeWithTag("bookProfileEditorial").assertIsDisplayed()
-        composeTestRule.onNodeWithTag("bookProfileEditionPlace").assertIsDisplayed()
+  @Test
+  fun iconsAreClickable() {
+    composeTestRule.setContent {
+      val navController = rememberNavController()
+      val navigationActions = NavigationActions(navController)
+      BookProfileScreen(
+          bookId = testBookId,
+          booksRepository = mockBookRepo,
+          navController = navigationActions,
+          currentUserId = currentUserId)
     }
 
-    @Test
-    fun iconsAreClickable(){
-        composeTestRule.setContent {
-            val navController = rememberNavController()
-            val navigationActions = NavigationActions(navController)
-            BookProfileScreen(bookId = testBookId, booksRepository = mockBookRepo, navController = navigationActions, currentUserId = currentUserId)
-        }
+    composeTestRule.onNodeWithTag("bookProfileImageLeft").assertHasClickAction()
+    composeTestRule.onNodeWithTag("bookProfileImageRight").assertHasClickAction()
+  }
 
-        composeTestRule.onNodeWithTag("bookProfileImageLeft").assertHasClickAction()
-        composeTestRule.onNodeWithTag("bookProfileImageRight").assertHasClickAction()
+  @Test
+  fun pictureChangesOnIconClick() {
+    composeTestRule.setContent {
+      val navController = rememberNavController()
+      val navigationActions = NavigationActions(navController)
+      BookProfileScreen(
+          bookId = testBookId,
+          booksRepository = mockBookRepo,
+          navController = navigationActions,
+          currentUserId = currentUserId)
     }
 
-    @Test
-    fun pictureChangesOnIconClick(){
-        composeTestRule.setContent {
-            val navController = rememberNavController()
-            val navigationActions = NavigationActions(navController)
-            BookProfileScreen(bookId = testBookId, booksRepository = mockBookRepo, navController = navigationActions, currentUserId = currentUserId)
-        }
+    // Verify the first picture is displayed
+    composeTestRule.onNodeWithTag("bookProfileImage Isabel La Catolica").assertIsDisplayed()
 
-        // Verify the first picture is displayed
-        composeTestRule.onNodeWithTag("bookProfileImage Isabel La Catolica").assertIsDisplayed()
+    // Perform a click action on the icon
+    composeTestRule.onNodeWithTag("bookProfileImageRight").performClick()
 
-        // Perform a click action on the icon
-        composeTestRule.onNodeWithTag("bookProfileImageRight").performClick()
-
-        // Verify the next picture is displayed
-        composeTestRule.onNodeWithTag("bookProfileImage Felipe II").assertIsDisplayed()
-    }
+    // Verify the next picture is displayed
+    composeTestRule.onNodeWithTag("bookProfileImage Felipe II").assertIsDisplayed()
+  }
 }

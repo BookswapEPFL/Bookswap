@@ -71,7 +71,7 @@ val books =
             photo = "url_to_photo_2",
             language = BookLanguages.FRENCH,
             isbn = "234-567-890",
-            genres = listOf(BookGenres.FICTION)
+            genres = listOf(BookGenres.FICTION),
             userId = userId))
 
 class MapScreenTest {

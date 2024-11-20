@@ -92,10 +92,10 @@ class GoogleBookDataSourceTest {
             photo = "image2",
             language = BookLanguages.ENGLISH,
             isbn = "9780435123437",
-            userId = UUID.randomUUID()
-            )
+            userId = UUID.randomUUID())
 
-    assertBookEquals(dataBook, mockGoogleBookDataSource.parseISBNResponse(jsonBook, dataBook.userId).getOrNull())
+    assertBookEquals(
+        dataBook, mockGoogleBookDataSource.parseISBNResponse(jsonBook, dataBook.userId).getOrNull())
   }
 
   @Test
@@ -143,8 +143,8 @@ class GoogleBookDataSourceTest {
     """
             .trimIndent()
 
-      val userId = UUID.randomUUID()
-      assertTrue(mockGoogleBookDataSource.parseISBNResponse(missingTitleJson, userId).isFailure)
+    val userId = UUID.randomUUID()
+    assertTrue(mockGoogleBookDataSource.parseISBNResponse(missingTitleJson, userId).isFailure)
   }
 
   @Test
@@ -213,10 +213,13 @@ class GoogleBookDataSourceTest {
             photo = null,
             language = BookLanguages.OTHER,
             isbn = "9780435123437",
-            userId = UUID.randomUUID()
-            )
+            userId = UUID.randomUUID())
 
-    assertBookEquals(dataBook, mockGoogleBookDataSource.parseISBNResponse(fieldsEmpty, dataBook.userId).getOrNull())
-    assertBookEquals(dataBook, mockGoogleBookDataSource.parseISBNResponse(listEmpty, dataBook.userId).getOrNull())
+    assertBookEquals(
+        dataBook,
+        mockGoogleBookDataSource.parseISBNResponse(fieldsEmpty, dataBook.userId).getOrNull())
+    assertBookEquals(
+        dataBook,
+        mockGoogleBookDataSource.parseISBNResponse(listEmpty, dataBook.userId).getOrNull())
   }
 }

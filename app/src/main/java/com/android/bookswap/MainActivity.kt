@@ -1,17 +1,12 @@
 package com.android.bookswap
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTag
@@ -19,9 +14,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
-import com.android.bookswap.data.BookGenres
-import com.android.bookswap.data.BookLanguages
-import com.android.bookswap.data.DataBook
 import com.android.bookswap.data.DataUser
 import com.android.bookswap.data.MessageBox
 import com.android.bookswap.data.repository.BooksRepository
@@ -29,8 +21,6 @@ import com.android.bookswap.data.repository.MessageRepository
 import com.android.bookswap.data.repository.UsersRepository
 import com.android.bookswap.data.source.network.BooksFirestoreSource
 import com.android.bookswap.data.source.network.MessageFirestoreSource
-import com.android.bookswap.model.UserViewModel
-import com.android.bookswap.model.chat.MessageBox
 import com.android.bookswap.data.source.network.PhotoFirebaseStorageSource
 import com.android.bookswap.data.source.network.UserFirestoreSource
 import com.android.bookswap.model.UserViewModel
@@ -41,11 +31,10 @@ import com.android.bookswap.model.map.DefaultGeolocation
 import com.android.bookswap.model.map.Geolocation
 import com.android.bookswap.model.map.IGeolocation
 import com.android.bookswap.resources.C
-import com.android.bookswap.ui.books.BookProfileScreen
+import com.android.bookswap.ui.authentication.SignInScreen
 import com.android.bookswap.ui.books.add.AddISBNScreen
 import com.android.bookswap.ui.books.add.AddToBookScreen
 import com.android.bookswap.ui.books.add.BookAdditionChoiceScreen
-import com.android.bookswap.ui.books.edit.EditBookScreen
 import com.android.bookswap.ui.chat.ChatScreen
 import com.android.bookswap.ui.chat.ListChatScreen
 import com.android.bookswap.ui.components.TopAppBarComponent
@@ -276,7 +265,7 @@ class MainActivity : ComponentActivity() {
               bookRepository,
               topAppBar = { topAppBar(null) },
               bottomAppBar = { bottomAppBar(this@navigation.route ?: "") },
-              userid)
+              userId = currentUserUUID)
         }
       }
       navigation(startDestination = Screen.PROFILE, route = Route.PROFILE) {
