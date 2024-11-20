@@ -21,6 +21,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -31,6 +33,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.bookswap.data.MessageBox
+import com.android.bookswap.model.chat.ContactViewModel
 import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.navigation.Screen
 import com.android.bookswap.ui.theme.ColorVariable
@@ -39,11 +42,14 @@ import com.android.bookswap.ui.theme.ColorVariable
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ListChatScreen(
-    placeHolderData: List<MessageBox> = emptyList(),
     navigationActions: NavigationActions,
     topAppBar: @Composable () -> Unit = {},
     bottomAppBar: @Composable () -> Unit = {},
+    contactViewModel: ContactViewModel = ContactViewModel()
 ) {
+    contactViewModel.updateMessageBoxMap()
+    val messageBoxMap by contactViewModel.messageBoxMap.collectAsState()
+    val messageList = messageBoxMap.values.toList()
   Scaffold(
       modifier = Modifier.testTag("chat_listScreen"),
       topBar = topAppBar,
@@ -55,7 +61,7 @@ fun ListChatScreen(
                     .background(color = ColorVariable.BackGround)
                     .testTag("chat_messageList")) {
               item { MessageDivider() }
-              if (placeHolderData.isEmpty()) {
+              if (messageBoxMap.isEmpty()) {
                 item {
                   Text(
                       text = "No messages yet",
@@ -66,10 +72,11 @@ fun ListChatScreen(
                       textAlign = TextAlign.Center)
                 }
               } else {
-                items(placeHolderData.size) { message ->
-                  MessageBoxDisplay(placeHolderData[message]) {
+                items(messageList.size) { index ->
+                   val messageBox = messageList[index]
+                  MessageBoxDisplay(messageBox) {
                     navigationActions.navigateTo(
-                        Screen.CHAT, placeHolderData[message].contact.userUUID.toString())
+                        Screen.CHAT, messageBox.contact.userUUID.toString())
                   }
                   MessageDivider()
                 }
