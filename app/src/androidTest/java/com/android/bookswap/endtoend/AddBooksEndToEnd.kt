@@ -46,8 +46,7 @@ class AddBooksEndToEnd {
     every { mockBookRepository.addBook(any(), any()) } just runs
     every { mockBookRepository.getNewUUID() } returns UUID.randomUUID()
 
-
-      val testUUID = UUID.randomUUID()
+    val testUUID = UUID.randomUUID()
     mockedBook =
         DataBook(
             uuid = UUID.randomUUID(),
@@ -62,8 +61,7 @@ class AddBooksEndToEnd {
 
     mockkConstructor(GoogleBookDataSource::class)
     every {
-      anyConstructed<GoogleBookDataSource>()
-          .getBookFromISBN("9780743273565",any(), any())
+      anyConstructed<GoogleBookDataSource>().getBookFromISBN("9780743273565", any(), any())
     } answers
         {
           val callback = thirdArg<(Result<DataBook>) -> Unit>()
@@ -92,8 +90,7 @@ class AddBooksEndToEnd {
     composeTestRule.onNodeWithTag("isbn_searchButton").performClick()
 
     verify {
-      anyConstructed<GoogleBookDataSource>()
-          .getBookFromISBN(eq("9780743273565"), any(), any())
+      anyConstructed<GoogleBookDataSource>().getBookFromISBN(eq("9780743273565"), any(), any())
     }
     verify { mockBookRepository.addBook(any(), any()) }
 

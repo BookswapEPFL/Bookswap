@@ -41,9 +41,9 @@ class GoogleBookDataSource(context: Context) {
       callback(Result.failure(exception))
       return
     }
-      Log.d("ISBN Validation", "Received ISBN: $isbn")
+    Log.d("ISBN Validation", "Received ISBN: $isbn")
 
-      val stringRequest =
+    val stringRequest =
         StringRequest(
             Request.Method.GET,
             GOOGLE_BOOK_API.plus("isbn:${isbn}"),
