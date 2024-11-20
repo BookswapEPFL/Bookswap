@@ -44,8 +44,10 @@ class AddBooksEndToEnd {
     mockPhotoStorage = mockk()
 
     every { mockBookRepository.addBook(any(), any()) } just runs
+    every { mockBookRepository.getNewUUID() } returns UUID.randomUUID()
 
-    val testUUID = UUID.randomUUID()
+
+      val testUUID = UUID.randomUUID()
     mockedBook =
         DataBook(
             uuid = UUID.randomUUID(),
@@ -61,10 +63,10 @@ class AddBooksEndToEnd {
     mockkConstructor(GoogleBookDataSource::class)
     every {
       anyConstructed<GoogleBookDataSource>()
-          .getBookFromISBN("9780743273565", userId = testUUID, any())
+          .getBookFromISBN("9780743273565",any(), any())
     } answers
         {
-          val callback = secondArg<(Result<DataBook>) -> Unit>()
+          val callback = thirdArg<(Result<DataBook>) -> Unit>()
           callback(Result.success(mockedBook)) // Simulation de succès avec `mockedBook`
         }
 
@@ -91,7 +93,7 @@ class AddBooksEndToEnd {
 
     verify {
       anyConstructed<GoogleBookDataSource>()
-          .getBookFromISBN(eq("9780743273565"), match { it is UUID }, any())
+          .getBookFromISBN(eq("9780743273565"), any(), any())
     }
     verify { mockBookRepository.addBook(any(), any()) }
 

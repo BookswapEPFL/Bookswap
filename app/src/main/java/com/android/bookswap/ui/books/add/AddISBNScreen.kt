@@ -65,6 +65,7 @@ fun AddISBNScreen(
                         value = isbn) {
                           if (it.all { c -> c.isDigit() } && it.length <= 13) {
                             isbn = it
+                            Log.d("ISBN Input", "Updated ISBN: $isbn")
                           }
                         }
                     ButtonComponent(
