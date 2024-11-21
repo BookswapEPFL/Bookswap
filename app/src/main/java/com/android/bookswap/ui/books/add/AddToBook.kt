@@ -47,7 +47,6 @@ fun AddToBookScreen(
       topBar = topAppBar,
       bottomBar = bottomAppBar,
       content = { paddingValues ->
-        // Column layout to stack input fields vertically with spacing
         EntriesListBookComponent(
             paddingValues,
             title,
@@ -58,9 +57,9 @@ fun AddToBookScreen(
             isbn,
             photo,
             language,
-            buttons = { modifier, list ->
+            buttons = { list ->
               ButtonComponent(
-                  modifier = modifier.testTag("save_button").fillMaxWidth(0.5f),
+                  modifier = Modifier.testTag("save_button").fillMaxWidth(0.5f),
                   enabled = !list.any { it.isBlank() },
                   onClick = {
                     viewModel.saveDataBook(
