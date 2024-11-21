@@ -34,12 +34,13 @@ class GoogleBookDataSourceTest {
 
   @Test
   fun `ISBN input validation`() {
+    val userId = UUID.randomUUID()
 
     val callback: (Result<DataBook>) -> Unit = mockk()
     every { callback(any()) } answers { assertTrue(firstArg<Result<DataBook>>().isFailure) }
 
-    mockGoogleBookDataSource.getBookFromISBN("01a3456789", callback)
-    mockGoogleBookDataSource.getBookFromISBN("01234567890", callback)
+    mockGoogleBookDataSource.getBookFromISBN("01a3456789", userId, callback)
+    mockGoogleBookDataSource.getBookFromISBN("01234567890", userId, callback)
 
     verify(exactly = 2) { callback(any()) }
   }
@@ -90,16 +91,19 @@ class GoogleBookDataSourceTest {
             rating = null,
             photo = "image2",
             language = BookLanguages.ENGLISH,
-            isbn = "9780435123437")
+            isbn = "9780435123437",
+            userId = UUID.randomUUID())
 
-    assertBookEquals(dataBook, mockGoogleBookDataSource.parseISBNResponse(jsonBook).getOrNull())
+    assertBookEquals(
+        dataBook, mockGoogleBookDataSource.parseISBNResponse(jsonBook, dataBook.userId).getOrNull())
   }
 
   @Test
   fun `parseISBNResponse fail when json is wrong`() {
+    val userId = UUID.randomUUID()
     val brokenJSON = "BROKEN JSON"
 
-    assertTrue(mockGoogleBookDataSource.parseISBNResponse(brokenJSON).isFailure)
+    assertTrue(mockGoogleBookDataSource.parseISBNResponse(brokenJSON, userId).isFailure)
   }
 
   @Test
@@ -139,7 +143,8 @@ class GoogleBookDataSourceTest {
     """
             .trimIndent()
 
-    assertTrue(mockGoogleBookDataSource.parseISBNResponse(missingTitleJson).isFailure)
+    val userId = UUID.randomUUID()
+    assertTrue(mockGoogleBookDataSource.parseISBNResponse(missingTitleJson, userId).isFailure)
   }
 
   @Test
@@ -207,9 +212,14 @@ class GoogleBookDataSourceTest {
             rating = null,
             photo = null,
             language = BookLanguages.OTHER,
-            isbn = "9780435123437")
+            isbn = "9780435123437",
+            userId = UUID.randomUUID())
 
-    assertBookEquals(dataBook, mockGoogleBookDataSource.parseISBNResponse(fieldsEmpty).getOrNull())
-    assertBookEquals(dataBook, mockGoogleBookDataSource.parseISBNResponse(listEmpty).getOrNull())
+    assertBookEquals(
+        dataBook,
+        mockGoogleBookDataSource.parseISBNResponse(fieldsEmpty, dataBook.userId).getOrNull())
+    assertBookEquals(
+        dataBook,
+        mockGoogleBookDataSource.parseISBNResponse(listEmpty, dataBook.userId).getOrNull())
   }
 }
