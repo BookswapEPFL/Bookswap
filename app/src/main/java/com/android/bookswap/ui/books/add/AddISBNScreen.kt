@@ -82,9 +82,13 @@ fun AddISBNScreen(
                                   result.getOrThrow(),
                                   callback = { res ->
                                     if (res.isSuccess) {
-                                        val newBookList = user.bookList + result.getOrNull()?.uuid!!
+                                      val newBookList = user.bookList + result.getOrNull()?.uuid!!
                                       userVM.updateUser(bookList = newBookList)
-                                        Toast.makeText(context, "${result.getOrNull()?.title} added", Toast.LENGTH_LONG).show()
+                                      Toast.makeText(
+                                              context,
+                                              "${result.getOrNull()?.title} added",
+                                              Toast.LENGTH_LONG)
+                                          .show()
                                       navigationActions.navigateTo(TopLevelDestinations.NEW_BOOK)
                                     } else {
                                       val error = res.exceptionOrNull()!!

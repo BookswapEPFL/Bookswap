@@ -48,11 +48,9 @@ fun ListChatScreen(
     bottomAppBar: @Composable () -> Unit = {},
     contactViewModel: ContactViewModel = ContactViewModel()
 ) {
-    LaunchedEffect(Unit) {
-        contactViewModel.updateMessageBoxMap()
-    }
-    val messageBoxMap by contactViewModel.messageBoxMap.collectAsState()
-    val messageList = messageBoxMap.values.toList()
+  LaunchedEffect(Unit) { contactViewModel.updateMessageBoxMap() }
+  val messageBoxMap by contactViewModel.messageBoxMap.collectAsState()
+  val messageList = messageBoxMap.values.toList()
   Scaffold(
       modifier = Modifier.testTag("chat_listScreen"),
       topBar = topAppBar,
@@ -76,7 +74,7 @@ fun ListChatScreen(
                 }
               } else {
                 items(messageList.size) { index ->
-                   val messageBox = messageList[index]
+                  val messageBox = messageList[index]
                   MessageBoxDisplay(messageBox) {
                     navigationActions.navigateTo(
                         Screen.CHAT, messageBox.contact.userUUID.toString())

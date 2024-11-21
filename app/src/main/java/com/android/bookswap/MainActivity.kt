@@ -118,8 +118,8 @@ class MainActivity : ComponentActivity() {
     if (currentUser != null) {
       userVM.getUserByGoogleUid(currentUser.uid) // This will scrap the user from the database
     }
-      //Message part
-      val contactViewModel = ContactViewModel(userVM,userRepository,messageRepository)
+    // Message part
+    val contactViewModel = ContactViewModel(userVM, userRepository, messageRepository)
     // Book part
     val bookFilter = BookFilter()
     val bookManagerViewModel =
@@ -227,7 +227,7 @@ class MainActivity : ComponentActivity() {
           android.util.Log.d("ChatScreen", "user2UUID: $user2UUID")
           val user2: DataUser? = contactViewModel.getUserInMessageBoxMap(user2UUID)
           android.util.Log.d("ChatScreen", "user2: $user2")
-          if ( user2 != null) {
+          if (user2 != null) {
             ChatScreen(messageRepository, userVM.getUser(), user2, navigationActions, photoStorage)
           } else {
             BookAdditionChoiceScreen(
@@ -258,7 +258,7 @@ class MainActivity : ComponentActivity() {
         composable(Screen.ADD_BOOK_MANUALLY) {
           AddToBookScreen(
               bookRepository,
-                userVM,
+              userVM,
               topAppBar = { topAppBar("Add your Book") },
               bottomAppBar = { bottomAppBar(this@navigation.route ?: "") })
         }
@@ -267,7 +267,7 @@ class MainActivity : ComponentActivity() {
           AddISBNScreen(
               navigationActions,
               bookRepository,
-                userVM,
+              userVM,
               topAppBar = { topAppBar(null) },
               bottomAppBar = { bottomAppBar(this@navigation.route ?: "") })
         }

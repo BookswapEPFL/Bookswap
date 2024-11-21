@@ -206,17 +206,20 @@ fun AddToBookScreen(
                         Toast.makeText(context, "Invalid argument", Toast.LENGTH_SHORT).show()
                       } else {
                         Log.d("AddToBookScreen", "Adding book: $book")
-                        repository.addBook(book, callback = {
-                            if (it.isSuccess) {
+                        repository.addBook(
+                            book,
+                            callback = {
+                              if (it.isSuccess) {
                                 val newBookList = user.bookList + book.uuid
                                 userVM.updateUser(bookList = newBookList)
-                                Toast.makeText(context, "${book.title} added", Toast.LENGTH_LONG).show()
-                            } else {
+                                Toast.makeText(context, "${book.title} added", Toast.LENGTH_LONG)
+                                    .show()
+                              } else {
                                 val error = it.exceptionOrNull()!!
                                 Log.e("AddToBookScreen", it.toString())
                                 Toast.makeText(context, error.message, Toast.LENGTH_LONG).show()
-                            }
-                        })
+                              }
+                            })
                       }
                     } else {
                       // Show a Toast message if title or ISBN is empty

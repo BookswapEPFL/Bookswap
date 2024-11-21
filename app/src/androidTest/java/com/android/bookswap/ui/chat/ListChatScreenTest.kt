@@ -23,8 +23,8 @@ import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
 import io.mockk.runs
-import kotlinx.coroutines.flow.MutableStateFlow
 import java.util.UUID
+import kotlinx.coroutines.flow.MutableStateFlow
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -33,42 +33,43 @@ class ListChatScreenTest {
 
   @get:Rule val composeTestRule = createComposeRule()
   private lateinit var placeHolderData: ContactViewModel
-    private lateinit var messageBoxMapStateFlow: MutableStateFlow<Map<UUID, MessageBox>>
+  private lateinit var messageBoxMapStateFlow: MutableStateFlow<Map<UUID, MessageBox>>
   private lateinit var placeHolderDataEmpty: ContactViewModel
 
   @Before
   fun setUp() {
-    //Not empty mocking data
+    // Not empty mocking data
     placeHolderData = mockk()
-    val generatedMap = List(12) { index ->
-        UUID.randomUUID() to MessageBox(
-            DataUser(
-                userUUID = UUID.randomUUID(),
-                greeting = "Hello",
-                firstName = "First ${index + 1}",
-                lastName = "Last ${index + 1}",
-                email = "",
-                phoneNumber = "",
-                latitude = 0.0,
-                longitude = 0.0,
-                profilePictureUrl = "",
-                bookList = emptyList(),
-                googleUid = "googleUid"
-            ),
-            message = "Test message $index test for the feature of ellipsis in the message",
-            date = "01.01.24"
-        )
-    }.toMap()
+    val generatedMap =
+        List(12) { index ->
+              UUID.randomUUID() to
+                  MessageBox(
+                      DataUser(
+                          userUUID = UUID.randomUUID(),
+                          greeting = "Hello",
+                          firstName = "First ${index + 1}",
+                          lastName = "Last ${index + 1}",
+                          email = "",
+                          phoneNumber = "",
+                          latitude = 0.0,
+                          longitude = 0.0,
+                          profilePictureUrl = "",
+                          bookList = emptyList(),
+                          googleUid = "googleUid"),
+                      message =
+                          "Test message $index test for the feature of ellipsis in the message",
+                      date = "01.01.24")
+            }
+            .toMap()
     messageBoxMapStateFlow = MutableStateFlow(generatedMap)
-      every { placeHolderData.messageBoxMap } returns messageBoxMapStateFlow
-      every{placeHolderData.updateMessageBoxMap()} just runs
-   //Empty mocking data
-   placeHolderDataEmpty = mockk()
+    every { placeHolderData.messageBoxMap } returns messageBoxMapStateFlow
+    every { placeHolderData.updateMessageBoxMap() } just runs
+    // Empty mocking data
+    placeHolderDataEmpty = mockk()
     val generatedMapEmpty = emptyMap<UUID, MessageBox>()
     messageBoxMapStateFlow = MutableStateFlow(generatedMapEmpty)
-      every { placeHolderDataEmpty.messageBoxMap } returns messageBoxMapStateFlow
-      every{placeHolderDataEmpty.updateMessageBoxMap()} just runs
-
+    every { placeHolderDataEmpty.messageBoxMap } returns messageBoxMapStateFlow
+    every { placeHolderDataEmpty.updateMessageBoxMap() } just runs
   }
 
   @Test
@@ -155,8 +156,7 @@ class ListChatScreenTest {
                 tabList = List_Navigation_Bar_Destinations,
                 selectedItem = navigationActions.currentRoute())
           },
-          contactViewModel = placeHolderData
-      )
+          contactViewModel = placeHolderData)
     }
 
     val messageNodes = composeTestRule.onAllNodesWithTag("chat_messageBox")
