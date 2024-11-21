@@ -47,9 +47,9 @@ class AddBooksEndToEnd {
     every { mockBookRepository.addBook(any(), any()) } just runs
 
     val testUUID = UUID.randomUUID()
-      every { mockBookRepository.getNewUUID() } returns testUUID
+    every { mockBookRepository.getNewUUID() } returns testUUID
 
-      mockedBook =
+    mockedBook =
         DataBook(
             uuid = testUUID,
             title = "The Great Gatsby",
