@@ -1,5 +1,6 @@
 package com.android.bookswap
 
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -8,6 +9,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTag
 import androidx.navigation.compose.NavHost
@@ -74,12 +76,14 @@ class MainActivity : ComponentActivity() {
     val db = FirebaseFirestore.getInstance()
     val storage = FirebaseStorage.getInstance()
 
+    val context = LocalContext.current
+
     // Create the data source objects
     val messageRepository = MessageFirestoreSource(db)
     val bookRepository = BooksFirestoreSource(db)
     val userDataSource = UserFirestoreSource(db)
     val photoStorage = PhotoFirebaseStorageSource(storage)
-    val messageStorage = OfflineMessageStorage("", db)
+    val messageStorage = OfflineMessageStorage(context)
 
     // Initialize the geolocation
     val geolocation = Geolocation(this)
@@ -94,7 +98,8 @@ class MainActivity : ComponentActivity() {
                 userRepository = userDataSource,
                 photoStorage = photoStorage,
                 messageStorage = messageStorage,
-                geolocation = geolocation)
+                geolocation = geolocation,
+                context = context)
           }
     }
   }
@@ -107,7 +112,8 @@ class MainActivity : ComponentActivity() {
       startDestination: String = Route.AUTH,
       photoStorage: PhotoFirebaseStorageSource,
       messageStorage: OfflineMessageStorage,
-      geolocation: IGeolocation = DefaultGeolocation()
+      geolocation: IGeolocation = DefaultGeolocation(),
+      context: Context
   ) {
     // navigation part
     val navController = rememberNavController()
@@ -234,7 +240,8 @@ class MainActivity : ComponentActivity() {
                 user2,
                 navigationActions,
                 photoStorage,
-                messageStorage)
+                messageStorage,
+                context)
           } else {
             BookAdditionChoiceScreen(
                 navigationActions,

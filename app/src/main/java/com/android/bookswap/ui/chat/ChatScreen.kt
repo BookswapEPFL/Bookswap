@@ -1,5 +1,6 @@
 package com.android.bookswap.ui.chat
 
+import android.content.Context
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -52,7 +53,6 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.TextFieldValue
@@ -93,13 +93,14 @@ fun ChatScreen(
     otherUser: DataUser,
     navController: NavigationActions,
     photoStorage: PhotoFirebaseStorageRepository,
-    messageStorage: OfflineMessageStorage
+    messageStorage: OfflineMessageStorage,
+    context: Context
 ) {
-  val context = LocalContext.current
   var messages by remember { mutableStateOf(emptyList<DataMessage>()) }
   var newMessageText by remember { mutableStateOf(TextFieldValue("")) }
   var selectedMessage by remember { mutableStateOf<DataMessage?>(null) }
   var updateActive by remember { mutableStateOf(false) }
+  val maxMessagesStoredOffline = 10
   val padding8 = 8.dp
   val padding24 = 24.dp
   val padding36 = 36.dp
@@ -146,16 +147,11 @@ fun ChatScreen(
 
   LaunchedEffect(Unit) {
     while (true) {
-      messageStorage.retrieveMessagesFromFirestore { result: Result<List<DataMessage>> ->
-        if (result.isSuccess) {
-          for (message in result.getOrThrow()) {
-            messageStorage.addMessage(message)
-          }
-          messageStorage.setMessages()
-        } else {
-          Log.e("ChatScreen", "Error retrieving messages: ${result.exceptionOrNull()}")
-        }
+      for (message in
+          messageStorage.extractMessages(messages.toMutableList(), maxMessagesStoredOffline)) {
+        messageStorage.addMessage(message)
       }
+      messageStorage.setMessages()
       messageRepository.getMessages { result ->
         if (result.isSuccess) {
           messages =

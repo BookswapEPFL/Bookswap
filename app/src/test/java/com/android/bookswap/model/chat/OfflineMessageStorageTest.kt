@@ -1,5 +1,6 @@
 package com.android.bookswap.model.chat
 
+import android.content.Context
 import com.android.bookswap.data.DataMessage
 import com.android.bookswap.data.MessageType
 import com.google.android.gms.tasks.Tasks
@@ -19,6 +20,7 @@ class OfflineMessageStorageTest {
   private val mockFirestore: FirebaseFirestore = mockk()
   private val mockQuerySnapshot: QuerySnapshot = mockk()
   private lateinit var offlineMessageStorage: OfflineMessageStorage
+  private lateinit var context: Context
 
   private val testMessages =
       List(12) {
@@ -33,10 +35,18 @@ class OfflineMessageStorageTest {
 
   @Before
   fun setup() {
-    val file = File("MessagesTest.txt")
-    file.writeText("")
+    context = mockk()
+    val mockFile =
+        File(
+            "C:\\Users\\jaime\\Desktop\\Bookswap\\app\\src\\test\\java\\com\\android\\bookswap\\model\\chat")
+    every { context.filesDir } returns mockFile
 
-    offlineMessageStorage = OfflineMessageStorage(file.path, mockFirestore)
+    val messagesFile = File(mockFile, "Messages.txt")
+    if (messagesFile.exists()) {
+      messagesFile.writeText("")
+    }
+
+    offlineMessageStorage = OfflineMessageStorage(context)
 
     val mockCollectionReference = mockk<CollectionReference>()
     val mockQuery = mockk<Query>()
@@ -90,15 +100,28 @@ class OfflineMessageStorageTest {
   }
 
   @Test
-  fun `retrieveMessagesFromFirestore retrieves and stores messages`() {
-    every { mockQuerySnapshot.documents } returns
-        testMessages.map { mockk { every { toObject(DataMessage::class.java) } returns it } }
+  fun `extractMessages returns last 10 TEXT messages and IMAGE messages in between`() {
+    val limit = 10
+    val shuffledMessages = testMessages.shuffled()
 
-    offlineMessageStorage.retrieveMessagesFromFirestore { result ->
-      assertTrue(result.isSuccess)
-      val messages = result.getOrNull()
-      assertNotNull(messages)
-      assertTrue(messages!!.containsAll(testMessages))
+    val extractedMessages =
+        offlineMessageStorage.extractMessages(shuffledMessages.toMutableList(), limit)
+
+    val sortedMessages = shuffledMessages.sortedByDescending { it.timestamp }
+    val expectedMessages = mutableListOf<DataMessage>()
+    var textCount = 0
+
+    for (message in sortedMessages) {
+      if (message.messageType == MessageType.TEXT && textCount < limit) {
+        expectedMessages.add(message)
+        textCount++
+      } else if (message.messageType == MessageType.IMAGE) {
+        expectedMessages.add(message)
+      }
+      if (textCount == limit) break
     }
+
+    assertEquals(expectedMessages.size, extractedMessages.size)
+    assertTrue(expectedMessages.containsAll(extractedMessages))
   }
 }
