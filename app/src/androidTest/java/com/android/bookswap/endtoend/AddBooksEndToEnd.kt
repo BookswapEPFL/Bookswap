@@ -1,5 +1,6 @@
 package com.android.bookswap.endtoend
 
+import android.content.Context
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -13,6 +14,7 @@ import com.android.bookswap.data.repository.MessageRepository
 import com.android.bookswap.data.repository.UsersRepository
 import com.android.bookswap.data.source.api.GoogleBookDataSource
 import com.android.bookswap.data.source.network.PhotoFirebaseStorageSource
+import com.android.bookswap.model.chat.OfflineMessageStorage
 import com.android.bookswap.ui.navigation.Route
 import io.mockk.every
 import io.mockk.just
@@ -32,6 +34,8 @@ class AddBooksEndToEnd {
   private lateinit var mockBookRepository: BooksRepository
   private lateinit var mockUserRepository: UsersRepository
   private lateinit var mockPhotoStorage: PhotoFirebaseStorageSource
+  private lateinit var mockMessageStorage: OfflineMessageStorage
+  private lateinit var context: Context
 
   private lateinit var mockedBook: DataBook
 
@@ -42,9 +46,13 @@ class AddBooksEndToEnd {
     mockBookRepository = mockk()
     mockUserRepository = mockk()
     mockPhotoStorage = mockk()
+    mockMessageStorage = mockk()
+    context = mockk()
 
     every { mockBookRepository.addBook(any(), any()) } just runs
+    every { mockBookRepository.getNewUUID() } returns UUID.randomUUID()
 
+    val testUUID = UUID.randomUUID()
     mockedBook =
         DataBook(
             uuid = UUID.randomUUID(),
@@ -54,12 +62,15 @@ class AddBooksEndToEnd {
             rating = 5,
             isbn = "9780743273565",
             photo = "https://example.com/greatgatsby.jpg",
-            language = BookLanguages.ENGLISH)
+            language = BookLanguages.ENGLISH,
+            userId = testUUID)
 
     mockkConstructor(GoogleBookDataSource::class)
-    every { anyConstructed<GoogleBookDataSource>().getBookFromISBN("9780743273565", any()) } answers
+    every {
+      anyConstructed<GoogleBookDataSource>().getBookFromISBN("9780743273565", any(), any())
+    } answers
         {
-          val callback = secondArg<(Result<DataBook>) -> Unit>()
+          val callback = thirdArg<(Result<DataBook>) -> Unit>()
           callback(Result.success(mockedBook)) // Simulation de succès avec `mockedBook`
         }
 
@@ -70,7 +81,9 @@ class AddBooksEndToEnd {
               mockBookRepository,
               mockUserRepository,
               startDestination = Route.NEWBOOK,
-              photoStorage = mockPhotoStorage)
+              photoStorage = mockPhotoStorage,
+              messageStorage = mockMessageStorage,
+              context = context)
     }
   }
 
@@ -84,7 +97,9 @@ class AddBooksEndToEnd {
     composeTestRule.onNodeWithTag("isbn_field").performTextInput("9780743273565")
     composeTestRule.onNodeWithTag("isbn_searchButton").performClick()
 
-    verify { anyConstructed<GoogleBookDataSource>().getBookFromISBN("9780743273565", any()) }
+    verify {
+      anyConstructed<GoogleBookDataSource>().getBookFromISBN(eq("9780743273565"), any(), any())
+    }
     verify { mockBookRepository.addBook(any(), any()) }
 
     composeTestRule.onNodeWithTag("backButton").performClick()

@@ -39,7 +39,8 @@ class EditBookScreenTest {
           photo = "sample_photo_url",
           language = BookLanguages.ENGLISH,
           isbn = "123456789",
-          genres = listOf(BookGenres.FANTASY))
+          genres = listOf(BookGenres.FANTASY),
+          userId = UUID.randomUUID())
 
   @Before
   fun setUp() {

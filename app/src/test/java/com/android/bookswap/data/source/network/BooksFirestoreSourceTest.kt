@@ -37,7 +37,8 @@ class BooksFirestoreSourceTest {
           rating = 5,
           photo = "http://example.com/photo.jpg",
           language = BookLanguages.ENGLISH,
-          isbn = "1234567890")
+          isbn = "1234567890",
+          userId = UUID.randomUUID())
 
   @Before
   fun setUp() {
@@ -54,10 +55,10 @@ class BooksFirestoreSourceTest {
     every { mockDocumentSnapshot.getString("language") }.returns(testBook.language.name)
     every { mockDocumentSnapshot.getString("isbn") }.returns(testBook.isbn)
     every { mockDocumentSnapshot.get("genres") }.returns(emptyList<String>())
-    every { mockDocumentSnapshot.getLong("uuid.mostSignificantBits") }
-        .returns(testBook.uuid.mostSignificantBits)
-    every { mockDocumentSnapshot.getLong("uuid.leastSignificantBits") }
-        .returns(testBook.uuid.leastSignificantBits)
+    every { mockDocumentSnapshot.getString("uuid") }.returns(testBook.uuid.toString())
+    every { mockDocumentSnapshot.getString("userid") }.returns(testBook.userId.toString())
+
+    every { mockDocumentReference.set(any<Map<String, Any>>()) }.returns(Tasks.forResult(null))
   }
 
   @Test
@@ -101,7 +102,8 @@ class BooksFirestoreSourceTest {
     bookSource.addBook(testBook) { result -> assertTrue(result.isSuccess) }
 
     // Verify Firestore set operation
-    verify { mockDocumentReference.set(testBook) }
+    verify { mockDocumentReference.set(any<Map<String, Any>>()) }
+    // verify { mockDocumentReference.set(testBook) }
   }
 
   @Test

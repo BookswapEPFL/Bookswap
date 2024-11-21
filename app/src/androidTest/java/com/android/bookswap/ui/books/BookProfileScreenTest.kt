@@ -11,7 +11,9 @@ import androidx.navigation.compose.rememberNavController
 import com.android.bookswap.data.BookGenres
 import com.android.bookswap.data.BookLanguages
 import com.android.bookswap.data.DataBook
+import com.android.bookswap.data.repository.BooksRepository
 import com.android.bookswap.ui.navigation.NavigationActions
+import io.mockk.coEvery
 import io.mockk.mockk
 import java.util.UUID
 import org.junit.Before
@@ -22,23 +24,35 @@ class BookProfileScreenTest {
 
   @get:Rule val composeTestRule = createComposeRule()
   private lateinit var mockNavController: NavigationActions
+  private lateinit var mockBookRepo: BooksRepository
+  private val testBookId = UUID.randomUUID()
+  private val currentUserId = UUID.randomUUID()
 
   private val testBook =
       DataBook(
-          uuid = UUID.randomUUID(),
+          uuid = testBookId,
           title = "Historia de España",
           author = "Jose Ignacio Pastor Iglesias",
           description =
-              "Recuento de la historia de España desde los primeros pobladores hasta la actualidad. Escrito con especial enfasis en los reyes catolicos y la exploracion de América.",
+              "Recuento de la historia de España desde los primeros pobladores hasta la actualidad.",
           rating = 9,
           photo = null,
           language = BookLanguages.SPANISH,
           isbn = "978-84-09025-23-5",
-          genres = listOf(BookGenres.HISTORICAL, BookGenres.NONFICTION, BookGenres.BIOGRAPHY))
+          genres = listOf(BookGenres.HISTORICAL, BookGenres.NONFICTION, BookGenres.BIOGRAPHY),
+          userId = currentUserId)
 
   @Before
   fun setUp() {
     mockNavController = mockk()
+    mockBookRepo = mockk()
+
+    // Mocking the getBook call to return the test book
+    coEvery { mockBookRepo.getBook(testBookId, any(), any()) } answers
+        {
+          val onSuccess = it.invocation.args[1] as (DataBook) -> Unit
+          onSuccess(testBook)
+        }
   }
 
   @Test
@@ -46,7 +60,11 @@ class BookProfileScreenTest {
     composeTestRule.setContent {
       val navController = rememberNavController()
       val navigationActions = NavigationActions(navController)
-      BookProfileScreen(testBook, navigationActions)
+      BookProfileScreen(
+          bookId = testBookId,
+          booksRepository = mockBookRepo,
+          navController = navigationActions,
+          currentUserId = currentUserId)
     }
 
     composeTestRule.onNodeWithTag("bookTitle").assertIsDisplayed()
@@ -72,7 +90,11 @@ class BookProfileScreenTest {
     composeTestRule.setContent {
       val navController = rememberNavController()
       val navigationActions = NavigationActions(navController)
-      BookProfileScreen(testBook, navigationActions)
+      BookProfileScreen(
+          bookId = testBookId,
+          booksRepository = mockBookRepo,
+          navController = navigationActions,
+          currentUserId = currentUserId)
     }
 
     composeTestRule.onNodeWithTag("bookProfileImageLeft").assertHasClickAction()
@@ -84,7 +106,11 @@ class BookProfileScreenTest {
     composeTestRule.setContent {
       val navController = rememberNavController()
       val navigationActions = NavigationActions(navController)
-      BookProfileScreen(testBook, navigationActions)
+      BookProfileScreen(
+          bookId = testBookId,
+          booksRepository = mockBookRepo,
+          navController = navigationActions,
+          currentUserId = currentUserId)
     }
 
     // Verify the first picture is displayed

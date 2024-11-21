@@ -77,7 +77,8 @@ fun EditBookScreen(
                           photo.value,
                           language.value,
                           isbn.value,
-                          genres.value)
+                          genres.value,
+                          book.userId)
                     }) {
                       Text("Save")
                     }
