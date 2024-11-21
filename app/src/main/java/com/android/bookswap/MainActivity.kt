@@ -24,7 +24,7 @@ import com.android.bookswap.data.source.network.MessageFirestoreSource
 import com.android.bookswap.data.source.network.PhotoFirebaseStorageSource
 import com.android.bookswap.data.source.network.UserFirestoreSource
 import com.android.bookswap.model.UserViewModel
-import com.android.bookswap.model.add.AddBookViewModel
+import com.android.bookswap.model.add.AddToBookViewModel
 import com.android.bookswap.model.chat.PermissionHandler
 import com.android.bookswap.model.map.BookFilter
 import com.android.bookswap.model.map.BookManagerViewModel
@@ -51,7 +51,6 @@ import com.android.bookswap.ui.profile.UserProfile
 import com.android.bookswap.ui.theme.BookSwapAppTheme
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
-import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import java.util.UUID
@@ -254,7 +253,7 @@ class MainActivity : ComponentActivity() {
         }
         composable(Screen.ADD_BOOK_MANUALLY) {
           AddToBookScreen(
-              AddBookViewModel(bookRepository),
+              AddToBookViewModel(bookRepository),
               topAppBar = { topAppBar("Add your Book") },
               bottomAppBar = { bottomAppBar(this@navigation.route ?: "") })
         }

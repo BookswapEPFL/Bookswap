@@ -11,7 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import com.android.bookswap.data.BookGenres
-import com.android.bookswap.model.add.AddBookViewModel
+import com.android.bookswap.model.add.AddToBookViewModel
 import com.android.bookswap.ui.components.ButtonComponent
 import com.android.bookswap.ui.components.EntriesListBookComponent
 
@@ -25,7 +25,7 @@ import com.android.bookswap.ui.components.EntriesListBookComponent
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddToBookScreen(
-    viewModel: AddBookViewModel,
+    viewModel: AddToBookViewModel,
     topAppBar: @Composable () -> Unit = {},
     bottomAppBar: @Composable () -> Unit = {}
 ) {

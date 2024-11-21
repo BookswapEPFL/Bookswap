@@ -7,7 +7,7 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
-import com.android.bookswap.model.add.AddBookViewModel
+import com.android.bookswap.model.add.AddToBookViewModel
 import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
@@ -19,7 +19,7 @@ import org.junit.Test
 
 class AddToBookTest {
   @get:Rule val composeTestRule = createComposeRule()
-  private val mockViewModel: AddBookViewModel = mockk()
+  private val mockViewModel: AddToBookViewModel = mockk()
 
   @Before
   fun init() {
