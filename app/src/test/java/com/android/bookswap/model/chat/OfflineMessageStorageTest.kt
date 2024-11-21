@@ -11,9 +11,15 @@ import com.google.firebase.firestore.QuerySnapshot
 import io.mockk.every
 import io.mockk.mockk
 import java.io.File
+import java.io.IOException
 import java.util.UUID
+import javax.crypto.SecretKey
 import junit.framework.TestCase.assertEquals
+import junit.framework.TestCase.assertFalse
+import junit.framework.TestCase.assertNotNull
 import junit.framework.TestCase.assertTrue
+import junit.framework.TestCase.fail
+import org.junit.Assert.assertNotEquals
 import org.junit.Before
 import org.junit.Test
 
@@ -60,6 +66,51 @@ class OfflineMessageStorageTest {
   }
 
   @Test
+  fun `generateKey generates valid AES key`() {
+    val key: SecretKey = offlineMessageStorage.generateKey()
+    assertNotNull(key)
+    assertEquals("AES", key.algorithm)
+    assertEquals(256 / 8, key.encoded.size) // AES-256 key size in bytes
+  }
+
+  @Test
+  fun `encrypt encrypts data correctly`() {
+    val plainText = "Test encryption data"
+    val encryptedData = offlineMessageStorage.encrypt(plainText)
+
+    // Ensure encrypted data is not empty and different from the plain text
+    assertTrue(encryptedData.isNotEmpty())
+    assertNotEquals(plainText, String(encryptedData, Charsets.UTF_8))
+
+    // Ensure the encrypted data is not directly readable as plain text
+    val encryptedString = String(encryptedData, Charsets.UTF_8)
+    assertFalse(encryptedString.contains(plainText))
+  }
+
+  @Test
+  fun `decrypt decrypts data correctly`() {
+    val plainText = "Test decryption data"
+    val encryptedData = offlineMessageStorage.encrypt(plainText)
+    val decryptedText = offlineMessageStorage.decrypt(encryptedData)
+
+    // Ensure the decrypted text matches the original plain text
+    assertEquals(plainText, decryptedText)
+  }
+
+  @Test
+  fun `encrypt and decrypt together maintain data integrity`() {
+    val plainText = "Full cycle encryption and decryption test"
+    val encryptedData = offlineMessageStorage.encrypt(plainText)
+    val decryptedText = offlineMessageStorage.decrypt(encryptedData)
+
+    // Ensure the decrypted text matches the original plain text
+    assertEquals(plainText, decryptedText)
+
+    // Ensure the encrypted data is different from the original plain text
+    assertNotEquals(plainText, String(encryptedData, Charsets.UTF_8))
+  }
+
+  @Test
   fun `addMessage adds a message to the internal list`() {
     val message = testMessages[0]
     offlineMessageStorage.addMessage(message)
@@ -75,18 +126,53 @@ class OfflineMessageStorageTest {
   }
 
   @Test
-  fun `setMessages writes messages to file`() {
-    testMessages.forEach { offlineMessageStorage.addMessage(it) }
-    offlineMessageStorage.setMessages()
-    val messagesFromFile = offlineMessageStorage.getMessagesFromText()
-    assertTrue(messagesFromFile.containsAll(testMessages))
+  fun `getMessagesFromText returns empty list if message file does not exist`() {
+    // Ensure the message file does not exist
+    val messagesFile = File(tempDir, "Messages.txt")
+    if (messagesFile.exists()) {
+      messagesFile.delete()
+    }
+
+    // Call getMessagesFromText and verify it returns an empty list
+    val messages = offlineMessageStorage.getMessagesFromText()
+    assertTrue(messages.isEmpty())
   }
 
   @Test
-  fun `getMessagesFromText reads messages from file`() {
+  fun `setMessages writes encrypted messages to file`() {
+    testMessages.forEach { offlineMessageStorage.addMessage(it) }
+    offlineMessageStorage.setMessages()
+
+    val messagesFile = File(tempDir, "Messages.txt")
+    assertTrue(messagesFile.exists())
+    val encryptedData = messagesFile.readBytes()
+    assertTrue(encryptedData.isNotEmpty())
+    assertFalse(String(encryptedData).contains("Test message"))
+  }
+
+  @Test
+  fun `setMessages handles failure gracefully`() {
+    testMessages.forEach { offlineMessageStorage.addMessage(it) }
+
+    // Simulate a failure by making the file read-only
+    val messagesFile = File(tempDir, "Messages.txt")
+    messagesFile.createNewFile()
+    messagesFile.setReadOnly()
+
+    try {
+      offlineMessageStorage.setMessages()
+      fail("Expected IOException to be thrown")
+    } catch (e: IOException) {
+      assertTrue(e.message?.contains("Failed to write messages to file") == true)
+    }
+  }
+
+  @Test
+  fun `getMessagesFromText decrypts messages from file`() {
     testMessages.forEach { offlineMessageStorage.addMessage(it) }
     offlineMessageStorage.setMessages()
     val messagesFromFile = offlineMessageStorage.getMessagesFromText()
+    assertEquals(testMessages.size, messagesFromFile.size)
     assertTrue(messagesFromFile.containsAll(testMessages))
   }
 
