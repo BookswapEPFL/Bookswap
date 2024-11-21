@@ -114,7 +114,7 @@ class NewUserScreenTest {
   @Test
   fun clickOnCreateButtonWithEmptyFieldsShowsErrors() {
     justRun {
-      userVM.updateUser(any(), any(), any(), any(), any(), any(), any(), any(), any(), any())
+      userVM.updateUser(any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any())
     }
     composeTestRule.setContent { NewUserScreen(navigationActions, userVM) }
 
