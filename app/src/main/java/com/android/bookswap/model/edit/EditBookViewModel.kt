@@ -8,9 +8,13 @@ import com.android.bookswap.data.BookGenres
 import com.android.bookswap.data.BookLanguages
 import com.android.bookswap.data.DataBook
 import com.android.bookswap.data.repository.BooksRepository
+import com.android.bookswap.ui.navigation.NavigationActions
 import java.util.UUID
 
-class EditBookViewModel(private val booksRepository: BooksRepository) : ViewModel() {
+class EditBookViewModel(
+    private val booksRepository: BooksRepository,
+    private val navigation: NavigationActions
+) : ViewModel() {
   /**
    * Creates a DataBook instance after validating the input parameters.
    *
@@ -25,7 +29,7 @@ class EditBookViewModel(private val booksRepository: BooksRepository) : ViewMode
    * @param genres The list of genres the book belongs to.
    * @return A DataBook instance if all validations pass, null otherwise.
    */
-  fun saveDataBook(
+  fun updateDataBook(
       context: Context,
       uuid: UUID,
       title: String,
@@ -65,14 +69,22 @@ class EditBookViewModel(private val booksRepository: BooksRepository) : ViewMode
         book,
         callback = {
           if (it.isSuccess) {
-            Toast.makeText(context, "Book edited.", Toast.LENGTH_LONG).show()
+            Toast.makeText(context, "Book updated.", Toast.LENGTH_LONG).show()
+            navigation.goBack()
           } else {
-            Toast.makeText(context, "Failed to edit book.", Toast.LENGTH_LONG).show()
+            Toast.makeText(context, "Failed to update book.", Toast.LENGTH_LONG).show()
           }
         })
   }
 
   fun deleteBooks(context: Context, uuid: UUID) {
-    booksRepository.deleteBooks(uuid) {}
+    booksRepository.deleteBooks(uuid) {
+      if (it.isSuccess) {
+        Toast.makeText(context, "Book deleted.", Toast.LENGTH_LONG).show()
+        navigation.goBack()
+      } else {
+        Toast.makeText(context, "Failed to delete book.", Toast.LENGTH_LONG).show()
+      }
+    }
   }
 }

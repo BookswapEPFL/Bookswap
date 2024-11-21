@@ -62,10 +62,7 @@ fun EntriesListBookComponent(
               title.value = it
             }
         ExposedDropdownMenuBox(
-            modifier =
-                Modifier.fillMaxWidth()
-                    .padding(horizontal = HORIZONTAL_PADDING.dp)
-                    .testTag("genre_field"),
+            modifier = Modifier.fillMaxWidth().padding(horizontal = HORIZONTAL_PADDING.dp),
             expanded = expanded,
             onExpandedChange = { expanded = !expanded }) {
               FieldComponent(
@@ -73,7 +70,7 @@ fun EntriesListBookComponent(
                   onValueChange = {},
                   readOnly = true,
                   label = { Text(text = "Genres") },
-                  modifier = Modifier.menuAnchor().fillMaxWidth())
+                  modifier = Modifier.menuAnchor().fillMaxWidth().testTag("genre_field"))
               ExposedDropdownMenu(
                   expanded = expanded,
                   onDismissRequest = { expanded = false },
@@ -100,7 +97,8 @@ fun EntriesListBookComponent(
                             } else {
                               genres.value += genre
                             }
-                          })
+                          },
+                          modifier = Modifier.testTag("genre_menu_${genre.Genre}"))
                     }
                   }
             }
