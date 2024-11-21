@@ -171,7 +171,8 @@ class AddToBookTest {
 
   @Test
   fun testDropdownMenuIsInitiallyClosed() {
-    composeTestRule.setContent { AddToBookScreen(mockBooksRepository) }
+    val userId = UUID.randomUUID()
+    composeTestRule.setContent { AddToBookScreen(mockBooksRepository, userId = userId) }
 
     // Verify that the dropdown menu is initially not expanded
     composeTestRule.onNodeWithTag("language_field").assertIsDisplayed()
@@ -180,7 +181,8 @@ class AddToBookTest {
 
   @Test
   fun testDropdownMenuOpensOnClick() {
-    composeTestRule.setContent { AddToBookScreen(mockBooksRepository) }
+    val userId = UUID.randomUUID()
+    composeTestRule.setContent { AddToBookScreen(mockBooksRepository, userId = userId) }
 
     // Simulate clicking the dropdown to expand it
     composeTestRule.onNodeWithTag("language_field").performClick()
@@ -197,7 +199,9 @@ class AddToBookTest {
 
   @Test
   fun testDropdownMenuItemSelection() {
-    composeTestRule.setContent { AddToBookScreen(mockBooksRepository) }
+    val userId = UUID.randomUUID()
+
+    composeTestRule.setContent { AddToBookScreen(mockBooksRepository, userId = userId) }
 
     // Expand the dropdown menu:
     composeTestRule.onNodeWithTag("language_field").performClick()
@@ -211,7 +215,9 @@ class AddToBookTest {
 
   @Test
   fun testDropdownMenuClosesAfterSelection() {
-    composeTestRule.setContent { AddToBookScreen(mockBooksRepository) }
+    val userId = UUID.randomUUID()
+
+    composeTestRule.setContent { AddToBookScreen(mockBooksRepository, userId = userId) }
 
     // Expand the dropdown menu
     composeTestRule.onNodeWithTag("language_field").performClick()
