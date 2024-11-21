@@ -1,5 +1,6 @@
 package com.android.bookswap.ui.books.edit
 
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.Scaffold
@@ -60,31 +61,33 @@ fun EditBookScreen(
             isbn,
             photo,
             language,
-            buttons = { list ->
-              ButtonComponent(
-                  modifier = Modifier.testTag("save_button").fillMaxWidth(WIDTH_BUTTON),
-                  enabled = !list.any { it.isBlank() },
-                  onClick = {
-                    viewModel.updateDataBook(
-                        context,
-                        book.uuid,
-                        title.value,
-                        author.value,
-                        description.value,
-                        rating.value,
-                        photo.value,
-                        language.value,
-                        isbn.value,
-                        genres.value)
-                  }) {
-                    Text("Save")
-                  }
-              Spacer(modifier = Modifier.fillMaxWidth(SPACE_BETWEEN_BUTTON))
-              ButtonComponent(
-                  modifier = Modifier.testTag("delete_button").fillMaxWidth(),
-                  onClick = { viewModel.deleteBooks(context, book.uuid) }) {
-                    Text("Delete")
-                  }
+            buttons = { list, modifier ->
+              Row(modifier.fillMaxWidth()) {
+                ButtonComponent(
+                    modifier = Modifier.testTag("save_button").fillMaxWidth(WIDTH_BUTTON),
+                    enabled = !list.any { it.isBlank() },
+                    onClick = {
+                      viewModel.updateDataBook(
+                          context,
+                          book.uuid,
+                          title.value,
+                          author.value,
+                          description.value,
+                          rating.value,
+                          photo.value,
+                          language.value,
+                          isbn.value,
+                          genres.value)
+                    }) {
+                      Text("Save")
+                    }
+                Spacer(modifier = Modifier.fillMaxWidth(SPACE_BETWEEN_BUTTON))
+                ButtonComponent(
+                    modifier = Modifier.testTag("delete_button").fillMaxWidth(),
+                    onClick = { viewModel.deleteBooks(context, book.uuid) }) {
+                      Text("Delete")
+                    }
+              }
             })
       })
 }

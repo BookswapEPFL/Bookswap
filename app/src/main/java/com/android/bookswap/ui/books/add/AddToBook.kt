@@ -1,5 +1,6 @@
 package com.android.bookswap.ui.books.add
 
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
@@ -18,7 +19,7 @@ import com.android.bookswap.ui.components.EntriesListBookComponent
 /**
  * Composable function to display the screen for adding a new book.
  *
- * @param repository The repository to interact with book data.
+ * @param viewModel The viewModel that manage the saving of the book.
  * @param topAppBar A composable function to display the top app bar.
  * @param bottomAppBar A composable function to display the bottom app bar.
  */
@@ -57,24 +58,26 @@ fun AddToBookScreen(
             isbn,
             photo,
             language,
-            buttons = { list ->
-              ButtonComponent(
-                  modifier = Modifier.testTag("save_button").fillMaxWidth(0.5f),
-                  enabled = !list.any { it.isBlank() },
-                  onClick = {
-                    viewModel.saveDataBook(
-                        context,
-                        title.value,
-                        author.value,
-                        description.value,
-                        rating.value,
-                        photo.value,
-                        language.value,
-                        isbn.value,
-                        genres.value)
-                  }) {
-                    Text("Save")
-                  }
+            buttons = { list, modifier ->
+              Row(modifier.fillMaxWidth(0.5f)) {
+                ButtonComponent(
+                    modifier = Modifier.testTag("save_button"),
+                    enabled = !list.any { it.isBlank() },
+                    onClick = {
+                      viewModel.saveDataBook(
+                          context,
+                          title.value,
+                          author.value,
+                          description.value,
+                          rating.value,
+                          photo.value,
+                          language.value,
+                          isbn.value,
+                          genres.value)
+                    }) {
+                      Text("Save")
+                    }
+              }
             })
       })
 }
