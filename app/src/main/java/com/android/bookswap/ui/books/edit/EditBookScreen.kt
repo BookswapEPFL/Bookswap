@@ -11,6 +11,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import com.android.bookswap.data.BookLanguages
 import com.android.bookswap.data.DataBook
 import com.android.bookswap.model.edit.EditBookViewModel
 import com.android.bookswap.ui.components.ButtonComponent
@@ -40,7 +41,7 @@ fun EditBookScreen(
   val description = remember { mutableStateOf(book.description ?: "") }
   val rating = remember { mutableStateOf(book.rating?.toString() ?: "") }
   val photo = remember { mutableStateOf(book.photo ?: "") }
-  val language = remember { mutableStateOf(book.language.toString()) }
+  val language = remember { mutableStateOf<BookLanguages?>(null) }
   val genres = remember { mutableStateOf(book.genres) }
   val isbn = remember { mutableStateOf(book.isbn ?: "") }
 
@@ -61,11 +62,14 @@ fun EditBookScreen(
             isbn,
             photo,
             language,
-            buttons = { list, modifier ->
+            buttons = { modifier ->
               Row(modifier.fillMaxWidth()) {
                 ButtonComponent(
                     modifier = Modifier.testTag("save_button").fillMaxWidth(WIDTH_BUTTON),
-                    enabled = !list.any { it.isBlank() },
+                    enabled =
+                        title.value.isNotBlank() &&
+                            author.value.isNotBlank() &&
+                            language.value != null,
                     onClick = {
                       viewModel.updateDataBook(
                           context,
@@ -75,7 +79,7 @@ fun EditBookScreen(
                           description.value,
                           rating.value,
                           photo.value,
-                          language.value,
+                          language.value!!,
                           isbn.value,
                           genres.value)
                     }) {

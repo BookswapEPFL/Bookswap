@@ -27,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.android.bookswap.data.BookGenres
+import com.android.bookswap.data.BookLanguages
 import com.android.bookswap.ui.theme.ColorVariable.BackGround
 
 private const val HORIZONTAL_PADDING = 30
@@ -42,11 +43,11 @@ fun EntriesListBookComponent(
     rating: MutableState<String>,
     isbn: MutableState<String>,
     photo: MutableState<String>,
-    language: MutableState<String>,
-    buttons: @Composable (necessaryEntries: List<String>, modifier: Modifier) -> Unit
+    selectedLanguage: MutableState<BookLanguages?>,
+    buttons: @Composable (modifier: Modifier) -> Unit
 ) {
-  var expanded by remember { mutableStateOf(false) } // State for dropdown menu
-  val necessaryEntries = listOf(title.value, author.value, language.value)
+  var expanded by remember { mutableStateOf(false) }
+  var expandedLanguage by remember { mutableStateOf(false) }
   Column(
       modifier =
           Modifier.background(BackGround).fillMaxWidth().fillMaxHeight().padding(paddingValues),
@@ -154,17 +155,38 @@ fun EntriesListBookComponent(
             value = photo.value) {
               photo.value = it
             }
-        FieldComponent(
+        ExposedDropdownMenuBox(
             modifier =
-                Modifier.testTag("language_field")
-                    .fillMaxWidth()
-                    .padding(horizontal = HORIZONTAL_PADDING.dp),
-            labelText = "Language*",
-            value = language.value) {
-              language.value = it
+                Modifier.fillMaxWidth()
+                    .padding(horizontal = HORIZONTAL_PADDING.dp)
+                    .testTag("language_field"),
+            expanded = expandedLanguage,
+            onExpandedChange = { expandedLanguage = !expandedLanguage }) {
+              FieldComponent(
+                  value = selectedLanguage.value?.languageCode ?: "",
+                  onValueChange = {},
+                  readOnly = true,
+                  label = { Text(text = "Language*") },
+                  modifier = Modifier.menuAnchor().fillMaxWidth())
+              ExposedDropdownMenu(
+                  expanded = expandedLanguage,
+                  onDismissRequest = { expandedLanguage = false },
+                  modifier = Modifier.fillMaxWidth()) {
+                    BookLanguages.values().forEach { language ->
+                      DropdownMenuItem(
+                          text = {
+                            Text(
+                                text = language.languageCode,
+                            )
+                          },
+                          onClick = {
+                            selectedLanguage.value = language
+                            expandedLanguage = false
+                          })
+                    }
+                  }
             }
         buttons(
-            necessaryEntries,
             Modifier.align(Alignment.CenterHorizontally)
                 .padding(horizontal = HORIZONTAL_PADDING.dp))
         // empty Spacer to have space bellow save button

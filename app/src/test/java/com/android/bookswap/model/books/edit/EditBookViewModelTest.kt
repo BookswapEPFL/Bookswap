@@ -45,17 +45,16 @@ class EditBookViewModelTest {
     val mockToast = mockk<Toast>(relaxed = true)
     every { Toast.makeText(any(), any<String>(), any()) } returns mockToast
 
-    every { booksRepository.updateBook(any(), any()) } answers
-        {
-          val callback = secondArg<(Result<Unit>) -> Unit>()
-          callback(Result.success(Unit))
-        }
-
     every { navigation.goBack() } just Runs
   }
 
   @Test
   fun `updateDataBook updates book successfully`() {
+    every { booksRepository.updateBook(any(), any()) } answers
+        {
+          val callback = secondArg<(Result<Unit>) -> Unit>()
+          callback(Result.success(Unit))
+        }
     viewModel.updateDataBook(
         context,
         book.uuid,
@@ -64,7 +63,7 @@ class EditBookViewModelTest {
         book.description!!,
         book.rating!!.toString(),
         book.photo!!,
-        book.language.toString(),
+        book.language,
         book.isbn!!,
         book.genres)
 
@@ -73,7 +72,12 @@ class EditBookViewModelTest {
   }
 
   @Test
-  fun `updateDataBook shows error on invalid language`() {
+  fun `updateDataBook don't navigate back on failure`() {
+    every { booksRepository.updateBook(any(), any()) } answers
+        {
+          val callback = secondArg<(Result<Unit>) -> Unit>()
+          callback(Result.failure(Exception("Updating failed")))
+        }
     viewModel.updateDataBook(
         context,
         book.uuid,
@@ -82,11 +86,12 @@ class EditBookViewModelTest {
         book.description!!,
         book.rating!!.toString(),
         book.photo!!,
-        "Test",
+        book.language,
         book.isbn!!,
         book.genres)
 
-    verify(exactly = 0) { booksRepository.updateBook(any(), any()) }
+    verify { booksRepository.updateBook(eq(book), any()) }
+    verify(exactly = 0) { navigation.goBack() }
   }
 
   @Test
@@ -105,7 +110,7 @@ class EditBookViewModelTest {
   }
 
   @Test
-  fun `deleteBooks shows error when deletion fails`() {
+  fun `deleteBooks don't go back when deletion fails`() {
     // Arrange
     val uuid = UUID.randomUUID()
     every { booksRepository.deleteBooks(uuid, any()) } answers

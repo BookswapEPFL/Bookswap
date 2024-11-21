@@ -1,12 +1,10 @@
 package com.android.bookswap.ui.navigation
 
 import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
-import androidx.compose.ui.test.performScrollToNode
 import androidx.compose.ui.test.performTextInput
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -16,6 +14,7 @@ import com.android.bookswap.data.BookGenres
 import com.android.bookswap.data.BookLanguages
 import com.android.bookswap.data.DataBook
 import com.android.bookswap.data.repository.BooksRepository
+import com.android.bookswap.model.edit.EditBookViewModel
 import com.android.bookswap.ui.books.BookProfileScreen
 import com.android.bookswap.ui.books.edit.EditBookScreen
 import io.mockk.coEvery
@@ -71,8 +70,7 @@ class NavigationFromBookProfileToEditBookTest {
           val bookId = backStackEntry.arguments?.getString("bookId")?.let { UUID.fromString(it) }
           if (bookId != null) {
             EditBookScreen(
-                booksRepository = mockBookRepo,
-                navigationActions = NavigationActions(navController),
+                EditBookViewModel(mockBookRepo, NavigationActions(navController), testBook.userId),
                 book = testBook.copy(uuid = bookId))
           }
         }
@@ -97,12 +95,9 @@ class NavigationFromBookProfileToEditBookTest {
     // Description")
 
     // Edit book title and save
-    composeTestRule.onNodeWithTag("inputBookTitle").performTextInput("Updated Title")
-    composeTestRule
-        .onNodeWithTag("editBookScreenColumn")
-        .performScrollToNode(hasTestTag("bookSave"))
-    composeTestRule.onNodeWithTag("bookSave").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("bookSave").performClick()
+    composeTestRule.onNodeWithTag("title_field").performTextInput("Updated Title")
+    composeTestRule.onNodeWithTag("save_button").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("save_button").performClick()
 
     // Verify updated book is reflected in BookProfileScreen
     coEvery { mockBookRepo.getBook(eq(testBookId), any(), any()) } answers

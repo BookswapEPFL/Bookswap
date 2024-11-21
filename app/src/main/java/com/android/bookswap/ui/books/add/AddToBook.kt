@@ -58,11 +58,14 @@ fun AddToBookScreen(
             isbn,
             photo,
             language,
-            buttons = { list, modifier ->
+            buttons = { modifier ->
               Row(modifier.fillMaxWidth(0.5f)) {
                 ButtonComponent(
                     modifier = Modifier.testTag("save_button"),
-                    enabled = !list.any { it.isBlank() },
+                    enabled =
+                        title.value.isNotBlank() &&
+                            author.value.isNotBlank() &&
+                            language.value != null,
                     onClick = {
                       viewModel.saveDataBook(
                           context,
@@ -71,7 +74,7 @@ fun AddToBookScreen(
                           description.value,
                           rating.value,
                           photo.value,
-                          language.value,
+                          language.value!!,
                           isbn.value,
                           genres.value)
                     }) {

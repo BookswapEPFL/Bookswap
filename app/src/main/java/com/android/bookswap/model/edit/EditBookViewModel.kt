@@ -38,22 +38,10 @@ class EditBookViewModel(
       description: String,
       ratingStr: String,
       photo: String,
-      bookLanguageStr: String,
+      language: BookLanguages,
       isbn: String,
       genres: List<BookGenres>
   ) {
-    // Validate Language
-    val languages: BookLanguages =
-        try {
-          BookLanguages.valueOf(bookLanguageStr.uppercase())
-        } catch (e: IllegalArgumentException) {
-          Log.e(
-              "AddToBookScreen",
-              "Invalid language: $bookLanguageStr. Please use one of the supported languages.")
-          Toast.makeText(context, "Invalid language: $bookLanguageStr.", Toast.LENGTH_LONG).show()
-          return
-        }
-
     val book =
         DataBook(
             uuid = uuid,
@@ -62,7 +50,7 @@ class EditBookViewModel(
             description = description,
             rating = ratingStr.toIntOrNull(),
             photo = photo,
-            language = languages,
+            language = language,
             isbn = isbn,
             genres = genres,
             userID)

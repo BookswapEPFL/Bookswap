@@ -42,17 +42,17 @@ class AddToBookViewModelTest {
     val mockToast = mockk<Toast>(relaxed = true)
     every { Toast.makeText(any(), any<String>(), any()) } returns mockToast
 
-    every { booksRepository.addBook(any(), any()) } answers
-        {
-          val callback = secondArg<(Result<Unit>) -> Unit>()
-          callback(Result.success(Unit))
-        }
     mockkStatic(UUID::class)
     every { UUID.randomUUID() } returns UUID(1, 1)
   }
 
   @Test
   fun `updateDataBook updates book successfully`() {
+    every { booksRepository.addBook(any(), any()) } answers
+        {
+          val callback = secondArg<(Result<Unit>) -> Unit>()
+          callback(Result.success(Unit))
+        }
     viewModel.saveDataBook(
         context,
         book.title,
@@ -60,26 +60,10 @@ class AddToBookViewModelTest {
         book.description!!,
         book.rating!!.toString(),
         book.photo!!,
-        book.language.toString(),
+        book.language,
         book.isbn!!,
         book.genres)
 
     verify { booksRepository.addBook(eq(book), any()) }
-  }
-
-  @Test
-  fun `updateDataBook shows error on invalid language`() {
-    viewModel.saveDataBook(
-        context,
-        book.title,
-        book.author!!,
-        book.description!!,
-        book.rating!!.toString(),
-        book.photo!!,
-        "Test",
-        book.isbn!!,
-        book.genres)
-
-    verify(exactly = 0) { booksRepository.addBook(any(), any()) }
   }
 }
