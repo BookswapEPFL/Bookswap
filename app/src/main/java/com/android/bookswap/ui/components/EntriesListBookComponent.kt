@@ -43,7 +43,7 @@ fun EntriesListBookComponent(
     isbn: MutableState<String>,
     photo: MutableState<String>,
     language: MutableState<String>,
-    buttons: @Composable (modifier: Modifier, necessaryEntries: List<String>) -> Unit
+    buttons: @Composable (necessaryEntries: List<String>) -> Unit
 ) {
   var expanded by remember { mutableStateOf(false) } // State for dropdown menu
   val necessaryEntries = listOf(title.value, author.value, language.value)
@@ -165,7 +165,13 @@ fun EntriesListBookComponent(
             value = language.value) {
               language.value = it
             }
-        buttons(Modifier.align(Alignment.CenterHorizontally), necessaryEntries)
+        Row(
+            modifier =
+                Modifier.align(Alignment.CenterHorizontally)
+                    .padding(horizontal = HORIZONTAL_PADDING.dp)
+                    .fillMaxWidth()) {
+              buttons(necessaryEntries)
+            }
         // empty Spacer to have space bellow save button
         Spacer(modifier = Modifier)
       }
