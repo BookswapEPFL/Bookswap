@@ -224,9 +224,7 @@ class MainActivity : ComponentActivity() {
         }
         composable("${Screen.CHAT}/{user2}") { backStackEntry ->
           val user2UUID = UUID.fromString(backStackEntry.arguments?.getString("user2"))
-          android.util.Log.d("ChatScreen", "user2UUID: $user2UUID")
           val user2: DataUser? = contactViewModel.getUserInMessageBoxMap(user2UUID)
-          android.util.Log.d("ChatScreen", "user2: $user2")
           if (user2 != null) {
             ChatScreen(messageRepository, userVM.getUser(), user2, navigationActions, photoStorage)
           } else {
