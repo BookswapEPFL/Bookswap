@@ -6,13 +6,18 @@ import com.android.bookswap.data.MessageType
 import com.google.gson.Gson
 import java.io.File
 import java.io.IOException
+import java.security.SecureRandom
 import javax.crypto.Cipher
 import javax.crypto.KeyGenerator
 import javax.crypto.SecretKey
+import javax.crypto.spec.IvParameterSpec
 
 class OfflineMessageStorage(context: Context) {
   private val messages = mutableListOf<DataMessage>()
   private val messagesFile: File = File(context.filesDir, "Messages.txt")
+
+  // Secure random for IV generation
+  private val secureRandom = SecureRandom()
 
   // Secret key for encryption (you might want to generate and securely store this)
   private val secretKey: SecretKey = generateKey()
@@ -24,18 +29,27 @@ class OfflineMessageStorage(context: Context) {
     return keyGen.generateKey()
   }
 
-  // Encrypt a string
+  // Encrypt data with AES CBC mode and PKCS5Padding
   internal fun encrypt(data: String): ByteArray {
-    val cipher = Cipher.getInstance("AES")
-    cipher.init(Cipher.ENCRYPT_MODE, secretKey)
-    return cipher.doFinal(data.toByteArray(Charsets.UTF_8))
+    val cipher = Cipher.getInstance("AES/CBC/PKCS5Padding")
+    val iv = ByteArray(cipher.blockSize)
+    secureRandom.nextBytes(iv) // Generate random IV
+    cipher.init(Cipher.ENCRYPT_MODE, secretKey, IvParameterSpec(iv))
+
+    // Prepend IV to the encrypted data
+    return iv + cipher.doFinal(data.toByteArray(Charsets.UTF_8))
   }
 
-  // Decrypt a byte array
+  // Decrypt data with AES CBC mode and PKCS5Padding
   internal fun decrypt(data: ByteArray): String {
-    val cipher = Cipher.getInstance("AES")
-    cipher.init(Cipher.DECRYPT_MODE, secretKey)
-    return String(cipher.doFinal(data), Charsets.UTF_8)
+    val cipher = Cipher.getInstance("AES/CBC/PKCS5Padding")
+
+    // Extract IV from the data
+    val iv = data.copyOfRange(0, cipher.blockSize)
+    val encryptedData = data.copyOfRange(cipher.blockSize, data.size)
+
+    cipher.init(Cipher.DECRYPT_MODE, secretKey, IvParameterSpec(iv))
+    return String(cipher.doFinal(encryptedData), Charsets.UTF_8)
   }
 
   fun getMessagesFromText(): MutableList<DataMessage> {

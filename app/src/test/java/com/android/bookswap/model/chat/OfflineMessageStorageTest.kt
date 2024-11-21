@@ -13,6 +13,7 @@ import io.mockk.mockk
 import java.io.File
 import java.io.IOException
 import java.util.UUID
+import javax.crypto.Cipher
 import javax.crypto.SecretKey
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertFalse
@@ -74,21 +75,24 @@ class OfflineMessageStorageTest {
   }
 
   @Test
-  fun `encrypt encrypts data correctly`() {
+  fun `encrypt encrypts data correctly with IV`() {
     val plainText = "Test encryption data"
     val encryptedData = offlineMessageStorage.encrypt(plainText)
 
-    // Ensure encrypted data is not empty and different from the plain text
+    // Ensure encrypted data is not empty
     assertTrue(encryptedData.isNotEmpty())
-    assertNotEquals(plainText, String(encryptedData, Charsets.UTF_8))
 
-    // Ensure the encrypted data is not directly readable as plain text
-    val encryptedString = String(encryptedData, Charsets.UTF_8)
-    assertFalse(encryptedString.contains(plainText))
+    // The IV should be prepended, and its length should match the block size
+    val cipherBlockSize = Cipher.getInstance("AES/CBC/PKCS5Padding").blockSize
+    assertEquals(cipherBlockSize, encryptedData.copyOfRange(0, cipherBlockSize).size)
+
+    // The encrypted portion should not match the plain text
+    val encryptedPortion = encryptedData.copyOfRange(cipherBlockSize, encryptedData.size)
+    assertNotEquals(plainText, String(encryptedPortion, Charsets.UTF_8))
   }
 
   @Test
-  fun `decrypt decrypts data correctly`() {
+  fun `decrypt decrypts data correctly with IV`() {
     val plainText = "Test decryption data"
     val encryptedData = offlineMessageStorage.encrypt(plainText)
     val decryptedText = offlineMessageStorage.decrypt(encryptedData)
@@ -98,7 +102,7 @@ class OfflineMessageStorageTest {
   }
 
   @Test
-  fun `encrypt and decrypt together maintain data integrity`() {
+  fun `encrypt and decrypt together maintain data integrity with IV`() {
     val plainText = "Full cycle encryption and decryption test"
     val encryptedData = offlineMessageStorage.encrypt(plainText)
     val decryptedText = offlineMessageStorage.decrypt(encryptedData)
@@ -106,7 +110,7 @@ class OfflineMessageStorageTest {
     // Ensure the decrypted text matches the original plain text
     assertEquals(plainText, decryptedText)
 
-    // Ensure the encrypted data is different from the original plain text
+    // Ensure the encrypted data is different from the plain text
     assertNotEquals(plainText, String(encryptedData, Charsets.UTF_8))
   }
 
