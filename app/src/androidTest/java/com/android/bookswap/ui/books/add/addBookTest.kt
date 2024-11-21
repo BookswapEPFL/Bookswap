@@ -2,10 +2,14 @@ package com.android.bookswap.ui.books.add
 
 import android.content.Context
 import android.widget.Toast
+import androidx.compose.ui.test.assert
+import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsNotEnabled
+import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import androidx.navigation.compose.rememberNavController
@@ -146,5 +150,60 @@ class AddToBookTest {
 
     // Check if the Save button is still disabled
     composeTestRule.onNodeWithTag("save_button").assertIsNotEnabled()
+  }
+
+  @Test
+  fun testDropdownMenuIsInitiallyClosed() {
+    composeTestRule.setContent { AddToBookScreen(mockBooksRepository) }
+
+    // Verify that the dropdown menu is initially not expanded
+    composeTestRule.onNodeWithTag("language_field").assertIsDisplayed()
+    composeTestRule.onNodeWithText("Language*").assertIsDisplayed()
+  }
+
+  @Test
+  fun testDropdownMenuOpensOnClick() {
+    composeTestRule.setContent { AddToBookScreen(mockBooksRepository) }
+
+    // Simulate clicking the dropdown to expand it
+    composeTestRule.onNodeWithTag("language_field").performClick()
+
+    // Verify that dropdown items are displayed:
+    composeTestRule.onNodeWithText("French").assertIsDisplayed()
+    composeTestRule.onNodeWithText("German").assertIsDisplayed()
+    composeTestRule.onNodeWithText("English").assertIsDisplayed()
+    composeTestRule.onNodeWithText("Spanish").assertIsDisplayed()
+    composeTestRule.onNodeWithText("Italian").assertIsDisplayed()
+    composeTestRule.onNodeWithText("Romansh").assertIsDisplayed()
+    composeTestRule.onNodeWithText("Other").assertIsDisplayed()
+  }
+
+  @Test
+  fun testDropdownMenuItemSelection() {
+    composeTestRule.setContent { AddToBookScreen(mockBooksRepository) }
+
+    // Expand the dropdown menu:
+    composeTestRule.onNodeWithTag("language_field").performClick()
+
+    // Click on a specific language ("English")
+    composeTestRule.onNodeWithText("English").performClick()
+
+    // Verify the language field updates with the selected language
+    composeTestRule.onNodeWithText("English").assertExists()
+  }
+
+  @Test
+  fun testDropdownMenuClosesAfterSelection() {
+    composeTestRule.setContent { AddToBookScreen(mockBooksRepository) }
+
+    // Expand the dropdown menu
+    composeTestRule.onNodeWithTag("language_field").performClick()
+
+    // Select a language to close the dropdown
+    composeTestRule.onNodeWithText("English").performClick()
+
+    // Ensure the dropdown items are no longer displayed (here we juste looks that Italian is not
+    // visible)
+    composeTestRule.onNodeWithText("Italian").assertDoesNotExist()
   }
 }
