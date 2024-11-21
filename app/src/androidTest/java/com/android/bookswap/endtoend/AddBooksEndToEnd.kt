@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import com.android.bookswap.MainActivity
@@ -50,12 +51,13 @@ class AddBooksEndToEnd {
     context = mockk()
 
     every { mockBookRepository.addBook(any(), any()) } just runs
-    every { mockBookRepository.getNewUUID() } returns UUID.randomUUID()
 
     val testUUID = UUID.randomUUID()
+    every { mockBookRepository.getNewUUID() } returns testUUID
+
     mockedBook =
         DataBook(
-            uuid = UUID.randomUUID(),
+            uuid = testUUID,
             title = "The Great Gatsby",
             author = "F. Scott Fitzgerald",
             description = "A classic novel set in the Jazz Age.",
@@ -115,10 +117,10 @@ class AddBooksEndToEnd {
     composeTestRule.onNodeWithTag("rating_field").performTextInput("5")
     composeTestRule.onNodeWithTag("isbn_field").performTextInput("9780743273565")
     composeTestRule.onNodeWithTag("photo_field").performTextInput("photo_url_test")
-    composeTestRule.onNodeWithTag("language_field").performTextInput("English")
-
     composeTestRule.onNodeWithTag("genre_field").performClick()
     composeTestRule.onNode(hasText("Fiction")).performClick()
+    composeTestRule.onNodeWithTag("language_field").performClick()
+    composeTestRule.onNodeWithText("English").performClick()
 
     composeTestRule.onNodeWithTag("save_button").performClick()
 

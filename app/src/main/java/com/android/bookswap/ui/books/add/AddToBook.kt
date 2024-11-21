@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import com.android.bookswap.data.BookGenres
+import com.android.bookswap.data.BookLanguages
 import com.android.bookswap.model.add.AddToBookViewModel
 import com.android.bookswap.ui.components.ButtonComponent
 import com.android.bookswap.ui.components.EntriesListBookComponent
@@ -37,10 +38,9 @@ fun AddToBookScreen(
   val rating = remember { mutableStateOf("") }
   val isbn = remember { mutableStateOf("") }
   val photo = remember { mutableStateOf("") }
-  val language = remember { mutableStateOf("") }
+  val language = remember { mutableStateOf<BookLanguages?>(null) }
   val genres = remember { mutableStateOf<List<BookGenres>>(emptyList()) } // Genre selection state
   val context = LocalContext.current
-  val necessaryEntries = listOf(title, author, description)
 
   // Scaffold to provide basic UI structure with a top app bar
   Scaffold(
