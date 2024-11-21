@@ -32,7 +32,9 @@ import com.android.bookswap.ui.chat.imageTestMessageUUID
 import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.navigation.TopLevelDestination
 import com.google.firebase.firestore.ListenerRegistration
+import io.mockk.Runs
 import io.mockk.every
+import io.mockk.just
 import io.mockk.mockk
 import java.util.UUID
 import org.junit.Assert.assertEquals
@@ -55,6 +57,8 @@ class ChatEndToEnd {
   @Before
   fun setup() {
     mockPhotoStorage = mockk()
+    mockMessageStorage = mockk()
+    context = mockk()
 
     // Initialize the mock message repository with placeholder messages
     mockMessageRepository = MockMessageRepository()
@@ -109,6 +113,10 @@ class ChatEndToEnd {
                 timestamp = System.currentTimeMillis()))
 
     placeholderMessages.forEach { mockMessageRepository.sendMessage(it) { /* No-op */} }
+
+    every { mockMessageStorage.extractMessages(any(), any()) } returns placeholderMessages
+    every { mockMessageStorage.addMessage(any()) } just Runs
+    every { mockMessageStorage.setMessages() } just Runs
   }
 
   @Test
