@@ -75,7 +75,7 @@ class GoogleBookDataSourceTest {
                 "smallThumbnail": "image1",
                 "thumbnail": "image2"
               },
-              "language": "en"
+              "language": "English"
             }
           }
         ]
@@ -135,7 +135,7 @@ class GoogleBookDataSourceTest {
                 "smallThumbnail": "image1",
                 "thumbnail": "image2"
               },
-              "language": "en"
+              "language": "English"
             }
           }
         ]

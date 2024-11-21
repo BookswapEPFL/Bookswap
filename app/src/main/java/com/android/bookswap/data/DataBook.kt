@@ -29,13 +29,13 @@ data class DataBook(
 
 /** All supported book language type */
 enum class BookLanguages(val languageCode: String) {
-  FRENCH("FR"), // French language
-  GERMAN("DE"), // German language
-  ENGLISH("EN"), // English language
-  SPANISH("ES"), // Spanish language
-  ITALIAN("IT"), // Italian language
-  ROMANSH("RM"), // Romansh, a language spoken in Switzerland
-  OTHER("OTHER") // All languages that are not yet implemented
+  FRENCH("French"), // French language
+  GERMAN("German"), // German language
+  ENGLISH("English"), // English language
+  SPANISH("Spanish"), // Spanish language
+  ITALIAN("Italian"), // Italian language
+  ROMANSH("Romansh"), // Romansh, a language spoken in Switzerland
+  OTHER("Other") // All languages that are not yet implemented
 }
 /** Genre of a book */
 enum class BookGenres(val Genre: String = "Other") {

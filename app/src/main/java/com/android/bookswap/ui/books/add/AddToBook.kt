@@ -57,7 +57,10 @@ fun AddToBookScreen(
   var rating by remember { mutableStateOf("") }
   var isbn by remember { mutableStateOf("") }
   var photo by remember { mutableStateOf("") }
-  var language by remember { mutableStateOf("") }
+  // var language by remember { mutableStateOf("") }
+  var selectedLanguage by remember {
+    mutableStateOf<BookLanguages?>(null)
+  } // Language selection state
   var selectedGenre by remember { mutableStateOf<BookGenres?>(null) } // Genre selection state
   var expanded by remember { mutableStateOf(false) } // State for dropdown menu
   var expandedLanguage by remember { mutableStateOf(false) } // State for dropdown menu Language
@@ -167,6 +170,7 @@ fun AddToBookScreen(
                   value = photo) {
                     photo = it
                   }
+              /*
               FieldComponent(
                   modifier =
                       Modifier.testTag("language_field")
@@ -175,7 +179,40 @@ fun AddToBookScreen(
                   labelText = "Language",
                   value = language) {
                     language = it
+                  }*/
+              // Language Dropdown:
+              ExposedDropdownMenuBox(
+                  modifier =
+                      Modifier.fillMaxWidth()
+                          .padding(horizontal = HORIZONTAL_PADDING.dp)
+                          .testTag("language_field"),
+                  expanded = expandedLanguage,
+                  onExpandedChange = { expandedLanguage = !expandedLanguage }) {
+                    FieldComponent(
+                        value = selectedLanguage?.languageCode ?: "",
+                        onValueChange = {},
+                        readOnly = true,
+                        label = { Text(text = "Language*") },
+                        modifier = Modifier.menuAnchor().fillMaxWidth())
+                    ExposedDropdownMenu(
+                        expanded = expandedLanguage,
+                        onDismissRequest = { expandedLanguage = false },
+                        modifier = Modifier.fillMaxWidth()) {
+                          BookLanguages.values().forEach { language ->
+                            DropdownMenuItem(
+                                text = {
+                                  Text(
+                                      text = language.languageCode,
+                                  )
+                                },
+                                onClick = {
+                                  selectedLanguage = language
+                                  expandedLanguage = false
+                                })
+                          }
+                        }
                   }
+
               ButtonComponent(
                   modifier =
                       Modifier.testTag("save_button")
@@ -195,7 +232,7 @@ fun AddToBookScreen(
                               description,
                               rating,
                               photo,
-                              language,
+                              selectedLanguage.toString(),
                               isbn,
                               listOf(selectedGenre!!),
                               userId)
