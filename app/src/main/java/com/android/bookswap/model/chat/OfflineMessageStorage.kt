@@ -10,7 +10,7 @@ import java.security.SecureRandom
 import javax.crypto.Cipher
 import javax.crypto.KeyGenerator
 import javax.crypto.SecretKey
-import javax.crypto.spec.IvParameterSpec
+import javax.crypto.spec.GCMParameterSpec
 
 class OfflineMessageStorage(context: Context) {
   private val messages = mutableListOf<DataMessage>()
@@ -22,6 +22,11 @@ class OfflineMessageStorage(context: Context) {
   // Secret key for encryption (you might want to generate and securely store this)
   private val secretKey: SecretKey = generateKey()
 
+  companion object {
+    private const val GCM_TAG_LENGTH = 128 // Authentication tag length (bits)
+    private const val IV_LENGTH = 12 // Recommended IV length for GCM (bytes)
+  }
+
   // Generate a symmetric encryption key
   internal fun generateKey(): SecretKey {
     val keyGen = KeyGenerator.getInstance("AES")
@@ -29,26 +34,26 @@ class OfflineMessageStorage(context: Context) {
     return keyGen.generateKey()
   }
 
-  // Encrypt data with AES CBC mode and PKCS5Padding
+  // Encrypt data with AES-GCM
   internal fun encrypt(data: String): ByteArray {
-    val cipher = Cipher.getInstance("AES/CBC/PKCS5Padding")
-    val iv = ByteArray(cipher.blockSize)
+    val cipher = Cipher.getInstance("AES/GCM/NoPadding")
+    val iv = ByteArray(IV_LENGTH)
     secureRandom.nextBytes(iv) // Generate random IV
-    cipher.init(Cipher.ENCRYPT_MODE, secretKey, IvParameterSpec(iv))
+    cipher.init(Cipher.ENCRYPT_MODE, secretKey, GCMParameterSpec(GCM_TAG_LENGTH, iv))
 
-    // Prepend IV to the encrypted data
+    // Combine IV and ciphertext (prepend IV to ciphertext)
     return iv + cipher.doFinal(data.toByteArray(Charsets.UTF_8))
   }
 
-  // Decrypt data with AES CBC mode and PKCS5Padding
+  // Decrypt data with AES-GCM
   internal fun decrypt(data: ByteArray): String {
-    val cipher = Cipher.getInstance("AES/CBC/PKCS5Padding")
+    val cipher = Cipher.getInstance("AES/GCM/NoPadding")
 
     // Extract IV from the data
-    val iv = data.copyOfRange(0, cipher.blockSize)
-    val encryptedData = data.copyOfRange(cipher.blockSize, data.size)
+    val iv = data.copyOfRange(0, IV_LENGTH)
+    val encryptedData = data.copyOfRange(IV_LENGTH, data.size)
 
-    cipher.init(Cipher.DECRYPT_MODE, secretKey, IvParameterSpec(iv))
+    cipher.init(Cipher.DECRYPT_MODE, secretKey, GCMParameterSpec(GCM_TAG_LENGTH, iv))
     return String(cipher.doFinal(encryptedData), Charsets.UTF_8)
   }
 

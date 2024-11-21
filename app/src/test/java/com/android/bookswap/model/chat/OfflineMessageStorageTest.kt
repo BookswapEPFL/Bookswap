@@ -13,7 +13,6 @@ import io.mockk.mockk
 import java.io.File
 import java.io.IOException
 import java.util.UUID
-import javax.crypto.Cipher
 import javax.crypto.SecretKey
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertFalse
@@ -75,24 +74,24 @@ class OfflineMessageStorageTest {
   }
 
   @Test
-  fun `encrypt encrypts data correctly with IV`() {
+  fun `encrypt encrypts data correctly with AES-GCM`() {
     val plainText = "Test encryption data"
     val encryptedData = offlineMessageStorage.encrypt(plainText)
 
     // Ensure encrypted data is not empty
     assertTrue(encryptedData.isNotEmpty())
 
-    // The IV should be prepended, and its length should match the block size
-    val cipherBlockSize = Cipher.getInstance("AES/CBC/PKCS5Padding").blockSize
-    assertEquals(cipherBlockSize, encryptedData.copyOfRange(0, cipherBlockSize).size)
+    // Verify IV length is correct (12 bytes for AES-GCM)
+    val ivLength = 12
+    assertEquals(ivLength, encryptedData.copyOfRange(0, ivLength).size)
 
-    // The encrypted portion should not match the plain text
-    val encryptedPortion = encryptedData.copyOfRange(cipherBlockSize, encryptedData.size)
+    // Verify encrypted portion is not the same as the plain text
+    val encryptedPortion = encryptedData.copyOfRange(ivLength, encryptedData.size)
     assertNotEquals(plainText, String(encryptedPortion, Charsets.UTF_8))
   }
 
   @Test
-  fun `decrypt decrypts data correctly with IV`() {
+  fun `decrypt decrypts data correctly with AES-GCM`() {
     val plainText = "Test decryption data"
     val encryptedData = offlineMessageStorage.encrypt(plainText)
     val decryptedText = offlineMessageStorage.decrypt(encryptedData)
@@ -102,7 +101,7 @@ class OfflineMessageStorageTest {
   }
 
   @Test
-  fun `encrypt and decrypt together maintain data integrity with IV`() {
+  fun `encrypt and decrypt together maintain data integrity with AES-GCM`() {
     val plainText = "Full cycle encryption and decryption test"
     val encryptedData = offlineMessageStorage.encrypt(plainText)
     val decryptedText = offlineMessageStorage.decrypt(encryptedData)
