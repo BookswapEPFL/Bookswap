@@ -108,15 +108,6 @@ open class NavigationActions(
     }
   }
 
-  /*
-  open fun navigateTo(screen: String, id: String? = null) {
-    val route = when (screen) {
-      Screen.EDIT_BOOK -> "$screen/$id"
-      else -> screen
-    }
-    navController.navigate(route)
-  }*/
-
   /**
    * Navigate to the specified screen.
    *

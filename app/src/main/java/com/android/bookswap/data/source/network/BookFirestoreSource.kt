@@ -183,19 +183,6 @@ class BooksFirestoreSource(private val db: FirebaseFirestore) : BooksRepository 
    *   success, or an exception on failure.
    */
   override fun updateBook(dataBook: DataBook, callback: (Result<Unit>) -> Unit) {
-    val bookMap =
-        mapOf(
-            "uuid" to dataBook.uuid.toString(),
-            "title" to dataBook.title,
-            "author" to dataBook.author,
-            "description" to dataBook.description,
-            "rating" to dataBook.rating,
-            "photo" to dataBook.photo,
-            "language" to dataBook.language.toString(),
-            "isbn" to dataBook.isbn,
-            "genres" to dataBook.genres.map { it.toString() },
-            "userId" to dataBook.userId.toString())
-
     performFirestoreOperation(
         db.collection(collectionBooks).document(dataBook.uuid.toString()).set(dataBook), callback)
   }
