@@ -60,8 +60,10 @@ class AddBooksEndToEnd {
     every { anyConstructed<GoogleBookDataSource>().getBookFromISBN("9780743273565", any()) } answers
         {
           val callback = secondArg<(Result<DataBook>) -> Unit>()
-          callback(Result.success(mockedBook)) // Simulation de succès avec `mockedBook`
+          callback(Result.success(mockedBook))
         }
+
+    every { mockUserRepository.getUser(uuid = any(), any()) } just runs
 
     composeTestRule.setContent {
       MainActivity()
