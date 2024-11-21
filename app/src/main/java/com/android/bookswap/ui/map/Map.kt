@@ -1,5 +1,6 @@
 package com.android.bookswap.ui.map
 
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -96,40 +97,53 @@ fun MapScreen(
   val longitude = geolocation.longitude.collectAsState()
   // Start location and books updates
   LaunchedEffect(Unit) {
-    bookManagerViewModel.startUpdatingBooks()
-    geolocation.startLocationUpdates()
-    cameraPositionState.position =
-        CameraPosition.fromLatLngZoom(LatLng(latitude.value, longitude.value), INIT_ZOOM)
+    if (isOnline) {
+      bookManagerViewModel.startUpdatingBooks()
+      geolocation.startLocationUpdates()
+      cameraPositionState.position =
+          CameraPosition.fromLatLngZoom(LatLng(latitude.value, longitude.value), INIT_ZOOM)
+    } else {
+      Toast.makeText(context, "Please connect to Internet to actualise", Toast.LENGTH_SHORT).show()
+    }
     isOnline = isNetworkAvailable(context)
   }
-  if (!isOnline) {
-    Text("No internet connection")
-  } else {
-    // Stop location and books updates when the screen is disposed
-    DisposableEffect(Unit) {
-      onDispose {
-        geolocation.stopLocationUpdates()
-        bookManagerViewModel.stopUpdatingBooks()
-      }
+  // Stop location and books updates when the screen is disposed
+  DisposableEffect(Unit) {
+    onDispose {
+      geolocation.stopLocationUpdates()
+      bookManagerViewModel.stopUpdatingBooks()
     }
+  }
 
-    var mutableStateSelectedUser by remember { mutableStateOf(selectedUser) }
-    var markerScreenPosition by remember { mutableStateOf<Offset?>(null) }
+  var mutableStateSelectedUser by remember { mutableStateOf(selectedUser) }
+  var markerScreenPosition by remember { mutableStateOf<Offset?>(null) }
 
-    val filteredBooks = bookManagerViewModel.filteredBooks.collectAsState()
+  val filteredBooks = bookManagerViewModel.filteredBooks.collectAsState()
 
-    val filteredUsers = bookManagerViewModel.filteredUsers.collectAsState()
+  val filteredUsers = bookManagerViewModel.filteredUsers.collectAsState()
 
-    // compute the position of the marker on the screen given the camera position and the marker's
-    // position on the map
-    fun computePositionOfMarker(cameraPositionState: CameraPositionState, markerLatLng: LatLng) {
-      val projection = cameraPositionState.projection
-      projection?.let {
-        val screenPosition = it.toScreenLocation(markerLatLng)
-        markerScreenPosition = Offset(screenPosition.x.toFloat(), screenPosition.y.toFloat())
-      }
+  // compute the position of the marker on the screen given the camera position and the marker's
+  // position on the map
+  fun computePositionOfMarker(cameraPositionState: CameraPositionState, markerLatLng: LatLng) {
+    val projection = cameraPositionState.projection
+    projection?.let {
+      val screenPosition = it.toScreenLocation(markerLatLng)
+      markerScreenPosition = Offset(screenPosition.x.toFloat(), screenPosition.y.toFloat())
     }
+  }
 
+  if (mutableStateSelectedUser >= 0 && mutableStateSelectedUser < filteredUsers.value.size) {
+    computePositionOfMarker(
+        cameraPositionState,
+        LatLng(
+            filteredUsers.value[mutableStateSelectedUser].latitude,
+            filteredUsers.value[mutableStateSelectedUser].longitude))
+  }
+
+  val coroutineScope = rememberCoroutineScope()
+
+  // Recalculate marker screen position during camera movement
+  LaunchedEffect(cameraPositionState.position) {
     if (mutableStateSelectedUser >= 0 && mutableStateSelectedUser < filteredUsers.value.size) {
       computePositionOfMarker(
           cameraPositionState,
@@ -137,84 +151,71 @@ fun MapScreen(
               filteredUsers.value[mutableStateSelectedUser].latitude,
               filteredUsers.value[mutableStateSelectedUser].longitude))
     }
-
-    val coroutineScope = rememberCoroutineScope()
-
-    // Recalculate marker screen position during camera movement
-    LaunchedEffect(cameraPositionState.position) {
-      if (mutableStateSelectedUser >= 0 && mutableStateSelectedUser < filteredUsers.value.size) {
-        computePositionOfMarker(
-            cameraPositionState,
-            LatLng(
-                filteredUsers.value[mutableStateSelectedUser].latitude,
-                filteredUsers.value[mutableStateSelectedUser].longitude))
-      }
-    }
-
-    Scaffold(
-        modifier = Modifier.testTag("mapScreen"),
-        topBar = topAppBar,
-        bottomBar = bottomAppBar,
-        content = { pd ->
-          Box(
-              Modifier.padding(
-                  top = pd.calculateTopPadding(), bottom = pd.calculateBottomPadding())) {
-                GoogleMap(
-                    onMapClick = { mutableStateSelectedUser = NO_USER_SELECTED },
-                    modifier =
-                        Modifier.fillMaxSize().testTag("mapGoogleMap").semantics {
-                          cameraPosition = cameraPositionState
-                        },
-                    cameraPositionState = cameraPositionState,
-                    uiSettings = MapUiSettings(zoomControlsEnabled = false),
-                ) {
-                  // Marker for user's current location
-                  if (!latitude.value.isNaN() && !longitude.value.isNaN()) {
-                    Marker(
-                        state = MarkerState(position = LatLng(latitude.value, longitude.value)),
-                        title = "Your Location",
-                        icon =
-                            BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE))
-                  }
-                  filteredUsers.value
-                      .filter {
-                        !it.longitude.isNaN() && !it.latitude.isNaN() && it.books.isNotEmpty()
-                      }
-                      .forEachIndexed { index, item ->
-                        val markerState =
-                            MarkerState(position = LatLng(item.latitude, item.longitude))
-
-                        Marker(
-                            state = markerState,
-                            onClick = {
-                              mutableStateSelectedUser = index
-                              coroutineScope.launch {
-                                computePositionOfMarker(cameraPositionState, markerState.position)
-                              }
-                              false
-                            })
-                      }
-                }
-                FilterButton { navigationActions.navigateTo(Screen.FILTER) }
-
-                // Custom info window linked to the marker
-                markerScreenPosition?.let { screenPos ->
-                  if (mutableStateSelectedUser >= 0 &&
-                      mutableStateSelectedUser < filteredUsers.value.size &&
-                      filteredUsers.value[mutableStateSelectedUser].books.isNotEmpty()) {
-                    CustomInfoWindow(
-                        modifier =
-                            Modifier.offset {
-                              IntOffset(screenPos.x.roundToInt(), screenPos.y.roundToInt())
-                            },
-                        userBooks = filteredUsers.value[mutableStateSelectedUser].books)
-                  }
-                }
-                // Draggable Bottom List
-                DraggableMenu(filteredBooks.value)
-              }
-        })
   }
+
+  Scaffold(
+      modifier = Modifier.testTag("mapScreen"),
+      topBar = topAppBar,
+      bottomBar = bottomAppBar,
+      content = { pd ->
+        Box(
+            Modifier.padding(
+                top = pd.calculateTopPadding(), bottom = pd.calculateBottomPadding())) {
+              GoogleMap(
+                  onMapClick = { mutableStateSelectedUser = NO_USER_SELECTED },
+                  modifier =
+                      Modifier.fillMaxSize().testTag("mapGoogleMap").semantics {
+                        cameraPosition = cameraPositionState
+                      },
+                  cameraPositionState = cameraPositionState,
+                  uiSettings = MapUiSettings(zoomControlsEnabled = false),
+              ) {
+                // Marker for user's current location
+                if (!latitude.value.isNaN() && !longitude.value.isNaN()) {
+                  Marker(
+                      state = MarkerState(position = LatLng(latitude.value, longitude.value)),
+                      title = "Your Location",
+                      icon =
+                          BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE))
+                }
+                filteredUsers.value
+                    .filter {
+                      !it.longitude.isNaN() && !it.latitude.isNaN() && it.books.isNotEmpty()
+                    }
+                    .forEachIndexed { index, item ->
+                      val markerState =
+                          MarkerState(position = LatLng(item.latitude, item.longitude))
+
+                      Marker(
+                          state = markerState,
+                          onClick = {
+                            mutableStateSelectedUser = index
+                            coroutineScope.launch {
+                              computePositionOfMarker(cameraPositionState, markerState.position)
+                            }
+                            false
+                          })
+                    }
+              }
+              FilterButton { navigationActions.navigateTo(Screen.FILTER) }
+
+              // Custom info window linked to the marker
+              markerScreenPosition?.let { screenPos ->
+                if (mutableStateSelectedUser >= 0 &&
+                    mutableStateSelectedUser < filteredUsers.value.size &&
+                    filteredUsers.value[mutableStateSelectedUser].books.isNotEmpty()) {
+                  CustomInfoWindow(
+                      modifier =
+                          Modifier.offset {
+                            IntOffset(screenPos.x.roundToInt(), screenPos.y.roundToInt())
+                          },
+                      userBooks = filteredUsers.value[mutableStateSelectedUser].books)
+                }
+              }
+              // Draggable Bottom List
+              DraggableMenu(filteredBooks.value)
+            }
+      })
 }
 
 const val PADDING_VERTICAL_DP = 4
