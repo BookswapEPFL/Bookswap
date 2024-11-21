@@ -58,11 +58,10 @@ class GoogleBookDataSource(context: Context) {
       // we do not always use get..OrNull()
       val item = json.getJSONArray("items").getJSONObject(0).getJSONObject("volumeInfo")
 
-      val language =
-          when (val languageCode = item.getStringOrNull("language")?.uppercase()) {
-            is String -> BookLanguages.values().first { it.languageCode == languageCode }
-            else -> null
-          }
+        val language =
+            item.getStringOrNull("language")?.lowercase()?.let { languageCode ->
+                BookLanguages.values().find { it.languageCode.equals(languageCode, ignoreCase = true) }
+            } ?: BookLanguages.OTHER
 
       // We do not know where the ISBN_13 is, so we need to filter for it
       val industryIdentifiers = item.getJSONArray("industryIdentifiers")
