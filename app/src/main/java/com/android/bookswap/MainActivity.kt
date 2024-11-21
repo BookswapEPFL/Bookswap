@@ -24,6 +24,7 @@ import com.android.bookswap.data.source.network.MessageFirestoreSource
 import com.android.bookswap.data.source.network.PhotoFirebaseStorageSource
 import com.android.bookswap.data.source.network.UserFirestoreSource
 import com.android.bookswap.model.UserViewModel
+import com.android.bookswap.model.add.AddBookViewModel
 import com.android.bookswap.model.chat.PermissionHandler
 import com.android.bookswap.model.map.BookFilter
 import com.android.bookswap.model.map.BookManagerViewModel
@@ -253,7 +254,7 @@ class MainActivity : ComponentActivity() {
         }
         composable(Screen.ADD_BOOK_MANUALLY) {
           AddToBookScreen(
-              bookRepository,
+              AddBookViewModel(bookRepository),
               topAppBar = { topAppBar("Add your Book") },
               bottomAppBar = { bottomAppBar(this@navigation.route ?: "") })
         }
