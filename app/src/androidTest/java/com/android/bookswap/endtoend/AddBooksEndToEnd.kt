@@ -58,12 +58,15 @@ class AddBooksEndToEnd {
             rating = 5,
             isbn = "9780743273565",
             photo = "https://example.com/greatgatsby.jpg",
-            language = BookLanguages.ENGLISH)
+            language = BookLanguages.ENGLISH,
+            userId = testUUID)
 
     mockkConstructor(GoogleBookDataSource::class)
-    every { anyConstructed<GoogleBookDataSource>().getBookFromISBN("9780743273565", any()) } answers
+    every {
+      anyConstructed<GoogleBookDataSource>().getBookFromISBN("9780743273565", any(), any())
+    } answers
         {
-          val callback = secondArg<(Result<DataBook>) -> Unit>()
+          val callback = thirdArg<(Result<DataBook>) -> Unit>()
           callback(Result.success(mockedBook)) // Simulation de succès avec `mockedBook`
         }
 
@@ -88,7 +91,9 @@ class AddBooksEndToEnd {
     composeTestRule.onNodeWithTag("isbn_field").performTextInput("9780743273565")
     composeTestRule.onNodeWithTag("isbn_searchButton").performClick()
 
-    verify { anyConstructed<GoogleBookDataSource>().getBookFromISBN("9780743273565", any()) }
+    verify {
+      anyConstructed<GoogleBookDataSource>().getBookFromISBN(eq("9780743273565"), any(), any())
+    }
     verify { mockBookRepository.addBook(any(), any()) }
 
     composeTestRule.onNodeWithTag("backButton").performClick()

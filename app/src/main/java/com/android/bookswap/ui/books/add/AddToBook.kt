@@ -47,7 +47,8 @@ private const val HORIZONTAL_PADDING = 30
 fun AddToBookScreen(
     repository: BooksRepository,
     topAppBar: @Composable () -> Unit = {},
-    bottomAppBar: @Composable () -> Unit = {}
+    bottomAppBar: @Composable () -> Unit = {},
+    userId: UUID
 ) {
   // State variables to store the values entered by the user
   var title by remember { mutableStateOf("") }
@@ -233,7 +234,8 @@ fun AddToBookScreen(
                               photo,
                               selectedLanguage.toString(),
                               isbn,
-                              listOf(selectedGenre!!))
+                              listOf(selectedGenre!!),
+                              userId)
                       if (book == null) {
                         Log.e("AddToBookScreen", "Invalid argument")
                         Toast.makeText(context, "Invalid argument", Toast.LENGTH_SHORT).show()
@@ -280,7 +282,8 @@ fun createDataBook(
     photo: String,
     bookLanguageStr: String,
     isbn: String,
-    genres: List<BookGenres>
+    genres: List<BookGenres>,
+    userId: UUID
 ): DataBook? {
   // Validate UUID
   if (uuid.toString().isBlank()) {
@@ -362,5 +365,6 @@ fun createDataBook(
       photo = photo,
       language = languages,
       isbn = isbn,
-      genres = genres)
+      genres = genres,
+      userId = userId)
 }
