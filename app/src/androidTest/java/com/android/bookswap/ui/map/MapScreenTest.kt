@@ -33,6 +33,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
+val userId = UUID.randomUUID()
 val longListBook =
     List(20) {
       DataBook(
@@ -44,7 +45,8 @@ val longListBook =
           photo = "url_to_photo_1",
           language = BookLanguages.ENGLISH,
           isbn = "123-456-789",
-          genres = listOf(BookGenres.FICTION, BookGenres.NONFICTION))
+          genres = listOf(BookGenres.FICTION, BookGenres.NONFICTION),
+          userId = userId)
     }
 
 val books =
@@ -58,7 +60,8 @@ val books =
             photo = "url_to_photo_1",
             language = BookLanguages.ENGLISH,
             isbn = "123-456-789",
-            genres = listOf(BookGenres.FICTION, BookGenres.HORROR)),
+            genres = listOf(BookGenres.FICTION, BookGenres.HORROR),
+            userId = userId),
         DataBook(
             uuid = UUID(2000, 1000),
             title = "Book 2",
@@ -68,7 +71,8 @@ val books =
             photo = "url_to_photo_2",
             language = BookLanguages.FRENCH,
             isbn = "234-567-890",
-            genres = listOf(BookGenres.FICTION)))
+            genres = listOf(BookGenres.FICTION),
+            userId = userId))
 
 class MapScreenTest {
   private val user = listOf(DataUser(bookList = listOf(UUID(1000, 1000), UUID(2000, 1000))))

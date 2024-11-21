@@ -38,7 +38,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.android.bookswap.data.BookGenres
 import com.android.bookswap.data.DataBook
-import com.android.bookswap.data.source.network.BooksFirestoreSource
+import com.android.bookswap.data.repository.BooksRepository
 import com.android.bookswap.ui.books.add.createDataBook
 import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.theme.ColorVariable
@@ -58,7 +58,7 @@ private const val COLUMN_WIDTH_RATIO = 0.9f // Column width as 90% of screen wid
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditBookScreen(
-    booksRepository: BooksFirestoreSource,
+    booksRepository: BooksRepository,
     navigationActions: NavigationActions,
     book: DataBook
 ) {
@@ -280,12 +280,18 @@ fun EditBookScreen(
                                 photo = photo,
                                 bookLanguageStr = language,
                                 isbn = book.isbn,
-                                genres = genres)
+                                genres = genres,
+                                userId = book.userId,
+                            )
 
                         booksRepository.updateBook(
                             updatedBook!!,
                             callback = { result ->
                               if (result.isSuccess) {
+                                // Fetch the updated book data from Firestore
+                                // booksRepository.getBook(updatedBook.uuid) {
+                                // updatedBookFromFirestore ->
+                                // createdBook.value = updatedBookFromFirestore
                                 navigationActions.goBack()
                               } else {
                                 Toast.makeText(
