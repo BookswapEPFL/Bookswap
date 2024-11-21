@@ -25,6 +25,8 @@ import com.android.bookswap.data.MessageBox
 import com.android.bookswap.data.MessageType
 import com.android.bookswap.data.repository.MessageRepository
 import com.android.bookswap.data.repository.PhotoFirebaseStorageRepository
+import com.android.bookswap.model.UserViewModel
+import com.android.bookswap.model.chat.ContactViewModel
 import com.android.bookswap.ui.chat.ChatScreen
 import com.android.bookswap.ui.chat.ListChatScreen
 import com.android.bookswap.ui.chat.imageTestMessageUUID
@@ -32,12 +34,16 @@ import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.navigation.TopLevelDestination
 import com.google.firebase.firestore.ListenerRegistration
 import io.mockk.every
+import io.mockk.just
 import io.mockk.mockk
+import io.mockk.runs
+import kotlinx.coroutines.flow.MutableStateFlow
 import java.util.UUID
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+
 
 class ChatEndToEnd {
   @get:Rule val composeTestRule = createComposeRule()
@@ -46,6 +52,8 @@ class ChatEndToEnd {
   private lateinit var mockMessageRepository: MockMessageRepository
   private lateinit var mockPhotoStorage: PhotoFirebaseStorageRepository
   private val navigateToChatScreen = mutableStateOf(false)
+  private lateinit var mockUserVM : UserViewModel
+  private lateinit var mockContactVM : ContactViewModel
   private val currentUserUUID = UUID.fromString("550e8400-e29b-41d4-a716-446655440002") // John Doe
   private val otherUserUUID = UUID.fromString("550e8400-e29b-41d4-a716-446655440001") // Other user
 
@@ -106,7 +114,40 @@ class ChatEndToEnd {
                 timestamp = System.currentTimeMillis()))
 
     placeholderMessages.forEach { mockMessageRepository.sendMessage(it) { /* No-op */} }
-  }
+
+    //mock UserViewModel and ContactViewModel
+    mockUserVM = mockk()
+    mockContactVM = mockk()
+
+    val contactMap =   MutableStateFlow(
+        mapOf(
+            currentUserUUID to MessageBox(
+                contact =
+                DataUser(
+                    userUUID = currentUserUUID,
+                    greeting = "Mr.",
+                    firstName = "John",
+                    lastName = "Doe",
+                    email = "",
+                    phoneNumber = "",
+                    longitude = 0.0,
+                    latitude = 0.0,
+                    profilePictureUrl = "",
+                    bookList = emptyList(),
+                    googleUid = ""
+                ),
+                message = "Hello",
+                date = "Today"
+            )
+        )
+    )
+
+    every { mockContactVM.updateMessageBoxMap()} just runs
+    every {mockContactVM.messageBoxMap} returns contactMap
+
+
+    }
+
 
   @Test
   fun testChatNavigationAndMessageManipulation() {
@@ -146,27 +187,10 @@ class ChatEndToEnd {
         )
       } else {
         ListChatScreen(
-            placeHolderData =
-                listOf(
-                    MessageBox(
-                        contact =
-                            DataUser(
-                                userUUID = currentUserUUID,
-                                greeting = "Mr.",
-                                firstName = "John",
-                                lastName = "Doe",
-                                email = "",
-                                phoneNumber = "",
-                                longitude = 0.0,
-                                latitude = 0.0,
-                                profilePictureUrl = "",
-                                bookList = emptyList(),
-                                googleUid = ""),
-                        message = "Hello",
-                        date = "Today")),
             navigationActions = mockNavigationActions,
             topAppBar = {},
-            bottomAppBar = {})
+            bottomAppBar = {},
+            contactViewModel = mockContactVM)
       }
     }
     // Simulate navigating to the chat screen by clicking on John Doe's message box
