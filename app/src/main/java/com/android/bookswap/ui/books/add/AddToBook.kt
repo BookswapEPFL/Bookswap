@@ -16,6 +16,7 @@ import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -29,6 +30,7 @@ import com.android.bookswap.data.BookGenres
 import com.android.bookswap.data.BookLanguages
 import com.android.bookswap.data.DataBook
 import com.android.bookswap.data.repository.BooksRepository
+import com.android.bookswap.model.isNetworkAvailable
 import com.android.bookswap.ui.components.ButtonComponent
 import com.android.bookswap.ui.components.FieldComponent
 import com.android.bookswap.ui.theme.ColorVariable.BackGround
@@ -60,163 +62,169 @@ fun AddToBookScreen(
   var selectedGenre by remember { mutableStateOf<BookGenres?>(null) } // Genre selection state
   var expanded by remember { mutableStateOf(false) } // State for dropdown menu
   var expandedLanguage by remember { mutableStateOf(false) } // State for dropdown menu Language
+  var isOnline by remember { mutableStateOf(false) } // State for dropdown menu Language
   // Getting the context for showing Toast messages
   val context = LocalContext.current
-
+  LaunchedEffect(Unit) { isOnline = isNetworkAvailable(context) }
   // Scaffold to provide basic UI structure with a top app bar
-  Scaffold(
-      modifier = Modifier.testTag("addBookScreen"),
-      topBar = topAppBar,
-      bottomBar = bottomAppBar,
-      content = { paddingValues ->
-        // Column layout to stack input fields vertically with spacing
-        Column(
-            modifier =
-                Modifier.background(BackGround)
-                    .fillMaxWidth()
-                    .fillMaxHeight()
-                    .padding(paddingValues),
-            verticalArrangement = Arrangement.SpaceBetween) {
-              // Title Input Field
-              FieldComponent(
-                  modifier =
-                      Modifier.testTag("title_field")
-                          .fillMaxWidth()
-                          .padding(horizontal = HORIZONTAL_PADDING.dp),
-                  labelText = "Title*",
-                  value = title) {
-                    title = it
-                  }
-              ExposedDropdownMenuBox(
-                  modifier =
-                      Modifier.fillMaxWidth()
-                          .padding(horizontal = HORIZONTAL_PADDING.dp)
-                          .testTag("genre_field"),
-                  expanded = expanded,
-                  onExpandedChange = { expanded = !expanded }) {
-                    FieldComponent(
-                        value = selectedGenre?.Genre ?: "",
-                        onValueChange = {},
-                        readOnly = true,
-                        label = { Text(text = "Genres*") },
-                        modifier = Modifier.menuAnchor().fillMaxWidth()
-                        // .background(shape = RoundedCornerShape(100), color =
-                        // Secondary).fillMaxWidth()
-                        )
-                    ExposedDropdownMenu(
-                        expanded = expanded,
-                        onDismissRequest = { expanded = false },
-                        modifier = Modifier.fillMaxWidth()) {
-                          BookGenres.values().forEach { genre ->
-                            DropdownMenuItem(
-                                text = {
-                                  Text(
-                                      text = genre.Genre,
-                                  )
-                                },
-                                onClick = {
-                                  selectedGenre = genre
-                                  expanded = false
-                                })
-                          }
-                        }
-                  }
-              FieldComponent(
-                  modifier =
-                      Modifier.testTag("author_field")
-                          .fillMaxWidth()
-                          .padding(horizontal = HORIZONTAL_PADDING.dp),
-                  labelText = "Author",
-                  value = author) {
-                    author = it
-                  }
-              FieldComponent(
-                  modifier =
-                      Modifier.testTag("description_field")
-                          .fillMaxWidth()
-                          .padding(horizontal = HORIZONTAL_PADDING.dp),
-                  labelText = "Description",
-                  value = description) {
-                    description = it
-                  }
-              FieldComponent(
-                  modifier =
-                      Modifier.testTag("rating_field")
-                          .fillMaxWidth()
-                          .padding(horizontal = HORIZONTAL_PADDING.dp),
-                  labelText = "Rating",
-                  value = rating) {
-                    rating = it
-                  }
-              FieldComponent(
-                  modifier =
-                      Modifier.testTag("isbn_field")
-                          .fillMaxWidth()
-                          .padding(horizontal = HORIZONTAL_PADDING.dp),
-                  labelText = "ISBN*",
-                  value = isbn) {
-                    isbn = it
-                  }
-              FieldComponent(
-                  modifier =
-                      Modifier.testTag("photo_field")
-                          .fillMaxWidth()
-                          .padding(horizontal = HORIZONTAL_PADDING.dp),
-                  labelText = "Photo",
-                  value = photo) {
-                    photo = it
-                  }
-              FieldComponent(
-                  modifier =
-                      Modifier.testTag("language_field")
-                          .fillMaxWidth()
-                          .padding(horizontal = HORIZONTAL_PADDING.dp),
-                  labelText = "Language",
-                  value = language) {
-                    language = it
-                  }
-              ButtonComponent(
-                  modifier =
-                      Modifier.testTag("save_button")
-                          .align(Alignment.CenterHorizontally)
-                          .fillMaxWidth(0.5f),
-                  enabled = title.isNotBlank() && isbn.isNotBlank(),
-                  onClick = {
-                    // Check if title and ISBN are not blank (required fields)
-                    if (title.isNotBlank() && isbn.isNotBlank() && selectedGenre != null) {
-                      // You can handle book object creation here (e.g., save the book)
-                      val book =
-                          createDataBook(
-                              context,
-                              repository.getNewUUID(),
-                              title,
-                              author,
-                              description,
-                              rating,
-                              photo,
-                              language,
-                              isbn,
-                              listOf(selectedGenre!!))
-                      if (book == null) {
-                        Log.e("AddToBookScreen", "Invalid argument")
-                        Toast.makeText(context, "Invalid argument", Toast.LENGTH_SHORT).show()
-                      } else {
-                        Log.d("AddToBookScreen", "Adding book: $book")
-                        repository.addBook(book, callback = {})
-                      }
-                    } else {
-                      // Show a Toast message if title or ISBN is empty
-                      Log.e("AddToBookScreen", "Title and ISBN are required.")
-                      Toast.makeText(context, "Title and ISBN are required.", Toast.LENGTH_SHORT)
-                          .show()
+  if (!isOnline) {
+    Toast.makeText(context, "No internet connection", Toast.LENGTH_SHORT).show()
+    Text("Please connect to internet to add a book")
+  } else {
+    Scaffold(
+        modifier = Modifier.testTag("addBookScreen"),
+        topBar = topAppBar,
+        bottomBar = bottomAppBar,
+        content = { paddingValues ->
+          // Column layout to stack input fields vertically with spacing
+          Column(
+              modifier =
+                  Modifier.background(BackGround)
+                      .fillMaxWidth()
+                      .fillMaxHeight()
+                      .padding(paddingValues),
+              verticalArrangement = Arrangement.SpaceBetween) {
+                // Title Input Field
+                FieldComponent(
+                    modifier =
+                        Modifier.testTag("title_field")
+                            .fillMaxWidth()
+                            .padding(horizontal = HORIZONTAL_PADDING.dp),
+                    labelText = "Title*",
+                    value = title) {
+                      title = it
                     }
-                  }) {
-                    Text("Save")
-                  }
-              // empty Spacer to have space bellow save button
-              Spacer(modifier = Modifier)
-            }
-      })
+                ExposedDropdownMenuBox(
+                    modifier =
+                        Modifier.fillMaxWidth()
+                            .padding(horizontal = HORIZONTAL_PADDING.dp)
+                            .testTag("genre_field"),
+                    expanded = expanded,
+                    onExpandedChange = { expanded = !expanded }) {
+                      FieldComponent(
+                          value = selectedGenre?.Genre ?: "",
+                          onValueChange = {},
+                          readOnly = true,
+                          label = { Text(text = "Genres*") },
+                          modifier = Modifier.menuAnchor().fillMaxWidth()
+                          // .background(shape = RoundedCornerShape(100), color =
+                          // Secondary).fillMaxWidth()
+                          )
+                      ExposedDropdownMenu(
+                          expanded = expanded,
+                          onDismissRequest = { expanded = false },
+                          modifier = Modifier.fillMaxWidth()) {
+                            BookGenres.values().forEach { genre ->
+                              DropdownMenuItem(
+                                  text = {
+                                    Text(
+                                        text = genre.Genre,
+                                    )
+                                  },
+                                  onClick = {
+                                    selectedGenre = genre
+                                    expanded = false
+                                  })
+                            }
+                          }
+                    }
+                FieldComponent(
+                    modifier =
+                        Modifier.testTag("author_field")
+                            .fillMaxWidth()
+                            .padding(horizontal = HORIZONTAL_PADDING.dp),
+                    labelText = "Author",
+                    value = author) {
+                      author = it
+                    }
+                FieldComponent(
+                    modifier =
+                        Modifier.testTag("description_field")
+                            .fillMaxWidth()
+                            .padding(horizontal = HORIZONTAL_PADDING.dp),
+                    labelText = "Description",
+                    value = description) {
+                      description = it
+                    }
+                FieldComponent(
+                    modifier =
+                        Modifier.testTag("rating_field")
+                            .fillMaxWidth()
+                            .padding(horizontal = HORIZONTAL_PADDING.dp),
+                    labelText = "Rating",
+                    value = rating) {
+                      rating = it
+                    }
+                FieldComponent(
+                    modifier =
+                        Modifier.testTag("isbn_field")
+                            .fillMaxWidth()
+                            .padding(horizontal = HORIZONTAL_PADDING.dp),
+                    labelText = "ISBN*",
+                    value = isbn) {
+                      isbn = it
+                    }
+                FieldComponent(
+                    modifier =
+                        Modifier.testTag("photo_field")
+                            .fillMaxWidth()
+                            .padding(horizontal = HORIZONTAL_PADDING.dp),
+                    labelText = "Photo",
+                    value = photo) {
+                      photo = it
+                    }
+                FieldComponent(
+                    modifier =
+                        Modifier.testTag("language_field")
+                            .fillMaxWidth()
+                            .padding(horizontal = HORIZONTAL_PADDING.dp),
+                    labelText = "Language",
+                    value = language) {
+                      language = it
+                    }
+                ButtonComponent(
+                    modifier =
+                        Modifier.testTag("save_button")
+                            .align(Alignment.CenterHorizontally)
+                            .fillMaxWidth(0.5f),
+                    enabled = title.isNotBlank() && isbn.isNotBlank(),
+                    onClick = {
+                      // Check if title and ISBN are not blank (required fields)
+                      if (title.isNotBlank() && isbn.isNotBlank() && selectedGenre != null) {
+                        // You can handle book object creation here (e.g., save the book)
+                        val book =
+                            createDataBook(
+                                context,
+                                repository.getNewUUID(),
+                                title,
+                                author,
+                                description,
+                                rating,
+                                photo,
+                                language,
+                                isbn,
+                                listOf(selectedGenre!!))
+                        if (book == null) {
+                          Log.e("AddToBookScreen", "Invalid argument")
+                          Toast.makeText(context, "Invalid argument", Toast.LENGTH_SHORT).show()
+                        } else {
+                          Log.d("AddToBookScreen", "Adding book: $book")
+                          repository.addBook(book, callback = {})
+                        }
+                      } else {
+                        // Show a Toast message if title or ISBN is empty
+                        Log.e("AddToBookScreen", "Title and ISBN are required.")
+                        Toast.makeText(context, "Title and ISBN are required.", Toast.LENGTH_SHORT)
+                            .show()
+                      }
+                    }) {
+                      Text("Save")
+                    }
+                // empty Spacer to have space bellow save button
+                Spacer(modifier = Modifier)
+              }
+        })
+  }
 }
 /**
  * Creates a DataBook instance after validating the input parameters.
