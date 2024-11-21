@@ -54,7 +54,7 @@ class BookManagerViewModel(
   val filteredUsers: StateFlow<List<UserBooksWithLocation>> = _filteredUsers.asStateFlow()
 
   private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
-  private var fetchBooksFromRepository: Job? = null
+  private var fetchBooksFromRepositoryJob: Job? = null
   private var computeDistanceOfUsersJob: Job? = null
   private var combineFlowsAndFilterBooksJob: Job? = null
 
@@ -66,7 +66,7 @@ class BookManagerViewModel(
    * distances and combines the flows to filter books based on user preferences.
    */
   fun startUpdatingBooks() {
-    fetchBooksFromRepository =
+    fetchBooksFromRepositoryJob =
         scope.launch {
           while (true) {
             fetchBooksFromRepository()
@@ -78,7 +78,7 @@ class BookManagerViewModel(
   }
   /** Stops updating books by canceling the coroutine scope. */
   fun stopUpdatingBooks() {
-    fetchBooksFromRepository?.cancel()
+    fetchBooksFromRepositoryJob?.cancel()
     computeDistanceOfUsersJob?.cancel()
     combineFlowsAndFilterBooksJob?.cancel()
   }
