@@ -1,10 +1,12 @@
 package com.android.bookswap.ui.navigation
 
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollToNode
 import androidx.compose.ui.test.performTextInput
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -96,6 +98,10 @@ class NavigationFromBookProfileToEditBookTest {
 
     // Edit book title and save
     composeTestRule.onNodeWithTag("inputBookTitle").performTextInput("Updated Title")
+    composeTestRule
+        .onNodeWithTag("editBookScreenColumn")
+        .performScrollToNode(hasTestTag("bookSave"))
+    composeTestRule.onNodeWithTag("bookSave").assertIsDisplayed()
     composeTestRule.onNodeWithTag("bookSave").performClick()
 
     // Verify updated book is reflected in BookProfileScreen
