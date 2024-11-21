@@ -27,5 +27,5 @@ enum class MessageType {
 }
 
 /** Data class for the message box */
-data class MessageBox(val contact: DataUser, val message: String, val date: String)
+data class MessageBox(val contact: DataUser, val message: String? = null, val date: String? = null)
 

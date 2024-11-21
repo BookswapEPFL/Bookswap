@@ -71,7 +71,7 @@ class ContactViewModelTest {
     )
 
     // Mock user data for testing
-    val user = DataUser(userUUID = listOfUUIDs[0], contactList = listOfUUIDs.drop(1))
+    val user = DataUser(userUUID = listOfUUIDs[0], contactList = listOfUUIDs.drop(1).map { it.toString() })
 
     // Mock users in the database (this simulates the users repository)
     val usersDB: List<DataUser> = listOf(

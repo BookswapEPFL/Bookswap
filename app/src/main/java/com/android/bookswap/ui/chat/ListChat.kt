@@ -21,6 +21,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -47,7 +48,9 @@ fun ListChatScreen(
     bottomAppBar: @Composable () -> Unit = {},
     contactViewModel: ContactViewModel = ContactViewModel()
 ) {
-    contactViewModel.updateMessageBoxMap()
+    LaunchedEffect(Unit) {
+        contactViewModel.updateMessageBoxMap()
+    }
     val messageBoxMap by contactViewModel.messageBoxMap.collectAsState()
     val messageList = messageBoxMap.values.toList()
   Scaffold(
@@ -114,14 +117,14 @@ fun MessageBoxDisplay(message: MessageBox, onClick: () -> Unit = {}) {
                     color = ColorVariable.Accent,
                     modifier = Modifier.testTag("chat_messageContactName"))
                 Text(
-                    text = message.date,
+                    text = message.date.takeUnless { it.isNullOrEmpty() } ?: "",
                     fontSize = 14.sp,
                     color = ColorVariable.AccentSecondary,
                     modifier = Modifier.testTag("chat_messageDate"))
               }
 
           Text(
-              text = message.message,
+              text = message.message?.takeUnless { it.isNullOrEmpty() } ?: "No messages yet",
               fontSize = 14.sp,
               color = ColorVariable.AccentSecondary,
               maxLines = 1,

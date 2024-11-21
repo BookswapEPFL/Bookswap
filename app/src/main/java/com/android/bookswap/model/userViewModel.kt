@@ -60,7 +60,7 @@ open class UserViewModel(
       picURL: String = dataUser.profilePictureUrl,
       bookList: List<UUID> = dataUser.bookList,
       googleUid: String = dataUser.googleUid,
-      contactList: List<UUID> = dataUser.contactList
+      contactList: List<String> = dataUser.contactList
   ) {
     updateUser(
         DataUser(
@@ -102,6 +102,8 @@ open class UserViewModel(
         Log.e(
             "UserViewModel",
             "User found {${dataUser.firstName}}{${dataUser.lastName}}{${dataUser.userUUID}}")
+        Log.e("UserViewModel", "User has books: ${dataUser.bookList}")
+        Log.i("UserViewModel", "User has contacts: ${dataUser.contactList}")
       }
       // If the user is not found, set isLoaded to false
       result.onFailure {

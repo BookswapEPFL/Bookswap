@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.android.bookswap.data.DataMessage
+import com.android.bookswap.data.DataUser
 import com.android.bookswap.data.MessageBox
 import com.android.bookswap.data.repository.MessageRepository
 import com.android.bookswap.data.repository.UsersRepository
@@ -32,6 +33,9 @@ class ContactViewModel(val userVM: UserViewModel = UserViewModel(UUID.randomUUID
 
     val messageBoxMap: StateFlow<Map<UUID, MessageBox>> = _messageBoxMap
 
+    fun getUserInMessageBoxMap(uuid: UUID): DataUser? {
+        return _messageBoxMap.value[uuid]?.contact
+    }
     /**
      * Updates the message box map with the latest messages for each contact
      */
@@ -46,12 +50,12 @@ class ContactViewModel(val userVM: UserViewModel = UserViewModel(UUID.randomUUID
 
 
                 userVM.getUser().contactList.forEach { contactUUID ->
-                    userFirestoreSource.getUser(contactUUID) { userResult ->
+                    userFirestoreSource.getUser(UUID.fromString(contactUUID)) { userResult ->
                         userResult.fold(
                             onSuccess = { contactUser ->
                                 val filtered = messages.filter { message ->
-                                    (message.senderUUID == userVM.getUser().userUUID && message.receiverUUID == contactUUID) ||
-                                            (message.senderUUID == contactUUID && message.receiverUUID == userVM.getUser().userUUID)
+                                    (message.senderUUID == userVM.getUser().userUUID && message.receiverUUID == UUID.fromString(contactUUID)) ||
+                                            (message.senderUUID == UUID.fromString(contactUUID) && message.receiverUUID == userVM.getUser().userUUID)
                                 }.sortedBy { it.timestamp }
 
                                 val lastMessageText = filtered.lastOrNull()?.text ?: ""
@@ -59,7 +63,7 @@ class ContactViewModel(val userVM: UserViewModel = UserViewModel(UUID.randomUUID
                                     filtered.lastOrNull()?.timestamp.toString()
 
                                 _messageBoxMap.value = _messageBoxMap.value.toMutableMap().apply {
-                                    this[contactUUID] = MessageBox(
+                                    this[UUID.fromString(contactUUID)] = MessageBox(
                                         contactUser,
                                         lastMessageText,
                                         lastMessageTimestamp

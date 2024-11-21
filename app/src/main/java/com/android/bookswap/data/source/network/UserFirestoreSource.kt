@@ -37,7 +37,7 @@ class UserFirestoreSource(private val db: FirebaseFirestore) : UsersRepository {
    */
   override fun getUser(uuid: UUID, callback: (Result<DataUser>) -> Unit) {
 
-    db.collection(COLLECTION_NAME).whereEqualTo("UUID", uuid).get().addOnCompleteListener { task ->
+    db.collection(COLLECTION_NAME).whereEqualTo("userUUID", uuid).get().addOnCompleteListener { task ->
       if (task.isSuccessful) {
         // Maps Firestore documents to DataUser objects or returns an empty list
         callback(
@@ -119,9 +119,9 @@ class UserFirestoreSource(private val db: FirebaseFirestore) : UsersRepository {
       val longitude = document.getDouble("longitude")!!
       val profilePicture = document.getString("profilePictureUrl")!!
       val googleUid = document.getString("googleUid")!!
-      Log.d("TAG_DOC2USR", "GUID: $googleUid")
       val bookList =
           (document.get("bookList") as List<Map<String, Long>>).map { bookMap ->
+              Log.d("TAG_BOOK_MAP", "bookMap: $bookMap")
             val mostSigBits = bookMap["mostSignificantBits"]
             val leastSigBits = bookMap["leastSignificantBits"]
             if (mostSigBits != null && leastSigBits != null) {
@@ -130,22 +130,13 @@ class UserFirestoreSource(private val db: FirebaseFirestore) : UsersRepository {
               null
             }
           }
-        val contactListRaw = document.get("contactList") as List<*>
-        val contactList = contactListRaw.mapNotNull { item ->
-            when (item) {
-                is String -> UUID.fromString(item)  // if contactList items are stored as strings
-                is Map<*, *> -> {
-                    val mostSigBits = (item["mostSignificantBits"] as Long?)
-                    val leastSigBits = (item["leastSignificantBits"] as Long?)
-                    if (mostSigBits != null && leastSigBits != null) {
-                        UUID(mostSigBits, leastSigBits)
-                    } else {
-                        null
-                    }
-                }
-                else -> null
-            }
+        val contactList = try {
+            (document.get("contactList") as? List<String>) ?: emptyList()
+        } catch (e: Exception) {
+            Log.e("TAG_CONTACT_LIST_ERROR", "Error parsing contactList: ${e.message}")
+            emptyList()
         }
+
       if (bookList.any { it == null }) {
         throw IllegalArgumentException("Book list contains null UUIDs")
 
@@ -164,7 +155,7 @@ class UserFirestoreSource(private val db: FirebaseFirestore) : UsersRepository {
               profilePicture,
               bookList.filterNotNull(),
               googleUid,
-              contactList))
+              contactList.filterNotNull()))
     } catch (e: Exception) {
       Log.e("FirestoreSource", "Error converting document to User: ${e.message}")
       Result.failure(e)
