@@ -277,13 +277,13 @@ class MainActivity : ComponentActivity() {
         composable(Screen.BOOK_PROFILE) { backStackEntry ->
           val bookId = backStackEntry.arguments?.getString("bookId")?.let { UUID.fromString(it) }
 
-          if(bookId != null){
-          BookProfileScreen(
-              bookId = bookId ?: UUID.randomUUID(), // Default for testing
-              booksRepository = BooksFirestoreSource(FirebaseFirestore.getInstance()),
-              navController = NavigationActions(navController),
-              currentUserId = UUID.randomUUID() // Pass the actual logged-in user ID
-              )
+          if (bookId != null) {
+            BookProfileScreen(
+                bookId = bookId ?: UUID.randomUUID(), // Default for testing
+                booksRepository = BooksFirestoreSource(FirebaseFirestore.getInstance()),
+                navController = NavigationActions(navController),
+                currentUserId = UUID.randomUUID() // Pass the actual logged-in user ID
+                )
           } else {
             Log.e("Navigation", "Invalid bookId passed to BookProfileScreen")
           }
