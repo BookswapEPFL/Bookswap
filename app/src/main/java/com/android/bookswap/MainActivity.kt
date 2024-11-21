@@ -1,5 +1,6 @@
 package com.android.bookswap
 
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -9,6 +10,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTag
 import androidx.navigation.compose.NavHost
@@ -26,6 +28,7 @@ import com.android.bookswap.data.source.network.MessageFirestoreSource
 import com.android.bookswap.data.source.network.PhotoFirebaseStorageSource
 import com.android.bookswap.data.source.network.UserFirestoreSource
 import com.android.bookswap.model.UserViewModel
+import com.android.bookswap.model.chat.OfflineMessageStorage
 import com.android.bookswap.model.chat.PermissionHandler
 import com.android.bookswap.model.map.BookFilter
 import com.android.bookswap.model.map.BookManagerViewModel
@@ -77,11 +80,14 @@ class MainActivity : ComponentActivity() {
     val db = FirebaseFirestore.getInstance()
     val storage = FirebaseStorage.getInstance()
 
+    val context = LocalContext.current
+
     // Create the data source objects
     val messageRepository = MessageFirestoreSource(db)
     val bookRepository = BooksFirestoreSource(db)
     val userDataSource = UserFirestoreSource(db)
     val photoStorage = PhotoFirebaseStorageSource(storage)
+    val messageStorage = OfflineMessageStorage(context)
 
     // Initialize the geolocation
     val geolocation = Geolocation(this)
@@ -91,11 +97,13 @@ class MainActivity : ComponentActivity() {
           modifier = Modifier.fillMaxSize().semantics { testTag = C.Tag.main_screen_container },
           color = MaterialTheme.colorScheme.background) {
             BookSwapApp(
-                messageRepository,
-                bookRepository,
-                userDataSource,
+                messageRepository = messageRepository,
+                bookRepository = bookRepository,
+                userRepository = userDataSource,
                 photoStorage = photoStorage,
-                geolocation = geolocation)
+                messageStorage = messageStorage,
+                geolocation = geolocation,
+                context = context)
           }
     }
   }
@@ -107,7 +115,9 @@ class MainActivity : ComponentActivity() {
       userRepository: UsersRepository,
       startDestination: String = Route.AUTH,
       photoStorage: PhotoFirebaseStorageSource,
-      geolocation: IGeolocation = DefaultGeolocation()
+      messageStorage: OfflineMessageStorage,
+      geolocation: IGeolocation = DefaultGeolocation(),
+      context: Context
   ) {
     // navigation part
     val navController = rememberNavController()
@@ -228,7 +238,14 @@ class MainActivity : ComponentActivity() {
           val user2 = placeHolder.firstOrNull { it.contact.userUUID == user2UUID }?.contact
 
           if (user2 != null) {
-            ChatScreen(messageRepository, userVM.getUser(), user2, navigationActions, photoStorage)
+            ChatScreen(
+                messageRepository,
+                userVM.getUser(),
+                user2,
+                navigationActions,
+                photoStorage,
+                messageStorage,
+                context)
           } else {
             BookAdditionChoiceScreen(
                 navigationActions,

@@ -25,13 +25,16 @@ import com.android.bookswap.data.MessageBox
 import com.android.bookswap.data.MessageType
 import com.android.bookswap.data.repository.MessageRepository
 import com.android.bookswap.data.repository.PhotoFirebaseStorageRepository
+import com.android.bookswap.model.chat.OfflineMessageStorage
 import com.android.bookswap.ui.chat.ChatScreen
 import com.android.bookswap.ui.chat.ListChatScreen
 import com.android.bookswap.ui.chat.imageTestMessageUUID
 import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.navigation.TopLevelDestination
 import com.google.firebase.firestore.ListenerRegistration
+import io.mockk.Runs
 import io.mockk.every
+import io.mockk.just
 import io.mockk.mockk
 import java.util.UUID
 import org.junit.Assert.assertEquals
@@ -45,6 +48,8 @@ class ChatEndToEnd {
   private lateinit var mockNavigationActions: NavigationActions
   private lateinit var mockMessageRepository: MockMessageRepository
   private lateinit var mockPhotoStorage: PhotoFirebaseStorageRepository
+  private lateinit var mockMessageStorage: OfflineMessageStorage
+  private lateinit var context: Context
   private val navigateToChatScreen = mutableStateOf(false)
   private val currentUserUUID = UUID.fromString("550e8400-e29b-41d4-a716-446655440002") // John Doe
   private val otherUserUUID = UUID.fromString("550e8400-e29b-41d4-a716-446655440001") // Other user
@@ -52,6 +57,8 @@ class ChatEndToEnd {
   @Before
   fun setup() {
     mockPhotoStorage = mockk()
+    mockMessageStorage = mockk()
+    context = mockk()
 
     // Initialize the mock message repository with placeholder messages
     mockMessageRepository = MockMessageRepository()
@@ -106,6 +113,10 @@ class ChatEndToEnd {
                 timestamp = System.currentTimeMillis()))
 
     placeholderMessages.forEach { mockMessageRepository.sendMessage(it) { /* No-op */} }
+
+    every { mockMessageStorage.extractMessages(any(), any()) } returns placeholderMessages
+    every { mockMessageStorage.addMessage(any()) } just Runs
+    every { mockMessageStorage.setMessages() } just Runs
   }
 
   @Test
@@ -143,6 +154,8 @@ class ChatEndToEnd {
                     googleUid = ""),
             navController = mockNavigationActions,
             photoStorage = mockPhotoStorage,
+            messageStorage = mockMessageStorage,
+            context = context,
         )
       } else {
         ListChatScreen(

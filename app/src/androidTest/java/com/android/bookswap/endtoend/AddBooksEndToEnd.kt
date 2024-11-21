@@ -1,5 +1,6 @@
 package com.android.bookswap.endtoend
 
+import android.content.Context
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -13,6 +14,7 @@ import com.android.bookswap.data.repository.MessageRepository
 import com.android.bookswap.data.repository.UsersRepository
 import com.android.bookswap.data.source.api.GoogleBookDataSource
 import com.android.bookswap.data.source.network.PhotoFirebaseStorageSource
+import com.android.bookswap.model.chat.OfflineMessageStorage
 import com.android.bookswap.ui.navigation.Route
 import io.mockk.every
 import io.mockk.just
@@ -32,6 +34,8 @@ class AddBooksEndToEnd {
   private lateinit var mockBookRepository: BooksRepository
   private lateinit var mockUserRepository: UsersRepository
   private lateinit var mockPhotoStorage: PhotoFirebaseStorageSource
+  private lateinit var mockMessageStorage: OfflineMessageStorage
+  private lateinit var context: Context
 
   private lateinit var mockedBook: DataBook
 
@@ -42,6 +46,8 @@ class AddBooksEndToEnd {
     mockBookRepository = mockk()
     mockUserRepository = mockk()
     mockPhotoStorage = mockk()
+    mockMessageStorage = mockk()
+    context = mockk()
 
     every { mockBookRepository.addBook(any(), any()) } just runs
     every { mockBookRepository.getNewUUID() } returns UUID.randomUUID()
@@ -75,7 +81,9 @@ class AddBooksEndToEnd {
               mockBookRepository,
               mockUserRepository,
               startDestination = Route.NEWBOOK,
-              photoStorage = mockPhotoStorage)
+              photoStorage = mockPhotoStorage,
+              messageStorage = mockMessageStorage,
+              context = context)
     }
   }
 
