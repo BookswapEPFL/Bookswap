@@ -55,7 +55,7 @@ fun AddToBookScreen(
   var isbn by remember { mutableStateOf("") }
   var photo by remember { mutableStateOf("") }
   var language by remember { mutableStateOf("") }
-  var selectedGenre by remember {
+  var genres by remember {
     mutableStateOf<List<BookGenres>>(emptyList())
   } // Genre selection state
   var expanded by remember { mutableStateOf(false) } // State for dropdown menu
@@ -95,7 +95,7 @@ fun AddToBookScreen(
                   expanded = expanded,
                   onExpandedChange = { expanded = !expanded }) {
                     FieldComponent(
-                        value = selectedGenre.joinToString { it.Genre },
+                        value = genres.joinToString { it.Genre },
                         onValueChange = {},
                         readOnly = true,
                         label = { Text(text = "Genres*") },
@@ -105,7 +105,7 @@ fun AddToBookScreen(
                         onDismissRequest = { expanded = false },
                         modifier = Modifier.fillMaxWidth().fillMaxHeight(0.5f)) {
                           BookGenres.values().forEach { genre ->
-                            val isSelected = selectedGenre.contains(genre)
+                            val isSelected = genres.contains(genre)
                             DropdownMenuItem(
                                 text = {
                                   Row(modifier = Modifier.fillMaxWidth()) {
@@ -122,9 +122,9 @@ fun AddToBookScreen(
                                 },
                                 onClick = {
                                   if (isSelected) {
-                                    selectedGenre -= genre
+                                    genres -= genre
                                   } else {
-                                    selectedGenre += genre
+                                    genres += genre
                                   }
                                 })
                           }
@@ -207,7 +207,7 @@ fun AddToBookScreen(
                         photo,
                         language,
                         isbn,
-                        selectedGenre)
+                        genres)
                   }) {
                     Text("Save")
                   }
