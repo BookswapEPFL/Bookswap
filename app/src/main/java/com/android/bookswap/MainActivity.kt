@@ -1,6 +1,7 @@
 package com.android.bookswap
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,6 +15,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
+import com.android.bookswap.data.DataBook
 import com.android.bookswap.data.DataUser
 import com.android.bookswap.data.MessageBox
 import com.android.bookswap.data.repository.BooksRepository
@@ -32,9 +34,11 @@ import com.android.bookswap.model.map.Geolocation
 import com.android.bookswap.model.map.IGeolocation
 import com.android.bookswap.resources.C
 import com.android.bookswap.ui.authentication.SignInScreen
+import com.android.bookswap.ui.books.BookProfileScreen
 import com.android.bookswap.ui.books.add.AddISBNScreen
 import com.android.bookswap.ui.books.add.AddToBookScreen
 import com.android.bookswap.ui.books.add.BookAdditionChoiceScreen
+import com.android.bookswap.ui.books.edit.EditBookScreen
 import com.android.bookswap.ui.chat.ChatScreen
 import com.android.bookswap.ui.chat.ListChatScreen
 import com.android.bookswap.ui.components.TopAppBarComponent
@@ -270,6 +274,38 @@ class MainActivity : ComponentActivity() {
       }
       navigation(startDestination = Screen.PROFILE, route = Route.PROFILE) {
         composable(Screen.PROFILE) { UserProfile(userVM) }
+        composable(Screen.BOOK_PROFILE) { backStackEntry ->
+          val bookId = backStackEntry.arguments?.getString("bookId")?.let { UUID.fromString(it) }
+
+          if(bookId != null){
+          BookProfileScreen(
+              bookId = bookId ?: UUID.randomUUID(), // Default for testing
+              booksRepository = BooksFirestoreSource(FirebaseFirestore.getInstance()),
+              navController = NavigationActions(navController),
+              currentUserId = UUID.randomUUID() // Pass the actual logged-in user ID
+              )
+          } else {
+            Log.e("Navigation", "Invalid bookId passed to BookProfileScreen")
+          }
+        }
+        composable("${Screen.EDIT_BOOK}/{bookId}") { backStackEntry ->
+          val bookId = backStackEntry.arguments?.getString("bookId")?.let { UUID.fromString(it) }
+          var book: DataBook? = null // How to create a book that will be assigned after ?
+          // Fetch book data
+          if (bookId != null) {
+
+            bookRepository.getBook(
+                uuid = bookId!!,
+                OnSucess = { fetchedbook -> book = fetchedbook },
+                onFailure = { Log.d("EditScreen", "Error while loading the book") })
+            EditBookScreen(
+                booksRepository = bookRepository,
+                navigationActions = NavigationActions(navController),
+                book = book!!)
+          } else {
+            Log.e("Navigation", "Invalid bookId passed to EditBookScreen")
+          }
+        }
       }
     }
   }

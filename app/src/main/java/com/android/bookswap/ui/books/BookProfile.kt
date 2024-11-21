@@ -16,6 +16,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -137,11 +138,11 @@ fun BookProfileScreen(
                   // Conditionally display the "Edit Book" button if the current user owns the book
                   if (dataBook.userId == currentUserId) {
                     item {
-                      androidx.compose.material3.Button(
+                      Button(
                           onClick = {
                             navController.navigateTo(Screen.EDIT_BOOK, dataBook.uuid.toString())
                           },
-                          modifier = Modifier.padding(8.dp)) {
+                          modifier = Modifier.padding(8.dp).testTag("editButton")) {
                             Text("Edit Book")
                           }
                     }

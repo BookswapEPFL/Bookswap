@@ -41,7 +41,8 @@ class BookManagerViewModelTest {
           photo = "url_to_photo_1",
           language = BookLanguages.ENGLISH,
           isbn = "123-456-789",
-          genres = listOf(BookGenres.FICTION, BookGenres.HORROR))
+          genres = listOf(BookGenres.FICTION, BookGenres.HORROR),
+          userId = UUID.randomUUID())
 
   private val book2 =
       DataBook(
@@ -53,7 +54,8 @@ class BookManagerViewModelTest {
           photo = "url_to_photo_2",
           language = BookLanguages.GERMAN,
           isbn = "234-567-890",
-          genres = listOf(BookGenres.FICTION))
+          genres = listOf(BookGenres.FICTION),
+          userId = UUID.randomUUID())
 
   private val book3 =
       DataBook(
@@ -65,7 +67,8 @@ class BookManagerViewModelTest {
           photo = "url_to_photo_3",
           language = BookLanguages.GERMAN,
           isbn = "234-567-890",
-          genres = listOf(BookGenres.NONFICTION, BookGenres.HORROR))
+          genres = listOf(BookGenres.NONFICTION, BookGenres.HORROR),
+          userId = UUID.randomUUID())
 
   private val books = listOf(book3, book1, book2)
 
