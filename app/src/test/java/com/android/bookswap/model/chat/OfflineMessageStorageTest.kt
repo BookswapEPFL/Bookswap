@@ -12,7 +12,8 @@ import io.mockk.every
 import io.mockk.mockk
 import java.io.File
 import java.util.UUID
-import org.junit.Assert.*
+import junit.framework.TestCase.assertEquals
+import junit.framework.TestCase.assertTrue
 import org.junit.Before
 import org.junit.Test
 
@@ -21,6 +22,7 @@ class OfflineMessageStorageTest {
   private val mockQuerySnapshot: QuerySnapshot = mockk()
   private lateinit var offlineMessageStorage: OfflineMessageStorage
   private lateinit var context: Context
+  private lateinit var tempDir: File
 
   private val testMessages =
       List(12) {
@@ -35,16 +37,12 @@ class OfflineMessageStorageTest {
 
   @Before
   fun setup() {
+    // Create a temporary directory for tests
+    tempDir = createTempDir()
     context = mockk()
-    val mockFile =
-        File(
-            "C:\\Users\\jaime\\Desktop\\Bookswap\\app\\src\\test\\java\\com\\android\\bookswap\\model\\chat")
-    every { context.filesDir } returns mockFile
 
-    val messagesFile = File(mockFile, "Messages.txt")
-    if (messagesFile.exists()) {
-      messagesFile.writeText("")
-    }
+    // Mock context to return the temporary directory
+    every { context.filesDir } returns tempDir
 
     offlineMessageStorage = OfflineMessageStorage(context)
 
