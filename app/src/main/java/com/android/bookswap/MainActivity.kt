@@ -31,6 +31,7 @@ import com.android.bookswap.model.UserViewModel
 import com.android.bookswap.model.add.AddToBookViewModel
 import com.android.bookswap.model.chat.OfflineMessageStorage
 import com.android.bookswap.model.chat.PermissionHandler
+import com.android.bookswap.model.edit.EditBookViewModel
 import com.android.bookswap.model.map.BookFilter
 import com.android.bookswap.model.map.BookManagerViewModel
 import com.android.bookswap.model.map.DefaultGeolocation
@@ -274,10 +275,9 @@ class MainActivity : ComponentActivity() {
         }
         composable(Screen.ADD_BOOK_MANUALLY) {
           AddToBookScreen(
-              AddToBookViewModel(bookRepository),
+              AddToBookViewModel(bookRepository, currentUserUUID),
               topAppBar = { topAppBar("Add your Book") },
-              bottomAppBar = { bottomAppBar(this@navigation.route ?: "") },
-              userId = currentUserUUID)
+              bottomAppBar = { bottomAppBar(this@navigation.route ?: "") })
         }
         composable(Screen.ADD_BOOK_SCAN) { /*Todo*/}
         composable(Screen.ADD_BOOK_ISBN) {
@@ -312,13 +312,14 @@ class MainActivity : ComponentActivity() {
           if (bookId != null) {
 
             bookRepository.getBook(
-                uuid = bookId!!,
+                uuid = bookId,
                 OnSucess = { fetchedbook -> book = fetchedbook },
                 onFailure = { Log.d("EditScreen", "Error while loading the book") })
             EditBookScreen(
-                booksRepository = bookRepository,
-                navigationActions = NavigationActions(navController),
-                book = book!!)
+                EditBookViewModel(bookRepository, navigationActions, currentUserUUID),
+                book = book!!,
+                topAppBar = { topAppBar("Edit your Book") },
+                bottomAppBar = { bottomAppBar(this@navigation.route ?: "") })
           } else {
             Log.e("Navigation", "Invalid bookId passed to EditBookScreen")
           }

@@ -10,7 +10,8 @@ import com.android.bookswap.data.DataBook
 import com.android.bookswap.data.repository.BooksRepository
 import java.util.UUID
 
-class AddToBookViewModel(private val booksRepository: BooksRepository) : ViewModel() {
+class AddToBookViewModel(private val booksRepository: BooksRepository, private val userID: UUID) :
+    ViewModel() {
 
   /**
    * Creates a DataBook instance after validating the input parameters.
@@ -59,7 +60,8 @@ class AddToBookViewModel(private val booksRepository: BooksRepository) : ViewMod
             photo = photo,
             language = languages,
             isbn = isbn,
-            genres = genres)
+            genres = genres,
+            userID)
     Log.d("AddToBookScreen", "Adding book: $book")
     booksRepository.addBook(
         book,

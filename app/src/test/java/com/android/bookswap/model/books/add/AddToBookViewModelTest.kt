@@ -28,13 +28,14 @@ class AddToBookViewModelTest {
           photo = "Test photo URL",
           language = BookLanguages.ENGLISH,
           isbn = "123456789",
-          genres = listOf(BookGenres.FICTION))
+          genres = listOf(BookGenres.FICTION),
+          userId = UUID(2, 2))
 
   @Before
   fun setup() {
     booksRepository = mockk()
     context = mockk()
-    viewModel = AddToBookViewModel(booksRepository)
+    viewModel = AddToBookViewModel(booksRepository, book.userId)
 
     // Mock Toast.makeText
     mockkStatic(Toast::class)
