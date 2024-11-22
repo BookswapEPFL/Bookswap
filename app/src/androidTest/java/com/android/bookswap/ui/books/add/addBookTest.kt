@@ -12,6 +12,7 @@ import androidx.navigation.compose.rememberNavController
 import com.android.bookswap.data.BookGenres
 import com.android.bookswap.data.BookLanguages
 import com.android.bookswap.data.repository.BooksRepository
+import com.android.bookswap.resources.C
 import com.android.bookswap.ui.navigation.NavigationActions
 import io.mockk.every
 import io.mockk.mockk
@@ -40,18 +41,18 @@ class AddToBookTest {
   fun testSaveButtonDisabledInitially() {
     composeTestRule.setContent { AddToBookScreen(mockBooksRepository) }
     // Check if the Save button is initially disabled
-    composeTestRule.onNodeWithTag("save_button").assertIsNotEnabled()
+    composeTestRule.onNodeWithTag(C.Tag.NewBookManually.save).assertIsNotEnabled()
   }
 
   @Test
   fun testSaveButtonEnabledWhenRequiredFieldsAreFilled() {
     composeTestRule.setContent { AddToBookScreen(mockBooksRepository) }
     // Fill in the Title and ISBN fields
-    composeTestRule.onNodeWithTag("title_field").performTextInput("My Book Title")
-    composeTestRule.onNodeWithTag("isbn_field").performTextInput("1234567890")
+    composeTestRule.onNodeWithTag(C.Tag.NewBookManually.title).performTextInput("My Book Title")
+    composeTestRule.onNodeWithTag(C.Tag.NewBookManually.isbn).performTextInput("1234567890")
     // Check if the Save button is now enabled
-    composeTestRule.onNodeWithTag("save_button").performClick()
-    composeTestRule.onNodeWithTag("save_button").assertIsEnabled()
+    composeTestRule.onNodeWithTag(C.Tag.NewBookManually.save).performClick()
+    composeTestRule.onNodeWithTag(C.Tag.NewBookManually.save).assertIsEnabled()
   }
 
   @Test
@@ -142,9 +143,9 @@ class AddToBookTest {
       AddToBookScreen(mockBooksRepository)
     }
     // Fill in the ISBN field but leave the Title field empty
-    composeTestRule.onNodeWithTag("isbn_field").performTextInput("1234567890")
+    composeTestRule.onNodeWithTag(C.Tag.NewBookManually.isbn).performTextInput("1234567890")
 
     // Check if the Save button is still disabled
-    composeTestRule.onNodeWithTag("save_button").assertIsNotEnabled()
+    composeTestRule.onNodeWithTag(C.Tag.NewBookManually.save).assertIsNotEnabled()
   }
 }
