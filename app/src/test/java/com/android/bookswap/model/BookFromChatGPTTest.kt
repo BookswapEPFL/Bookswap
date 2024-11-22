@@ -15,6 +15,7 @@ import io.mockk.mockk
 import io.mockk.mockkConstructor
 import io.mockk.mockkStatic
 import io.mockk.verify
+import java.util.UUID
 import org.junit.Before
 import org.junit.Test
 
@@ -24,6 +25,7 @@ class BookFromChatGPTTest {
   private val photoFirebaseStorageRepository: PhotoFirebaseStorageRepository = mockk()
   private val booksRepository: BooksRepository = mockk()
   private val bitmap: Bitmap = mockk()
+  private val uuid = UUID.randomUUID()
 
   @Before
   fun setup() {
@@ -47,7 +49,7 @@ class BookFromChatGPTTest {
         }
 
     mockkConstructor(GoogleBookDataSource::class)
-    every { anyConstructed<GoogleBookDataSource>().getBookFromISBN(testISBN, any()) } answers
+    every { anyConstructed<GoogleBookDataSource>().getBookFromISBN(testISBN, any(), any()) } answers
         {
           val dataBook: DataBook = mockk()
           secondArg<(Result<DataBook>) -> Unit>()(Result.success(dataBook))
@@ -68,7 +70,7 @@ class BookFromChatGPTTest {
 
     val bookFromChatGPT = BookFromChatGPT(context, photoFirebaseStorageRepository, booksRepository)
     val callback = mockk<(BookFromChatGPT.Companion.Error) -> Unit>(relaxed = true)
-    bookFromChatGPT.addBookFromImage(bitmap, callback)
+    bookFromChatGPT.addBookFromImage(bitmap, uuid, callback)
 
     verify(exactly = 1, timeout = 500) {
       callback.invoke(BookFromChatGPT.Companion.Error.FIREBASE_STORAGE_ERROR)
@@ -84,7 +86,7 @@ class BookFromChatGPTTest {
 
     val bookFromChatGPT = BookFromChatGPT(context, photoFirebaseStorageRepository, booksRepository)
     val callback = mockk<(BookFromChatGPT.Companion.Error) -> Unit>(relaxed = true)
-    bookFromChatGPT.addBookFromImage(bitmap, callback)
+    bookFromChatGPT.addBookFromImage(bitmap, uuid, callback)
 
     verify(exactly = 1, timeout = 500) {
       callback.invoke(BookFromChatGPT.Companion.Error.CHATGPT_ANALYZER_ERROR)
@@ -101,7 +103,7 @@ class BookFromChatGPTTest {
 
     val bookFromChatGPT = BookFromChatGPT(context, photoFirebaseStorageRepository, booksRepository)
     val callback = mockk<(BookFromChatGPT.Companion.Error) -> Unit>(relaxed = true)
-    bookFromChatGPT.addBookFromImage(bitmap, callback)
+    bookFromChatGPT.addBookFromImage(bitmap, uuid, callback)
 
     verify(exactly = 1, timeout = 500) {
       callback.invoke(BookFromChatGPT.Companion.Error.CHATGPT_ANALYZER_ERROR)
@@ -110,14 +112,14 @@ class BookFromChatGPTTest {
 
   @Test
   fun `error on getBookFromISBN return error`() {
-    every { anyConstructed<GoogleBookDataSource>().getBookFromISBN(any(), any()) } answers
+    every { anyConstructed<GoogleBookDataSource>().getBookFromISBN(any(), any(), any()) } answers
         {
           secondArg<(Result<DataBook>) -> Unit>()(Result.failure(Exception("")))
         }
 
     val bookFromChatGPT = BookFromChatGPT(context, photoFirebaseStorageRepository, booksRepository)
     val callback = mockk<(BookFromChatGPT.Companion.Error) -> Unit>(relaxed = true)
-    bookFromChatGPT.addBookFromImage(bitmap, callback)
+    bookFromChatGPT.addBookFromImage(bitmap, uuid, callback)
 
     verify(exactly = 1, timeout = 500) {
       callback.invoke(BookFromChatGPT.Companion.Error.ISBN_ERROR)
@@ -133,7 +135,7 @@ class BookFromChatGPTTest {
 
     val bookFromChatGPT = BookFromChatGPT(context, photoFirebaseStorageRepository, booksRepository)
     val callback = mockk<(BookFromChatGPT.Companion.Error) -> Unit>(relaxed = true)
-    bookFromChatGPT.addBookFromImage(bitmap, callback)
+    bookFromChatGPT.addBookFromImage(bitmap, uuid, callback)
 
     verify(exactly = 1, timeout = 500) {
       callback.invoke(BookFromChatGPT.Companion.Error.BOOK_ADD_ERROR)
@@ -144,7 +146,7 @@ class BookFromChatGPTTest {
   fun `book is added correctly`() {
     val bookFromChatGPT = BookFromChatGPT(context, photoFirebaseStorageRepository, booksRepository)
     val callback = mockk<(BookFromChatGPT.Companion.Error) -> Unit>(relaxed = true)
-    bookFromChatGPT.addBookFromImage(bitmap, callback)
+    bookFromChatGPT.addBookFromImage(bitmap, uuid, callback)
 
     verify(exactly = 1, timeout = 500) { callback.invoke(BookFromChatGPT.Companion.Error.NONE) }
   }
