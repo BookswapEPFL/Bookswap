@@ -38,8 +38,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.bookswap.model.UserViewModel
+import com.android.bookswap.resources.C
 import com.android.bookswap.ui.navigation.NavigationActions
-import com.android.bookswap.ui.navigation.Route
 import com.android.bookswap.ui.theme.ColorVariable
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
@@ -106,11 +106,11 @@ fun NewUserScreen(navigationActions: NavigationActions, userVM: UserViewModel) {
       modifier =
           Modifier.fillMaxSize()
               .background(color = ColorVariable.BackGround)
-              .testTag("NewUserScreen")) {
+              .testTag(C.Tag.new_user_screen_container)) {
         item {
           Text(
               "Welcome",
-              modifier = Modifier.testTag("welcomeTxt").fillMaxWidth(),
+              modifier = Modifier.testTag(C.Tag.TopAppBar.screen_title).fillMaxWidth(),
               style =
                   TextStyle(
                       color = ColorVariable.Accent,
@@ -123,7 +123,7 @@ fun NewUserScreen(navigationActions: NavigationActions, userVM: UserViewModel) {
           // The personal information text
           Text(
               "Please fill in your personal information to start BookSwapping",
-              modifier = Modifier.testTag("personalInfoTxt").fillMaxWidth(),
+              modifier = Modifier.testTag(C.Tag.NewUser.personal_info).fillMaxWidth(),
               style =
                   TextStyle(
                       color = ColorVariable.Accent,
@@ -135,7 +135,7 @@ fun NewUserScreen(navigationActions: NavigationActions, userVM: UserViewModel) {
 
         item {
           Card(
-              Modifier.testTag("editProfileContainer").background(ColorVariable.BackGround),
+              Modifier.testTag(C.Tag.edit_profile_screen_container).background(ColorVariable.BackGround),
               colors =
                   androidx.compose.material3.CardDefaults.cardColors()
                       .copy(containerColor = ColorVariable.BackGround)) {
@@ -147,7 +147,7 @@ fun NewUserScreen(navigationActions: NavigationActions, userVM: UserViewModel) {
                     Alignment.CenterHorizontally) {
                       IconButton(
                           onClick = { /* TODO */},
-                          modifier = Modifier.size(ICON_SIZE).testTag("profilPics")) {
+                          modifier = Modifier.size(ICON_SIZE).testTag(C.Tag.NewUser.profile_pic)) {
                             Icon(
                                 imageVector = Icons.Default.AccountCircle,
                                 contentDescription = "profile picture",
@@ -157,7 +157,7 @@ fun NewUserScreen(navigationActions: NavigationActions, userVM: UserViewModel) {
                       OutlinedTextField(
                           greeting.value,
                           { greeting.value = it },
-                          Modifier.testTag("greetingTF").fillMaxWidth().padding(TEXT_PADDING),
+                          Modifier.testTag(C.Tag.NewUser.greeting).fillMaxWidth().padding(TEXT_PADDING),
                           label = { Text("Greeting") },
                           placeholder = { Text("Mr.", Modifier, Color.Gray) },
                           keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
@@ -166,7 +166,7 @@ fun NewUserScreen(navigationActions: NavigationActions, userVM: UserViewModel) {
                       OutlinedTextField(
                           firstName.value,
                           { firstName.value = it },
-                          Modifier.testTag("firstnameTF").fillMaxWidth().padding(TEXT_PADDING),
+                          Modifier.testTag(C.Tag.NewUser.firstname).fillMaxWidth().padding(TEXT_PADDING),
                           label = { Text("Firstname") },
                           placeholder = { Text("John", Modifier, Color.Gray) },
                           keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
@@ -177,13 +177,13 @@ fun NewUserScreen(navigationActions: NavigationActions, userVM: UserViewModel) {
                             firstNameError.value!!,
                             color = Color.Red,
                             fontSize = ERROR_FONT_SIZE,
-                            modifier = Modifier.testTag("firstnameError"))
+                            modifier = Modifier.testTag(C.Tag.NewUser.firstname_error))
                       }
 
                       OutlinedTextField(
                           lastName.value,
                           { lastName.value = it },
-                          Modifier.testTag("lastnameTF").fillMaxWidth().padding(TEXT_PADDING),
+                          Modifier.testTag(C.Tag.NewUser.lastname).fillMaxWidth().padding(TEXT_PADDING),
                           label = { Text("Lastname") },
                           placeholder = { Text("Doe", Modifier, Color.Gray) },
                           keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
@@ -194,13 +194,13 @@ fun NewUserScreen(navigationActions: NavigationActions, userVM: UserViewModel) {
                             lastNameError.value!!,
                             color = Color.Red,
                             fontSize = ERROR_FONT_SIZE,
-                            modifier = Modifier.testTag("lastnameError"))
+                            modifier = Modifier.testTag(C.Tag.NewUser.lastname_error))
                       }
 
                       OutlinedTextField(
                           email.value,
                           { email.value = it },
-                          Modifier.testTag("emailTF").fillMaxWidth().padding(TEXT_PADDING),
+                          Modifier.testTag(C.Tag.NewUser.email).fillMaxWidth().padding(TEXT_PADDING),
                           label = { Text("Email") },
                           placeholder = { Text("John.Doe@example.com", Modifier, Color.Gray) },
                           keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
@@ -211,13 +211,13 @@ fun NewUserScreen(navigationActions: NavigationActions, userVM: UserViewModel) {
                             emailError.value!!,
                             color = Color.Red,
                             fontSize = ERROR_FONT_SIZE,
-                            modifier = Modifier.testTag("emailError"))
+                            modifier = Modifier.testTag(C.Tag.NewUser.email_error))
                       }
 
                       OutlinedTextField(
                           phone.value,
                           { phone.value = it },
-                          Modifier.testTag("phoneTF").fillMaxWidth().padding(TEXT_PADDING),
+                          Modifier.testTag(C.Tag.NewUser.phone).fillMaxWidth().padding(TEXT_PADDING),
                           label = { Text("Phone") },
                           placeholder = { Text("+4122345678", Modifier, Color.Gray) },
                           keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
@@ -228,7 +228,7 @@ fun NewUserScreen(navigationActions: NavigationActions, userVM: UserViewModel) {
                             phoneError.value!!,
                             color = Color.Red,
                             fontSize = ERROR_FONT_SIZE,
-                            modifier = Modifier.testTag("phoneError"))
+                            modifier = Modifier.testTag(C.Tag.NewUser.phone_error))
                       }
                     }
               }
@@ -246,14 +246,14 @@ fun NewUserScreen(navigationActions: NavigationActions, userVM: UserViewModel) {
                         email = email.value,
                         phone = phone.value,
                         googleUid = Firebase.auth.currentUser?.uid ?: "")
-                    navigationActions.navigateTo(Route.MAP)
+                    navigationActions.navigateTo(C.Route.MAP)
                   } else {
                     Toast.makeText(context, "Please correct the errors", Toast.LENGTH_SHORT).show()
                   }
                 },
                 colors = ButtonDefaults.buttonColors(ColorVariable.Primary),
                 modifier =
-                    Modifier.width(BUTTON_WIDTH).height(BUTTON_HEIGHT).testTag("CreateButton")) {
+                    Modifier.width(BUTTON_WIDTH).height(BUTTON_HEIGHT).testTag(C.Tag.NewUser.confirm)) {
                   Text(
                       text = "Create",
                       textAlign = TextAlign.Center,

@@ -161,6 +161,22 @@ object C {
       const val signIn = S.AUTH + UI_T.BUTTON
     }
 	
+	// NewUser Screen specific tags (NewUser.kt)
+	object NewUser {
+	  const val personal_info = "personal_info" + UI_T.TEXT
+	  const val profile_pic = A.NEW + PROFILE + UI_T.IMAGE + UI_T.ICON_BUTTON
+	  const val greeting = "greeting" + UI_T.TEXT_FIELD
+	  const val firstname = "firstname" + UI_T.TEXT_FIELD
+	  const val lastname = "lastname" + UI_T.TEXT_FIELD
+	  const val email = "email" + UI_T.TEXT_FIELD
+	  const val phone = "phone" + UI_T.TEXT_FIELD
+	  const val firstname_error = "firstname_error" + UI_T.TEXT
+	  const val lastname_error = "lastname_error" + UI_T.TEXT
+	  const val email_error = "email_error" + UI_T.TEXT
+	  const val phone_error = "phone_error" + UI_T.TEXT
+	  const val confirm = A.CONFIRM + UI_T.BUTTON
+	}
+	
 	// New Book Choice Screen specific tags (BookAdditionChoice.kt)
     object NewBookChoice {
       object btnWIcon {
