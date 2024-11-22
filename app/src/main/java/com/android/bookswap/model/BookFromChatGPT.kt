@@ -13,9 +13,9 @@ import java.util.UUID
 class BookFromChatGPT(
     private val context: Context,
     private val photoStorageRepository: PhotoFirebaseStorageRepository,
-    private val booksRepository: BooksRepository
+    private val booksRepository: BooksRepository,
 ) {
-  fun addBookFromImage(image: Bitmap, callback: (Error) -> Unit) {
+  fun addBookFromImage(image: Bitmap, userUUID: UUID, callback: (Error) -> Unit) {
     photoStorageRepository.addPhotoToStorage(UUID.randomUUID().toString(), image) { urlResult ->
       if (urlResult.isFailure) {
         callback(Error.FIREBASE_STORAGE_ERROR)
@@ -31,7 +31,7 @@ class BookFromChatGPT(
               return@analyzeImage
             }
 
-            GoogleBookDataSource(context).getBookFromISBN(isbn) { dataBookResult ->
+            GoogleBookDataSource(context).getBookFromISBN(isbn, userUUID) { dataBookResult ->
               if (dataBookResult.isFailure) {
                 callback(Error.ISBN_ERROR)
                 return@getBookFromISBN

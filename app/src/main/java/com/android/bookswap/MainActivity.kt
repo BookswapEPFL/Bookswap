@@ -252,7 +252,8 @@ class MainActivity : ComponentActivity() {
                 topAppBar = { topAppBar("Add a Book") },
                 bottomAppBar = { bottomAppBar(this@navigation.route ?: "") },
                 photoFirebaseStorageRepository = photoStorage,
-                booksRepository = bookRepository)
+                booksRepository = bookRepository,
+                userUUID = currentUserUUID)
           }
         }
       }
@@ -274,7 +275,8 @@ class MainActivity : ComponentActivity() {
               topAppBar = { topAppBar("Add a Book") },
               bottomAppBar = { bottomAppBar(this@navigation.route ?: "") },
               photoFirebaseStorageRepository = photoStorage,
-              booksRepository = bookRepository)
+              booksRepository = bookRepository,
+              userUUID = currentUserUUID)
         }
         composable(Screen.ADD_BOOK_MANUALLY) {
           AddToBookScreen(
