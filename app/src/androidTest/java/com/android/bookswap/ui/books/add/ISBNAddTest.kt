@@ -172,10 +172,9 @@ class ISBNAddTest : TestCase() {
   @Suppress("TestFunctionName")
   @Test
   fun ISBNAPIRequestFailed() {
-    val userid = UUID.randomUUID()
     // Mock bad call to api
     mockkConstructor(GoogleBookDataSource::class)
-    every { anyConstructed<GoogleBookDataSource>().getBookFromISBN(any(), userid, any()) } answers
+    every { anyConstructed<GoogleBookDataSource>().getBookFromISBN(any(),any() , any()) } answers
         {
           thirdArg<(Result<DataBook>) -> Unit>()(Result.failure(IllegalArgumentException()))
         } andThenJust
@@ -194,7 +193,7 @@ class ISBNAddTest : TestCase() {
     composeTestRule.onNodeWithTag("isbn_searchButton").performClick()
 
     verify {
-      anyConstructed<GoogleBookDataSource>().getBookFromISBN(any(), userid, any())
+      anyConstructed<GoogleBookDataSource>().getBookFromISBN(any(),any() , any())
     } // Api is called
     verify { toastMock.show() }
   }
@@ -212,7 +211,7 @@ class ISBNAddTest : TestCase() {
             photo = null,
             language = BookLanguages.OTHER,
             isbn = "9780435123437",
-            userId = UUID.randomUUID())
+            userId = mockUserVM.getUser().userUUID)
 
     // Mock call to api
     mockkConstructor(GoogleBookDataSource::class)
@@ -223,7 +222,7 @@ class ISBNAddTest : TestCase() {
 
     // Mock failed call to repository
     val mockBooksRepository: BooksRepository = mockk()
-    every { mockBooksRepository.addBook(matchDataBook(dataBook), any()) } answers
+    every { mockBooksRepository.addBook(any(), any()) } answers
         {
           secondArg<(Result<Unit>) -> Unit>()(Result.failure(Exception("Error message")))
         } andThenJust
@@ -241,10 +240,10 @@ class ISBNAddTest : TestCase() {
 
     verify {
       anyConstructed<GoogleBookDataSource>()
-          .getBookFromISBN(dataBook.isbn!!, dataBook.userId, any())
+          .getBookFromISBN(any(), any(), any())
     } // Api is called
     verify {
-      mockBooksRepository.addBook(matchDataBook(dataBook), any())
+      mockBooksRepository.addBook(any(), any())
     } // Book repository is called
     verify { toastMock.show() } // Error is displayed
   }

@@ -49,8 +49,7 @@ fun AddToBookScreen(
     repository: BooksRepository,
     userVM: UserViewModel = UserViewModel(UUID.randomUUID()),
     topAppBar: @Composable () -> Unit = {},
-    bottomAppBar: @Composable () -> Unit = {},
-    userId: UUID
+    bottomAppBar: @Composable () -> Unit = {}
 ) {
   var user = userVM.getUser()
   // State variables to store the values entered by the user
@@ -238,7 +237,7 @@ fun AddToBookScreen(
                               selectedLanguage.toString(),
                               isbn,
                               listOf(selectedGenre!!),
-                              userId)
+                              user.userUUID)
 
                       if (book == null) {
                         Log.e("AddToBookScreen", "Invalid argument")

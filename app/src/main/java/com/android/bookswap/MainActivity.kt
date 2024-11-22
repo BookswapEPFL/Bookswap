@@ -279,8 +279,7 @@ class MainActivity : ComponentActivity() {
               bookRepository,
               userVM,
               topAppBar = { topAppBar("Add your Book") },
-              bottomAppBar = { bottomAppBar(this@navigation.route ?: "") },
-              userId = currentUserUUID)
+              bottomAppBar = { bottomAppBar(this@navigation.route ?: "") })
         }
         composable(Screen.ADD_BOOK_SCAN) { /*Todo*/}
         composable(Screen.ADD_BOOK_ISBN) {
@@ -289,8 +288,7 @@ class MainActivity : ComponentActivity() {
               bookRepository,
               userVM,
               topAppBar = { topAppBar(null) },
-              bottomAppBar = { bottomAppBar(this@navigation.route ?: "") },
-              userId = currentUserUUID)
+              bottomAppBar = { bottomAppBar(this@navigation.route ?: "") },)
         }
       }
       navigation(startDestination = Screen.PROFILE, route = Route.PROFILE) {
