@@ -13,7 +13,7 @@ import com.android.bookswap.data.repository.MessageRepository
 import com.android.bookswap.data.repository.UsersRepository
 import com.android.bookswap.data.source.api.GoogleBookDataSource
 import com.android.bookswap.data.source.network.PhotoFirebaseStorageSource
-import com.android.bookswap.ui.navigation.Route
+import com.android.bookswap.resources.C
 import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
@@ -45,9 +45,12 @@ class AddBooksEndToEnd {
 
     every { mockBookRepository.addBook(any(), any()) } just runs
 
+    val testUUID = UUID.randomUUID()
+    every { mockBookRepository.getNewUUID() } returns testUUID
+
     mockedBook =
         DataBook(
-            uuid = UUID.randomUUID(),
+            uuid = testUUID,
             title = "The Great Gatsby",
             author = "F. Scott Fitzgerald",
             description = "A classic novel set in the Jazz Age.",
@@ -69,7 +72,7 @@ class AddBooksEndToEnd {
               mockMessageRepository,
               mockBookRepository,
               mockUserRepository,
-              startDestination = Route.NEWBOOK,
+              startDestination = C.Route.NEW_BOOK,
               photoStorage = mockPhotoStorage)
     }
   }
@@ -77,35 +80,39 @@ class AddBooksEndToEnd {
   @Test
   fun testAddBook() {
 
-    composeTestRule.onNodeWithTag("addBookChoiceScreen").assertExists()
+    composeTestRule.onNodeWithTag(C.Tag.new_book_choice_screen_container).assertExists()
 
-    composeTestRule.onNodeWithTag("button_From ISBN").performClick()
-    composeTestRule.onNodeWithTag("isbn_field").assertExists()
-    composeTestRule.onNodeWithTag("isbn_field").performTextInput("9780743273565")
-    composeTestRule.onNodeWithTag("isbn_searchButton").performClick()
+    composeTestRule
+        .onNodeWithTag(C.Screen.ADD_BOOK_ISBN + C.Tag.NewBookChoice.btnWIcon.button)
+        .performClick()
+    composeTestRule.onNodeWithTag(C.Tag.NewBookISBN.isbn).assertExists()
+    composeTestRule.onNodeWithTag(C.Tag.NewBookISBN.isbn).performTextInput("9780743273565")
+    composeTestRule.onNodeWithTag(C.Tag.NewBookISBN.search).performClick()
 
     verify { anyConstructed<GoogleBookDataSource>().getBookFromISBN("9780743273565", any()) }
     verify { mockBookRepository.addBook(any(), any()) }
 
-    composeTestRule.onNodeWithTag("backButton").performClick()
+    composeTestRule.onNodeWithTag(C.Tag.TopAppBar.back_button).performClick()
 
-    composeTestRule.onNodeWithTag("button_Manually").performClick()
-    composeTestRule.onNodeWithTag("addBookScreen").assertExists()
-
-    composeTestRule.onNodeWithTag("title_field").performTextInput("Test Book Title")
-    composeTestRule.onNodeWithTag("author_field").performTextInput("Author Name")
     composeTestRule
-        .onNodeWithTag("description_field")
-        .performTextInput("This is a test description for the book.")
-    composeTestRule.onNodeWithTag("rating_field").performTextInput("5")
-    composeTestRule.onNodeWithTag("isbn_field").performTextInput("9780743273565")
-    composeTestRule.onNodeWithTag("photo_field").performTextInput("photo_url_test")
-    composeTestRule.onNodeWithTag("language_field").performTextInput("English")
+        .onNodeWithTag(C.Screen.ADD_BOOK_MANUALLY + C.Tag.NewBookChoice.btnWIcon.button)
+        .performClick()
+    composeTestRule.onNodeWithTag(C.Tag.new_book_manual_screen_container).assertExists()
 
-    composeTestRule.onNodeWithTag("genre_field").performClick()
+    composeTestRule.onNodeWithTag(C.Tag.NewBookManually.title).performTextInput("Test Book Title")
+    composeTestRule.onNodeWithTag(C.Tag.NewBookManually.author).performTextInput("Author Name")
+    composeTestRule
+        .onNodeWithTag(C.Tag.NewBookManually.synopsis)
+        .performTextInput("This is a test description for the book.")
+    composeTestRule.onNodeWithTag(C.Tag.NewBookManually.rating).performTextInput("5")
+    composeTestRule.onNodeWithTag(C.Tag.NewBookManually.isbn).performTextInput("9780743273565")
+    composeTestRule.onNodeWithTag(C.Tag.NewBookManually.photo).performTextInput("photo_url_test")
+    composeTestRule.onNodeWithTag(C.Tag.NewBookManually.language).performTextInput("English")
+
+    composeTestRule.onNodeWithTag(C.Tag.NewBookManually.genres).performClick()
     composeTestRule.onNode(hasText("Fiction")).performClick()
 
-    composeTestRule.onNodeWithTag("save_button").performClick()
+    composeTestRule.onNodeWithTag(C.Tag.NewBookManually.save).performClick()
 
     verify {
       mockBookRepository.addBook(
