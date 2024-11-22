@@ -11,6 +11,7 @@ import androidx.navigation.compose.rememberNavController
 import com.android.bookswap.data.BookGenres
 import com.android.bookswap.data.BookLanguages
 import com.android.bookswap.data.DataBook
+import com.android.bookswap.resources.C
 import com.android.bookswap.ui.navigation.NavigationActions
 import io.mockk.mockk
 import java.util.UUID
@@ -49,22 +50,22 @@ class BookProfileScreenTest {
       BookProfileScreen(testBook, navigationActions)
     }
 
-    composeTestRule.onNodeWithTag("bookTitle").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("bookAuthor").assertIsDisplayed()
+    composeTestRule.onNodeWithTag(C.Tag.BookProfile.title).assertIsDisplayed()
+    composeTestRule.onNodeWithTag(C.Tag.BookProfile.author).assertIsDisplayed()
     composeTestRule
-        .onNodeWithTag("bookProfileScroll")
-        .performScrollToNode(hasTestTag("bookProfileEditionPlace"))
-    composeTestRule.onNodeWithTag("bookProfileLanguage").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("bookProfileGenresTitle").assertIsDisplayed()
+        .onNodeWithTag(C.Tag.BookProfile.scrollable)
+        .performScrollToNode(hasTestTag(C.Tag.BookProfile.location))
+    composeTestRule.onNodeWithTag(C.Tag.BookProfile.language).assertIsDisplayed()
+    composeTestRule.onNodeWithTag(C.Tag.BookProfile.genres).assertIsDisplayed()
     testBook.genres.forEach { genre ->
-      composeTestRule.onNodeWithTag("bookProfileGenre${genre.Genre}").assertIsDisplayed()
+      composeTestRule.onNodeWithTag(genre.Genre + C.Tag.BookProfile.genre).assertIsDisplayed()
     }
-    composeTestRule.onNodeWithTag("bookProfileISBN").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("bookProfileDate").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("bookProfileVolume").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("bookProfileIssue").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("bookProfileEditorial").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("bookProfileEditionPlace").assertIsDisplayed()
+    composeTestRule.onNodeWithTag(C.Tag.BookProfile.isbn).assertIsDisplayed()
+    composeTestRule.onNodeWithTag(C.Tag.BookProfile.date).assertIsDisplayed()
+    composeTestRule.onNodeWithTag(C.Tag.BookProfile.volume).assertIsDisplayed()
+    composeTestRule.onNodeWithTag(C.Tag.BookProfile.issue).assertIsDisplayed()
+    composeTestRule.onNodeWithTag(C.Tag.BookProfile.editorial).assertIsDisplayed()
+    composeTestRule.onNodeWithTag(C.Tag.BookProfile.location).assertIsDisplayed()
   }
 
   @Test
@@ -75,8 +76,8 @@ class BookProfileScreenTest {
       BookProfileScreen(testBook, navigationActions)
     }
 
-    composeTestRule.onNodeWithTag("bookProfileImageLeft").assertHasClickAction()
-    composeTestRule.onNodeWithTag("bookProfileImageRight").assertHasClickAction()
+    composeTestRule.onNodeWithTag(C.Tag.BookProfile.previous_image).assertHasClickAction()
+    composeTestRule.onNodeWithTag(C.Tag.BookProfile.next_image).assertHasClickAction()
   }
 
   @Test
@@ -88,12 +89,12 @@ class BookProfileScreenTest {
     }
 
     // Verify the first picture is displayed
-    composeTestRule.onNodeWithTag("bookProfileImage Isabel La Catolica").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("0_" + C.Tag.BookProfile.image).assertIsDisplayed()
 
     // Perform a click action on the icon
-    composeTestRule.onNodeWithTag("bookProfileImageRight").performClick()
+    composeTestRule.onNodeWithTag(C.Tag.BookProfile.next_image).performClick()
 
     // Verify the next picture is displayed
-    composeTestRule.onNodeWithTag("bookProfileImage Felipe II").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("1_" + C.Tag.BookProfile.image).assertIsDisplayed()
   }
 }

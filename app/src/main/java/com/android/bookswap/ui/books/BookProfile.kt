@@ -37,6 +37,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.android.bookswap.R
 import com.android.bookswap.data.DataBook
+import com.android.bookswap.resources.C
 import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.theme.ColorVariable
 
@@ -64,7 +65,7 @@ fun BookProfileScreen(
   val imagesDescription = listOf("Isabel La Catolica", "Felipe II")
   var currentImageIndex by remember { mutableIntStateOf(0) }
   Scaffold(
-      modifier = Modifier.testTag("bookProfileScreen"),
+      modifier = Modifier.testTag(C.Tag.book_profile_screen_container),
       topBar = topAppBar,
       bottomBar = bottomAppBar) { innerPadding ->
         LazyColumn(
@@ -72,20 +73,20 @@ fun BookProfileScreen(
                 Modifier.fillMaxSize()
                     .padding(innerPadding)
                     .background(ColorVariable.BackGround)
-                    .testTag("bookProfileScroll"),
+                    .testTag(C.Tag.BookProfile.scrollable),
             verticalArrangement = Arrangement.spacedBy(columnPadding),
             horizontalAlignment = Alignment.CenterHorizontally) {
               item {
                 Text(
                     text = DataBook.title,
-                    modifier = Modifier.testTag("bookTitle").padding(columnPadding),
+                    modifier = Modifier.testTag(C.Tag.BookProfile.title).padding(columnPadding),
                     color = ColorVariable.Accent,
                     style = MaterialTheme.typography.titleLarge)
               }
               item {
                 Text(
                     text = DataBook.author ?: "Author Unknown",
-                    modifier = Modifier.testTag("bookAuthor"),
+                    modifier = Modifier.testTag(C.Tag.BookProfile.author),
                     color = ColorVariable.AccentSecondary,
                     style = MaterialTheme.typography.titleMedium)
               }
@@ -101,8 +102,7 @@ fun BookProfileScreen(
                           modifier =
                               Modifier.height(pictureHeight)
                                   .fillMaxWidth()
-                                  .testTag(
-                                      "bookProfileImage ${imagesDescription[currentImageIndex]}"))
+                                  .testTag("${currentImageIndex}_" + C.Tag.BookProfile.image))
                     }
               }
               item {
@@ -115,7 +115,8 @@ fun BookProfileScreen(
                             currentImageIndex = (currentImageIndex - 1 + images.size) % images.size
                           },
                           modifier =
-                              Modifier.height(buttonsHeight).testTag("bookProfileImageLeft")) {
+                              Modifier.height(buttonsHeight)
+                                  .testTag(C.Tag.BookProfile.previous_image)) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                                 contentDescription = "Previous Image",
@@ -128,7 +129,8 @@ fun BookProfileScreen(
                       IconButton(
                           onClick = { currentImageIndex = (currentImageIndex + 1) % images.size },
                           modifier =
-                              Modifier.height(buttonsHeight).testTag("bookProfileImageRight")) {
+                              Modifier.height(buttonsHeight)
+                                  .testTag(C.Tag.BookProfile.next_image)) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.ArrowForward,
                                 contentDescription = "Next Image",
@@ -143,7 +145,8 @@ fun BookProfileScreen(
                       text = "Rating: $it/10",
                       color = ColorVariable.Accent,
                       style = MaterialTheme.typography.bodyMedium,
-                      modifier = Modifier.padding(vertical = 8.dp).testTag("bookProfileRating"))
+                      modifier =
+                          Modifier.padding(vertical = 8.dp).testTag(C.Tag.BookProfile.rating))
                 }
               }
               item { Spacer(modifier = Modifier.height(columnPadding)) }
@@ -153,14 +156,15 @@ fun BookProfileScreen(
                     color = ColorVariable.Accent,
                     style = MaterialTheme.typography.titleSmall,
                     modifier =
-                        Modifier.padding(vertical = 8.dp).testTag("bookProfileSynopsisTitle"))
+                        Modifier.padding(vertical = 8.dp).testTag(C.Tag.BookProfile.synopsis_label))
               }
               item {
                 Text(
                     text = DataBook.description ?: "No description available",
                     color = ColorVariable.Accent,
                     style = MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier.padding(vertical = 8.dp).testTag("bookProfileSynopsis"),
+                    modifier =
+                        Modifier.padding(vertical = 8.dp).testTag(C.Tag.BookProfile.synopsis),
                     textAlign = TextAlign.Center)
               }
               item { Spacer(modifier = Modifier.height(columnPadding)) }
@@ -169,8 +173,8 @@ fun BookProfileScreen(
                   Column(modifier = Modifier.weight(1f)) {
                     ProfileText(
                         text = "Language: ${DataBook.language.languageCode}",
-                        testTag = "bookProfileLanguage")
-                    ProfileText(text = "Genres:", testTag = "bookProfileGenresTitle")
+                        testTag = C.Tag.BookProfile.language)
+                    ProfileText(text = "Genres:", testTag = C.Tag.BookProfile.genres)
                     DataBook.genres.forEach { genre ->
                       Text(
                           text = "- ${genre.Genre}",
@@ -178,25 +182,29 @@ fun BookProfileScreen(
                           style = MaterialTheme.typography.bodyMedium,
                           modifier =
                               Modifier.padding(top = 2.dp, start = 16.dp)
-                                  .testTag("bookProfileGenre${genre.Genre}"))
+                                  .testTag(genre.Genre + C.Tag.BookProfile.genre))
                     }
                     ProfileText(
                         text = "ISBN: ${DataBook.isbn ?: "ISBN doesn't exist or is not available"}",
-                        testTag = "bookProfileISBN")
+                        testTag = C.Tag.BookProfile.isbn)
                   }
 
                   VerticalDivider(color = ColorVariable.Accent, thickness = 1.dp)
 
                   Column(modifier = Modifier.weight(1f)) {
                     ProfileText(
-                        text = "Date of Publication: [Temporary Date]", testTag = "bookProfileDate")
-                    ProfileText(text = "Volume: [Temporary Volume]", testTag = "bookProfileVolume")
-                    ProfileText(text = "Issue: [Temporary Issue]", testTag = "bookProfileIssue")
+                        text = "Date of Publication: [Temporary Date]",
+                        testTag = C.Tag.BookProfile.date)
                     ProfileText(
-                        text = "Editorial: [Temporary Editorial]", testTag = "bookProfileEditorial")
+                        text = "Volume: [Temporary Volume]", testTag = C.Tag.BookProfile.volume)
+                    ProfileText(
+                        text = "Issue: [Temporary Issue]", testTag = C.Tag.BookProfile.issue)
+                    ProfileText(
+                        text = "Editorial: [Temporary Editorial]",
+                        testTag = C.Tag.BookProfile.editorial)
                     ProfileText(
                         text = "Place of Edition: [Temporary Place]",
-                        testTag = "bookProfileEditionPlace")
+                        testTag = C.Tag.BookProfile.location)
                   }
                 }
               }
