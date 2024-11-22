@@ -52,7 +52,7 @@ class BookFromChatGPTTest {
     every { anyConstructed<GoogleBookDataSource>().getBookFromISBN(testISBN, any(), any()) } answers
         {
           val dataBook: DataBook = mockk()
-          secondArg<(Result<DataBook>) -> Unit>()(Result.success(dataBook))
+          thirdArg<(Result<DataBook>) -> Unit>()(Result.success(dataBook))
         }
 
     every { booksRepository.addBook(any(), any()) } answers
@@ -114,7 +114,7 @@ class BookFromChatGPTTest {
   fun `error on getBookFromISBN return error`() {
     every { anyConstructed<GoogleBookDataSource>().getBookFromISBN(any(), any(), any()) } answers
         {
-          secondArg<(Result<DataBook>) -> Unit>()(Result.failure(Exception("")))
+          thirdArg<(Result<DataBook>) -> Unit>()(Result.failure(Exception("")))
         }
 
     val bookFromChatGPT = BookFromChatGPT(context, photoFirebaseStorageRepository, booksRepository)
