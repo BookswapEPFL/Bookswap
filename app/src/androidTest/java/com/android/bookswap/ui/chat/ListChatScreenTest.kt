@@ -14,6 +14,7 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.navigation.compose.rememberNavController
 import com.android.bookswap.data.DataUser
 import com.android.bookswap.data.MessageBox
+import com.android.bookswap.resources.C
 import com.android.bookswap.ui.components.TopAppBarComponent
 import com.android.bookswap.ui.navigation.BottomNavigationMenu
 import com.android.bookswap.ui.navigation.List_Navigation_Bar_Destinations
@@ -68,13 +69,13 @@ class ListChatScreenTest {
                 selectedItem = navigationActions.currentRoute())
           })
     }
-    composeTestRule.onNodeWithTag("TopAppBar").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("profileIconButton").assertIsDisplayed()
+    composeTestRule.onNodeWithTag(C.Tag.top_app_bar_container).assertIsDisplayed()
+    composeTestRule.onNodeWithTag(C.Tag.TopAppBar.profile_button).assertIsDisplayed()
     composeTestRule.onNodeWithContentDescription("Profile Icon").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("chat_messageList").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("bottomNavigationMenu").assertIsDisplayed()
+    composeTestRule.onNodeWithTag(C.Tag.ChatList.scrollable).assertIsDisplayed()
+    composeTestRule.onNodeWithTag(C.Tag.bottom_navigation_menu_container).assertIsDisplayed()
 
-    composeTestRule.onNodeWithTag("TopAppBar_Title").assertTextEquals("Messages")
+    composeTestRule.onNodeWithTag(C.Tag.TopAppBar.screen_title).assertTextEquals("Messages")
   }
 
   @Test
@@ -93,14 +94,17 @@ class ListChatScreenTest {
                 selectedItem = navigationActions.currentRoute())
           })
     }
-    composeTestRule.onNodeWithTag("TopAppBar").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("profileIconButton").assertIsDisplayed()
+    composeTestRule.onNodeWithTag(C.Tag.top_app_bar_container).assertIsDisplayed()
+    composeTestRule.onNodeWithTag(C.Tag.TopAppBar.profile_button).assertIsDisplayed()
     composeTestRule.onNodeWithContentDescription("Profile Icon").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("chat_messageList").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("bottomNavigationMenu").assertIsDisplayed()
+    composeTestRule.onNodeWithTag(C.Tag.ChatList.scrollable).assertIsDisplayed()
+    composeTestRule.onNodeWithTag(C.Tag.bottom_navigation_menu_container).assertIsDisplayed()
 
-    composeTestRule.onNodeWithTag("TopAppBar_Title").assertTextEquals("Messages")
-    composeTestRule.onNodeWithTag("chat_messageList").onChild().assertTextEquals("No messages yet")
+    composeTestRule.onNodeWithTag(C.Tag.TopAppBar.screen_title).assertTextEquals("Messages")
+    composeTestRule
+        .onNodeWithTag(C.Tag.ChatList.scrollable)
+        .onChild()
+        .assertTextEquals("No messages yet")
   }
 
   @Test
@@ -119,7 +123,7 @@ class ListChatScreenTest {
                 selectedItem = navigationActions.currentRoute())
           })
     }
-    composeTestRule.onNodeWithTag("profileIconButton").assertHasClickAction()
+    composeTestRule.onNodeWithTag(C.Tag.TopAppBar.profile_button).assertHasClickAction()
   }
 
   @Test
@@ -139,7 +143,7 @@ class ListChatScreenTest {
           })
     }
 
-    val messageNodes = composeTestRule.onAllNodesWithTag("chat_messageBox")
+    val messageNodes = composeTestRule.onAllNodesWithTag(C.Tag.ChatList.item)
     assert(messageNodes.fetchSemanticsNodes().isNotEmpty())
     messageNodes.assertAll(hasClickAction())
   }
