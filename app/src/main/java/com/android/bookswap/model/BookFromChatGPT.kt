@@ -15,10 +15,10 @@ class BookFromChatGPT(
     private val photoStorageRepository: PhotoFirebaseStorageRepository,
     private val booksRepository: BooksRepository,
 ) {
-  fun addBookFromImage(image: Bitmap, userUUID: UUID, callback: (Error) -> Unit) {
+  fun addBookFromImage(image: Bitmap, userUUID: UUID, callback: (ErrorType) -> Unit) {
     photoStorageRepository.addPhotoToStorage(UUID.randomUUID().toString(), image) { urlResult ->
       if (urlResult.isFailure) {
-        callback(Error.FIREBASE_STORAGE_ERROR)
+        callback(ErrorType.FIREBASE_STORAGE_ERROR)
         return@addPhotoToStorage
       }
       val imageToData = ImageToDataSource(ChatGPTApiService(context))
@@ -27,30 +27,30 @@ class BookFromChatGPT(
           onSuccess = { map ->
             val isbn = map["isbn"]
             if (isbn == null || isbn == ImageToDataSource.UNDEFINED_ATTRIBUTE) {
-              callback(Error.CHATGPT_ANALYZER_ERROR)
+              callback(ErrorType.CHATGPT_ANALYZER_ERROR)
               return@analyzeImage
             }
 
             GoogleBookDataSource(context).getBookFromISBN(isbn, userUUID) { dataBookResult ->
               if (dataBookResult.isFailure) {
-                callback(Error.ISBN_ERROR)
+                callback(ErrorType.ISBN_ERROR)
                 return@getBookFromISBN
               }
               booksRepository.addBook(dataBookResult.getOrThrow()) { bookResult ->
                 if (bookResult.isFailure) {
-                  callback(Error.BOOK_ADD_ERROR)
+                  callback(ErrorType.BOOK_ADD_ERROR)
                 } else {
-                  callback(Error.NONE)
+                  callback(ErrorType.NONE)
                 }
               }
             }
           },
-          onError = { callback(Error.CHATGPT_ANALYZER_ERROR) })
+          onError = { callback(ErrorType.CHATGPT_ANALYZER_ERROR) })
     }
   }
 
   companion object {
-    enum class Error(val message: Int) {
+    enum class ErrorType(val message: Int) {
       NONE(R.string.book_gpt_error_success),
       FIREBASE_STORAGE_ERROR(R.string.book_gpt_error_firebase),
       CHATGPT_ANALYZER_ERROR(R.string.book_gpt_error_chatgpt),

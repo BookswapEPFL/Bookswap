@@ -69,11 +69,11 @@ class BookFromChatGPTTest {
         }
 
     val bookFromChatGPT = BookFromChatGPT(context, photoFirebaseStorageRepository, booksRepository)
-    val callback = mockk<(BookFromChatGPT.Companion.Error) -> Unit>(relaxed = true)
+    val callback = mockk<(BookFromChatGPT.Companion.ErrorType) -> Unit>(relaxed = true)
     bookFromChatGPT.addBookFromImage(bitmap, uuid, callback)
 
     verify(exactly = 1, timeout = 500) {
-      callback.invoke(BookFromChatGPT.Companion.Error.FIREBASE_STORAGE_ERROR)
+      callback.invoke(BookFromChatGPT.Companion.ErrorType.FIREBASE_STORAGE_ERROR)
     }
   }
 
@@ -85,11 +85,11 @@ class BookFromChatGPTTest {
         }
 
     val bookFromChatGPT = BookFromChatGPT(context, photoFirebaseStorageRepository, booksRepository)
-    val callback = mockk<(BookFromChatGPT.Companion.Error) -> Unit>(relaxed = true)
+    val callback = mockk<(BookFromChatGPT.Companion.ErrorType) -> Unit>(relaxed = true)
     bookFromChatGPT.addBookFromImage(bitmap, uuid, callback)
 
     verify(exactly = 1, timeout = 500) {
-      callback.invoke(BookFromChatGPT.Companion.Error.CHATGPT_ANALYZER_ERROR)
+      callback.invoke(BookFromChatGPT.Companion.ErrorType.CHATGPT_ANALYZER_ERROR)
     }
   }
 
@@ -102,11 +102,11 @@ class BookFromChatGPTTest {
         }
 
     val bookFromChatGPT = BookFromChatGPT(context, photoFirebaseStorageRepository, booksRepository)
-    val callback = mockk<(BookFromChatGPT.Companion.Error) -> Unit>(relaxed = true)
+    val callback = mockk<(BookFromChatGPT.Companion.ErrorType) -> Unit>(relaxed = true)
     bookFromChatGPT.addBookFromImage(bitmap, uuid, callback)
 
     verify(exactly = 1, timeout = 500) {
-      callback.invoke(BookFromChatGPT.Companion.Error.CHATGPT_ANALYZER_ERROR)
+      callback.invoke(BookFromChatGPT.Companion.ErrorType.CHATGPT_ANALYZER_ERROR)
     }
   }
 
@@ -118,11 +118,11 @@ class BookFromChatGPTTest {
         }
 
     val bookFromChatGPT = BookFromChatGPT(context, photoFirebaseStorageRepository, booksRepository)
-    val callback = mockk<(BookFromChatGPT.Companion.Error) -> Unit>(relaxed = true)
+    val callback = mockk<(BookFromChatGPT.Companion.ErrorType) -> Unit>(relaxed = true)
     bookFromChatGPT.addBookFromImage(bitmap, uuid, callback)
 
     verify(exactly = 1, timeout = 500) {
-      callback.invoke(BookFromChatGPT.Companion.Error.ISBN_ERROR)
+      callback.invoke(BookFromChatGPT.Companion.ErrorType.ISBN_ERROR)
     }
   }
 
@@ -134,20 +134,20 @@ class BookFromChatGPTTest {
         }
 
     val bookFromChatGPT = BookFromChatGPT(context, photoFirebaseStorageRepository, booksRepository)
-    val callback = mockk<(BookFromChatGPT.Companion.Error) -> Unit>(relaxed = true)
+    val callback = mockk<(BookFromChatGPT.Companion.ErrorType) -> Unit>(relaxed = true)
     bookFromChatGPT.addBookFromImage(bitmap, uuid, callback)
 
     verify(exactly = 1, timeout = 500) {
-      callback.invoke(BookFromChatGPT.Companion.Error.BOOK_ADD_ERROR)
+      callback.invoke(BookFromChatGPT.Companion.ErrorType.BOOK_ADD_ERROR)
     }
   }
 
   @Test
   fun `book is added correctly`() {
     val bookFromChatGPT = BookFromChatGPT(context, photoFirebaseStorageRepository, booksRepository)
-    val callback = mockk<(BookFromChatGPT.Companion.Error) -> Unit>(relaxed = true)
+    val callback = mockk<(BookFromChatGPT.Companion.ErrorType) -> Unit>(relaxed = true)
     bookFromChatGPT.addBookFromImage(bitmap, uuid, callback)
 
-    verify(exactly = 1, timeout = 500) { callback.invoke(BookFromChatGPT.Companion.Error.NONE) }
+    verify(exactly = 1, timeout = 500) { callback.invoke(BookFromChatGPT.Companion.ErrorType.NONE) }
   }
 }
