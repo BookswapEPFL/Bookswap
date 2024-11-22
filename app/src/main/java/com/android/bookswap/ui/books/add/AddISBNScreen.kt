@@ -73,7 +73,8 @@ fun AddISBNScreen(
                     ButtonComponent(
                         modifier = Modifier.testTag("isbn_searchButton"),
                         onClick = {
-                          GoogleBookDataSource(context).getBookFromISBN(isbn, user.userUUID) { result ->
+                          GoogleBookDataSource(context).getBookFromISBN(isbn, user.userUUID) {
+                              result ->
                             if (result.isFailure) {
                               Toast.makeText(context, "Search unsuccessful", Toast.LENGTH_LONG)
                                   .show()

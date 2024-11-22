@@ -57,7 +57,7 @@ class AddToBookTest {
     composeTestRule.setContent {
       val navController = rememberNavController()
       val navigationActions = NavigationActions(navController)
-      AddToBookScreen(mockBooksRepository, mockUserVM) 
+      AddToBookScreen(mockBooksRepository, mockUserVM)
     }
 
     // Fill in the Title and ISBN fields

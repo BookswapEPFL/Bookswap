@@ -119,7 +119,7 @@ class ChatEndToEnd {
                 timestamp = System.currentTimeMillis()))
 
     placeholderMessages.forEach { mockMessageRepository.sendMessage(it) { /* No-op */} }
-    
+
     // mock UserViewModel and ContactViewModel
     mockUserVM = mockk()
     mockContactVM = mockk()
@@ -150,7 +150,6 @@ class ChatEndToEnd {
     every { mockMessageStorage.extractMessages(any(), any()) } returns placeholderMessages
     every { mockMessageStorage.addMessage(any()) } just Runs
     every { mockMessageStorage.setMessages() } just Runs
-
   }
 
   @Test

@@ -288,7 +288,8 @@ class MainActivity : ComponentActivity() {
               bookRepository,
               userVM,
               topAppBar = { topAppBar(null) },
-              bottomAppBar = { bottomAppBar(this@navigation.route ?: "") },)
+              bottomAppBar = { bottomAppBar(this@navigation.route ?: "") },
+          )
         }
       }
       navigation(startDestination = Screen.PROFILE, route = Route.PROFILE) {

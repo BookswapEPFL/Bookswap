@@ -17,7 +17,6 @@ import com.android.bookswap.data.repository.BooksRepository
 import com.android.bookswap.data.source.api.GoogleBookDataSource
 import com.android.bookswap.model.UserViewModel
 import com.android.bookswap.ui.navigation.NavigationActions
-import com.android.bookswap.utils.matchDataBook
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
 import io.mockk.Runs
 import io.mockk.andThenJust
@@ -174,7 +173,7 @@ class ISBNAddTest : TestCase() {
   fun ISBNAPIRequestFailed() {
     // Mock bad call to api
     mockkConstructor(GoogleBookDataSource::class)
-    every { anyConstructed<GoogleBookDataSource>().getBookFromISBN(any(),any() , any()) } answers
+    every { anyConstructed<GoogleBookDataSource>().getBookFromISBN(any(), any(), any()) } answers
         {
           thirdArg<(Result<DataBook>) -> Unit>()(Result.failure(IllegalArgumentException()))
         } andThenJust
@@ -193,7 +192,7 @@ class ISBNAddTest : TestCase() {
     composeTestRule.onNodeWithTag("isbn_searchButton").performClick()
 
     verify {
-      anyConstructed<GoogleBookDataSource>().getBookFromISBN(any(),any() , any())
+      anyConstructed<GoogleBookDataSource>().getBookFromISBN(any(), any(), any())
     } // Api is called
     verify { toastMock.show() }
   }
@@ -233,18 +232,15 @@ class ISBNAddTest : TestCase() {
 
     composeTestRule.setContent {
       AddISBNScreen(mockNavigationActions, mockBooksRepository, mockUserVM)
-   }
+    }
 
     composeTestRule.onNodeWithTag("isbn_field").performTextInput(dataBook.isbn!!)
     composeTestRule.onNodeWithTag("isbn_searchButton").performClick()
 
     verify {
-      anyConstructed<GoogleBookDataSource>()
-          .getBookFromISBN(any(), any(), any())
+      anyConstructed<GoogleBookDataSource>().getBookFromISBN(any(), any(), any())
     } // Api is called
-    verify {
-      mockBooksRepository.addBook(any(), any())
-    } // Book repository is called
+    verify { mockBooksRepository.addBook(any(), any()) } // Book repository is called
     verify { toastMock.show() } // Error is displayed
   }
 }

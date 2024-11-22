@@ -73,7 +73,7 @@ class AddBooksEndToEnd {
     } answers
         {
           val callback = thirdArg<(Result<DataBook>) -> Unit>()
-          callback(Result.success(mockedBook)) 
+          callback(Result.success(mockedBook))
         }
 
     every { mockUserRepository.getUser(uuid = any(), any()) } just runs
