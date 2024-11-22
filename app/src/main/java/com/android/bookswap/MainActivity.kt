@@ -18,6 +18,7 @@ import com.android.bookswap.data.DataUser
 import com.android.bookswap.data.MessageBox
 import com.android.bookswap.data.repository.BooksRepository
 import com.android.bookswap.data.repository.MessageRepository
+import com.android.bookswap.data.repository.PhotoFirebaseStorageRepository
 import com.android.bookswap.data.repository.UsersRepository
 import com.android.bookswap.data.source.network.BooksFirestoreSource
 import com.android.bookswap.data.source.network.MessageFirestoreSource
@@ -50,7 +51,6 @@ import com.android.bookswap.ui.profile.UserProfile
 import com.android.bookswap.ui.theme.BookSwapAppTheme
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
-import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import java.util.UUID
@@ -102,7 +102,7 @@ class MainActivity : ComponentActivity() {
       bookRepository: BooksRepository,
       userRepository: UsersRepository,
       startDestination: String = Route.AUTH,
-      photoStorage: PhotoFirebaseStorageSource,
+      photoStorage: PhotoFirebaseStorageRepository,
       geolocation: IGeolocation = DefaultGeolocation()
   ) {
     // navigation part
@@ -229,7 +229,9 @@ class MainActivity : ComponentActivity() {
             BookAdditionChoiceScreen(
                 navigationActions,
                 topAppBar = { topAppBar("Add a Book") },
-                bottomAppBar = { bottomAppBar(this@navigation.route ?: "") })
+                bottomAppBar = { bottomAppBar(this@navigation.route ?: "") },
+                photoFirebaseStorageRepository = photoStorage,
+                booksRepository = bookRepository)
           }
         }
       }
@@ -249,7 +251,9 @@ class MainActivity : ComponentActivity() {
           BookAdditionChoiceScreen(
               navigationActions,
               topAppBar = { topAppBar("Add a Book") },
-              bottomAppBar = { bottomAppBar(this@navigation.route ?: "") })
+              bottomAppBar = { bottomAppBar(this@navigation.route ?: "") },
+              photoFirebaseStorageRepository = photoStorage,
+              booksRepository = bookRepository)
         }
         composable(Screen.ADD_BOOK_MANUALLY) {
           AddToBookScreen(

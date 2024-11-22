@@ -1,5 +1,6 @@
 package com.android.bookswap.ui.books.add
 
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -8,19 +9,19 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Dp
@@ -28,6 +29,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.times
 import com.android.bookswap.R
+import com.android.bookswap.data.repository.BooksRepository
+import com.android.bookswap.data.repository.PhotoFirebaseStorageRepository
+import com.android.bookswap.model.BookFromChatGPT
+import com.android.bookswap.model.PhotoRequester
 import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.theme.ColorVariable
 
@@ -37,16 +42,31 @@ import com.android.bookswap.ui.theme.ColorVariable
  * @param navController The navigation actions to handle navigation events.
  * @param topAppBar A composable function to display the top app bar.
  * @param bottomAppBar A composable function to display the bottom app bar.
+ * @param photoFirebaseStorageRepository a repository allowing to upload photo as url
  */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BookAdditionChoiceScreen(
     navController: NavigationActions,
     topAppBar: @Composable () -> Unit = {},
     bottomAppBar: @Composable () -> Unit = {},
+    photoFirebaseStorageRepository: PhotoFirebaseStorageRepository,
+    booksRepository: BooksRepository
 ) {
   val columnPadding = 16.dp
+  val context = LocalContext.current
   val buttonWidth = (LocalConfiguration.current.screenWidthDp.dp * (0.75f))
+
+  val photoRequester =
+      PhotoRequester(LocalContext.current) { result ->
+        if (result.isFailure) return@PhotoRequester
+        BookFromChatGPT(context, photoFirebaseStorageRepository, booksRepository).addBookFromImage(
+            result.getOrThrow().asAndroidBitmap()) { error ->
+              Toast.makeText(
+                      context, context.resources.getString(error.message), Toast.LENGTH_SHORT)
+                  .show()
+            }
+      }
+  photoRequester.Init()
   Scaffold(
       modifier = Modifier.testTag("addBookChoiceScreen"),
       topBar = topAppBar,
@@ -63,25 +83,23 @@ fun BookAdditionChoiceScreen(
                   text = "Manually",
                   leftIcon = Icons.Default.Add,
                   leftIconPainter = null,
-                  navController = navController,
-                  navDestination = "AddBookManually Screen",
+                  onClick = { navController.navigateTo("AddBookManually Screen") },
                   buttonWidth = buttonWidth)
               Spacer(modifier = Modifier.height(2f * columnPadding))
               ButtonWithIcon(
                   text = "From ISBN",
                   leftIcon = null,
                   leftIconPainter = painterResource(id = R.drawable.download),
-                  navController = navController,
-                  navDestination = "AddBookISBN Screen",
+                  onClick = { navController.navigateTo("AddBookISBN Screen") },
                   buttonWidth = buttonWidth)
               Spacer(modifier = Modifier.height(2f * columnPadding))
               ButtonWithIcon(
                   text = "From Photo",
                   leftIcon = null,
                   leftIconPainter = painterResource(id = R.drawable.photoicon),
-                  navController = navController,
-                  navDestination = "AddBookScan Screen",
-                  buttonWidth = buttonWidth)
+                  onClick = { photoRequester.requestPhoto() },
+                  buttonWidth = buttonWidth,
+              )
             }
       }
 }
@@ -100,8 +118,7 @@ fun ButtonWithIcon(
     text: String,
     leftIcon: ImageVector? = null,
     leftIconPainter: Painter? = null,
-    navController: NavigationActions,
-    navDestination: String,
+    onClick: () -> Unit,
     buttonWidth: Dp
 ) {
   val borderPadding = 1.dp
@@ -110,7 +127,7 @@ fun ButtonWithIcon(
   val pngSize = 24.dp
   val textSize = 18.sp
   Button(
-      onClick = { navController.navigateTo(navDestination) },
+      onClick = onClick,
       colors =
           ButtonDefaults.buttonColors(
               containerColor = ColorVariable.AccentSecondary,
