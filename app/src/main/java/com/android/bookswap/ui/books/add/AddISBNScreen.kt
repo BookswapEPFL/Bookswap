@@ -28,6 +28,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.android.bookswap.data.repository.BooksRepository
 import com.android.bookswap.data.source.api.GoogleBookDataSource
+import com.android.bookswap.resources.C
 import com.android.bookswap.ui.components.ButtonComponent
 import com.android.bookswap.ui.components.FieldComponent
 import com.android.bookswap.ui.navigation.NavigationActions
@@ -45,6 +46,7 @@ fun AddISBNScreen(
 ) {
   val context = LocalContext.current
   Scaffold(
+      modifier = Modifier.testTag(C.Tag.new_book_isbn_screen_container),
       topBar = topAppBar,
       bottomBar = bottomAppBar,
       content = { pv ->
@@ -58,7 +60,7 @@ fun AddISBNScreen(
                   horizontalAlignment = Alignment.CenterHorizontally,
                   verticalArrangement = Arrangement.spacedBy(45.dp)) {
                     FieldComponent(
-                        modifier = Modifier.testTag("isbn_field"),
+                        modifier = Modifier.testTag(C.Tag.NewBookISBN.isbn),
                         labelText = "ISBN*",
                         value = isbn) {
                           if (it.all { c -> c.isDigit() } && it.length <= 13) {
@@ -66,7 +68,7 @@ fun AddISBNScreen(
                           }
                         }
                     ButtonComponent(
-                        modifier = Modifier.testTag("isbn_searchButton"),
+                        modifier = Modifier.testTag(C.Tag.NewBookISBN.search),
                         onClick = {
                           GoogleBookDataSource(context).getBookFromISBN(isbn) { result ->
                             if (result.isFailure) {
