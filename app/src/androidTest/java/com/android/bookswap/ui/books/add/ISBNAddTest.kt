@@ -14,6 +14,7 @@ import com.android.bookswap.data.BookLanguages
 import com.android.bookswap.data.DataBook
 import com.android.bookswap.data.repository.BooksRepository
 import com.android.bookswap.data.source.api.GoogleBookDataSource
+import com.android.bookswap.resources.C
 import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.navigation.TopLevelDestination
 import com.android.bookswap.utils.matchDataBook
@@ -55,13 +56,13 @@ class ISBNAddTest : TestCase() {
       AddISBNScreen(mockNavigationActions, mockBooksRepository)
     }
 
-    val isbnField = composeTestRule.onNodeWithTag("isbn_field")
+    val isbnField = composeTestRule.onNodeWithTag(C.Tag.NewBookISBN.isbn)
     isbnField.assertIsDisplayed()
     Assert.assertEquals(
         "ISBN*", isbnField.fetchSemanticsNode().config[SemanticsProperties.Text][0].text)
 
-    composeTestRule.onNodeWithTag("isbn_searchButton").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("isbn_searchButton").assertHasClickAction()
+    composeTestRule.onNodeWithTag(C.Tag.NewBookISBN.search).assertIsDisplayed()
+    composeTestRule.onNodeWithTag(C.Tag.NewBookISBN.search).assertHasClickAction()
   }
 
   @Suppress("TestFunctionName")
@@ -72,7 +73,7 @@ class ISBNAddTest : TestCase() {
       val mockBooksRepository: BooksRepository = mockk()
       AddISBNScreen(mockNavigationActions, mockBooksRepository)
     }
-    val isbnField = composeTestRule.onNodeWithTag("isbn_field")
+    val isbnField = composeTestRule.onNodeWithTag(C.Tag.NewBookISBN.isbn)
 
     isbnField.performTextInput("testEmpty")
     Assert.assertEquals(
@@ -120,8 +121,8 @@ class ISBNAddTest : TestCase() {
 
     composeTestRule.setContent { AddISBNScreen(mockNavigationActions, mockBooksRepository) }
 
-    composeTestRule.onNodeWithTag("isbn_field").performTextInput(dataBook.isbn!!)
-    composeTestRule.onNodeWithTag("isbn_searchButton").performClick()
+    composeTestRule.onNodeWithTag(C.Tag.NewBookISBN.isbn).performTextInput(dataBook.isbn!!)
+    composeTestRule.onNodeWithTag(C.Tag.NewBookISBN.search).performClick()
 
     verify {
       anyConstructed<GoogleBookDataSource>().getBookFromISBN(dataBook.isbn!!, any())
@@ -150,8 +151,8 @@ class ISBNAddTest : TestCase() {
 
     composeTestRule.setContent { AddISBNScreen(mockNavigationActions, mockBooksRepository) }
 
-    composeTestRule.onNodeWithTag("isbn_field").performTextInput("BAD_ISBN")
-    composeTestRule.onNodeWithTag("isbn_searchButton").performClick()
+    composeTestRule.onNodeWithTag(C.Tag.NewBookISBN.isbn).performTextInput("BAD_ISBN")
+    composeTestRule.onNodeWithTag(C.Tag.NewBookISBN.search).performClick()
 
     verify { anyConstructed<GoogleBookDataSource>().getBookFromISBN(any(), any()) } // Api is called
     verify { toastMock.show() }
@@ -192,8 +193,8 @@ class ISBNAddTest : TestCase() {
 
     composeTestRule.setContent { AddISBNScreen(mockNavigationActions, mockBooksRepository) }
 
-    composeTestRule.onNodeWithTag("isbn_field").performTextInput(dataBook.isbn!!)
-    composeTestRule.onNodeWithTag("isbn_searchButton").performClick()
+    composeTestRule.onNodeWithTag(C.Tag.NewBookISBN.isbn).performTextInput(dataBook.isbn!!)
+    composeTestRule.onNodeWithTag(C.Tag.NewBookISBN.search).performClick()
 
     verify {
       anyConstructed<GoogleBookDataSource>().getBookFromISBN(dataBook.isbn!!, any())
