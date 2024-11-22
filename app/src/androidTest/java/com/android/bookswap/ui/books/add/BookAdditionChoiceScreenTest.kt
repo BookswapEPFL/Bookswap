@@ -8,6 +8,7 @@ import com.android.bookswap.data.repository.BooksRepository
 import com.android.bookswap.data.repository.PhotoFirebaseStorageRepository
 import com.android.bookswap.ui.navigation.NavigationActions
 import io.mockk.mockk
+import java.util.UUID
 import org.junit.Rule
 import org.junit.Test
 
@@ -24,7 +25,8 @@ class BookAdditionChoiceScreenTest {
       BookAdditionChoiceScreen(
           mockNavigationActions,
           photoFirebaseStorageRepository = mockPhotoFirebaseStorageRepository,
-          booksRepository = booksRepository)
+          booksRepository = booksRepository,
+          userUUID = UUID.randomUUID())
     }
     composeTestRule.onNodeWithTag("button_Manually").assertIsDisplayed()
     composeTestRule.onNodeWithTag("button_From ISBN").assertIsDisplayed()
@@ -37,7 +39,8 @@ class BookAdditionChoiceScreenTest {
       BookAdditionChoiceScreen(
           mockNavigationActions,
           photoFirebaseStorageRepository = mockPhotoFirebaseStorageRepository,
-          booksRepository = booksRepository)
+          booksRepository = booksRepository,
+          userUUID = UUID.randomUUID())
     }
     composeTestRule.onNodeWithTag("button_Manually").assertHasClickAction()
     composeTestRule.onNodeWithTag("button_From ISBN").assertHasClickAction()
