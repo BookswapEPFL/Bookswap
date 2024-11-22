@@ -47,7 +47,8 @@ private const val HORIZONTAL_PADDING = 30
 fun AddToBookScreen(
     repository: BooksRepository,
     topAppBar: @Composable () -> Unit = {},
-    bottomAppBar: @Composable () -> Unit = {}
+    bottomAppBar: @Composable () -> Unit = {},
+    userId: UUID
 ) {
   // State variables to store the values entered by the user
   var title by remember { mutableStateOf("") }
@@ -56,7 +57,10 @@ fun AddToBookScreen(
   var rating by remember { mutableStateOf("") }
   var isbn by remember { mutableStateOf("") }
   var photo by remember { mutableStateOf("") }
-  var language by remember { mutableStateOf("") }
+  // var language by remember { mutableStateOf("") }
+  var selectedLanguage by remember {
+    mutableStateOf<BookLanguages?>(null)
+  } // Language selection state
   var selectedGenre by remember { mutableStateOf<BookGenres?>(null) } // Genre selection state
   var expanded by remember { mutableStateOf(false) } // State for dropdown menu
   var expandedLanguage by remember { mutableStateOf(false) } // State for dropdown menu Language
@@ -166,6 +170,7 @@ fun AddToBookScreen(
                   value = photo) {
                     photo = it
                   }
+              /*
               FieldComponent(
                   modifier =
                       Modifier.testTag("language_field")
@@ -174,7 +179,40 @@ fun AddToBookScreen(
                   labelText = "Language",
                   value = language) {
                     language = it
+                  }*/
+              // Language Dropdown:
+              ExposedDropdownMenuBox(
+                  modifier =
+                      Modifier.fillMaxWidth()
+                          .padding(horizontal = HORIZONTAL_PADDING.dp)
+                          .testTag("language_field"),
+                  expanded = expandedLanguage,
+                  onExpandedChange = { expandedLanguage = !expandedLanguage }) {
+                    FieldComponent(
+                        value = selectedLanguage?.languageCode ?: "",
+                        onValueChange = {},
+                        readOnly = true,
+                        label = { Text(text = "Language*") },
+                        modifier = Modifier.menuAnchor().fillMaxWidth())
+                    ExposedDropdownMenu(
+                        expanded = expandedLanguage,
+                        onDismissRequest = { expandedLanguage = false },
+                        modifier = Modifier.fillMaxWidth()) {
+                          BookLanguages.values().forEach { language ->
+                            DropdownMenuItem(
+                                text = {
+                                  Text(
+                                      text = language.languageCode,
+                                  )
+                                },
+                                onClick = {
+                                  selectedLanguage = language
+                                  expandedLanguage = false
+                                })
+                          }
+                        }
                   }
+
               ButtonComponent(
                   modifier =
                       Modifier.testTag("save_button")
@@ -194,9 +232,10 @@ fun AddToBookScreen(
                               description,
                               rating,
                               photo,
-                              language,
+                              selectedLanguage.toString(),
                               isbn,
-                              listOf(selectedGenre!!))
+                              listOf(selectedGenre!!),
+                              userId)
                       if (book == null) {
                         Log.e("AddToBookScreen", "Invalid argument")
                         Toast.makeText(context, "Invalid argument", Toast.LENGTH_SHORT).show()
@@ -243,7 +282,8 @@ fun createDataBook(
     photo: String,
     bookLanguageStr: String,
     isbn: String,
-    genres: List<BookGenres>
+    genres: List<BookGenres>,
+    userId: UUID
 ): DataBook? {
   // Validate UUID
   if (uuid.toString().isBlank()) {
@@ -325,5 +365,6 @@ fun createDataBook(
       photo = photo,
       language = languages,
       isbn = isbn,
-      genres = genres)
+      genres = genres,
+      userId = userId)
 }
