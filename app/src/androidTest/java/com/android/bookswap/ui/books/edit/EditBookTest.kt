@@ -12,6 +12,7 @@ import com.android.bookswap.data.BookGenres
 import com.android.bookswap.data.BookLanguages
 import com.android.bookswap.data.DataBook
 import com.android.bookswap.data.source.network.BooksFirestoreSource
+import com.android.bookswap.resources.C
 import com.android.bookswap.ui.navigation.NavigationActions
 import io.mockk.MockKAnnotations
 import io.mockk.every
@@ -52,98 +53,98 @@ class EditBookScreenTest {
   fun displayEditScreenComponent() {
     composeTestRule.setContent { EditBookScreen(booksRepository, navigationActions, sampleBook) }
 
-    composeTestRule.onNodeWithTag("editBookScreen").assertIsDisplayed()
+    composeTestRule.onNodeWithTag(C.Tag.edit_book_screen_container).assertIsDisplayed()
   }
 
   @Test
   fun displayEditTitleComponent() {
     composeTestRule.setContent { EditBookScreen(booksRepository, navigationActions, sampleBook) }
 
-    composeTestRule.onNodeWithTag("editBookTitle").assertIsDisplayed()
+    composeTestRule.onNodeWithTag(C.Tag.TopAppBar.screen_title).assertIsDisplayed()
   }
 
   @Test
   fun displayEditTitleValueComponent() {
     composeTestRule.setContent { EditBookScreen(booksRepository, navigationActions, sampleBook) }
 
-    composeTestRule.onNodeWithTag("editBookTitle").assertTextEquals("Edit your Book")
+    composeTestRule.onNodeWithTag(C.Tag.TopAppBar.screen_title).assertTextEquals("Edit your Book")
   }
 
   @Test
   fun displayEditButtonComponent() {
     composeTestRule.setContent { EditBookScreen(booksRepository, navigationActions, sampleBook) }
-    composeTestRule.onNodeWithTag("goBackButton").assertIsDisplayed()
+    composeTestRule.onNodeWithTag(C.Tag.TopAppBar.back_button).assertIsDisplayed()
   }
 
   @Test
   fun displayEditSaveValueComponent() {
     composeTestRule.setContent { EditBookScreen(booksRepository, navigationActions, sampleBook) }
     composeTestRule
-        .onNodeWithTag("editBookScreenColumn")
-        .performScrollToNode(hasTestTag("bookSave"))
-    composeTestRule.onNodeWithTag("bookSave").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("bookSave").assertTextEquals("Save")
+        .onNodeWithTag(C.Tag.EditBook.scrollable)
+        .performScrollToNode(hasTestTag(C.Tag.EditBook.save))
+    composeTestRule.onNodeWithTag(C.Tag.EditBook.save).assertIsDisplayed()
+    composeTestRule.onNodeWithTag(C.Tag.EditBook.save).assertTextEquals("Save")
   }
 
   @Test
   fun displayEditDeleteValueComponent() {
     composeTestRule.setContent { EditBookScreen(booksRepository, navigationActions, sampleBook) }
     composeTestRule
-        .onNodeWithTag("editBookScreenColumn")
-        .performScrollToNode(hasTestTag("bookDelete"))
-    composeTestRule.onNodeWithTag("bookDelete").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("bookDelete").assertTextEquals("Delete")
+        .onNodeWithTag(C.Tag.EditBook.scrollable)
+        .performScrollToNode(hasTestTag(C.Tag.EditBook.delete))
+    composeTestRule.onNodeWithTag(C.Tag.EditBook.delete).assertIsDisplayed()
+    composeTestRule.onNodeWithTag(C.Tag.EditBook.delete).assertTextEquals("Delete")
   }
 
   @Test
   fun displayEditBookTitleComponent() {
     composeTestRule.setContent { EditBookScreen(booksRepository, navigationActions, sampleBook) }
 
-    composeTestRule.onNodeWithTag("inputBookTitle").assertIsDisplayed()
+    composeTestRule.onNodeWithTag(C.Tag.EditBook.title).assertIsDisplayed()
   }
 
   @Test
   fun displayEditBookAuthorComponent() {
     composeTestRule.setContent { EditBookScreen(booksRepository, navigationActions, sampleBook) }
-    composeTestRule.onNodeWithTag("inputBookAuthor").assertIsDisplayed()
+    composeTestRule.onNodeWithTag(C.Tag.EditBook.author).assertIsDisplayed()
   }
 
   @Test
   fun displayEditBookDescriptionComponent() {
     composeTestRule.setContent { EditBookScreen(booksRepository, navigationActions, sampleBook) }
-    composeTestRule.onNodeWithTag("inputBookDescription").assertIsDisplayed()
+    composeTestRule.onNodeWithTag(C.Tag.EditBook.synopsis).assertIsDisplayed()
   }
 
   @Test
   fun displayEditBookRatingComponent() {
     composeTestRule.setContent { EditBookScreen(booksRepository, navigationActions, sampleBook) }
-    composeTestRule.onNodeWithTag("inputBookRating").assertIsDisplayed()
+    composeTestRule.onNodeWithTag(C.Tag.EditBook.rating).assertIsDisplayed()
   }
 
   @Test
   fun displayEditBookPhotoComponent() {
     composeTestRule.setContent { EditBookScreen(booksRepository, navigationActions, sampleBook) }
-    composeTestRule.onNodeWithTag("inputBookPhoto").assertIsDisplayed()
+    composeTestRule.onNodeWithTag(C.Tag.EditBook.image).assertIsDisplayed()
   }
 
   @Test
   fun displayEditBookLanguageComponent() {
     composeTestRule.setContent { EditBookScreen(booksRepository, navigationActions, sampleBook) }
-    composeTestRule.onNodeWithTag("inputBookLanguage").assertIsDisplayed()
+    composeTestRule.onNodeWithTag(C.Tag.EditBook.language).assertIsDisplayed()
   }
 
   @Test
   fun inputsHaveInitialValue() {
     composeTestRule.setContent { EditBookScreen(booksRepository, navigationActions, sampleBook) }
 
-    composeTestRule.onNodeWithTag("inputBookTitle").assertTextContains(sampleBook.title)
-    composeTestRule.onNodeWithTag("inputBookAuthor").assertTextContains(sampleBook.author ?: "")
+    composeTestRule.onNodeWithTag(C.Tag.EditBook.title).assertTextContains(sampleBook.title)
+    composeTestRule.onNodeWithTag(C.Tag.EditBook.author).assertTextContains(sampleBook.author ?: "")
     composeTestRule
-        .onNodeWithTag("inputBookDescription")
+        .onNodeWithTag(C.Tag.EditBook.synopsis)
         .assertTextContains(sampleBook.description ?: "")
-    composeTestRule.onNodeWithTag("inputBookPhoto").assertTextContains(sampleBook.photo ?: "")
+    composeTestRule.onNodeWithTag(C.Tag.EditBook.image).assertTextContains(sampleBook.photo ?: "")
     composeTestRule
-        .onNodeWithTag("inputBookLanguage")
+        .onNodeWithTag(C.Tag.EditBook.language)
         .assertTextContains(sampleBook.language.toString())
   }
 
@@ -152,10 +153,10 @@ class EditBookScreenTest {
     composeTestRule.setContent { EditBookScreen(booksRepository, navigationActions, sampleBook) }
 
     // opens genre dropdown and select a genre
-    composeTestRule.onNodeWithTag("GenreDropdown").performClick()
-    composeTestRule.onNodeWithTag("GenreDropdownItem_Fantasy").performClick()
+    composeTestRule.onNodeWithTag(C.Tag.EditBook.genres).performClick()
+    composeTestRule.onNodeWithTag("Fantasy" + C.Tag.EditBook.genre).performClick()
 
     // verify the selected genre
-    composeTestRule.onNodeWithTag("SelectedGenre").assertTextContains("Fantasy")
+    composeTestRule.onNodeWithTag("selected" + C.Tag.EditBook.genre).assertTextContains("Fantasy")
   }
 }
