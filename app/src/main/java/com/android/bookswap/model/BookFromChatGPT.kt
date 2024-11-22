@@ -16,26 +16,33 @@ class BookFromChatGPT(
     private val booksRepository: BooksRepository,
 ) {
   fun addBookFromImage(image: Bitmap, userUUID: UUID, callback: (ErrorType) -> Unit) {
+    // Send the image to firestore storage
     photoStorageRepository.addPhotoToStorage(UUID.randomUUID().toString(), image) { urlResult ->
       if (urlResult.isFailure) {
         callback(ErrorType.FIREBASE_STORAGE_ERROR)
         return@addPhotoToStorage
       }
+
+      // Send the url to ChatGPT
       val imageToData = ImageToDataSource(ChatGPTApiService(context))
       imageToData.analyzeImage(
           urlResult.getOrThrow(),
           onSuccess = { map ->
+            // Get isbn from result
             val isbn = map["isbn"]
             if (isbn == null || isbn == ImageToDataSource.UNDEFINED_ATTRIBUTE) {
               callback(ErrorType.CHATGPT_ANALYZER_ERROR)
               return@analyzeImage
             }
 
+            // Request book from ISBN
             GoogleBookDataSource(context).getBookFromISBN(isbn, userUUID) { dataBookResult ->
               if (dataBookResult.isFailure) {
                 callback(ErrorType.ISBN_ERROR)
                 return@getBookFromISBN
               }
+
+              // Add book
               booksRepository.addBook(dataBookResult.getOrThrow()) { bookResult ->
                 if (bookResult.isFailure) {
                   callback(ErrorType.BOOK_ADD_ERROR)

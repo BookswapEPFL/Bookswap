@@ -44,6 +44,8 @@ import java.util.UUID
  * @param topAppBar A composable function to display the top app bar.
  * @param bottomAppBar A composable function to display the bottom app bar.
  * @param photoFirebaseStorageRepository a repository allowing to upload photo as url
+ * @param booksRepository book where to add the book
+ * @param userUUID to which user add the book
  */
 @Composable
 fun BookAdditionChoiceScreen(
@@ -58,11 +60,15 @@ fun BookAdditionChoiceScreen(
   val context = LocalContext.current
   val buttonWidth = (LocalConfiguration.current.screenWidthDp.dp * (0.75f))
 
+  // When the Photo is taken execute the lambda
   val photoRequester =
       PhotoRequester(LocalContext.current) { result ->
         if (result.isFailure) return@PhotoRequester
+        // Send photo to viewmodel for chatgpt system
         BookFromChatGPT(context, photoFirebaseStorageRepository, booksRepository).addBookFromImage(
-            result.getOrThrow().asAndroidBitmap(), userUUID) { error ->
+            // Display error message in a toast.
+            result.getOrThrow().asAndroidBitmap(),
+            userUUID) { error ->
               Toast.makeText(
                       context, context.resources.getString(error.message), Toast.LENGTH_SHORT)
                   .show()
@@ -111,8 +117,7 @@ fun BookAdditionChoiceScreen(
  * @param text The text to display on the button.
  * @param leftIcon The optional left icon to display on the button.
  * @param leftIconPainter The optional left icon painter to display on the button.
- * @param navController The navigation actions to handle navigation events.
- * @param navDestination The destination to navigate to when the button is clicked.
+ * @param onClick action on click
  * @param buttonWidth The width of the button.
  */
 @Composable
