@@ -1,6 +1,5 @@
 package com.android.bookswap.data.source.network
 
-import com.android.bookswap.R
 import com.android.bookswap.data.source.api.ApiService
 import io.mockk.every
 import io.mockk.invoke
@@ -16,7 +15,7 @@ class ImageToDataSourceTest {
   private lateinit var apiService: ApiService
   private lateinit var imageToDataSource: ImageToDataSource
   private val imageUrl = "https://example.com/book-cover.jpg"
-  private val expectedPrompt = "${R.string.prompt} $imageUrl"
+  private val expectedPrompt = "${ImageToDataSource.PROMPT} $imageUrl"
 
   @Before
   fun setup() {
