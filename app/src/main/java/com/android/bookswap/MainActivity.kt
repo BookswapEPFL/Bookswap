@@ -285,7 +285,6 @@ class MainActivity : ComponentActivity() {
               bottomAppBar = { bottomAppBar(this@navigation.route ?: "") },
               userId = currentUserUUID)
         }
-        composable(Screen.ADD_BOOK_SCAN) { /*Todo*/}
         composable(Screen.ADD_BOOK_ISBN) {
           AddISBNScreen(
               navigationActions,
