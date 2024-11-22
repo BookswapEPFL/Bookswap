@@ -44,7 +44,8 @@ fun AddISBNScreen(
     booksRepository: BooksRepository,
     userVM: UserViewModel = UserViewModel(UUID.randomUUID()),
     topAppBar: @Composable () -> Unit = {},
-    bottomAppBar: @Composable () -> Unit = {}
+    bottomAppBar: @Composable () -> Unit = {},
+    userId: UUID
 ) {
   val context = LocalContext.current
   val user = userVM.getUser()
@@ -67,12 +68,13 @@ fun AddISBNScreen(
                         value = isbn) {
                           if (it.all { c -> c.isDigit() } && it.length <= 13) {
                             isbn = it
+                            Log.d("ISBN Input", "Updated ISBN: $isbn")
                           }
                         }
                     ButtonComponent(
                         modifier = Modifier.testTag("isbn_searchButton"),
                         onClick = {
-                          GoogleBookDataSource(context).getBookFromISBN(isbn) { result ->
+                          GoogleBookDataSource(context).getBookFromISBN(isbn, userId) { result ->
                             if (result.isFailure) {
                               Toast.makeText(context, "Search unsuccessful", Toast.LENGTH_LONG)
                                   .show()

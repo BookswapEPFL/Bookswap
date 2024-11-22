@@ -20,6 +20,7 @@ data class DataMessage(
     val receiverUUID: UUID,
     val timestamp: Long = 0L
 )
+
 /** Enum representing the type of a message. */
 enum class MessageType {
   TEXT,

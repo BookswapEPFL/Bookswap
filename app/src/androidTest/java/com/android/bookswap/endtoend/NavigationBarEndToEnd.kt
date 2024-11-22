@@ -1,5 +1,6 @@
 package com.android.bookswap.endtoend
 
+import android.content.Context
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
@@ -9,6 +10,7 @@ import com.android.bookswap.data.repository.UsersRepository
 import com.android.bookswap.data.source.network.MessageFirestoreSource
 import com.android.bookswap.data.source.network.PhotoFirebaseStorageSource
 import com.android.bookswap.model.chat.ContactViewModel
+import com.android.bookswap.model.chat.OfflineMessageStorage
 import com.android.bookswap.ui.navigation.Route
 import com.google.firebase.firestore.FirebaseFirestore
 import io.mockk.every
@@ -26,11 +28,15 @@ class NavigationBarEndToEnd {
   private lateinit var mockBookRepository: BooksRepository
   private lateinit var mockUserRepository: UsersRepository
   private lateinit var mockPhotoStorage: PhotoFirebaseStorageSource
+  private lateinit var mockMessageStorage: OfflineMessageStorage
+  private lateinit var context: Context
 
   @Before
   fun setUp() {
     mockPhotoStorage = mockk()
     mockBookRepository = mockk()
+    mockMessageStorage = mockk()
+    context = mockk()
     every { mockBookRepository.getBook(any()) } just runs
     mockUserRepository = mockk()
     every { mockUserRepository.getUsers(any()) } just runs
@@ -48,7 +54,9 @@ class NavigationBarEndToEnd {
               mockBookRepository,
               mockUserRepository,
               Route.MAP,
-              mockPhotoStorage)
+              mockPhotoStorage,
+              messageStorage = mockMessageStorage,
+              context = context)
     }
   }
 

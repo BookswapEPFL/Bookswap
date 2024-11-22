@@ -20,9 +20,13 @@ import com.android.bookswap.data.DataUser
 import com.android.bookswap.data.MessageType
 import com.android.bookswap.data.repository.MessageRepository
 import com.android.bookswap.data.repository.PhotoFirebaseStorageRepository
+import com.android.bookswap.model.chat.OfflineMessageStorage
 import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.theme.ColorVariable
 import com.google.firebase.firestore.ListenerRegistration
+import io.mockk.Runs
+import io.mockk.every
+import io.mockk.just
 import io.mockk.mockk
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -37,9 +41,11 @@ class ChatScreenTest {
   private lateinit var placeHolderData: List<DataMessage>
   private lateinit var mockMessageRepository: MessageRepository
   private lateinit var mockPhotoStorage: PhotoFirebaseStorageRepository
+  private lateinit var mockMessageStorage: OfflineMessageStorage
   private val currentUserUUID = UUID.randomUUID()
   private val otherUserUUID = UUID.randomUUID()
   private lateinit var mockNavigationActions: NavigationActions
+  private lateinit var context: Context
   private val currentUser =
       DataUser(
           currentUserUUID, "Hello", "Jaime", "Oliver Pastor", "", "", 0.0, 0.0, "", emptyList(), "")
@@ -50,6 +56,8 @@ class ChatScreenTest {
   fun setUp() {
     mockPhotoStorage = mockk()
     mockNavigationActions = mockk()
+    mockMessageStorage = mockk()
+    context = mockk()
 
     placeHolderData =
         List(6) {
@@ -74,6 +82,10 @@ class ChatScreenTest {
         MockMessageFirestoreSource().apply {
           messages = placeHolderData as MutableList<DataMessage>
         }
+
+    every { mockMessageStorage.extractMessages(any(), any()) } returns placeHolderData
+    every { mockMessageStorage.addMessage(any()) } just Runs
+    every { mockMessageStorage.setMessages() } just Runs
   }
 
   private val palette =
@@ -100,7 +112,9 @@ class ChatScreenTest {
           currentUser = currentUser,
           otherUser = otherUser,
           mockNavigationActions,
-          photoStorage = mockPhotoStorage)
+          photoStorage = mockPhotoStorage,
+          messageStorage = mockMessageStorage,
+          context = context)
     }
     composeTestRule.onNodeWithTag("message_input_field").assertIsDisplayed()
     composeTestRule.onNodeWithTag("send_button").assertIsDisplayed()
@@ -117,7 +131,9 @@ class ChatScreenTest {
           currentUser = currentUser,
           otherUser = otherUser,
           mockNavigationActions,
-          photoStorage = mockPhotoStorage)
+          photoStorage = mockPhotoStorage,
+          messageStorage = mockMessageStorage,
+          context = context)
     }
     composeTestRule.onNodeWithTag("message_input_field").assertIsDisplayed()
     composeTestRule.onNodeWithTag("send_button").assertIsDisplayed()
@@ -159,7 +175,9 @@ class ChatScreenTest {
           currentUser = currentUser,
           otherUser = otherUser,
           mockNavigationActions,
-          photoStorage = mockPhotoStorage)
+          photoStorage = mockPhotoStorage,
+          messageStorage = mockMessageStorage,
+          context = context)
     }
 
     composeTestRule
@@ -179,7 +197,9 @@ class ChatScreenTest {
           currentUser = currentUser,
           otherUser = otherUser,
           mockNavigationActions,
-          photoStorage = mockPhotoStorage)
+          photoStorage = mockPhotoStorage,
+          messageStorage = mockMessageStorage,
+          context = context)
     }
     composeTestRule.onNodeWithTag("send_button").assertHasClickAction()
   }
@@ -192,7 +212,9 @@ class ChatScreenTest {
           currentUser = currentUser,
           otherUser = otherUser,
           mockNavigationActions,
-          photoStorage = mockPhotoStorage)
+          photoStorage = mockPhotoStorage,
+          messageStorage = mockMessageStorage,
+          context = context)
     }
     val testInput = "Hello, World!"
     composeTestRule.onNodeWithTag("message_input_field").performTextInput(testInput)
@@ -210,7 +232,9 @@ class ChatScreenTest {
           currentUser = currentUser,
           otherUser = otherUser,
           mockNavigationActions,
-          photoStorage = mockPhotoStorage)
+          photoStorage = mockPhotoStorage,
+          messageStorage = mockMessageStorage,
+          context = context)
     }
 
     val testInput = "Hello, World!"
@@ -234,7 +258,9 @@ class ChatScreenTest {
           currentUser = currentUser,
           otherUser = otherUser,
           mockNavigationActions,
-          photoStorage = mockPhotoStorage)
+          photoStorage = mockPhotoStorage,
+          messageStorage = mockMessageStorage,
+          context = context)
     }
 
     composeTestRule.onNodeWithTag("chatTopAppBar").assertIsDisplayed()
@@ -253,7 +279,9 @@ class ChatScreenTest {
           currentUser = currentUser,
           otherUser = otherUser,
           navController = mockNavigationActions,
-          photoStorage = mockPhotoStorage)
+          photoStorage = mockPhotoStorage,
+          messageStorage = mockMessageStorage,
+          context = context)
     }
 
     composeTestRule.waitForIdle()
@@ -294,7 +322,9 @@ class ChatScreenTest {
           currentUser = currentUser,
           otherUser = otherUser,
           mockNavigationActions,
-          photoStorage = mockPhotoStorage)
+          photoStorage = mockPhotoStorage,
+          messageStorage = mockMessageStorage,
+          context = context)
     }
 
     val message = placeHolderData.first()
@@ -339,7 +369,9 @@ class ChatScreenTest {
           currentUser = currentUser,
           otherUser = otherUser,
           navController = mockNavigationActions,
-          photoStorage = mockPhotoStorage)
+          photoStorage = mockPhotoStorage,
+          messageStorage = mockMessageStorage,
+          context = context)
     }
 
     val message = placeHolderData.first()
@@ -410,7 +442,9 @@ class ChatScreenTest {
           currentUser = currentUser,
           otherUser = otherUser,
           mockNavigationActions,
-          photoStorage = mockPhotoStorage)
+          photoStorage = mockPhotoStorage,
+          messageStorage = mockMessageStorage,
+          context = context)
     }
 
     composeTestRule
@@ -448,7 +482,9 @@ class ChatScreenTest {
           currentUser = currentUser,
           otherUser = otherUser,
           mockNavigationActions,
-          photoStorage = mockPhotoStorage)
+          photoStorage = mockPhotoStorage,
+          messageStorage = mockMessageStorage,
+          context = context)
     }
 
     val uiColors =
