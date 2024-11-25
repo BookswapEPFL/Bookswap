@@ -37,7 +37,7 @@ import java.util.UUID
  *   composable.
  */
 @Composable
-fun OtherUserProfileScreen(
+fun OthersUserProfileScreen(
     userId: UUID,
     userVM: UserViewModel = UserViewModel(userId),
     topAppBar: @Composable () -> Unit = {},
