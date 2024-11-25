@@ -47,7 +47,7 @@ class OthersUserProfileTest {
         composeTestRule.setContent {
             val navController = rememberNavController()
             val navigationActions = NavigationActions(navController)
-            OtherUserProfileScreen(userId = testUserId ,userVM = userVM, { TopAppBarComponent(Modifier, navigationActions, "Messages") })
+            OthersUserProfileScreen(userId = testUserId ,userVM = userVM, { TopAppBarComponent(Modifier, navigationActions, "Messages") })
         }
     }
 
