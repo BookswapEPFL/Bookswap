@@ -25,6 +25,7 @@ import com.android.bookswap.data.MessageBox
 import com.android.bookswap.data.MessageType
 import com.android.bookswap.data.repository.MessageRepository
 import com.android.bookswap.data.repository.PhotoFirebaseStorageRepository
+import com.android.bookswap.model.chat.OfflineMessageStorage
 import com.android.bookswap.resources.C
 import com.android.bookswap.ui.chat.ChatScreen
 import com.android.bookswap.ui.chat.ListChatScreen
@@ -32,7 +33,9 @@ import com.android.bookswap.ui.chat.imageTestMessageUUID
 import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.navigation.TopLevelDestination
 import com.google.firebase.firestore.ListenerRegistration
+import io.mockk.Runs
 import io.mockk.every
+import io.mockk.just
 import io.mockk.mockk
 import java.util.UUID
 import org.junit.Assert.assertEquals
@@ -46,6 +49,8 @@ class ChatEndToEnd {
   private lateinit var mockNavigationActions: NavigationActions
   private lateinit var mockMessageRepository: MockMessageRepository
   private lateinit var mockPhotoStorage: PhotoFirebaseStorageRepository
+  private lateinit var mockMessageStorage: OfflineMessageStorage
+  private lateinit var mockContext: Context
   private val navigateToChatScreen = mutableStateOf(false)
   private val currentUserUUID = UUID.fromString("550e8400-e29b-41d4-a716-446655440002") // John Doe
   private val otherUserUUID = UUID.fromString("550e8400-e29b-41d4-a716-446655440001") // Other user
@@ -53,6 +58,8 @@ class ChatEndToEnd {
   @Before
   fun setup() {
     mockPhotoStorage = mockk()
+    mockMessageStorage = mockk()
+    mockContext = mockk()
 
     // Initialize the mock message repository with placeholder messages
     mockMessageRepository = MockMessageRepository()
@@ -85,28 +92,32 @@ class ChatEndToEnd {
     val placeholderMessages =
         listOf(
             DataMessage(
-                messageType = MessageType.TEXT,
-                uuid = UUID.randomUUID(),
-                senderUUID = otherUserUUID,
-                receiverUUID = currentUserUUID,
-                text = "Welcome to the chat!",
-                timestamp = System.currentTimeMillis() - 100000),
+                MessageType.TEXT,
+                UUID.randomUUID(),
+                "Welcome to the chat!",
+                otherUserUUID,
+                currentUserUUID,
+                System.currentTimeMillis() - 100000),
             DataMessage(
-                messageType = MessageType.TEXT,
-                uuid = UUID.randomUUID(),
-                senderUUID = currentUserUUID,
-                receiverUUID = otherUserUUID,
-                text = "Thank you!",
-                timestamp = System.currentTimeMillis() - 50000),
+                MessageType.TEXT,
+                UUID.randomUUID(),
+                "Thank you!",
+                currentUserUUID,
+                otherUserUUID,
+                System.currentTimeMillis() - 50000),
             DataMessage(
-                messageType = MessageType.IMAGE,
-                uuid = imageTestMessageUUID,
-                senderUUID = otherUserUUID,
-                receiverUUID = currentUserUUID,
-                text = "Image Message",
-                timestamp = System.currentTimeMillis()))
+                MessageType.IMAGE,
+                imageTestMessageUUID,
+                "Image Message",
+                otherUserUUID,
+                currentUserUUID,
+                System.currentTimeMillis()))
 
     placeholderMessages.forEach { mockMessageRepository.sendMessage(it) { /* No-op */} }
+
+    every { mockMessageStorage.extractMessages(any(), any()) } returns placeholderMessages
+    every { mockMessageStorage.addMessage(any()) } just Runs
+    every { mockMessageStorage.setMessages() } just Runs
   }
 
   @Test
@@ -115,59 +126,35 @@ class ChatEndToEnd {
     composeTestRule.setContent {
       if (navigateToChatScreen.value) {
         ChatScreen(
-            messageRepository = mockMessageRepository,
-            currentUser =
-                DataUser(
-                    userUUID = currentUserUUID,
-                    greeting = "Mr.",
-                    firstName = "John",
-                    lastName = "Doe",
-                    email = "",
-                    phoneNumber = "",
-                    longitude = 0.0,
-                    latitude = 0.0,
-                    profilePictureUrl = "",
-                    bookList = emptyList(),
-                    googleUid = ""),
-            otherUser =
-                DataUser(
-                    userUUID = otherUserUUID,
-                    greeting = "Mr.",
-                    firstName = "Tester",
-                    lastName = "User",
-                    email = "",
-                    phoneNumber = "",
-                    longitude = 0.0,
-                    latitude = 0.0,
-                    profilePictureUrl = "",
-                    bookList = emptyList(),
-                    googleUid = ""),
-            navController = mockNavigationActions,
-            photoStorage = mockPhotoStorage,
+            mockMessageRepository,
+            DataUser(currentUserUUID, "Mr.", "John", "Doe", "", "", 0.0, 0.0, "", emptyList(), ""),
+            DataUser(otherUserUUID, "Mr.", "Tester", "User", "", "", 0.0, 0.0, "", emptyList(), ""),
+            mockNavigationActions,
+            mockPhotoStorage,
+            mockMessageStorage,
+            mockContext,
         )
       } else {
         ListChatScreen(
-            placeHolderData =
-                listOf(
-                    MessageBox(
-                        contact =
-                            DataUser(
-                                userUUID = currentUserUUID,
-                                greeting = "Mr.",
-                                firstName = "John",
-                                lastName = "Doe",
-                                email = "",
-                                phoneNumber = "",
-                                longitude = 0.0,
-                                latitude = 0.0,
-                                profilePictureUrl = "",
-                                bookList = emptyList(),
-                                googleUid = ""),
-                        message = "Hello",
-                        date = "Today")),
-            navigationActions = mockNavigationActions,
-            topAppBar = {},
-            bottomAppBar = {})
+            listOf(
+                MessageBox(
+                    DataUser(
+                        currentUserUUID,
+                        "Mr.",
+                        "John",
+                        "Doe",
+                        "",
+                        "",
+                        0.0,
+                        0.0,
+                        "",
+                        emptyList(),
+                        ""),
+                    "Hello",
+                    "Today")),
+            mockNavigationActions,
+            {},
+            {})
       }
     }
     // Simulate navigating to the chat screen by clicking on John Doe's message box

@@ -19,9 +19,7 @@ class BottomNavigationMenuTest {
 
   @Test
   fun bottomNavigation_isDisplayed() {
-    composeTestRule.setContent {
-      BottomNavigationMenu(onTabSelect = {}, tabList = mockTabs, selectedItem = C.Route.CHAT_LIST)
-    }
+    composeTestRule.setContent { BottomNavigationMenu({}, mockTabs, C.Route.CHAT_LIST) }
 
     // Check if the bottom navigation is displayed
     composeTestRule.onNodeWithTag(C.Tag.bottom_navigation_menu_container).assertIsDisplayed()
@@ -29,9 +27,7 @@ class BottomNavigationMenuTest {
 
   @Test
   fun bottomNavigation_hasCorrectNumberOfTabs() {
-    composeTestRule.setContent {
-      BottomNavigationMenu(onTabSelect = {}, tabList = mockTabs, selectedItem = C.Route.CHAT_LIST)
-    }
+    composeTestRule.setContent { BottomNavigationMenu({}, mockTabs, C.Route.CHAT_LIST) }
 
     // Check if the correct number of tabs is displayed
     mockTabs.forEach { tab ->
@@ -41,9 +37,7 @@ class BottomNavigationMenuTest {
 
   @Test
   fun bottomNavigation_selectedItemIsHighlighted() {
-    composeTestRule.setContent {
-      BottomNavigationMenu(onTabSelect = {}, tabList = mockTabs, selectedItem = C.Route.MAP)
-    }
+    composeTestRule.setContent { BottomNavigationMenu({}, mockTabs, C.Route.MAP) }
 
     // Verify that the selected item is 'Map'
     composeTestRule.onNodeWithTag(C.Route.MAP + C.Tag.BottomNavMenu.nav_item).assertIsSelected()
@@ -54,8 +48,7 @@ class BottomNavigationMenuTest {
     var selectedTab: TopLevelDestination? = null
 
     composeTestRule.setContent {
-      BottomNavigationMenu(
-          onTabSelect = { selectedTab = it }, tabList = mockTabs, selectedItem = C.Route.CHAT_LIST)
+      BottomNavigationMenu({ selectedTab = it }, mockTabs, C.Route.CHAT_LIST)
     }
 
     // Perform a click on the "New Book" tab

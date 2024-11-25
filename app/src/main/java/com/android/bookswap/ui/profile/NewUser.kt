@@ -135,7 +135,8 @@ fun NewUserScreen(navigationActions: NavigationActions, userVM: UserViewModel) {
 
         item {
           Card(
-              Modifier.testTag(C.Tag.edit_profile_screen_container).background(ColorVariable.BackGround),
+              Modifier.testTag(C.Tag.edit_profile_screen_container)
+                  .background(ColorVariable.BackGround),
               colors =
                   androidx.compose.material3.CardDefaults.cardColors()
                       .copy(containerColor = ColorVariable.BackGround)) {
@@ -157,7 +158,9 @@ fun NewUserScreen(navigationActions: NavigationActions, userVM: UserViewModel) {
                       OutlinedTextField(
                           greeting.value,
                           { greeting.value = it },
-                          Modifier.testTag(C.Tag.NewUser.greeting).fillMaxWidth().padding(TEXT_PADDING),
+                          Modifier.testTag(C.Tag.NewUser.greeting)
+                              .fillMaxWidth()
+                              .padding(TEXT_PADDING),
                           label = { Text("Greeting") },
                           placeholder = { Text("Mr.", Modifier, Color.Gray) },
                           keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
@@ -166,7 +169,9 @@ fun NewUserScreen(navigationActions: NavigationActions, userVM: UserViewModel) {
                       OutlinedTextField(
                           firstName.value,
                           { firstName.value = it },
-                          Modifier.testTag(C.Tag.NewUser.firstname).fillMaxWidth().padding(TEXT_PADDING),
+                          Modifier.testTag(C.Tag.NewUser.firstname)
+                              .fillMaxWidth()
+                              .padding(TEXT_PADDING),
                           label = { Text("Firstname") },
                           placeholder = { Text("John", Modifier, Color.Gray) },
                           keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
@@ -183,7 +188,9 @@ fun NewUserScreen(navigationActions: NavigationActions, userVM: UserViewModel) {
                       OutlinedTextField(
                           lastName.value,
                           { lastName.value = it },
-                          Modifier.testTag(C.Tag.NewUser.lastname).fillMaxWidth().padding(TEXT_PADDING),
+                          Modifier.testTag(C.Tag.NewUser.lastname)
+                              .fillMaxWidth()
+                              .padding(TEXT_PADDING),
                           label = { Text("Lastname") },
                           placeholder = { Text("Doe", Modifier, Color.Gray) },
                           keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
@@ -200,7 +207,9 @@ fun NewUserScreen(navigationActions: NavigationActions, userVM: UserViewModel) {
                       OutlinedTextField(
                           email.value,
                           { email.value = it },
-                          Modifier.testTag(C.Tag.NewUser.email).fillMaxWidth().padding(TEXT_PADDING),
+                          Modifier.testTag(C.Tag.NewUser.email)
+                              .fillMaxWidth()
+                              .padding(TEXT_PADDING),
                           label = { Text("Email") },
                           placeholder = { Text("John.Doe@example.com", Modifier, Color.Gray) },
                           keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
@@ -217,7 +226,9 @@ fun NewUserScreen(navigationActions: NavigationActions, userVM: UserViewModel) {
                       OutlinedTextField(
                           phone.value,
                           { phone.value = it },
-                          Modifier.testTag(C.Tag.NewUser.phone).fillMaxWidth().padding(TEXT_PADDING),
+                          Modifier.testTag(C.Tag.NewUser.phone)
+                              .fillMaxWidth()
+                              .padding(TEXT_PADDING),
                           label = { Text("Phone") },
                           placeholder = { Text("+4122345678", Modifier, Color.Gray) },
                           keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
@@ -253,7 +264,9 @@ fun NewUserScreen(navigationActions: NavigationActions, userVM: UserViewModel) {
                 },
                 colors = ButtonDefaults.buttonColors(ColorVariable.Primary),
                 modifier =
-                    Modifier.width(BUTTON_WIDTH).height(BUTTON_HEIGHT).testTag(C.Tag.NewUser.confirm)) {
+                    Modifier.width(BUTTON_WIDTH)
+                        .height(BUTTON_HEIGHT)
+                        .testTag(C.Tag.NewUser.confirm)) {
                   Text(
                       text = "Create",
                       textAlign = TextAlign.Center,

@@ -68,12 +68,14 @@ open class NavigationActions(
    * @param user1 The first user to pass to the screen
    * @param user2 The second user to pass to the screen
    */
-  open fun navigateTo(screen: String, otherUserUUID: String) {
-    val route = "$screen/$otherUserUUID"
-    // Only navigate if the route is different from the current route
-    if (!isCurrentDestination(route)) {
-      navController.navigate(route)
-    }
+  open fun navigateTo(screen: String, UUID: String) {
+    val screen_address =
+        when (screen) {
+          C.Screen.CHAT -> "$screen/$UUID"
+          C.Screen.EDIT_BOOK -> "$screen/$UUID"
+          else -> screen
+        }
+    navigateTo(screen_address)
   }
 
   /**

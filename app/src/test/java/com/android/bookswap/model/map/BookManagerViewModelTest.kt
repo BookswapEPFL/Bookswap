@@ -41,7 +41,8 @@ class BookManagerViewModelTest {
           photo = "url_to_photo_1",
           language = BookLanguages.ENGLISH,
           isbn = "123-456-789",
-          genres = listOf(BookGenres.FICTION, BookGenres.HORROR))
+          genres = listOf(BookGenres.FICTION, BookGenres.HORROR),
+          userId = UUID.randomUUID())
 
   private val book2 =
       DataBook(
@@ -53,7 +54,8 @@ class BookManagerViewModelTest {
           photo = "url_to_photo_2",
           language = BookLanguages.GERMAN,
           isbn = "234-567-890",
-          genres = listOf(BookGenres.FICTION))
+          genres = listOf(BookGenres.FICTION),
+          userId = UUID.randomUUID())
 
   private val book3 =
       DataBook(
@@ -65,7 +67,8 @@ class BookManagerViewModelTest {
           photo = "url_to_photo_3",
           language = BookLanguages.GERMAN,
           isbn = "234-567-890",
-          genres = listOf(BookGenres.NONFICTION, BookGenres.HORROR))
+          genres = listOf(BookGenres.NONFICTION, BookGenres.HORROR),
+          userId = UUID.randomUUID())
 
   private val books = listOf(book3, book1, book2)
 
@@ -77,10 +80,7 @@ class BookManagerViewModelTest {
 
   private val userBooksWithLocation = listOf(userBooksWithLocation2, userBooksWithLocation1)
 
-  private val filteredBooksWithLocation =
-      listOf(
-          userBooksWithLocation2,
-          UserBooksWithLocation(user1.userUUID, user1.longitude, user1.latitude, emptyList()))
+  private val filteredBooksWithLocation = listOf(userBooksWithLocation2)
 
   private val geolocation1 = listOf(0.0, 0.0)
   private val geolocation2 = listOf(100.0, 100.0)
@@ -150,6 +150,23 @@ class BookManagerViewModelTest {
     val bookManagerViewModel =
         BookManagerViewModel(
             mockGeolocation1, mockBookRepository, mockUsersRepository, mockBookFilter, sortingTest)
+    bookManagerViewModel.startUpdatingBooks()
+    bookManagerViewModel.filteredBooks.first { it != emptyList<DataBook>() }
+    bookManagerViewModel.filteredUsers.first { it != emptyList<UserBooksWithLocation>() }
+    assertEquals(listOf(book3), bookManagerViewModel.filteredBooks.value)
+    assertEquals(filteredBooksWithLocation, bookManagerViewModel.filteredUsers.value)
+    bookManagerViewModel.stopUpdatingBooks()
+  }
+
+  @Test
+  fun startUpdatingWorksAfterStop() = runTest {
+    val bookManagerViewModel =
+        BookManagerViewModel(
+            mockGeolocation1, mockBookRepository, mockUsersRepository, mockBookFilter, sortingTest)
+    every { mockBookFilter.filterBooks(any()) } answers { emptyList() }
+    bookManagerViewModel.startUpdatingBooks()
+    bookManagerViewModel.stopUpdatingBooks()
+    every { mockBookFilter.filterBooks(any()) } answers { listOf(book3) }
     bookManagerViewModel.startUpdatingBooks()
     bookManagerViewModel.filteredBooks.first { it != emptyList<DataBook>() }
     bookManagerViewModel.filteredUsers.first { it != emptyList<UserBooksWithLocation>() }

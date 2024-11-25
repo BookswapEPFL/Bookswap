@@ -64,9 +64,9 @@ class ListChatScreenTest {
           { TopAppBarComponent(Modifier, navigationActions, "Messages") },
           {
             BottomNavigationMenu(
-                onTabSelect = { destination -> navigationActions.navigateTo(destination) },
-                tabList = List_Navigation_Bar_Destinations,
-                selectedItem = navigationActions.currentRoute())
+                { destination -> navigationActions.navigateTo(destination) },
+                List_Navigation_Bar_Destinations,
+                navigationActions.currentRoute())
           })
     }
     composeTestRule.onNodeWithTag(C.Tag.top_app_bar_container).assertIsDisplayed()
@@ -89,9 +89,9 @@ class ListChatScreenTest {
           { TopAppBarComponent(Modifier, navigationActions, "Messages") },
           {
             BottomNavigationMenu(
-                onTabSelect = { destination -> navigationActions.navigateTo(destination) },
-                tabList = List_Navigation_Bar_Destinations,
-                selectedItem = navigationActions.currentRoute())
+                { destination -> navigationActions.navigateTo(destination) },
+                List_Navigation_Bar_Destinations,
+                navigationActions.currentRoute())
           })
     }
     composeTestRule.onNodeWithTag(C.Tag.top_app_bar_container).assertIsDisplayed()
@@ -118,9 +118,9 @@ class ListChatScreenTest {
           { TopAppBarComponent(Modifier, navigationActions, "Messages") },
           {
             BottomNavigationMenu(
-                onTabSelect = { destination -> navigationActions.navigateTo(destination) },
-                tabList = List_Navigation_Bar_Destinations,
-                selectedItem = navigationActions.currentRoute())
+                { destination -> navigationActions.navigateTo(destination) },
+                List_Navigation_Bar_Destinations,
+                navigationActions.currentRoute())
           })
     }
     composeTestRule.onNodeWithTag(C.Tag.TopAppBar.profile_button).assertHasClickAction()
@@ -137,9 +137,9 @@ class ListChatScreenTest {
           { TopAppBarComponent(Modifier, navigationActions, "Messages") },
           {
             BottomNavigationMenu(
-                onTabSelect = { destination -> navigationActions.navigateTo(destination) },
-                tabList = List_Navigation_Bar_Destinations,
-                selectedItem = navigationActions.currentRoute())
+                { destination -> navigationActions.navigateTo(destination) },
+                List_Navigation_Bar_Destinations,
+                navigationActions.currentRoute())
           })
     }
 

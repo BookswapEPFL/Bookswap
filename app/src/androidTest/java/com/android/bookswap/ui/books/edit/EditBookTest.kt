@@ -32,15 +32,16 @@ class EditBookScreenTest {
 
   private val sampleBook =
       DataBook(
-          uuid = UUID.randomUUID(),
-          title = "Sample Book",
-          author = "Sample Author",
-          description = "Sample Description",
-          rating = 4,
-          photo = "sample_photo_url",
-          language = BookLanguages.ENGLISH,
-          isbn = "123456789",
-          genres = listOf(BookGenres.FANTASY))
+          UUID.randomUUID(),
+          "Sample Book",
+          "Sample Author",
+          "Sample Description",
+          4,
+          "sample_photo_url",
+          BookLanguages.ENGLISH,
+          "123456789",
+          listOf(BookGenres.FANTASY),
+          UUID.randomUUID())
 
   @Before
   fun setUp() {

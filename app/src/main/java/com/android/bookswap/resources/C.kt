@@ -58,7 +58,7 @@ private object S {
 
 object C {
   object Tag {
-	// Screen and components containers
+    // Screen and components containers
     const val main_screen_container = "main" + UI_T.SCREEN_CONTAINER
     const val sign_in_screen_container = S.AUTH + UI_T.SCREEN_CONTAINER
     const val new_user_screen_container = S.NEW_USER + UI_T.SCREEN_CONTAINER
@@ -77,7 +77,7 @@ object C {
     const val bottom_navigation_menu_container = "bottom_navigation_menu" + UI_T.CONTAINER
     const val top_app_bar_container = "top_app_bar" + UI_T.CONTAINER
 
-	// TopAppBar specific tags (TopAppBarComponent.kt)
+    // TopAppBar specific tags (TopAppBarComponent.kt)
     object TopAppBar {
       const val back_button = A.BACK + UI_T.ICON_BUTTON
       const val back_icon = A.BACK + UI_T.ICON
@@ -85,21 +85,21 @@ object C {
       const val profile_button = S.USER_PROFILE + UI_T.ICON_BUTTON
       const val profile_icon = S.USER_PROFILE + UI_T.ICON
     }
-	
-	// BottomNavigationMenu specific tags (BottomNavigationMenu.kt)
+
+    // BottomNavigationMenu specific tags (BottomNavigationMenu.kt)
     object BottomNavMenu {
       const val nav_icon = "_nav" + UI_T.ICON
       const val nav_item = "_nav" + UI_T.ICON_BUTTON
     }
-	
-	// BookListComponent specific tags (BookListComponent.kt)
+
+    // BookListComponent specific tags (BookListComponent.kt)
     object BookListComp {
       const val book_list_container = BOOK + LIST + UI_T.SCROLLABLE_CONTAINER
       const val empty_list_text = "empty" + LIST + UI_T.TEXT
       const val divider = BOOK + LIST + UI_T.DIVIDER
     }
-	
-	// BookDisplayComponent specific tags (BookDisplayComponent.kt)
+
+    // BookDisplayComponent specific tags (BookDisplayComponent.kt)
     object BookDisplayComp {
       const val book_display_container = BOOK + UI_T.CONTAINER
       const val image = BOOK + UI_T.IMAGE
@@ -112,8 +112,8 @@ object C {
       const val filled_star = "filled_star" + UI_T.ICON
       const val hollow_star = "hollow_star" + UI_T.ICON
     }
-	
-	// User Profile Screen specific tags (UserProfile.kt)
+
+    // User Profile Screen specific tags (UserProfile.kt)
     object UserProfile {
       const val fullname = "fullname" + UI_T.TEXT
       const val email = "email" + UI_T.TEXT
@@ -121,8 +121,8 @@ object C {
       const val address = "address" + UI_T.TEXT
       const val edit = S.EDIT_PROFILE + UI_T.BUTTON
     }
-	
-	// Edit User Profile Screen specific tags (EditProfile.kt)
+
+    // Edit User Profile Screen specific tags (EditProfile.kt)
     object EditProfile {
       const val greeting = "greeting" + UI_T.TEXT_FIELD
       const val firstname = "firstname" + UI_T.TEXT_FIELD
@@ -132,8 +132,8 @@ object C {
       const val confirm = A.CONFIRM + UI_T.BUTTON
       const val dismiss = A.CANCEL + UI_T.BUTTON
     }
-	
-	// Book Profile Screen specific tags (BookProfile.kt)
+
+    // Book Profile Screen specific tags (BookProfile.kt)
     object BookProfile {
       const val scrollable = Screen.BOOK_PROFILE + UI_T.SCROLLABLE_CONTAINER
       const val title = BOOK + "_title" + UI_T.TEXT
@@ -153,31 +153,33 @@ object C {
       const val issue = BOOK + "_issue" + UI_T.TEXT
       const val editorial = BOOK + "_editorial" + UI_T.TEXT
       const val location = BOOK + "_location" + UI_T.TEXT
+      const val edit = BOOK + A.EDIT + UI_T.BUTTON
+      const val scrollable_end = S.BOOK_PROFILE + UI_T.DIVIDER
     }
-	
-	// SignIn Screen specific tags (SignIn.kt)
+
+    // SignIn Screen specific tags (SignIn.kt)
     object SignIn {
       const val app_name = S.AUTH + "_login_title" + UI_T.TEXT
       const val signIn = S.AUTH + UI_T.BUTTON
     }
-	
-	// NewUser Screen specific tags (NewUser.kt)
-	object NewUser {
-	  const val personal_info = "personal_info" + UI_T.TEXT
-	  const val profile_pic = A.NEW + PROFILE + UI_T.IMAGE + UI_T.ICON_BUTTON
-	  const val greeting = "greeting" + UI_T.TEXT_FIELD
-	  const val firstname = "firstname" + UI_T.TEXT_FIELD
-	  const val lastname = "lastname" + UI_T.TEXT_FIELD
-	  const val email = "email" + UI_T.TEXT_FIELD
-	  const val phone = "phone" + UI_T.TEXT_FIELD
-	  const val firstname_error = "firstname_error" + UI_T.TEXT
-	  const val lastname_error = "lastname_error" + UI_T.TEXT
-	  const val email_error = "email_error" + UI_T.TEXT
-	  const val phone_error = "phone_error" + UI_T.TEXT
-	  const val confirm = A.CONFIRM + UI_T.BUTTON
-	}
-	
-	// New Book Choice Screen specific tags (BookAdditionChoice.kt)
+
+    // NewUser Screen specific tags (NewUser.kt)
+    object NewUser {
+      const val personal_info = "personal_info" + UI_T.TEXT
+      const val profile_pic = A.NEW + PROFILE + UI_T.IMAGE + UI_T.ICON_BUTTON
+      const val greeting = "greeting" + UI_T.TEXT_FIELD
+      const val firstname = "firstname" + UI_T.TEXT_FIELD
+      const val lastname = "lastname" + UI_T.TEXT_FIELD
+      const val email = "email" + UI_T.TEXT_FIELD
+      const val phone = "phone" + UI_T.TEXT_FIELD
+      const val firstname_error = "firstname_error" + UI_T.TEXT
+      const val lastname_error = "lastname_error" + UI_T.TEXT
+      const val email_error = "email_error" + UI_T.TEXT
+      const val phone_error = "phone_error" + UI_T.TEXT
+      const val confirm = A.CONFIRM + UI_T.BUTTON
+    }
+
+    // New Book Choice Screen specific tags (BookAdditionChoice.kt)
     object NewBookChoice {
       object btnWIcon {
         val button = UI_T.BUTTON
@@ -186,14 +188,14 @@ object C {
         val arrow = "_arrow" + UI_T.ICON
       }
     }
-	
-	// New Book ISBN Screen specific tags (AddISBNScreen.kt)
+
+    // New Book ISBN Screen specific tags (AddISBNScreen.kt)
     object NewBookISBN {
       const val isbn = "isbn" + UI_T.TEXT_FIELD
       const val search = "search" + UI_T.BUTTON
     }
-	
-	// New Book Manually Screen specific tags (AddToBook.kt)
+
+    // New Book Manually Screen specific tags (AddToBook.kt)
     object NewBookManually {
       const val title = BOOK + "_title" + UI_T.TEXT_FIELD
       const val genres = BOOK + "_genres" + UI_T.FIELD
@@ -202,11 +204,11 @@ object C {
       const val rating = "rating " + UI_T.TEXT_FIELD
       const val isbn = "isbn " + UI_T.TEXT_FIELD
       const val photo = "photo" + UI_T.IMAGE_FIELD
-      const val language = "language " + UI_T.TEXT_FIELD
+      const val language = BOOK + "_language" + UI_T.FIELD
       const val save = A.CONFIRM + UI_T.BUTTON
     }
-	
-	// Edit Book Screen specific tags (EditBookScreen.kt)
+
+    // Edit Book Screen specific tags (EditBookScreen.kt)
     object EditBook {
       const val scrollable = Screen.EDIT_BOOK + UI_T.SCROLLABLE_CONTAINER
       const val title = BOOK + "_title" + UI_T.TEXT_FIELD
@@ -221,8 +223,8 @@ object C {
       const val save = A.CONFIRM + UI_T.BUTTON
       const val delete = A.DELETE + UI_T.BUTTON
     }
-	
-	// Map Screen specific tags (Map.kt)
+
+    // Map Screen specific tags (Map.kt)
     object Map {
       const val google_map = "google_map" + UI_T.CONTAINER
       const val bottom_drawer_container = "bottom_drawer" + UI_T.CONTAINER
@@ -240,14 +242,14 @@ object C {
         const val book_author = "marker_info_" + BOOK + "_author" + UI_T.TEXT
       }
     }
-	
-	// Map Filter Screen specific tags (FilterMap.kt)
+
+    // Map Filter Screen specific tags (FilterMap.kt)
     object MapFilter {
       const val apply = A.CONFIRM + UI_T.BUTTON
       const val filter = "_filter" + UI_T.BUTTON
     }
-	
-	// Chat List Screen specific tags (ChatList.kt)
+
+    // Chat List Screen specific tags (ChatList.kt)
     object ChatList {
       const val scrollable = S.CHAT_LIST + UI_T.SCROLLABLE_CONTAINER
       const val item = S.CHAT + "_item" + UI_T.CONTAINER
@@ -255,8 +257,8 @@ object C {
       const val message = S.CHAT + "_message" + UI_T.TEXT
       const val timestamp = S.CHAT + "_timestamp" + UI_T.TEXT
     }
-	
-	// Chat Screen specific tags (ChatScreen.kt)
+
+    // Chat Screen specific tags (ChatScreen.kt)
     object ChatScreen {
       const val scrollable = Screen.CHAT + UI_T.SCROLLABLE_CONTAINER
       const val add_image = A.NEW + UI_T.ICON + UI_T.BUTTON
@@ -271,7 +273,7 @@ object C {
       const val pop_out = "pop_out" + UI_T.CONTAINER
     }
   }
-  
+
   // Top-level navigation routes
   object Route {
     const val AUTH = S.AUTH

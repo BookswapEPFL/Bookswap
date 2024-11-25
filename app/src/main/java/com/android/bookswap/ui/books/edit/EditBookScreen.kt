@@ -38,7 +38,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.android.bookswap.data.BookGenres
 import com.android.bookswap.data.DataBook
-import com.android.bookswap.data.source.network.BooksFirestoreSource
+import com.android.bookswap.data.repository.BooksRepository
 import com.android.bookswap.resources.C
 import com.android.bookswap.ui.books.add.createDataBook
 import com.android.bookswap.ui.navigation.NavigationActions
@@ -59,7 +59,7 @@ private const val COLUMN_WIDTH_RATIO = 0.9f // Column width as 90% of screen wid
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditBookScreen(
-    booksRepository: BooksFirestoreSource,
+    booksRepository: BooksRepository,
     navigationActions: NavigationActions,
     book: DataBook
 ) {
@@ -157,8 +157,7 @@ fun EditBookScreen(
                             BookGenres.values().forEach { genre ->
                               DropdownMenuItem(
                                   text = { Text(text = genre.Genre) },
-                                  modifier =
-                                      Modifier.testTag("${genre.Genre}" + C.Tag.EditBook.genre),
+                                  modifier = Modifier.testTag(genre.Genre + C.Tag.EditBook.genre),
                                   onClick = {
                                     selectedGenre = genre
                                     genres = listOf(genre) // Update genres list with selected genre
@@ -213,15 +212,6 @@ fun EditBookScreen(
                             focusedBorderColor = Color.Black,
                             unfocusedBorderColor = Color.Black))
               }
-              // ISBN Edit Field
-              /*OutlinedTextField(
-                  value = isbn,
-                  onValueChange = { isbn = it },
-                  label = { Text("ISBN") },
-                  placeholder = { Text("ISBN Number") },
-                  modifier = Modifier.fillMaxWidth().testTag("inputBookISBN")
-              )*/
-              // Remove for now but could be added later
 
               item {
                 // Photo Edit Field
@@ -286,12 +276,18 @@ fun EditBookScreen(
                                 photo = photo,
                                 bookLanguageStr = language,
                                 isbn = book.isbn,
-                                genres = genres)
+                                genres = genres,
+                                userId = book.userId,
+                            )
 
                         booksRepository.updateBook(
                             updatedBook!!,
                             callback = { result ->
                               if (result.isSuccess) {
+                                // Fetch the updated book data from Firestore
+                                // booksRepository.getBook(updatedBook.uuid) {
+                                // updatedBookFromFirestore ->
+                                // createdBook.value = updatedBookFromFirestore
                                 navigationActions.goBack()
                               } else {
                                 Toast.makeText(

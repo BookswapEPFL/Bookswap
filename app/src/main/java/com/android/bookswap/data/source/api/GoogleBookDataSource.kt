@@ -32,7 +32,7 @@ class GoogleBookDataSource(context: Context) {
    * @throws IllegalArgumentException if isbn is not in a valid format
    * @author EdenKahane
    */
-  fun getBookFromISBN(isbn: String, callback: (Result<DataBook>) -> Unit) {
+  fun getBookFromISBN(isbn: String, userId: UUID, callback: (Result<DataBook>) -> Unit) {
     try {
       require(isbn.all { it.isDigit() }) { "ISBN should only be composed of digits" }
       require(isbn.length == 10 || isbn.length == 13) { "ISBN should be of length 10 or 13" }
@@ -45,13 +45,13 @@ class GoogleBookDataSource(context: Context) {
         StringRequest(
             Request.Method.GET,
             GOOGLE_BOOK_API.plus("isbn:${isbn}"),
-            { response -> callback(parseISBNResponse(response)) },
+            { response -> callback(parseISBNResponse(response, userId)) },
             { error -> Result.failure<VolleyError>(error) })
     queue.add(stringRequest)
   }
 
   @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-  fun parseISBNResponse(response: String): Result<DataBook> {
+  fun parseISBNResponse(response: String, userId: UUID): Result<DataBook> {
     try {
       val json = JSONObject(response)
       // Since we want the result to fail when specific data are not available (like title),
@@ -59,10 +59,9 @@ class GoogleBookDataSource(context: Context) {
       val item = json.getJSONArray("items").getJSONObject(0).getJSONObject("volumeInfo")
 
       val language =
-          when (val languageCode = item.getStringOrNull("language")?.uppercase()) {
-            is String -> BookLanguages.values().first { it.languageCode == languageCode }
-            else -> null
-          }
+          item.getStringOrNull("language")?.lowercase()?.let { languageCode ->
+            BookLanguages.values().find { it.languageCode.equals(languageCode, ignoreCase = true) }
+          } ?: BookLanguages.OTHER
 
       // We do not know where the ISBN_13 is, so we need to filter for it
       val industryIdentifiers = item.getJSONArray("industryIdentifiers")
@@ -81,7 +80,8 @@ class GoogleBookDataSource(context: Context) {
               null,
               item.getJSONObjectOrNull("imageLinks")?.getStringOrNull("thumbnail"),
               language ?: BookLanguages.OTHER,
-              identifier))
+              isbn = identifier,
+              userId = userId))
     } catch (exception: Exception) {
       return Result.failure(exception)
     }

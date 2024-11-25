@@ -155,6 +155,7 @@ dependencies {
     implementation ("com.google.firebase:firebase-storage:20.1.0")
     implementation(libs.google.play.services.location)
     implementation("io.coil-kt:coil-compose:2.1.0")
+    implementation("com.google.code.gson:gson:2.8.9")
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.firebase.database.ktx)

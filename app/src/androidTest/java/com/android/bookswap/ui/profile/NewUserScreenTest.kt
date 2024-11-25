@@ -97,7 +97,9 @@ class NewUserScreenTest {
     composeTestRule.onNodeWithTag(C.Tag.NewUser.greeting).performTextInput("Mr.")
     composeTestRule.onNodeWithTag(C.Tag.NewUser.firstname).performTextInput("John")
     composeTestRule.onNodeWithTag(C.Tag.NewUser.lastname).performTextInput("Doe")
-    composeTestRule.onNodeWithTag(C.Tag.NewUser.email).performTextInput("john.doe.com") // Email invalide
+    composeTestRule
+        .onNodeWithTag(C.Tag.NewUser.email)
+        .performTextInput("john.doe.com") // Email invalide
     composeTestRule.onNodeWithTag(C.Tag.NewUser.phone).performTextInput("+4122345678")
 
     composeTestRule.onNodeWithTag(C.Tag.NewUser.confirm).performClick()

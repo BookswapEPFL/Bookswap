@@ -34,42 +34,46 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
+val userId = UUID.randomUUID()
 val longListBook =
     List(20) {
       DataBook(
-          uuid = UUID(2000, 2000),
-          title = "Book 1",
-          author = "Author 1",
-          description = "Description of Book 1",
-          rating = 5,
-          photo = "url_to_photo_1",
-          language = BookLanguages.ENGLISH,
-          isbn = "123-456-789",
-          genres = listOf(BookGenres.FICTION, BookGenres.NONFICTION))
+          UUID(2000, 2000),
+          "Book 1",
+          "Author 1",
+          "Description of Book 1",
+          5,
+          "url_to_photo_1",
+          BookLanguages.ENGLISH,
+          "123-456-789",
+          listOf(BookGenres.FICTION, BookGenres.NONFICTION),
+          userId)
     }
 
 val books =
     listOf(
         DataBook(
-            uuid = UUID(1000, 1000),
-            title = "Book 1",
-            author = "Author 1",
-            description = "Description of Book 1",
-            rating = 5,
-            photo = "url_to_photo_1",
-            language = BookLanguages.ENGLISH,
-            isbn = "123-456-789",
-            genres = listOf(BookGenres.FICTION, BookGenres.HORROR)),
+            UUID(1000, 1000),
+            "Book 1",
+            "Author 1",
+            "Description of Book 1",
+            5,
+            "url_to_photo_1",
+            BookLanguages.ENGLISH,
+            "123-456-789",
+            listOf(BookGenres.FICTION, BookGenres.HORROR),
+            userId),
         DataBook(
-            uuid = UUID(2000, 1000),
-            title = "Book 2",
-            author = "Author 2",
-            description = "Description of Book 2",
-            rating = 4,
-            photo = "url_to_photo_2",
-            language = BookLanguages.FRENCH,
-            isbn = "234-567-890",
-            genres = listOf(BookGenres.FICTION)))
+            UUID(2000, 1000),
+            "Book 2",
+            "Author 2",
+            "Description of Book 2",
+            4,
+            "url_to_photo_2",
+            BookLanguages.FRENCH,
+            "234-567-890",
+            listOf(BookGenres.FICTION),
+            userId))
 
 class MapScreenTest {
   private val user = listOf(DataUser(bookList = listOf(UUID(1000, 1000), UUID(2000, 1000))))
