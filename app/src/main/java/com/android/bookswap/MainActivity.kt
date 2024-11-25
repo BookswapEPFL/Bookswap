@@ -314,7 +314,7 @@ class MainActivity : ComponentActivity() {
             bookRepository.getBook(
                 uuid = bookId!!,
                 OnSucess = { fetchedbook -> book = fetchedbook },
-                onFailure = { Log.d("EditScreen", "Error while loading the book") })
+                onFailure = { Log.e("EditScreen", "Error while loading the book") })
             EditBookScreen(
                 booksRepository = bookRepository,
                 navigationActions = NavigationActions(navController),

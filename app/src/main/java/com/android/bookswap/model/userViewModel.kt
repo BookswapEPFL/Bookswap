@@ -97,9 +97,6 @@ open class UserViewModel(
         dataUser = it
         isLoaded = true
         _isStored.value = true
-        Log.e(
-            "UserViewModel",
-            "User found {${dataUser.firstName}}{${dataUser.lastName}}{${dataUser.userUUID}}")
       }
       // If the user is not found, set isLoaded to false
       result.onFailure {
