@@ -1,9 +1,11 @@
 package com.android.bookswap.endtoend
 
+import android.Manifest
 import android.content.Context
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
+import androidx.test.rule.GrantPermissionRule
 import com.android.bookswap.MainActivity
 import com.android.bookswap.data.repository.BooksRepository
 import com.android.bookswap.data.repository.UsersRepository
@@ -22,6 +24,12 @@ import org.junit.Test
 
 class NavigationBarEndToEnd {
   @get:Rule val composeTestRule = createComposeRule()
+  @get:Rule
+  val grantPermissionRule: GrantPermissionRule =
+      GrantPermissionRule.grant(
+          Manifest.permission.ACCESS_FINE_LOCATION,
+          Manifest.permission.ACCESS_COARSE_LOCATION,
+          Manifest.permission.ACCESS_BACKGROUND_LOCATION)
 
   private lateinit var mockBookRepository: BooksRepository
   private lateinit var mockUserRepository: UsersRepository
