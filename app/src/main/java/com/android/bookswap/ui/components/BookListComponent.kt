@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.Dp
 import com.android.bookswap.data.DataBook
+import com.android.bookswap.resources.C
 
 val DIVIDER_THICKNESS_DP = Dp.Hairline
 /**
@@ -33,7 +34,7 @@ fun BookListComponent(
     bookList: List<DataBook> = emptyList(),
 ) {
   LazyColumn(
-      modifier = modifier.fillMaxWidth().testTag("BookListColumn"),
+      modifier = modifier.fillMaxWidth().testTag(C.Tag.BookListComp.book_list_container),
       state = rememberLazyListState(),
       contentPadding = PaddingValues(PADDING_HORIZONTAL_DP, PADDING_VERTICAL_DP),
       horizontalAlignment = Alignment.CenterHorizontally,
@@ -41,13 +42,16 @@ fun BookListComponent(
       userScrollEnabled = true,
   ) {
     if (bookList.isEmpty()) {
-      item { Text(text = "No books to display", Modifier.testTag("mapDraggableMenuNoBook")) }
+      item {
+        Text(text = "No books to display", Modifier.testTag(C.Tag.BookListComp.empty_list_text))
+      }
     } else {
       itemsIndexed(bookList) { i, book ->
-        BookDisplayComponent(Modifier.testTag("mapDraggableMenuBookBox${i}"), book = book)
+        BookDisplayComponent(
+            Modifier.testTag("${i}_" + C.Tag.BookDisplayComp.book_display_container), book = book)
         if (i < bookList.size - 1) {
           HorizontalDivider(
-              modifier = Modifier.testTag("mapDraggableMenuBookBoxDivider"),
+              modifier = Modifier.testTag(C.Tag.BookListComp.divider),
           )
         }
       }

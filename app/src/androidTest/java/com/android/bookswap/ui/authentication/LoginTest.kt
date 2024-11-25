@@ -12,8 +12,8 @@ import androidx.test.espresso.intent.Intents.intended
 import androidx.test.espresso.intent.matcher.IntentMatchers.toPackage
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.android.bookswap.model.UserViewModel
+import com.android.bookswap.resources.C
 import com.android.bookswap.ui.navigation.NavigationActions
-import com.android.bookswap.ui.navigation.Screen
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
 import io.mockk.every
 import io.mockk.mockk
@@ -53,13 +53,13 @@ class LoginTest : TestCase() {
       val navigationActions = NavigationActions(navController)
       SignInScreen(navigationActions, userVM)
     }
-    composeTestRule.onNodeWithTag("login_loginTitle1").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("login_loginTitle1").assertTextEquals("Welcome to")
-    composeTestRule.onNodeWithTag("login_loginTitle2").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("login_loginTitle2").assertTextEquals("BookSwap")
+    composeTestRule.onNodeWithTag(C.Tag.TopAppBar.screen_title).assertIsDisplayed()
+    composeTestRule.onNodeWithTag(C.Tag.TopAppBar.screen_title).assertTextEquals("Welcome to")
+    composeTestRule.onNodeWithTag(C.Tag.SignIn.app_name).assertIsDisplayed()
+    composeTestRule.onNodeWithTag(C.Tag.SignIn.app_name).assertTextEquals("BookSwap")
 
-    composeTestRule.onNodeWithTag("loginButton").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("loginButton").assertHasClickAction()
+    composeTestRule.onNodeWithTag(C.Tag.SignIn.signIn).assertIsDisplayed()
+    composeTestRule.onNodeWithTag(C.Tag.SignIn.signIn).assertHasClickAction()
   }
 
   @Test
@@ -70,7 +70,7 @@ class LoginTest : TestCase() {
       val navigationActions = NavigationActions(navController)
       SignInScreen(navigationActions, userVM)
     }
-    composeTestRule.onNodeWithTag("loginButton").performClick()
+    composeTestRule.onNodeWithTag(C.Tag.SignIn.signIn).performClick()
     composeTestRule.waitForIdle()
     // assert that an Intent resolving to Google Mobile Services has been sent (for sign-in)
     intended(toPackage("com.google.android.gms"))
@@ -80,8 +80,8 @@ class LoginTest : TestCase() {
   fun navigateToNewUserScreenWhenUserIsNotStored() {
     every { userVM.isStored } returns MutableStateFlow(false)
     composeTestRule.setContent { SignInScreen(mocknavi, userVM) }
-    composeTestRule.onNodeWithTag("loginButton").performClick()
+    composeTestRule.onNodeWithTag(C.Tag.SignIn.signIn).performClick()
     composeTestRule.waitForIdle()
-    verify { mocknavi.navigateTo(Screen.NEW_USER) }
+    verify { mocknavi.navigateTo(C.Screen.NEW_USER) }
   }
 }
