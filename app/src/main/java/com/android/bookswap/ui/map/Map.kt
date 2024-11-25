@@ -158,7 +158,9 @@ fun MapScreen(
                         cameraPosition = cameraPositionState
                       },
                   cameraPositionState = cameraPositionState,
-                  uiSettings = MapUiSettings(zoomControlsEnabled = false),
+                  uiSettings =
+                      MapUiSettings(myLocationButtonEnabled = true, zoomControlsEnabled = false),
+                  properties = MapProperties(isMyLocationEnabled = true),
               ) {
                 // Marker for user's current location
                 if (!latitude.value.isNaN() && !longitude.value.isNaN()) {
