@@ -16,6 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.android.bookswap.data.DataUser
+import com.android.bookswap.resources.C
 import com.android.bookswap.ui.theme.BookSwapAppTheme
 
 /**
@@ -37,19 +38,19 @@ fun EditProfileDialog(onDismiss: () -> Unit, onSave: (DataUser) -> Unit, dataUse
 
   BookSwapAppTheme {
     Dialog({ onDismiss() }, DialogProperties(true, true)) {
-      Card(Modifier.testTag("editProfileContainer").padding(16.dp)) {
+      Card(Modifier.testTag(C.Tag.edit_profile_screen_container).padding(16.dp)) {
         Column(
             Modifier.fillMaxWidth().padding(16.dp),
             Arrangement.Center,
             Alignment.CenterHorizontally) {
-              Text("Edit Profile", Modifier.testTag("editProfileTitleTxt"))
+              Text("Edit Profile", Modifier.testTag(C.Tag.TopAppBar.screen_title))
               OutlinedTextField(
                   _greeting.value,
                   {
                     _greeting.value = it
                     dataUser.greeting = _greeting.value
                   },
-                  Modifier.testTag("greetingTbx").fillMaxWidth().padding(8.dp, 4.dp),
+                  Modifier.testTag(C.Tag.EditProfile.greeting).fillMaxWidth().padding(8.dp, 4.dp),
                   label = { Text("Greeting") },
                   placeholder = { Text("Mr.", Modifier, Color.Gray) },
                   keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
@@ -61,7 +62,7 @@ fun EditProfileDialog(onDismiss: () -> Unit, onSave: (DataUser) -> Unit, dataUse
                     _firstName.value = it
                     dataUser.firstName = _firstName.value
                   },
-                  Modifier.testTag("firstnameTbx").fillMaxWidth().padding(8.dp, 4.dp),
+                  Modifier.testTag(C.Tag.EditProfile.firstname).fillMaxWidth().padding(8.dp, 4.dp),
                   label = { Text("Firstname") },
                   placeholder = { Text("John", Modifier, Color.Gray) },
                   keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
@@ -73,7 +74,7 @@ fun EditProfileDialog(onDismiss: () -> Unit, onSave: (DataUser) -> Unit, dataUse
                     _lastName.value = it
                     dataUser.lastName = _lastName.value
                   },
-                  Modifier.testTag("lastnameTbx").fillMaxWidth().padding(8.dp, 4.dp),
+                  Modifier.testTag(C.Tag.EditProfile.lastname).fillMaxWidth().padding(8.dp, 4.dp),
                   label = { Text("Lastname") },
                   placeholder = { Text("Doe", Modifier, Color.Gray) },
                   keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
@@ -85,7 +86,7 @@ fun EditProfileDialog(onDismiss: () -> Unit, onSave: (DataUser) -> Unit, dataUse
                     _email.value = it
                     dataUser.email = _email.value
                   },
-                  Modifier.testTag("emailTbx").fillMaxWidth().padding(8.dp, 4.dp),
+                  Modifier.testTag(C.Tag.EditProfile.email).fillMaxWidth().padding(8.dp, 4.dp),
                   label = { Text("Email") },
                   placeholder = { Text("John.Doe@example.com", Modifier, Color.Gray) },
                   keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
@@ -97,7 +98,7 @@ fun EditProfileDialog(onDismiss: () -> Unit, onSave: (DataUser) -> Unit, dataUse
                     _phone.value = it
                     dataUser.phoneNumber = _phone.value
                   },
-                  Modifier.testTag("phoneTbx").fillMaxWidth().padding(8.dp, 4.dp),
+                  Modifier.testTag(C.Tag.EditProfile.phone).fillMaxWidth().padding(8.dp, 4.dp),
                   label = { Text("Phone") },
                   placeholder = { Text("+4122345678", Modifier, Color.Gray) },
                   keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
@@ -111,13 +112,13 @@ fun EditProfileDialog(onDismiss: () -> Unit, onSave: (DataUser) -> Unit, dataUse
                           "Save Clicked, User info: ${dataUser.printFullname()}")
                       onSave(dataUser)
                     },
-                    Modifier.testTag("confirmBtn")) {
+                    Modifier.testTag(C.Tag.EditProfile.confirm)) {
                       Text("Save")
                     }
 
                 Button(
                     { Log.d("EditProfile_ClickBtn", "Cancel Clicked") },
-                    Modifier.testTag("dismissBtn")) {
+                    Modifier.testTag(C.Tag.EditProfile.dismiss)) {
                       Text("Cancel")
                     }
               }

@@ -29,6 +29,7 @@ import com.android.bookswap.data.BookGenres
 import com.android.bookswap.data.BookLanguages
 import com.android.bookswap.data.DataBook
 import com.android.bookswap.data.repository.BooksRepository
+import com.android.bookswap.resources.C
 import com.android.bookswap.ui.components.ButtonComponent
 import com.android.bookswap.ui.components.FieldComponent
 import com.android.bookswap.ui.theme.ColorVariable.BackGround
@@ -47,7 +48,8 @@ private const val HORIZONTAL_PADDING = 30
 fun AddToBookScreen(
     repository: BooksRepository,
     topAppBar: @Composable () -> Unit = {},
-    bottomAppBar: @Composable () -> Unit = {}
+    bottomAppBar: @Composable () -> Unit = {},
+    userId: UUID
 ) {
   // State variables to store the values entered by the user
   var title by remember { mutableStateOf("") }
@@ -56,7 +58,10 @@ fun AddToBookScreen(
   var rating by remember { mutableStateOf("") }
   var isbn by remember { mutableStateOf("") }
   var photo by remember { mutableStateOf("") }
-  var language by remember { mutableStateOf("") }
+  // var language by remember { mutableStateOf("") }
+  var selectedLanguage by remember {
+    mutableStateOf<BookLanguages?>(null)
+  } // Language selection state
   var selectedGenre by remember { mutableStateOf<BookGenres?>(null) } // Genre selection state
   var expanded by remember { mutableStateOf(false) } // State for dropdown menu
   var expandedLanguage by remember { mutableStateOf(false) } // State for dropdown menu Language
@@ -65,7 +70,7 @@ fun AddToBookScreen(
 
   // Scaffold to provide basic UI structure with a top app bar
   Scaffold(
-      modifier = Modifier.testTag("addBookScreen"),
+      modifier = Modifier.testTag(C.Tag.new_book_manual_screen_container),
       topBar = topAppBar,
       bottomBar = bottomAppBar,
       content = { paddingValues ->
@@ -80,7 +85,7 @@ fun AddToBookScreen(
               // Title Input Field
               FieldComponent(
                   modifier =
-                      Modifier.testTag("title_field")
+                      Modifier.testTag(C.Tag.NewBookManually.title)
                           .fillMaxWidth()
                           .padding(horizontal = HORIZONTAL_PADDING.dp),
                   labelText = "Title*",
@@ -91,7 +96,7 @@ fun AddToBookScreen(
                   modifier =
                       Modifier.fillMaxWidth()
                           .padding(horizontal = HORIZONTAL_PADDING.dp)
-                          .testTag("genre_field"),
+                          .testTag(C.Tag.NewBookManually.genres),
                   expanded = expanded,
                   onExpandedChange = { expanded = !expanded }) {
                     FieldComponent(
@@ -123,7 +128,7 @@ fun AddToBookScreen(
                   }
               FieldComponent(
                   modifier =
-                      Modifier.testTag("author_field")
+                      Modifier.testTag(C.Tag.NewBookManually.author)
                           .fillMaxWidth()
                           .padding(horizontal = HORIZONTAL_PADDING.dp),
                   labelText = "Author",
@@ -132,7 +137,7 @@ fun AddToBookScreen(
                   }
               FieldComponent(
                   modifier =
-                      Modifier.testTag("description_field")
+                      Modifier.testTag(C.Tag.NewBookManually.synopsis)
                           .fillMaxWidth()
                           .padding(horizontal = HORIZONTAL_PADDING.dp),
                   labelText = "Description",
@@ -141,7 +146,7 @@ fun AddToBookScreen(
                   }
               FieldComponent(
                   modifier =
-                      Modifier.testTag("rating_field")
+                      Modifier.testTag(C.Tag.NewBookManually.rating)
                           .fillMaxWidth()
                           .padding(horizontal = HORIZONTAL_PADDING.dp),
                   labelText = "Rating",
@@ -150,7 +155,7 @@ fun AddToBookScreen(
                   }
               FieldComponent(
                   modifier =
-                      Modifier.testTag("isbn_field")
+                      Modifier.testTag(C.Tag.NewBookManually.isbn)
                           .fillMaxWidth()
                           .padding(horizontal = HORIZONTAL_PADDING.dp),
                   labelText = "ISBN*",
@@ -159,25 +164,59 @@ fun AddToBookScreen(
                   }
               FieldComponent(
                   modifier =
-                      Modifier.testTag("photo_field")
+                      Modifier.testTag(C.Tag.NewBookManually.photo)
                           .fillMaxWidth()
                           .padding(horizontal = HORIZONTAL_PADDING.dp),
                   labelText = "Photo",
                   value = photo) {
                     photo = it
                   }
+              /*
               FieldComponent(
                   modifier =
-                      Modifier.testTag("language_field")
+                      Modifier.testTag(C.Tag.NewBookManually.language)
                           .fillMaxWidth()
                           .padding(horizontal = HORIZONTAL_PADDING.dp),
                   labelText = "Language",
                   value = language) {
                     language = it
+                  }*/
+              // Language Dropdown:
+              ExposedDropdownMenuBox(
+                  modifier =
+                      Modifier.fillMaxWidth()
+                          .padding(horizontal = HORIZONTAL_PADDING.dp)
+                          .testTag(C.Tag.NewBookManually.language),
+                  expanded = expandedLanguage,
+                  onExpandedChange = { expandedLanguage = !expandedLanguage }) {
+                    FieldComponent(
+                        value = selectedLanguage?.languageCode ?: "",
+                        onValueChange = {},
+                        readOnly = true,
+                        label = { Text(text = "Language*") },
+                        modifier = Modifier.menuAnchor().fillMaxWidth())
+                    ExposedDropdownMenu(
+                        expanded = expandedLanguage,
+                        onDismissRequest = { expandedLanguage = false },
+                        modifier = Modifier.fillMaxWidth()) {
+                          BookLanguages.values().forEach { language ->
+                            DropdownMenuItem(
+                                text = {
+                                  Text(
+                                      text = language.languageCode,
+                                  )
+                                },
+                                onClick = {
+                                  selectedLanguage = language
+                                  expandedLanguage = false
+                                })
+                          }
+                        }
                   }
+
               ButtonComponent(
                   modifier =
-                      Modifier.testTag("save_button")
+                      Modifier.testTag(C.Tag.NewBookManually.save)
                           .align(Alignment.CenterHorizontally)
                           .fillMaxWidth(0.5f),
                   enabled = title.isNotBlank() && isbn.isNotBlank(),
@@ -194,9 +233,10 @@ fun AddToBookScreen(
                               description,
                               rating,
                               photo,
-                              language,
+                              selectedLanguage.toString(),
                               isbn,
-                              listOf(selectedGenre!!))
+                              listOf(selectedGenre!!),
+                              userId)
                       if (book == null) {
                         Log.e("AddToBookScreen", "Invalid argument")
                         Toast.makeText(context, "Invalid argument", Toast.LENGTH_SHORT).show()
@@ -243,7 +283,8 @@ fun createDataBook(
     photo: String,
     bookLanguageStr: String,
     isbn: String,
-    genres: List<BookGenres>
+    genres: List<BookGenres>,
+    userId: UUID
 ): DataBook? {
   // Validate UUID
   if (uuid.toString().isBlank()) {
@@ -325,5 +366,6 @@ fun createDataBook(
       photo = photo,
       language = languages,
       isbn = isbn,
-      genres = genres)
+      genres = genres,
+      userId = userId)
 }

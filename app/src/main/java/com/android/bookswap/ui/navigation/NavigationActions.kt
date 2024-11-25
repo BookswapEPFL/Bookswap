@@ -8,42 +8,21 @@ import androidx.compose.material.icons.outlined.Place
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
-
-object Route {
-  const val CHAT = "Chat"
-  const val PROFILE = "Profile"
-  const val MAP = "Map"
-  const val NEWBOOK = "NewBook"
-  const val AUTH = "Auth"
-}
-
-object Screen {
-  const val AUTH = "Auth Screen"
-  const val CHATLIST = "ChatList Screen"
-  const val CHAT = "Chat Screen"
-  const val MAP = "Map Screen"
-  const val NEWBOOK = "NewBook Screen"
-  const val ADD_BOOK_MANUALLY = "AddBookManually Screen"
-  const val ADD_BOOK_SCAN = "AddBookScan Screen"
-  const val ADD_BOOK_ISBN = "AddBookISBN Screen"
-  const val SETTINGS = "Settings Screen"
-  const val FILTER = "Filter Screen"
-  const val PROFILE = "Profile Screen"
-  const val NEW_USER = "New User Screen"
-}
+import com.android.bookswap.resources.C
 
 data class TopLevelDestination(val route: String, val icon: ImageVector, val textId: String)
 
 object TopLevelDestinations {
   val CHAT =
-      TopLevelDestination(route = Route.CHAT, icon = Icons.Filled.MailOutline, textId = "Chat")
-  val MAP = TopLevelDestination(route = Route.MAP, icon = Icons.Outlined.Place, textId = "Map")
+      TopLevelDestination(
+          route = C.Route.CHAT_LIST, icon = Icons.Filled.MailOutline, textId = "Chat")
+  val MAP = TopLevelDestination(route = C.Route.MAP, icon = Icons.Outlined.Place, textId = "Map")
   val NEW_BOOK =
       TopLevelDestination(
-          route = Route.NEWBOOK, icon = Icons.Outlined.AddCircle, textId = "New Book")
+          route = C.Route.NEW_BOOK, icon = Icons.Outlined.AddCircle, textId = "New Book")
   val PROFILE =
       TopLevelDestination(
-          route = Route.PROFILE, icon = Icons.Outlined.AccountCircle, textId = "Profile")
+          route = C.Route.USER_PROFILE, icon = Icons.Outlined.AccountCircle, textId = "Profile")
 }
 /** List of top level destinations that are shown in the bottom navigation bar */
 val List_Navigation_Bar_Destinations =
@@ -75,7 +54,7 @@ open class NavigationActions(
         launchSingleTop = true
 
         // Restore state when reelecting a previously selected item
-        if (destination.route != Route.AUTH) {
+        if (destination.route != C.Route.AUTH) {
           restoreState = true
         }
       }
@@ -89,12 +68,14 @@ open class NavigationActions(
    * @param user1 The first user to pass to the screen
    * @param user2 The second user to pass to the screen
    */
-  open fun navigateTo(screen: String, otherUserUUID: String) {
-    val route = "$screen/$otherUserUUID"
-    // Only navigate if the route is different from the current route
-    if (!isCurrentDestination(route)) {
-      navController.navigate(route)
-    }
+  open fun navigateTo(screen: String, UUID: String) {
+    val screen_address =
+        when (screen) {
+          C.Screen.CHAT -> "$screen/$UUID"
+          C.Screen.EDIT_BOOK -> "$screen/$UUID"
+          else -> screen
+        }
+    navigateTo(screen_address)
   }
 
   /**
