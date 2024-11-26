@@ -81,9 +81,10 @@ class ISBNAddTest : TestCase() {
         "", isbnField.fetchSemanticsNode().config[SemanticsProperties.EditableText].text)
 
     isbnField.performTextClearance()
-    isbnField.performTextInput("12845")
+    isbnField.performTextInput("978-3-16-148410-0")
     Assert.assertEquals(
-        "12845", isbnField.fetchSemanticsNode().config[SemanticsProperties.EditableText].text)
+        "978-3-16-148410-0",
+        isbnField.fetchSemanticsNode().config[SemanticsProperties.EditableText].text)
   }
 
   @Suppress("TestFunctionName")

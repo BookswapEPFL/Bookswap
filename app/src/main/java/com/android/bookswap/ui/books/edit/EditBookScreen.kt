@@ -172,7 +172,7 @@ fun EditBookScreen(
                 // Author Edit Field
                 OutlinedTextField(
                     value = author,
-                    onValueChange = { author = it },
+                    onValueChange = { if (it.length <= 50) author = it },
                     label = { Text("Author") },
                     placeholder = { Text("Enter the author's name") },
                     modifier = Modifier.fillMaxWidth().testTag(C.Tag.EditBook.author),
@@ -187,7 +187,7 @@ fun EditBookScreen(
                 // Description Edit Field
                 OutlinedTextField(
                     value = description,
-                    onValueChange = { description = it },
+                    onValueChange = { if (it.length <= 10000) description = it },
                     label = { Text("Description") },
                     placeholder = { Text("Provide a description of the book") },
                     modifier = Modifier.fillMaxWidth().testTag(C.Tag.EditBook.synopsis),
@@ -202,7 +202,7 @@ fun EditBookScreen(
                 // Rating Edit Field
                 OutlinedTextField(
                     value = rating,
-                    onValueChange = { rating = it },
+                    onValueChange = { if (it.length <= 1) rating = it },
                     label = { Text("Rating") },
                     placeholder = { Text("Rate the book (e.g. 4.5)") },
                     modifier = Modifier.fillMaxWidth().testTag(C.Tag.EditBook.rating),
@@ -217,7 +217,7 @@ fun EditBookScreen(
                 // Photo Edit Field
                 OutlinedTextField(
                     value = photo,
-                    onValueChange = { photo = it },
+                    onValueChange = { if (it.length <= 50) photo = it },
                     label = { Text("Photo ") },
                     placeholder = { Text("Enter a photo of the books") },
                     modifier = Modifier.testTag(C.Tag.EditBook.image),

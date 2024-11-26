@@ -65,6 +65,7 @@ import com.android.bookswap.data.DataUser
 import com.android.bookswap.data.MessageType
 import com.android.bookswap.data.repository.MessageRepository
 import com.android.bookswap.data.repository.PhotoFirebaseStorageRepository
+import com.android.bookswap.model.InputVerification
 import com.android.bookswap.model.PhotoRequester
 import com.android.bookswap.model.chat.OfflineMessageStorage
 import com.android.bookswap.resources.C
@@ -101,10 +102,12 @@ fun ChatScreen(
   var newMessageText by remember { mutableStateOf(TextFieldValue("")) }
   var selectedMessage by remember { mutableStateOf<DataMessage?>(null) }
   var updateActive by remember { mutableStateOf(false) }
+  val verification = InputVerification()
   val maxMessagesStoredOffline = 10
   val padding8 = 8.dp
   val padding24 = 24.dp
   val padding36 = 36.dp
+  val maxLength = 100000
   val photoReq =
       PhotoRequester(context) { result ->
         if (result.isSuccess) {
@@ -230,7 +233,12 @@ fun ChatScreen(
                   }
               BasicTextField(
                   value = newMessageText,
-                  onValueChange = { newMessageText = it },
+                  onValueChange = {
+                    if (it.text.length <=
+                        maxLength) { // Check if the input length is within the maxLength
+                      newMessageText = it
+                    }
+                  },
                   modifier =
                       Modifier.weight(1f)
                           .padding(padding8)
@@ -241,7 +249,9 @@ fun ChatScreen(
               )
               Button(
                   onClick = {
-                    if (updateActive) {
+                    if (newMessageText.text.isEmpty()) {
+                      Toast.makeText(context, "Message cannot be empty", Toast.LENGTH_SHORT).show()
+                    } else if (updateActive) {
                       // Update the message
                       messageRepository.updateMessage(
                           selectedMessage!!.copy(text = newMessageText.text),

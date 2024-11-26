@@ -29,6 +29,7 @@ import com.android.bookswap.data.BookGenres
 import com.android.bookswap.data.BookLanguages
 import com.android.bookswap.data.DataBook
 import com.android.bookswap.data.repository.BooksRepository
+import com.android.bookswap.model.InputVerification
 import com.android.bookswap.resources.C
 import com.android.bookswap.ui.components.ButtonComponent
 import com.android.bookswap.ui.components.FieldComponent
@@ -67,6 +68,7 @@ fun AddToBookScreen(
   var expandedLanguage by remember { mutableStateOf(false) } // State for dropdown menu Language
   // Getting the context for showing Toast messages
   val context = LocalContext.current
+  val inputVerification = InputVerification()
 
   // Scaffold to provide basic UI structure with a top app bar
   Scaffold(
@@ -89,7 +91,8 @@ fun AddToBookScreen(
                           .fillMaxWidth()
                           .padding(horizontal = HORIZONTAL_PADDING.dp),
                   labelText = "Title*",
-                  value = title) {
+                  value = title,
+                  maxLength = 50) {
                     title = it
                   }
               ExposedDropdownMenuBox(
@@ -132,7 +135,8 @@ fun AddToBookScreen(
                           .fillMaxWidth()
                           .padding(horizontal = HORIZONTAL_PADDING.dp),
                   labelText = "Author",
-                  value = author) {
+                  value = author,
+                  maxLength = 50) {
                     author = it
                   }
               FieldComponent(
@@ -141,7 +145,8 @@ fun AddToBookScreen(
                           .fillMaxWidth()
                           .padding(horizontal = HORIZONTAL_PADDING.dp),
                   labelText = "Description",
-                  value = description) {
+                  value = description,
+                  maxLength = 10000) {
                     description = it
                   }
               FieldComponent(
@@ -150,7 +155,8 @@ fun AddToBookScreen(
                           .fillMaxWidth()
                           .padding(horizontal = HORIZONTAL_PADDING.dp),
                   labelText = "Rating",
-                  value = rating) {
+                  value = rating,
+                  maxLength = 1) {
                     rating = it
                   }
               FieldComponent(
@@ -159,8 +165,12 @@ fun AddToBookScreen(
                           .fillMaxWidth()
                           .padding(horizontal = HORIZONTAL_PADDING.dp),
                   labelText = "ISBN*",
-                  value = isbn) {
-                    isbn = it
+                  value = isbn,
+                  maxLength = 17) {
+                    if (inputVerification.testIsbn(it)) {
+                      isbn = it
+                      Log.d("ISBN Input", "Updated ISBN: $isbn")
+                    }
                   }
               FieldComponent(
                   modifier =
@@ -168,7 +178,8 @@ fun AddToBookScreen(
                           .fillMaxWidth()
                           .padding(horizontal = HORIZONTAL_PADDING.dp),
                   labelText = "Photo",
-                  value = photo) {
+                  value = photo,
+                  maxLength = 50) {
                     photo = it
                   }
               /*

@@ -28,6 +28,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.android.bookswap.data.repository.BooksRepository
 import com.android.bookswap.data.source.api.GoogleBookDataSource
+import com.android.bookswap.model.InputVerification
 import com.android.bookswap.resources.C
 import com.android.bookswap.ui.components.ButtonComponent
 import com.android.bookswap.ui.components.FieldComponent
@@ -47,6 +48,7 @@ fun AddISBNScreen(
     userId: UUID
 ) {
   val context = LocalContext.current
+  val inputVerification = InputVerification()
   Scaffold(
       modifier = Modifier.testTag(C.Tag.new_book_isbn_screen_container),
       topBar = topAppBar,
@@ -64,8 +66,9 @@ fun AddISBNScreen(
                     FieldComponent(
                         modifier = Modifier.testTag(C.Tag.NewBookISBN.isbn),
                         labelText = "ISBN*",
-                        value = isbn) {
-                          if (it.all { c -> c.isDigit() } && it.length <= 13) {
+                        value = isbn,
+                        maxLength = 17) {
+                          if (inputVerification.testIsbn(it)) {
                             isbn = it
                             Log.d("ISBN Input", "Updated ISBN: $isbn")
                           }

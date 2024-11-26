@@ -37,6 +37,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.android.bookswap.model.InputVerification
 import com.android.bookswap.model.UserViewModel
 import com.android.bookswap.resources.C
 import com.android.bookswap.ui.navigation.NavigationActions
@@ -65,6 +66,7 @@ private val ERROR_FONT_SIZE = 12.sp
 @Composable
 fun NewUserScreen(navigationActions: NavigationActions, userVM: UserViewModel) {
   val context = LocalContext.current
+  val verification = InputVerification()
 
   val email = remember { mutableStateOf("") }
   val phone = remember { mutableStateOf("") }
@@ -72,34 +74,12 @@ fun NewUserScreen(navigationActions: NavigationActions, userVM: UserViewModel) {
   val firstName = remember { mutableStateOf("") }
   val lastName = remember { mutableStateOf("") }
 
-  val emailError = remember { mutableStateOf<String?>(null) }
-  val phoneError = remember { mutableStateOf<String?>(null) }
-  val firstNameError = remember { mutableStateOf<String?>(null) }
-  val lastNameError = remember { mutableStateOf<String?>(null) }
+  val emailError = remember { mutableStateOf<String?>("Invalid email format") }
+  val phoneError = remember { mutableStateOf<String?>("Invalid phone number") }
+  val firstNameError = remember { mutableStateOf<String?>("First name required") }
+  val lastNameError = remember { mutableStateOf<String?>("Last name required") }
 
-  fun validateEmail(input: String): Boolean {
-    return android.util.Patterns.EMAIL_ADDRESS.matcher(input).matches()
-  }
-
-  fun validatePhone(input: String): Boolean {
-    return input.matches(Regex("^\\+?\\d{10,15}$")) // Matches phone numbers with 10 to 15 digits
-  }
-
-  fun validateNonEmpty(input: String): Boolean {
-    return input.isNotBlank()
-  }
-
-  fun validateForm(): Boolean {
-    emailError.value = if (validateEmail(email.value)) null else "Invalid email format"
-    phoneError.value = if (validatePhone(phone.value)) null else "Invalid phone number"
-    firstNameError.value = if (validateNonEmpty(firstName.value)) null else "First name required"
-    lastNameError.value = if (validateNonEmpty(lastName.value)) null else "Last name required"
-
-    return emailError.value == null &&
-        phoneError.value == null &&
-        firstNameError.value == null &&
-        lastNameError.value == null
-  }
+  var firstAttempt = true
 
   LazyColumn(
       contentPadding = PaddingValues(CONTENT_PADDING),
@@ -157,7 +137,7 @@ fun NewUserScreen(navigationActions: NavigationActions, userVM: UserViewModel) {
                           }
                       OutlinedTextField(
                           greeting.value,
-                          { greeting.value = it },
+                          { if (it.length <= 5) greeting.value = it },
                           Modifier.testTag(C.Tag.NewUser.greeting)
                               .fillMaxWidth()
                               .padding(TEXT_PADDING),
@@ -168,7 +148,7 @@ fun NewUserScreen(navigationActions: NavigationActions, userVM: UserViewModel) {
 
                       OutlinedTextField(
                           firstName.value,
-                          { firstName.value = it },
+                          { if (it.length <= 100) firstName.value = it },
                           Modifier.testTag(C.Tag.NewUser.firstname)
                               .fillMaxWidth()
                               .padding(TEXT_PADDING),
@@ -176,8 +156,9 @@ fun NewUserScreen(navigationActions: NavigationActions, userVM: UserViewModel) {
                           placeholder = { Text("John", Modifier, Color.Gray) },
                           keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                           singleLine = true,
-                          isError = firstNameError.value != null)
-                      if (firstNameError.value != null) {
+                          isError =
+                              !verification.validateNonEmpty(firstName.value) && !firstAttempt)
+                      if (!verification.validateNonEmpty(firstName.value) && !firstAttempt) {
                         Text(
                             firstNameError.value!!,
                             color = Color.Red,
@@ -187,7 +168,7 @@ fun NewUserScreen(navigationActions: NavigationActions, userVM: UserViewModel) {
 
                       OutlinedTextField(
                           lastName.value,
-                          { lastName.value = it },
+                          { if (it.length <= 300) lastName.value = it },
                           Modifier.testTag(C.Tag.NewUser.lastname)
                               .fillMaxWidth()
                               .padding(TEXT_PADDING),
@@ -195,8 +176,8 @@ fun NewUserScreen(navigationActions: NavigationActions, userVM: UserViewModel) {
                           placeholder = { Text("Doe", Modifier, Color.Gray) },
                           keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                           singleLine = true,
-                          isError = lastNameError.value != null)
-                      if (lastNameError.value != null) {
+                          isError = !verification.validateNonEmpty(lastName.value) && !firstAttempt)
+                      if (!verification.validateNonEmpty(lastName.value) && !firstAttempt) {
                         Text(
                             lastNameError.value!!,
                             color = Color.Red,
@@ -206,7 +187,7 @@ fun NewUserScreen(navigationActions: NavigationActions, userVM: UserViewModel) {
 
                       OutlinedTextField(
                           email.value,
-                          { email.value = it },
+                          { if (it.length <= 320) email.value = it },
                           Modifier.testTag(C.Tag.NewUser.email)
                               .fillMaxWidth()
                               .padding(TEXT_PADDING),
@@ -214,8 +195,8 @@ fun NewUserScreen(navigationActions: NavigationActions, userVM: UserViewModel) {
                           placeholder = { Text("John.Doe@example.com", Modifier, Color.Gray) },
                           keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                           singleLine = true,
-                          isError = emailError.value != null)
-                      if (emailError.value != null) {
+                          isError = !verification.validateEmail(email.value) && !firstAttempt)
+                      if (!verification.validateEmail(email.value) && !firstAttempt) {
                         Text(
                             emailError.value!!,
                             color = Color.Red,
@@ -225,7 +206,7 @@ fun NewUserScreen(navigationActions: NavigationActions, userVM: UserViewModel) {
 
                       OutlinedTextField(
                           phone.value,
-                          { phone.value = it },
+                          { if (it.length <= 15) phone.value = it },
                           Modifier.testTag(C.Tag.NewUser.phone)
                               .fillMaxWidth()
                               .padding(TEXT_PADDING),
@@ -233,8 +214,8 @@ fun NewUserScreen(navigationActions: NavigationActions, userVM: UserViewModel) {
                           placeholder = { Text("+4122345678", Modifier, Color.Gray) },
                           keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
                           singleLine = true,
-                          isError = phoneError.value != null)
-                      if (phoneError.value != null) {
+                          isError = !verification.validatePhone(phone.value) && !firstAttempt)
+                      if (!verification.validatePhone(phone.value) && !firstAttempt) {
                         Text(
                             phoneError.value!!,
                             color = Color.Red,
@@ -249,7 +230,10 @@ fun NewUserScreen(navigationActions: NavigationActions, userVM: UserViewModel) {
           Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
             Button(
                 onClick = {
-                  if (validateForm()) {
+                  if (emailError.value == null &&
+                      phoneError.value == null &&
+                      firstNameError.value == null &&
+                      lastNameError.value == null) {
                     userVM.updateUser(
                         greeting = greeting.value,
                         firstName = firstName.value,
@@ -259,6 +243,7 @@ fun NewUserScreen(navigationActions: NavigationActions, userVM: UserViewModel) {
                         googleUid = Firebase.auth.currentUser?.uid ?: "")
                     navigationActions.navigateTo(C.Route.MAP)
                   } else {
+                    firstAttempt = false
                     Toast.makeText(context, "Please correct the errors", Toast.LENGTH_SHORT).show()
                   }
                 },

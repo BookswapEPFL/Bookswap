@@ -94,6 +94,8 @@ class NewUserScreenTest {
 
     composeTestRule.setContent { NewUserScreen(navigationActions, userVM) }
 
+    composeTestRule.onNodeWithTag(C.Tag.NewUser.confirm).performClick()
+
     composeTestRule.onNodeWithTag(C.Tag.NewUser.greeting).performTextInput("Mr.")
     composeTestRule.onNodeWithTag(C.Tag.NewUser.firstname).performTextInput("John")
     composeTestRule.onNodeWithTag(C.Tag.NewUser.lastname).performTextInput("Doe")
@@ -119,6 +121,8 @@ class NewUserScreenTest {
       userVM.updateUser(any(), any(), any(), any(), any(), any(), any(), any(), any(), any())
     }
     composeTestRule.setContent { NewUserScreen(navigationActions, userVM) }
+
+    composeTestRule.onNodeWithTag(C.Tag.NewUser.confirm).performClick()
 
     composeTestRule.onNodeWithTag(C.Tag.NewUser.greeting).performTextInput("")
     composeTestRule.onNodeWithTag(C.Tag.NewUser.firstname).performTextInput("")
