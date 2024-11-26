@@ -94,6 +94,7 @@ class NewUserScreenTest {
 
     composeTestRule.setContent { NewUserScreen(navigationActions, userVM) }
 
+    composeTestRule.waitForIdle()
     composeTestRule.onNodeWithTag(C.Tag.NewUser.confirm).performClick()
 
     composeTestRule.onNodeWithTag(C.Tag.NewUser.greeting).performTextInput("Mr.")
@@ -122,6 +123,7 @@ class NewUserScreenTest {
     }
     composeTestRule.setContent { NewUserScreen(navigationActions, userVM) }
 
+    composeTestRule.waitForIdle()
     composeTestRule.onNodeWithTag(C.Tag.NewUser.confirm).performClick()
 
     composeTestRule.onNodeWithTag(C.Tag.NewUser.greeting).performTextInput("")
