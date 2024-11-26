@@ -99,12 +99,12 @@ fun MapScreen(
   LaunchedEffect(Unit) {
     if (isOnline) {
       bookManagerViewModel.startUpdatingBooks()
-      geolocation.startLocationUpdates()
-      cameraPositionState.position =
-          CameraPosition.fromLatLngZoom(LatLng(latitude.value, longitude.value), INIT_ZOOM)
     } else {
       Toast.makeText(context, "Please connect to Internet to actualise", Toast.LENGTH_SHORT).show()
     }
+    geolocation.startLocationUpdates()
+    cameraPositionState.position =
+        CameraPosition.fromLatLngZoom(LatLng(latitude.value, longitude.value), INIT_ZOOM)
     isOnline = isNetworkAvailable(context)
   }
   // Stop location and books updates when the screen is disposed
