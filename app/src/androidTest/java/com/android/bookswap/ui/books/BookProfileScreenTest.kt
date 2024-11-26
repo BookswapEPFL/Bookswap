@@ -11,10 +11,7 @@ import androidx.navigation.compose.rememberNavController
 import com.android.bookswap.data.BookGenres
 import com.android.bookswap.data.BookLanguages
 import com.android.bookswap.data.DataBook
-import com.android.bookswap.data.repository.BooksRepository
-import com.android.bookswap.resources.C
 import com.android.bookswap.ui.navigation.NavigationActions
-import io.mockk.coEvery
 import io.mockk.mockk
 import java.util.UUID
 import org.junit.Before
@@ -25,34 +22,23 @@ class BookProfileScreenTest {
 
   @get:Rule val composeTestRule = createComposeRule()
   private lateinit var mockNavController: NavigationActions
-  private lateinit var mockBookRepo: BooksRepository
-  private val testBookId = UUID.randomUUID()
-  private val currentUserId = UUID.randomUUID()
 
   private val testBook =
       DataBook(
-          testBookId,
-          "Historia de España",
-          "Jose Ignacio Pastor Iglesias",
-          "Recuento de la historia de España desde los primeros pobladores hasta la actualidad.",
-          9,
-          null,
-          BookLanguages.SPANISH,
-          "978-84-09025-23-5",
-          listOf(BookGenres.HISTORICAL, BookGenres.NONFICTION, BookGenres.BIOGRAPHY),
-          currentUserId)
+          uuid = UUID.randomUUID(),
+          title = "Historia de España",
+          author = "Jose Ignacio Pastor Iglesias",
+          description =
+              "Recuento de la historia de España desde los primeros pobladores hasta la actualidad. Escrito con especial enfasis en los reyes catolicos y la exploracion de América.",
+          rating = 9,
+          photo = null,
+          language = BookLanguages.SPANISH,
+          isbn = "978-84-09025-23-5",
+          genres = listOf(BookGenres.HISTORICAL, BookGenres.NONFICTION, BookGenres.BIOGRAPHY))
 
   @Before
   fun setUp() {
     mockNavController = mockk()
-    mockBookRepo = mockk()
-
-    // Mocking the getBook call to return the test book
-    coEvery { mockBookRepo.getBook(testBookId, any(), any()) } answers
-        {
-          val onSuccess = it.invocation.args[1] as (DataBook) -> Unit
-          onSuccess(testBook)
-        }
   }
 
   @Test
@@ -60,25 +46,25 @@ class BookProfileScreenTest {
     composeTestRule.setContent {
       val navController = rememberNavController()
       val navigationActions = NavigationActions(navController)
-      BookProfileScreen(testBookId, mockBookRepo, navigationActions, currentUserId = currentUserId)
+      BookProfileScreen(testBook, navigationActions)
     }
 
-    composeTestRule.onNodeWithTag(C.Tag.BookProfile.title).assertIsDisplayed()
-    composeTestRule.onNodeWithTag(C.Tag.BookProfile.author).assertIsDisplayed()
+    composeTestRule.onNodeWithTag("bookTitle").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("bookAuthor").assertIsDisplayed()
     composeTestRule
-        .onNodeWithTag(C.Tag.BookProfile.scrollable)
-        .performScrollToNode(hasTestTag(C.Tag.BookProfile.location))
-    composeTestRule.onNodeWithTag(C.Tag.BookProfile.language).assertIsDisplayed()
-    composeTestRule.onNodeWithTag(C.Tag.BookProfile.genres).assertIsDisplayed()
+        .onNodeWithTag("bookProfileScroll")
+        .performScrollToNode(hasTestTag("bookProfileEditionPlace"))
+    composeTestRule.onNodeWithTag("bookProfileLanguage").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("bookProfileGenresTitle").assertIsDisplayed()
     testBook.genres.forEach { genre ->
-      composeTestRule.onNodeWithTag(genre.Genre + C.Tag.BookProfile.genre).assertIsDisplayed()
+      composeTestRule.onNodeWithTag("bookProfileGenre${genre.Genre}").assertIsDisplayed()
     }
-    composeTestRule.onNodeWithTag(C.Tag.BookProfile.isbn).assertIsDisplayed()
-    composeTestRule.onNodeWithTag(C.Tag.BookProfile.date).assertIsDisplayed()
-    composeTestRule.onNodeWithTag(C.Tag.BookProfile.volume).assertIsDisplayed()
-    composeTestRule.onNodeWithTag(C.Tag.BookProfile.issue).assertIsDisplayed()
-    composeTestRule.onNodeWithTag(C.Tag.BookProfile.editorial).assertIsDisplayed()
-    composeTestRule.onNodeWithTag(C.Tag.BookProfile.location).assertIsDisplayed()
+    composeTestRule.onNodeWithTag("bookProfileISBN").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("bookProfileDate").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("bookProfileVolume").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("bookProfileIssue").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("bookProfileEditorial").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("bookProfileEditionPlace").assertIsDisplayed()
   }
 
   @Test
@@ -86,11 +72,11 @@ class BookProfileScreenTest {
     composeTestRule.setContent {
       val navController = rememberNavController()
       val navigationActions = NavigationActions(navController)
-      BookProfileScreen(testBookId, mockBookRepo, navigationActions, currentUserId = currentUserId)
+      BookProfileScreen(testBook, navigationActions)
     }
 
-    composeTestRule.onNodeWithTag(C.Tag.BookProfile.previous_image).assertHasClickAction()
-    composeTestRule.onNodeWithTag(C.Tag.BookProfile.next_image).assertHasClickAction()
+    composeTestRule.onNodeWithTag("bookProfileImageLeft").assertHasClickAction()
+    composeTestRule.onNodeWithTag("bookProfileImageRight").assertHasClickAction()
   }
 
   @Test
@@ -98,16 +84,16 @@ class BookProfileScreenTest {
     composeTestRule.setContent {
       val navController = rememberNavController()
       val navigationActions = NavigationActions(navController)
-      BookProfileScreen(testBookId, mockBookRepo, navigationActions, currentUserId = currentUserId)
+      BookProfileScreen(testBook, navigationActions)
     }
 
     // Verify the first picture is displayed
-    composeTestRule.onNodeWithTag("0_" + C.Tag.BookProfile.image).assertIsDisplayed()
+    composeTestRule.onNodeWithTag("bookProfileImage Isabel La Catolica").assertIsDisplayed()
 
     // Perform a click action on the icon
-    composeTestRule.onNodeWithTag(C.Tag.BookProfile.next_image).performClick()
+    composeTestRule.onNodeWithTag("bookProfileImageRight").performClick()
 
     // Verify the next picture is displayed
-    composeTestRule.onNodeWithTag("1_" + C.Tag.BookProfile.image).assertIsDisplayed()
+    composeTestRule.onNodeWithTag("bookProfileImage Felipe II").assertIsDisplayed()
   }
 }
