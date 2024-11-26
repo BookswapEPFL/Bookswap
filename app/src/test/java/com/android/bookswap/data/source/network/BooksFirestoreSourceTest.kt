@@ -38,7 +38,9 @@ class BooksFirestoreSourceTest {
           photo = "http://example.com/photo.jpg",
           language = BookLanguages.ENGLISH,
           isbn = "1234567890",
-          userId = UUID.randomUUID())
+          userId = UUID.randomUUID(),
+          archived = false,
+          exchange = false)
 
   @Before
   fun setUp() {
