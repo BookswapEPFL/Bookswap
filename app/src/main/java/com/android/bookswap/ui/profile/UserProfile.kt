@@ -26,6 +26,7 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.android.bookswap.model.UserViewModel
+import com.android.bookswap.resources.C
 import com.android.bookswap.ui.components.ButtonComponent
 import com.android.bookswap.ui.theme.*
 
@@ -79,7 +80,7 @@ fun UserProfile(
 
   // Scaffold to provide basic UI structure with a top app bar
   Scaffold(
-      modifier = Modifier.testTag("profileScreenContainer"),
+      modifier = Modifier.testTag(C.Tag.user_profile_screen_container),
       topBar = topAppBar,
       bottomBar = bottomAppBar) {
         // Column layout to stack input fields vertically with spacing
@@ -116,23 +117,24 @@ fun UserProfile(
                 // Full name text
                 Text(
                     text = "${user.greeting} ${user.firstName} ${user.lastName}",
-                    modifier = Modifier.testTag("fullNameTxt"))
+                    modifier = Modifier.testTag(C.Tag.UserProfile.fullname))
 
                 // Email text
-                Text(text = user.email, modifier = Modifier.testTag("emailTxt"))
+                Text(text = user.email, modifier = Modifier.testTag(C.Tag.UserProfile.email))
 
                 // Phone number text
-                Text(text = user.phoneNumber, modifier = Modifier.testTag("phoneNumberTxt"))
+                Text(text = user.phoneNumber, modifier = Modifier.testTag(C.Tag.UserProfile.phone))
 
                 // User address
                 Text(
                     text = "${user.latitude}, ${user.longitude}",
-                    modifier = Modifier.testTag("addressTxt"))
+                    modifier = Modifier.testTag(C.Tag.UserProfile.address))
 
                 // Edit Button
-                ButtonComponent({ showEditProfile = true }, Modifier.testTag("editProfileBtn")) {
-                  Text("Edit Profile")
-                }
+                ButtonComponent(
+                    { showEditProfile = true }, Modifier.testTag(C.Tag.UserProfile.edit)) {
+                      Text("Edit Profile")
+                    }
               }
             }
       }

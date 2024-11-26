@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
+import com.android.bookswap.resources.C
 import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.theme.ColorVariable
 
@@ -16,12 +17,12 @@ import com.android.bookswap.ui.theme.ColorVariable
 @Composable
 fun ProfileIcon(navigationActions: NavigationActions) {
   IconButton(
-      onClick = { navigationActions.navigateTo("Profile Screen") },
-      modifier = Modifier.testTag("profileIconButton")) {
+      onClick = { navigationActions.navigateTo(C.Screen.USER_PROFILE) },
+      modifier = Modifier.testTag(C.Tag.TopAppBar.profile_button)) {
         Icon(
             Icons.Filled.AccountCircle,
             contentDescription = "Profile Icon",
             tint = ColorVariable.Accent,
-            modifier = Modifier.size(32.dp).testTag("profileIcon"))
+            modifier = Modifier.size(32.dp).testTag(C.Tag.TopAppBar.profile_icon))
       }
 }

@@ -29,6 +29,7 @@ import com.android.bookswap.data.BookGenres
 import com.android.bookswap.data.BookLanguages
 import com.android.bookswap.data.DataBook
 import com.android.bookswap.data.repository.BooksRepository
+import com.android.bookswap.resources.C
 import com.android.bookswap.ui.components.ButtonComponent
 import com.android.bookswap.ui.components.FieldComponent
 import com.android.bookswap.ui.theme.ColorVariable.BackGround
@@ -69,7 +70,7 @@ fun AddToBookScreen(
 
   // Scaffold to provide basic UI structure with a top app bar
   Scaffold(
-      modifier = Modifier.testTag("addBookScreen"),
+      modifier = Modifier.testTag(C.Tag.new_book_manual_screen_container),
       topBar = topAppBar,
       bottomBar = bottomAppBar,
       content = { paddingValues ->
@@ -84,7 +85,7 @@ fun AddToBookScreen(
               // Title Input Field
               FieldComponent(
                   modifier =
-                      Modifier.testTag("title_field")
+                      Modifier.testTag(C.Tag.NewBookManually.title)
                           .fillMaxWidth()
                           .padding(horizontal = HORIZONTAL_PADDING.dp),
                   labelText = "Title*",
@@ -95,7 +96,7 @@ fun AddToBookScreen(
                   modifier =
                       Modifier.fillMaxWidth()
                           .padding(horizontal = HORIZONTAL_PADDING.dp)
-                          .testTag("genre_field"),
+                          .testTag(C.Tag.NewBookManually.genres),
                   expanded = expanded,
                   onExpandedChange = { expanded = !expanded }) {
                     FieldComponent(
@@ -127,7 +128,7 @@ fun AddToBookScreen(
                   }
               FieldComponent(
                   modifier =
-                      Modifier.testTag("author_field")
+                      Modifier.testTag(C.Tag.NewBookManually.author)
                           .fillMaxWidth()
                           .padding(horizontal = HORIZONTAL_PADDING.dp),
                   labelText = "Author",
@@ -136,7 +137,7 @@ fun AddToBookScreen(
                   }
               FieldComponent(
                   modifier =
-                      Modifier.testTag("description_field")
+                      Modifier.testTag(C.Tag.NewBookManually.synopsis)
                           .fillMaxWidth()
                           .padding(horizontal = HORIZONTAL_PADDING.dp),
                   labelText = "Description",
@@ -145,7 +146,7 @@ fun AddToBookScreen(
                   }
               FieldComponent(
                   modifier =
-                      Modifier.testTag("rating_field")
+                      Modifier.testTag(C.Tag.NewBookManually.rating)
                           .fillMaxWidth()
                           .padding(horizontal = HORIZONTAL_PADDING.dp),
                   labelText = "Rating",
@@ -154,7 +155,7 @@ fun AddToBookScreen(
                   }
               FieldComponent(
                   modifier =
-                      Modifier.testTag("isbn_field")
+                      Modifier.testTag(C.Tag.NewBookManually.isbn)
                           .fillMaxWidth()
                           .padding(horizontal = HORIZONTAL_PADDING.dp),
                   labelText = "ISBN*",
@@ -163,7 +164,7 @@ fun AddToBookScreen(
                   }
               FieldComponent(
                   modifier =
-                      Modifier.testTag("photo_field")
+                      Modifier.testTag(C.Tag.NewBookManually.photo)
                           .fillMaxWidth()
                           .padding(horizontal = HORIZONTAL_PADDING.dp),
                   labelText = "Photo",
@@ -173,7 +174,7 @@ fun AddToBookScreen(
               /*
               FieldComponent(
                   modifier =
-                      Modifier.testTag("language_field")
+                      Modifier.testTag(C.Tag.NewBookManually.language)
                           .fillMaxWidth()
                           .padding(horizontal = HORIZONTAL_PADDING.dp),
                   labelText = "Language",
@@ -185,7 +186,7 @@ fun AddToBookScreen(
                   modifier =
                       Modifier.fillMaxWidth()
                           .padding(horizontal = HORIZONTAL_PADDING.dp)
-                          .testTag("language_field"),
+                          .testTag(C.Tag.NewBookManually.language),
                   expanded = expandedLanguage,
                   onExpandedChange = { expandedLanguage = !expandedLanguage }) {
                     FieldComponent(
@@ -215,7 +216,7 @@ fun AddToBookScreen(
 
               ButtonComponent(
                   modifier =
-                      Modifier.testTag("save_button")
+                      Modifier.testTag(C.Tag.NewBookManually.save)
                           .align(Alignment.CenterHorizontally)
                           .fillMaxWidth(0.5f),
                   enabled = title.isNotBlank() && isbn.isNotBlank(),
