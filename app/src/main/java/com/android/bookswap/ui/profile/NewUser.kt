@@ -74,6 +74,12 @@ fun NewUserScreen(navigationActions: NavigationActions, userVM: UserViewModel) {
   val firstName = remember { mutableStateOf("") }
   val lastName = remember { mutableStateOf("") }
 
+  val maxLengthGreetings = 5
+  val maxLengthFirstName = 100
+  val maxLengthLastName = 300
+  val maxLengthPhone = 20
+  val maxLengthEmail = 320
+
   val emailError = remember { mutableStateOf<String?>("Invalid email format") }
   val phoneError = remember { mutableStateOf<String?>("Invalid phone number") }
   val firstNameError = remember { mutableStateOf<String?>("First name required") }
@@ -137,7 +143,7 @@ fun NewUserScreen(navigationActions: NavigationActions, userVM: UserViewModel) {
                           }
                       OutlinedTextField(
                           greeting.value,
-                          { if (it.length <= 5) greeting.value = it },
+                          { if (it.length <= maxLengthGreetings) greeting.value = it },
                           Modifier.testTag(C.Tag.NewUser.greeting)
                               .fillMaxWidth()
                               .padding(TEXT_PADDING),
@@ -148,7 +154,7 @@ fun NewUserScreen(navigationActions: NavigationActions, userVM: UserViewModel) {
 
                       OutlinedTextField(
                           firstName.value,
-                          { if (it.length <= 100) firstName.value = it },
+                          { if (it.length <= maxLengthFirstName) firstName.value = it },
                           Modifier.testTag(C.Tag.NewUser.firstname)
                               .fillMaxWidth()
                               .padding(TEXT_PADDING),
@@ -168,7 +174,7 @@ fun NewUserScreen(navigationActions: NavigationActions, userVM: UserViewModel) {
 
                       OutlinedTextField(
                           lastName.value,
-                          { if (it.length <= 300) lastName.value = it },
+                          { if (it.length <= maxLengthLastName) lastName.value = it },
                           Modifier.testTag(C.Tag.NewUser.lastname)
                               .fillMaxWidth()
                               .padding(TEXT_PADDING),
@@ -187,7 +193,7 @@ fun NewUserScreen(navigationActions: NavigationActions, userVM: UserViewModel) {
 
                       OutlinedTextField(
                           email.value,
-                          { if (it.length <= 320) email.value = it },
+                          { if (it.length <= maxLengthEmail) email.value = it },
                           Modifier.testTag(C.Tag.NewUser.email)
                               .fillMaxWidth()
                               .padding(TEXT_PADDING),
@@ -206,7 +212,7 @@ fun NewUserScreen(navigationActions: NavigationActions, userVM: UserViewModel) {
 
                       OutlinedTextField(
                           phone.value,
-                          { if (it.length <= 15) phone.value = it },
+                          { if (it.length <= maxLengthPhone) phone.value = it },
                           Modifier.testTag(C.Tag.NewUser.phone)
                               .fillMaxWidth()
                               .padding(TEXT_PADDING),

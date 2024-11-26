@@ -70,6 +70,13 @@ fun AddToBookScreen(
   val context = LocalContext.current
   val inputVerification = InputVerification()
 
+  val maxLengthTitle = 50
+  val maxLengthAuthor = 50
+  val maxLengthDescription = 10000
+  val maxLengthRating = 1
+  val maxLengthPhoto = 50
+  val maxLengthISBN = 17
+
   // Scaffold to provide basic UI structure with a top app bar
   Scaffold(
       modifier = Modifier.testTag(C.Tag.new_book_manual_screen_container),
@@ -92,7 +99,7 @@ fun AddToBookScreen(
                           .padding(horizontal = HORIZONTAL_PADDING.dp),
                   labelText = "Title*",
                   value = title,
-                  maxLength = 50) {
+                  maxLength = maxLengthTitle) {
                     title = it
                   }
               ExposedDropdownMenuBox(
@@ -136,7 +143,7 @@ fun AddToBookScreen(
                           .padding(horizontal = HORIZONTAL_PADDING.dp),
                   labelText = "Author",
                   value = author,
-                  maxLength = 50) {
+                  maxLength = maxLengthAuthor) {
                     author = it
                   }
               FieldComponent(
@@ -146,7 +153,7 @@ fun AddToBookScreen(
                           .padding(horizontal = HORIZONTAL_PADDING.dp),
                   labelText = "Description",
                   value = description,
-                  maxLength = 10000) {
+                  maxLength = maxLengthDescription) {
                     description = it
                   }
               FieldComponent(
@@ -156,7 +163,7 @@ fun AddToBookScreen(
                           .padding(horizontal = HORIZONTAL_PADDING.dp),
                   labelText = "Rating",
                   value = rating,
-                  maxLength = 1) {
+                  maxLength = maxLengthRating) {
                     rating = it
                   }
               FieldComponent(
@@ -166,7 +173,7 @@ fun AddToBookScreen(
                           .padding(horizontal = HORIZONTAL_PADDING.dp),
                   labelText = "ISBN*",
                   value = isbn,
-                  maxLength = 17) {
+                  maxLength = maxLengthISBN) {
                     if (inputVerification.testIsbn(it)) {
                       isbn = it
                       Log.d("ISBN Input", "Updated ISBN: $isbn")
@@ -179,7 +186,7 @@ fun AddToBookScreen(
                           .padding(horizontal = HORIZONTAL_PADDING.dp),
                   labelText = "Photo",
                   value = photo,
-                  maxLength = 50) {
+                  maxLength = maxLengthPhoto) {
                     photo = it
                   }
               /*

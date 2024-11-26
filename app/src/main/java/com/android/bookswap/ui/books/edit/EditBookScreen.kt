@@ -84,6 +84,12 @@ fun EditBookScreen(
   var selectedGenre by remember { mutableStateOf<BookGenres?>(null) } // Genre selection state
   var expanded by remember { mutableStateOf(false) } // State for dropdown menu
 
+  val maxLengthTitle = 50
+  val maxLengthAuthor = 50
+  val maxLengthDescription = 10000
+  val maxLengthRating = 1
+  val maxLengthPhoto = 50
+
   val context = LocalContext.current
 
   Scaffold(
@@ -120,7 +126,7 @@ fun EditBookScreen(
               item {
                 OutlinedTextField(
                     value = title,
-                    onValueChange = { title = it },
+                    onValueChange = { if (it.length <= maxLengthTitle) title = it },
                     label = { Text("Title") },
                     placeholder = { Text("Enter the book title") },
                     modifier = Modifier.fillMaxWidth().testTag(C.Tag.EditBook.title),
@@ -172,7 +178,7 @@ fun EditBookScreen(
                 // Author Edit Field
                 OutlinedTextField(
                     value = author,
-                    onValueChange = { if (it.length <= 50) author = it },
+                    onValueChange = { if (it.length <= maxLengthAuthor) author = it },
                     label = { Text("Author") },
                     placeholder = { Text("Enter the author's name") },
                     modifier = Modifier.fillMaxWidth().testTag(C.Tag.EditBook.author),
@@ -187,7 +193,7 @@ fun EditBookScreen(
                 // Description Edit Field
                 OutlinedTextField(
                     value = description,
-                    onValueChange = { if (it.length <= 10000) description = it },
+                    onValueChange = { if (it.length <= maxLengthDescription) description = it },
                     label = { Text("Description") },
                     placeholder = { Text("Provide a description of the book") },
                     modifier = Modifier.fillMaxWidth().testTag(C.Tag.EditBook.synopsis),
@@ -202,7 +208,7 @@ fun EditBookScreen(
                 // Rating Edit Field
                 OutlinedTextField(
                     value = rating,
-                    onValueChange = { if (it.length <= 1) rating = it },
+                    onValueChange = { if (it.length <= maxLengthRating) rating = it },
                     label = { Text("Rating") },
                     placeholder = { Text("Rate the book (e.g. 4.5)") },
                     modifier = Modifier.fillMaxWidth().testTag(C.Tag.EditBook.rating),
@@ -217,7 +223,7 @@ fun EditBookScreen(
                 // Photo Edit Field
                 OutlinedTextField(
                     value = photo,
-                    onValueChange = { if (it.length <= 50) photo = it },
+                    onValueChange = { if (it.length <= maxLengthPhoto) photo = it },
                     label = { Text("Photo ") },
                     placeholder = { Text("Enter a photo of the books") },
                     modifier = Modifier.testTag(C.Tag.EditBook.image),

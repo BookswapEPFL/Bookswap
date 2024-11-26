@@ -48,6 +48,7 @@ fun AddISBNScreen(
     userId: UUID
 ) {
   val context = LocalContext.current
+  val maxLengthISBN = 17
   val inputVerification = InputVerification()
   Scaffold(
       modifier = Modifier.testTag(C.Tag.new_book_isbn_screen_container),
@@ -67,7 +68,7 @@ fun AddISBNScreen(
                         modifier = Modifier.testTag(C.Tag.NewBookISBN.isbn),
                         labelText = "ISBN*",
                         value = isbn,
-                        maxLength = 17) {
+                        maxLength = maxLengthISBN) {
                           if (inputVerification.testIsbn(it)) {
                             isbn = it
                             Log.d("ISBN Input", "Updated ISBN: $isbn")

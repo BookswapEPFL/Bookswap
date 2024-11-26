@@ -65,7 +65,6 @@ import com.android.bookswap.data.DataUser
 import com.android.bookswap.data.MessageType
 import com.android.bookswap.data.repository.MessageRepository
 import com.android.bookswap.data.repository.PhotoFirebaseStorageRepository
-import com.android.bookswap.model.InputVerification
 import com.android.bookswap.model.PhotoRequester
 import com.android.bookswap.model.chat.OfflineMessageStorage
 import com.android.bookswap.resources.C
@@ -102,7 +101,6 @@ fun ChatScreen(
   var newMessageText by remember { mutableStateOf(TextFieldValue("")) }
   var selectedMessage by remember { mutableStateOf<DataMessage?>(null) }
   var updateActive by remember { mutableStateOf(false) }
-  val verification = InputVerification()
   val maxMessagesStoredOffline = 10
   val padding8 = 8.dp
   val padding24 = 24.dp

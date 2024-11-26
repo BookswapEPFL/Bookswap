@@ -37,6 +37,12 @@ fun EditProfileDialog(onDismiss: () -> Unit, onSave: (DataUser) -> Unit, dataUse
   val _firstName = remember { mutableStateOf<String>(dataUser.firstName) }
   val _lastName = remember { mutableStateOf<String>(dataUser.lastName) }
 
+  val maxLengthGreetings = 5
+  val maxLengthFirstName = 100
+  val maxLengthLastName = 300
+  val maxLengthPhone = 20
+  val maxLengthEmail = 320
+
   val verification = InputVerification()
 
   val greetingError = remember { mutableStateOf(false) }
@@ -56,7 +62,7 @@ fun EditProfileDialog(onDismiss: () -> Unit, onSave: (DataUser) -> Unit, dataUse
               OutlinedTextField(
                   value = _greeting.value,
                   onValueChange = {
-                    if (it.length <= 5) {
+                    if (it.length <= maxLengthGreetings) {
                       _greeting.value = it
                       dataUser.greeting = _greeting.value
                       greetingError.value = false
@@ -75,7 +81,7 @@ fun EditProfileDialog(onDismiss: () -> Unit, onSave: (DataUser) -> Unit, dataUse
               OutlinedTextField(
                   value = _firstName.value,
                   onValueChange = {
-                    if (it.length <= 100) {
+                    if (it.length <= maxLengthFirstName) {
                       _firstName.value = it
                       dataUser.firstName = _firstName.value
                       firstNameError.value = false
@@ -93,7 +99,7 @@ fun EditProfileDialog(onDismiss: () -> Unit, onSave: (DataUser) -> Unit, dataUse
               OutlinedTextField(
                   value = _lastName.value,
                   onValueChange = {
-                    if (it.length <= 300) {
+                    if (it.length <= maxLengthLastName) {
                       _lastName.value = it
                       dataUser.lastName = _lastName.value
                       lastNameError.value = false
@@ -111,7 +117,7 @@ fun EditProfileDialog(onDismiss: () -> Unit, onSave: (DataUser) -> Unit, dataUse
               OutlinedTextField(
                   value = _email.value,
                   onValueChange = {
-                    if (it.length <= 320) {
+                    if (it.length <= maxLengthEmail) {
                       _email.value = it
                       emailError.value = false
                       if (verification.validateEmail(_email.value)) {
@@ -131,7 +137,7 @@ fun EditProfileDialog(onDismiss: () -> Unit, onSave: (DataUser) -> Unit, dataUse
               OutlinedTextField(
                   value = _phone.value,
                   onValueChange = {
-                    if (it.length <= 15) {
+                    if (it.length <= maxLengthPhone) {
                       _phone.value = it
                       phoneError.value = false
                       if (verification.validatePhone(_phone.value)) {
