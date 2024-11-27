@@ -6,6 +6,7 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import com.android.bookswap.data.repository.BooksRepository
 import com.android.bookswap.data.repository.PhotoFirebaseStorageRepository
+import com.android.bookswap.resources.C
 import com.android.bookswap.ui.navigation.NavigationActions
 import io.mockk.mockk
 import java.util.UUID
@@ -28,9 +29,9 @@ class BookAdditionChoiceScreenTest {
           booksRepository = booksRepository,
           userUUID = UUID.randomUUID())
     }
-    composeTestRule.onNodeWithTag("button_Manually").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("button_From ISBN").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("button_From Photo").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("Manually" + C.Tag.NewBookChoice.btnWIcon.button).assertIsDisplayed()
+    composeTestRule.onNodeWithTag("From ISBN" + C.Tag.NewBookChoice.btnWIcon.button).assertIsDisplayed()
+    composeTestRule.onNodeWithTag("From Photo" + C.Tag.NewBookChoice.btnWIcon.button).assertIsDisplayed()
   }
 
   @Test
@@ -42,8 +43,8 @@ class BookAdditionChoiceScreenTest {
           booksRepository = booksRepository,
           userUUID = UUID.randomUUID())
     }
-    composeTestRule.onNodeWithTag("button_Manually").assertHasClickAction()
-    composeTestRule.onNodeWithTag("button_From ISBN").assertHasClickAction()
-    composeTestRule.onNodeWithTag("button_From Photo").assertHasClickAction()
+    composeTestRule.onNodeWithTag("Manually" + C.Tag.NewBookChoice.btnWIcon.button).assertHasClickAction()
+    composeTestRule.onNodeWithTag("From ISBN" + C.Tag.NewBookChoice.btnWIcon.button).assertHasClickAction()
+    composeTestRule.onNodeWithTag("From Photo" + C.Tag.NewBookChoice.btnWIcon.button).assertHasClickAction()
   }
 }

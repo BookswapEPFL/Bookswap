@@ -145,7 +145,7 @@ fun ButtonWithIcon(
       modifier =
           Modifier.padding(buttonPadding)
               .width(buttonWidth)
-              .testTag(C.Tag.NewBookChoice.btnWIcon.button)) {
+              .testTag(text + C.Tag.NewBookChoice.btnWIcon.button)) {
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -156,14 +156,14 @@ fun ButtonWithIcon(
                     contentDescription = null,
                     modifier =
                         Modifier.size(iconSize)
-                            .testTag(C.Tag.NewBookChoice.btnWIcon.icon))
+                            .testTag(text + C.Tag.NewBookChoice.btnWIcon.icon))
               } else if (leftIconPainter != null) {
                 Image(
                     painter = leftIconPainter,
                     contentDescription = null,
                     modifier =
                         Modifier.size(pngSize)
-                            .testTag(C.Tag.NewBookChoice.btnWIcon.png))
+                            .testTag(text + C.Tag.NewBookChoice.btnWIcon.png))
               }
               Text(text, fontSize = textSize)
               Icon(
@@ -171,7 +171,7 @@ fun ButtonWithIcon(
                   contentDescription = null,
                   modifier =
                       Modifier.size(iconSize)
-                          .testTag(C.Tag.NewBookChoice.btnWIcon.arrow))
+                          .testTag(text + C.Tag.NewBookChoice.btnWIcon.arrow))
             }
       }
 }
