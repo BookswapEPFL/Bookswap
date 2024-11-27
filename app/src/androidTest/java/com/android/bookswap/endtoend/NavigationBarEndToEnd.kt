@@ -9,12 +9,14 @@ import com.android.bookswap.data.repository.BooksRepository
 import com.android.bookswap.data.repository.UsersRepository
 import com.android.bookswap.data.source.network.MessageFirestoreSource
 import com.android.bookswap.data.source.network.PhotoFirebaseStorageSource
+import com.android.bookswap.model.chat.ContactViewModel
 import com.android.bookswap.model.chat.OfflineMessageStorage
-import com.android.bookswap.ui.navigation.Route
+import com.android.bookswap.resources.C
 import com.google.firebase.firestore.FirebaseFirestore
 import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
+import io.mockk.mockkConstructor
 import io.mockk.runs
 import org.junit.Before
 import org.junit.Rule
@@ -27,20 +29,23 @@ class NavigationBarEndToEnd {
   private lateinit var mockUserRepository: UsersRepository
   private lateinit var mockPhotoStorage: PhotoFirebaseStorageSource
   private lateinit var mockMessageStorage: OfflineMessageStorage
-  private lateinit var context: Context
+  private lateinit var mockContext: Context
 
   @Before
   fun setUp() {
     mockPhotoStorage = mockk()
     mockBookRepository = mockk()
     mockMessageStorage = mockk()
-    context = mockk()
+    mockContext = mockk()
     every { mockBookRepository.getBook(any()) } just runs
     mockUserRepository = mockk()
     every { mockUserRepository.getUsers(any()) } just runs
 
+    mockkConstructor(ContactViewModel::class)
+    every { anyConstructed<ContactViewModel>().updateMessageBoxMap() } just runs
+
     composeTestRule.setContent {
-      val db = FirebaseFirestore.getInstance()
+      val db: FirebaseFirestore = mockk(relaxed = true)
 
       val messageRepository = MessageFirestoreSource(db)
       MainActivity()
@@ -48,25 +53,34 @@ class NavigationBarEndToEnd {
               messageRepository,
               mockBookRepository,
               mockUserRepository,
-              Route.MAP,
+              C.Route.MAP,
               mockPhotoStorage,
-              messageStorage = mockMessageStorage,
-              context = context)
+              mockMessageStorage,
+              context = mockContext)
     }
   }
 
   @Test
   fun testNavigationBar() {
     // Click on the Add Book tab and check if the AddToBookScreen is displayed
-    composeTestRule.onNodeWithTag("New Book").assertExists().performClick()
-    composeTestRule.onNodeWithTag("addBookChoiceScreen").assertExists()
+    composeTestRule
+        .onNodeWithTag(C.Route.NEW_BOOK + C.Tag.BottomNavMenu.nav_item)
+        .assertExists()
+        .performClick()
+    composeTestRule.onNodeWithTag(C.Tag.new_book_choice_screen_container).assertExists()
 
     // Click on the Chat tab and check if the ListChatScreen is displayed
-    composeTestRule.onNodeWithTag("Chat").assertExists().performClick()
-    composeTestRule.onNodeWithTag("chat_listScreen").assertExists()
+    composeTestRule
+        .onNodeWithTag(C.Route.CHAT_LIST + C.Tag.BottomNavMenu.nav_item)
+        .assertExists()
+        .performClick()
+    composeTestRule.onNodeWithTag(C.Tag.chat_list_screen_container).assertExists()
 
     // Click on the Map tab and check if the MapScreen is displayed
-    composeTestRule.onNodeWithTag("Map").assertExists().performClick()
-    composeTestRule.onNodeWithTag("mapScreen").assertExists()
+    composeTestRule
+        .onNodeWithTag(C.Route.MAP + C.Tag.BottomNavMenu.nav_item)
+        .assertExists()
+        .performClick()
+    composeTestRule.onNodeWithTag(C.Tag.map_screen_container).assertExists()
   }
 }

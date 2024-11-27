@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
+import com.android.bookswap.resources.C
 import com.android.bookswap.ui.theme.ColorVariable
 
 /** Constants * */
@@ -28,7 +29,10 @@ fun BottomNavigationMenu(
     selectedItem: String
 ) {
   BottomNavigation(
-      modifier = Modifier.fillMaxWidth().height(BOTTOM_NAV_HEIGHT).testTag("bottomNavigationMenu"),
+      modifier =
+          Modifier.fillMaxWidth()
+              .height(BOTTOM_NAV_HEIGHT)
+              .testTag(C.Tag.bottom_navigation_menu_container),
       backgroundColor = ColorVariable.Primary, // Color of the bottom navigation bar
       content = {
         tabList.forEach { tab ->
@@ -37,12 +41,14 @@ fun BottomNavigationMenu(
                 // Display the icon for each tab
                 Icon(
                     tab.icon,
-                    contentDescription = "icon_${tab.textId}",
+                    contentDescription = tab.route + C.Tag.BottomNavMenu.nav_icon,
                     tint = ColorVariable.BackGround)
               },
               selected = tab.route == selectedItem,
               onClick = { onTabSelect(tab) },
-              modifier = Modifier.clip(RoundedCornerShape(ROUNDED_CORNER_SIZE)).testTag(tab.textId))
+              modifier =
+                  Modifier.clip(RoundedCornerShape(ROUNDED_CORNER_SIZE))
+                      .testTag(tab.route + C.Tag.BottomNavMenu.nav_item))
         }
       },
   )

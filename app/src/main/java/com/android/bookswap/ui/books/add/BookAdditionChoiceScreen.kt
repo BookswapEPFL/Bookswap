@@ -33,6 +33,7 @@ import com.android.bookswap.data.repository.BooksRepository
 import com.android.bookswap.data.repository.PhotoFirebaseStorageRepository
 import com.android.bookswap.model.BookFromChatGPT
 import com.android.bookswap.model.PhotoRequester
+import com.android.bookswap.resources.C
 import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.theme.ColorVariable
 import java.util.UUID
@@ -76,7 +77,7 @@ fun BookAdditionChoiceScreen(
       }
   photoRequester.Init()
   Scaffold(
-      modifier = Modifier.testTag("addBookChoiceScreen"),
+      modifier = Modifier.testTag(C.Tag.new_book_choice_screen_container),
       topBar = topAppBar,
       bottomBar = bottomAppBar) { innerPadding ->
         Column(
@@ -91,14 +92,14 @@ fun BookAdditionChoiceScreen(
                   text = "Manually",
                   leftIcon = Icons.Default.Add,
                   leftIconPainter = null,
-                  onClick = { navController.navigateTo("AddBookManually Screen") },
+                  onClick = { navController.navigateTo(C.Screen.ADD_BOOK_MANUALLY) },
                   buttonWidth = buttonWidth)
               Spacer(modifier = Modifier.height(2f * columnPadding))
               ButtonWithIcon(
                   text = "From ISBN",
                   leftIcon = null,
                   leftIconPainter = painterResource(id = R.drawable.download),
-                  onClick = { navController.navigateTo("AddBookISBN Screen") },
+                  onClick = { navController.navigateTo(C.Screen.ADD_BOOK_ISBN) },
                   buttonWidth = buttonWidth)
               Spacer(modifier = Modifier.height(2f * columnPadding))
               ButtonWithIcon(
@@ -141,7 +142,10 @@ fun ButtonWithIcon(
               contentColor = ColorVariable.BackGround),
       border = BorderStroke(borderPadding, ColorVariable.Accent),
       shape = RoundedCornerShape(buttonPadding),
-      modifier = Modifier.padding(buttonPadding).width(buttonWidth).testTag("button_$text")) {
+      modifier =
+          Modifier.padding(buttonPadding)
+              .width(buttonWidth)
+              .testTag(C.Tag.NewBookChoice.btnWIcon.button)) {
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -150,18 +154,24 @@ fun ButtonWithIcon(
                 Icon(
                     imageVector = leftIcon,
                     contentDescription = null,
-                    modifier = Modifier.size(iconSize).testTag("leftIcon_$text"))
+                    modifier =
+                        Modifier.size(iconSize)
+                            .testTag(C.Tag.NewBookChoice.btnWIcon.icon))
               } else if (leftIconPainter != null) {
                 Image(
                     painter = leftIconPainter,
                     contentDescription = null,
-                    modifier = Modifier.size(pngSize).testTag("leftPngIcon_$text"))
+                    modifier =
+                        Modifier.size(pngSize)
+                            .testTag(C.Tag.NewBookChoice.btnWIcon.png))
               }
               Text(text, fontSize = textSize)
               Icon(
                   imageVector = Icons.AutoMirrored.Filled.ArrowForward,
                   contentDescription = null,
-                  modifier = Modifier.size(iconSize).testTag("rightIcon_$text"))
+                  modifier =
+                      Modifier.size(iconSize)
+                          .testTag(C.Tag.NewBookChoice.btnWIcon.arrow))
             }
       }
 }
