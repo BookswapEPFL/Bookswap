@@ -85,6 +85,8 @@ fun NewUserScreen(navigationActions: NavigationActions, userVM: UserViewModel) {
   val firstNameError = remember { mutableStateOf<String?>("First name required") }
   val lastNameError = remember { mutableStateOf<String?>("Last name required") }
 
+  var firstAttempt = true
+
   LazyColumn(
       contentPadding = PaddingValues(CONTENT_PADDING),
       modifier =
@@ -160,8 +162,9 @@ fun NewUserScreen(navigationActions: NavigationActions, userVM: UserViewModel) {
                           placeholder = { Text("John", Modifier, Color.Gray) },
                           keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                           singleLine = true,
-                          isError = !verification.validateNonEmpty(firstName.value))
-                      if (!verification.validateNonEmpty(firstName.value)) {
+                          isError =
+                              !verification.validateNonEmpty(firstName.value) && !firstAttempt)
+                      if (!verification.validateNonEmpty(firstName.value) && !firstAttempt) {
                         Text(
                             firstNameError.value!!,
                             color = Color.Red,
@@ -179,8 +182,8 @@ fun NewUserScreen(navigationActions: NavigationActions, userVM: UserViewModel) {
                           placeholder = { Text("Doe", Modifier, Color.Gray) },
                           keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                           singleLine = true,
-                          isError = !verification.validateNonEmpty(lastName.value))
-                      if (!verification.validateNonEmpty(lastName.value)) {
+                          isError = !verification.validateNonEmpty(lastName.value) && !firstAttempt)
+                      if (!verification.validateNonEmpty(lastName.value) && !firstAttempt) {
                         Text(
                             lastNameError.value!!,
                             color = Color.Red,
@@ -198,8 +201,8 @@ fun NewUserScreen(navigationActions: NavigationActions, userVM: UserViewModel) {
                           placeholder = { Text("John.Doe@example.com", Modifier, Color.Gray) },
                           keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                           singleLine = true,
-                          isError = !verification.validateEmail(email.value))
-                      if (!verification.validateEmail(email.value)) {
+                          isError = !verification.validateEmail(email.value) && !firstAttempt)
+                      if (!verification.validateEmail(email.value) && !firstAttempt) {
                         Text(
                             emailError.value!!,
                             color = Color.Red,
@@ -217,8 +220,8 @@ fun NewUserScreen(navigationActions: NavigationActions, userVM: UserViewModel) {
                           placeholder = { Text("+4122345678", Modifier, Color.Gray) },
                           keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
                           singleLine = true,
-                          isError = !verification.validatePhone(phone.value))
-                      if (!verification.validatePhone(phone.value)) {
+                          isError = !verification.validatePhone(phone.value) && !firstAttempt)
+                      if (!verification.validatePhone(phone.value) && !firstAttempt) {
                         Text(
                             phoneError.value!!,
                             color = Color.Red,
@@ -246,6 +249,7 @@ fun NewUserScreen(navigationActions: NavigationActions, userVM: UserViewModel) {
                         googleUid = Firebase.auth.currentUser?.uid ?: "")
                     navigationActions.navigateTo(C.Route.MAP)
                   } else {
+                    firstAttempt = false
                     Toast.makeText(context, "Please correct the errors", Toast.LENGTH_SHORT).show()
                   }
                 },

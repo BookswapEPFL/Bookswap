@@ -17,6 +17,7 @@ import io.mockk.verify
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.any
 
 class NewUserScreenTest {
   @get:Rule val composeTestRule = createComposeRule()
@@ -93,6 +94,9 @@ class NewUserScreenTest {
 
     composeTestRule.setContent { NewUserScreen(navigationActions, userVM) }
 
+    composeTestRule.waitForIdle()
+    composeTestRule.onNodeWithTag(C.Tag.NewUser.confirm).performClick()
+
     composeTestRule.onNodeWithTag(C.Tag.NewUser.greeting).performTextInput("Mr.")
     composeTestRule.onNodeWithTag(C.Tag.NewUser.firstname).performTextInput("John")
     composeTestRule.onNodeWithTag(C.Tag.NewUser.lastname).performTextInput("Doe")
@@ -118,6 +122,9 @@ class NewUserScreenTest {
       userVM.updateUser(any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any())
     }
     composeTestRule.setContent { NewUserScreen(navigationActions, userVM) }
+
+    composeTestRule.waitForIdle()
+    composeTestRule.onNodeWithTag(C.Tag.NewUser.confirm).performClick()
 
     composeTestRule.onNodeWithTag(C.Tag.NewUser.greeting).performTextInput("")
     composeTestRule.onNodeWithTag(C.Tag.NewUser.firstname).performTextInput("")
