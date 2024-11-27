@@ -29,6 +29,7 @@ import com.android.bookswap.data.BookGenres
 import com.android.bookswap.data.BookLanguages
 import com.android.bookswap.data.DataBook
 import com.android.bookswap.data.repository.BooksRepository
+import com.android.bookswap.model.UserViewModel
 import com.android.bookswap.resources.C
 import com.android.bookswap.ui.components.ButtonComponent
 import com.android.bookswap.ui.components.FieldComponent
@@ -47,10 +48,11 @@ private const val HORIZONTAL_PADDING = 30
 @Composable
 fun AddToBookScreen(
     repository: BooksRepository,
+    userVM: UserViewModel = UserViewModel(UUID.randomUUID()),
     topAppBar: @Composable () -> Unit = {},
-    bottomAppBar: @Composable () -> Unit = {},
-    userId: UUID
+    bottomAppBar: @Composable () -> Unit = {}
 ) {
+  var user = userVM.getUser()
   // State variables to store the values entered by the user
   var title by remember { mutableStateOf("") }
   var author by remember { mutableStateOf("") }
@@ -236,13 +238,27 @@ fun AddToBookScreen(
                               selectedLanguage.toString(),
                               isbn,
                               listOf(selectedGenre!!),
-                              userId)
+                              user.userUUID)
+
                       if (book == null) {
                         Log.e("AddToBookScreen", "Invalid argument")
                         Toast.makeText(context, "Invalid argument", Toast.LENGTH_SHORT).show()
                       } else {
                         Log.d("AddToBookScreen", "Adding book: $book")
-                        repository.addBook(book, callback = {})
+                        repository.addBook(
+                            book,
+                            callback = {
+                              if (it.isSuccess) {
+                                val newBookList = user.bookList + book.uuid
+                                userVM.updateUser(bookList = newBookList)
+                                Toast.makeText(context, "${book.title} added", Toast.LENGTH_LONG)
+                                    .show()
+                              } else {
+                                val error = it.exceptionOrNull()!!
+                                Log.e("AddToBookScreen", it.toString())
+                                Toast.makeText(context, error.message, Toast.LENGTH_LONG).show()
+                              }
+                            })
                       }
                     } else {
                       // Show a Toast message if title or ISBN is empty

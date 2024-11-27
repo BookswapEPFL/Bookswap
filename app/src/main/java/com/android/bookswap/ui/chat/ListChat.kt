@@ -21,6 +21,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -31,6 +34,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.bookswap.data.MessageBox
+import com.android.bookswap.model.chat.ContactViewModel
 import com.android.bookswap.resources.C
 import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.theme.ColorVariable
@@ -39,11 +43,14 @@ import com.android.bookswap.ui.theme.ColorVariable
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ListChatScreen(
-    placeHolderData: List<MessageBox> = emptyList(),
     navigationActions: NavigationActions,
     topAppBar: @Composable () -> Unit = {},
     bottomAppBar: @Composable () -> Unit = {},
+    contactViewModel: ContactViewModel = ContactViewModel()
 ) {
+  LaunchedEffect(Unit) { contactViewModel.updateMessageBoxMap() }
+  val messageBoxMap by contactViewModel.messageBoxMap.collectAsState()
+  val messageList = messageBoxMap.values.toList()
   Scaffold(
       modifier = Modifier.testTag(C.Tag.chat_list_screen_container),
       topBar = topAppBar,
@@ -55,7 +62,7 @@ fun ListChatScreen(
                     .background(color = ColorVariable.BackGround)
                     .testTag(C.Tag.ChatList.scrollable)) {
               item { MessageDivider() }
-              if (placeHolderData.isEmpty()) {
+              if (messageBoxMap.isEmpty()) {
                 item {
                   Text(
                       text = "No messages yet",
@@ -66,10 +73,11 @@ fun ListChatScreen(
                       textAlign = TextAlign.Center)
                 }
               } else {
-                items(placeHolderData.size) { message ->
-                  MessageBoxDisplay(placeHolderData[message]) {
+                items(messageList.size) { index ->
+                  val messageBox = messageList[index]
+                  MessageBoxDisplay(messageBox) {
                     navigationActions.navigateTo(
-                        C.Screen.CHAT, placeHolderData[message].contact.userUUID.toString())
+                        C.Screen.CHAT, messageBox.contact.userUUID.toString())
                   }
                   MessageDivider()
                 }
@@ -107,14 +115,14 @@ fun MessageBoxDisplay(message: MessageBox, onClick: () -> Unit = {}) {
                     color = ColorVariable.Accent,
                     modifier = Modifier.testTag(C.Tag.ChatList.contact))
                 Text(
-                    text = message.date,
+                    text = message.date.takeUnless { it.isNullOrEmpty() } ?: "",
                     fontSize = 14.sp,
                     color = ColorVariable.AccentSecondary,
                     modifier = Modifier.testTag(C.Tag.ChatList.timestamp))
               }
 
           Text(
-              text = message.message,
+              text = message.message?.takeUnless { it.isNullOrEmpty() } ?: "No messages yet",
               fontSize = 14.sp,
               color = ColorVariable.AccentSecondary,
               maxLines = 1,
