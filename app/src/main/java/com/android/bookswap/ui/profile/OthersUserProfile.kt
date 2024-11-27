@@ -21,6 +21,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.android.bookswap.data.DataUser
+import com.android.bookswap.data.repository.BooksRepository
+import com.android.bookswap.model.UserBookViewModel
 import com.android.bookswap.model.UserViewModel
 import com.android.bookswap.ui.components.BookListComponent
 import java.util.UUID
@@ -30,7 +32,7 @@ import java.util.UUID
  * Composable function to display the user profile screen.
  *
  * @param userId The UUID of the user whose profile is to be displayed.
- * @param userVM The ViewModel containing user data. Defaults to a new UserViewModel instance.
+ * @param otherUserVM The ViewModel containing user data. Defaults to a new UserViewModel instance.
  * @param topAppBar A composable function to display the top app bar. Defaults to an empty
  *   composable.
  * @param bottomAppBar A composable function to display the bottom app bar. Defaults to an empty
@@ -39,7 +41,9 @@ import java.util.UUID
 @Composable
 fun OthersUserProfileScreen(
     userId: UUID,
-    userVM: UserViewModel = UserViewModel(userId),
+    otherUserVM: UserViewModel = UserViewModel(userId),
+    booksRepository: BooksRepository,
+    UserBookViewModel: UserBookViewModel = UserBookViewModel(booksRepository),
     topAppBar: @Composable () -> Unit = {},
     bottomAppBar: @Composable () -> Unit = {}
 ) {
@@ -50,7 +54,7 @@ fun OthersUserProfileScreen(
     //I think it is better (good thing) to use LaunchedEffect
     LaunchedEffect(userId) {
         isLoading = true
-        user = userVM.getUser(force = true)
+        user = otherUserVM.getUser(force = true)
         isLoading = false
     }
 
@@ -124,11 +128,11 @@ fun OthersUserProfileScreen(
                         modifier = Modifier.testTag("otherUserAddressTxt")
                     )
                 }
-
+                val booklist = UserBookViewModel.getBooks(user.bookList)
                 // BookList:
                 BookListComponent(
                     modifier = Modifier.testTag("otherUserBookList"),
-                    bookList = user.bookList,
+                    bookList = booklist,
                     //bc it is a list of UUIDs I maybe need to retrieve each book before
                     //or maybe the retrieval of the books should be done in the booklist composable
                 )
