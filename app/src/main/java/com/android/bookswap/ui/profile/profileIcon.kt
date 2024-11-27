@@ -11,13 +11,14 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.android.bookswap.resources.C
 import com.android.bookswap.ui.navigation.NavigationActions
+import com.android.bookswap.ui.navigation.TopLevelDestinations
 import com.android.bookswap.ui.theme.ColorVariable
 
 /** Profile Icon for the top app bar */
 @Composable
 fun ProfileIcon(navigationActions: NavigationActions) {
   IconButton(
-      onClick = { navigationActions.navigateTo(C.Screen.USER_PROFILE) },
+      onClick = { navigationActions.navigateTo(TopLevelDestinations.PROFILE) },
       modifier = Modifier.testTag(C.Tag.TopAppBar.profile_button)) {
         Icon(
             Icons.Filled.AccountCircle,

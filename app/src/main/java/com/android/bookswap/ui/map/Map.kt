@@ -42,6 +42,7 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.bookswap.data.DataBook
+import com.android.bookswap.model.UserViewModel
 import com.android.bookswap.model.map.BookFilter
 import com.android.bookswap.model.map.BookManagerViewModel
 import com.android.bookswap.model.map.DefaultGeolocation
@@ -85,7 +86,9 @@ fun MapScreen(
     geolocation: IGeolocation = DefaultGeolocation(),
     topAppBar: @Composable () -> Unit = {},
     bottomAppBar: @Composable () -> Unit = {},
+    userVM: UserViewModel
 ) {
+  geolocation.startLocationUpdates()
   val cameraPositionState = rememberCameraPositionState()
   // Get the user's current location
   val latitude = geolocation.latitude.collectAsState()
@@ -95,11 +98,13 @@ fun MapScreen(
     bookManagerViewModel.startUpdatingBooks()
     geolocation.startLocationUpdates()
     cameraPositionState.position =
-        CameraPosition.fromLatLngZoom(LatLng(latitude.value, longitude.value), INIT_ZOOM)
+        CameraPosition.fromLatLngZoom(LatLng(geolocation.latitude.value, geolocation.longitude.value), INIT_ZOOM)
   }
   // Stop location and books updates when the screen is disposed
   DisposableEffect(Unit) {
-    onDispose {
+    onDispose { android.util.Log.d("TAG_MAP","${latitude.value},${longitude.value};${geolocation.latitude.value},${geolocation.longitude.value}")
+      userVM.lat = geolocation.latitude.value
+      userVM.lon = geolocation.longitude.value
       geolocation.stopLocationUpdates()
       bookManagerViewModel.stopUpdatingBooks()
     }
@@ -154,9 +159,12 @@ fun MapScreen(
               GoogleMap(
                   onMapClick = { mutableStateSelectedUser = NO_USER_SELECTED },
                   modifier =
-                      Modifier.fillMaxSize().testTag(C.Tag.Map.google_map).semantics {
-                        cameraPosition = cameraPositionState
-                      },
+				  Modifier
+					.fillMaxSize()
+					.testTag(C.Tag.Map.google_map)
+					.semantics {
+					  cameraPosition = cameraPositionState
+					},
                   cameraPositionState = cameraPositionState,
                   uiSettings = MapUiSettings(zoomControlsEnabled = false),
               ) {
@@ -234,32 +242,37 @@ const val SECONDARY_TEXT_FONT_SP = 16
 private fun CustomInfoWindow(modifier: Modifier = Modifier, userBooks: List<DataBook>) {
   Card(
       modifier =
-          modifier
-              .wrapContentSize()
-              .width(CARD_WIDTH_DP.dp)
-              .border(
-                  BorderStroke(width = DIVIDER_THICKNESS_DP.dp, color = ColorVariable.Accent),
-                  shape =
-                      RoundedCornerShape(
-                          0.dp,
-                          CARD_CORNER_RADIUS.dp,
-                          CARD_CORNER_RADIUS.dp,
-                          CARD_CORNER_RADIUS.dp))
-              .heightIn(max = CARD_HEIGHT_DP.dp)
-              .testTag(C.Tag.Map.Marker.info_window_container)
-              .background(Color.Transparent),
+	  modifier
+		.wrapContentSize()
+		.width(CARD_WIDTH_DP.dp)
+		.border(
+		  BorderStroke(width = DIVIDER_THICKNESS_DP.dp, color = ColorVariable.Accent),
+		  shape =
+		  RoundedCornerShape(
+			0.dp,
+			CARD_CORNER_RADIUS.dp,
+			CARD_CORNER_RADIUS.dp,
+			CARD_CORNER_RADIUS.dp
+		  )
+		)
+		.heightIn(max = CARD_HEIGHT_DP.dp)
+		.testTag(C.Tag.Map.Marker.info_window_container)
+		.background(Color.Transparent),
       colors = CardDefaults.cardColors(containerColor = ColorVariable.Secondary),
       shape =
           RoundedCornerShape(
               0.dp, CARD_CORNER_RADIUS.dp, CARD_CORNER_RADIUS.dp, CARD_CORNER_RADIUS.dp)) {
         Spacer(modifier.height(CARD_CORNER_RADIUS.dp))
         LazyColumn(
-            modifier = Modifier.fillMaxWidth().testTag(C.Tag.Map.Marker.info_window_scrollable)) {
+            modifier = Modifier
+			  .fillMaxWidth()
+			  .testTag(C.Tag.Map.Marker.info_window_scrollable)) {
               itemsIndexed(userBooks) { index, book ->
                 Column(
                     modifier =
-                        Modifier.padding(horizontal = PADDING_HORIZONTAL_DP.dp)
-                            .testTag(C.Tag.Map.Marker.info_window_book_container)) {
+					Modifier
+					  .padding(horizontal = PADDING_HORIZONTAL_DP.dp)
+					  .testTag(C.Tag.Map.Marker.info_window_book_container)) {
                       Text(
                           text = book.title,
                           color = ColorVariable.Accent,
@@ -275,9 +288,10 @@ private fun CustomInfoWindow(modifier: Modifier = Modifier, userBooks: List<Data
                 if (index < userBooks.size - 1)
                     HorizontalDivider(
                         modifier =
-                            Modifier.fillMaxWidth()
-                                .height(PADDING_VERTICAL_DP.dp)
-                                .testTag(C.Tag.Map.Marker.info_window_divider),
+						Modifier
+						  .fillMaxWidth()
+						  .height(PADDING_VERTICAL_DP.dp)
+						  .testTag(C.Tag.Map.Marker.info_window_divider),
                         thickness = DIVIDER_THICKNESS_DP.dp,
                         color = ColorVariable.Accent)
               }

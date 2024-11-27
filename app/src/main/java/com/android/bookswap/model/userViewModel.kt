@@ -1,12 +1,15 @@
 package com.android.bookswap.model
 
+import android.content.Context
 import android.util.Log
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import com.android.bookswap.data.DataUser
 import com.android.bookswap.data.repository.UsersRepository
 import com.android.bookswap.data.source.network.UserFirestoreSource
+import com.android.bookswap.model.map.GeoLocVewModel
 import com.google.firebase.firestore.FirebaseFirestore
 import java.util.UUID
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,8 +27,14 @@ open class UserViewModel(
 ) : ViewModel() {
   private var dataUser = DataUser(uuid)
   private var isLoaded = false
-  private val _isStored = MutableStateFlow<Boolean?>(null)
-  val isStored: StateFlow<Boolean?> = _isStored
+  private val _isStored = MutableStateFlow<Boolean>(false)
+  val isStored: StateFlow<Boolean> = _isStored
+  var lat
+	get() = dataUser.latitude
+	set(v){dataUser.latitude = v}
+  var lon
+	get() = dataUser.longitude
+	set(v){dataUser.longitude = v}
   private val userRepository: UsersRepository = repository
 
   open fun getUser(force: Boolean = false): DataUser {
@@ -117,5 +126,11 @@ open class UserViewModel(
   fun updateGoogleUid(googleUid: String) {
     dataUser.googleUid = googleUid
     updateUser(dataUser)
+  }
+
+  fun getLocationPlace(context: Context): MutableStateFlow<String> {
+    val place = GeoLocVewModel.getPlace(lat, lon, context)
+    android.util.Log.d("TAG_UserVM", "|$place|")
+    return GeoLocVewModel.addressStr
   }
 }

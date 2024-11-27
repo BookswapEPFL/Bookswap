@@ -24,7 +24,7 @@ interface BooksRepository {
    * @param callback A callback function that receives the list of books when the operation succeeds
    *   or an exception if it fails
    */
-  fun getBook(callback: (Result<List<DataBook>>) -> Unit)
+  fun getBooks(callback: (Result<List<DataBook>>) -> Unit)
 
   // Function to fetch a specific book from the repository by UUID.
   fun getBook(uuid: UUID, OnSucess: (DataBook) -> Unit, onFailure: (Exception) -> Unit)

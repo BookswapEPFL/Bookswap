@@ -61,12 +61,12 @@ class BooksFirestoreSource(private val db: FirebaseFirestore) : BooksRepository 
    * @param callback Callback to be invoked with the result of the operation. The result is a list
    *   of DataBook objects on success, or an exception on failure.
    */
-  override fun getBook(callback: (Result<List<DataBook>>) -> Unit) {
+  override fun getBooks(callback: (Result<List<DataBook>>) -> Unit) {
     db.collection(collectionBooks).get().addOnCompleteListener { task ->
       if (task.isSuccessful) {
         // Maps Firestore documents to DataBook objects or returns an empty list
         val books = task.result?.mapNotNull { document -> documentToBooks(document) } ?: emptyList()
-        callback(Result.success(books))
+        callback(Result.success(task.result?.mapNotNull { documentToBooks(it) } ?: emptyList()))
       } else {
         task.exception?.let { e -> callback(Result.failure(e)) }
       }
@@ -226,7 +226,8 @@ class BooksFirestoreSource(private val db: FirebaseFirestore) : BooksRepository 
               null
             }
           }
-      val userid = UUID.fromString(document.getString("userid")) ?: return null
+	  val tuid = document.getString("userid")
+      val userid = UUID.fromString(tuid?:UUID.randomUUID().toString())
       DataBook(
           UUID.fromString(bookuuid),
           title,

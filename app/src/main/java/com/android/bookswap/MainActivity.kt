@@ -5,10 +5,20 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.semantics
@@ -53,11 +63,14 @@ import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.profile.NewUserScreen
 import com.android.bookswap.ui.profile.UserProfile
 import com.android.bookswap.ui.theme.BookSwapAppTheme
+import com.android.bookswap.utils.ManifestUtils
+import com.google.android.libraries.places.api.Places
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import java.util.UUID
+import java.util.regex.Pattern
 
 class MainActivity : ComponentActivity() {
 
@@ -88,16 +101,23 @@ class MainActivity : ComponentActivity() {
 
     // Initialize the geolocation
     val geolocation = Geolocation(this)
+
+    val apiKey = ManifestUtils.getApiKeyFromManifest(this)
+    if (!Places.isInitialized() && apiKey != null) {
+      Places.initialize(applicationContext, apiKey)
+    }
     BookSwapAppTheme {
       // A surface container using the 'background' color from the theme
       Surface(
-          modifier = Modifier.fillMaxSize().semantics { testTag = C.Tag.main_screen_container },
+          modifier = Modifier
+			.fillMaxSize()
+			.semantics { testTag = C.Tag.main_screen_container },
           color = MaterialTheme.colorScheme.background) {
             BookSwapApp(
                 messageRepository,
                 bookRepository,
                 userDataSource,
-                C.Route.AUTH,
+                C.Route.MAP,
                 photoStorage,
                 messageStorage,
                 geolocation,
@@ -124,10 +144,12 @@ class MainActivity : ComponentActivity() {
     // user part
     Firebase.auth.signOut() // Uncomment this line to test the sign in screen
     val currentUser = Firebase.auth.currentUser
-    val userVM = UserViewModel(UUID.randomUUID(), userRepository)
-
+    val userVM =
+        UserViewModel(UUID.fromString("550e8400-e29b-41d4-a716-446655440000"), userRepository)
     if (currentUser != null) {
       userVM.getUserByGoogleUid(currentUser.uid) // This will scrap the user from the database
+    } else {
+      userVM.getUser(true)
     }
     // Book part
     val bookFilter = BookFilter()
@@ -231,7 +253,7 @@ class MainActivity : ComponentActivity() {
               topAppBar = { topAppBar("Messages") },
               bottomAppBar = { bottomAppBar(this@navigation.route ?: "") })
         }
-        composable("$ {C.Screen.CHAT}/{user2}") { backStackEntry ->
+        composable("${C.Screen.CHAT}/{user2}") { backStackEntry ->
           val user2UUID = UUID.fromString(backStackEntry.arguments?.getString("user2"))
           val user2 = placeHolder.firstOrNull { it.contact.userUUID == user2UUID }?.contact
 
@@ -259,7 +281,8 @@ class MainActivity : ComponentActivity() {
               navigationActions = navigationActions,
               geolocation = geolocation,
               topAppBar = { topAppBar("Map") },
-              bottomAppBar = { bottomAppBar(this@navigation.route ?: "") })
+              bottomAppBar = { bottomAppBar(this@navigation.route ?: "") },
+              userVM = userVM)
         }
         composable(C.Screen.MAP_FILTER) { FilterMapScreen(navigationActions, bookFilter) }
       }
@@ -288,7 +311,10 @@ class MainActivity : ComponentActivity() {
         }
       }
       navigation(startDestination = C.Screen.USER_PROFILE, route = C.Route.USER_PROFILE) {
-        composable(C.Screen.USER_PROFILE) { UserProfile(userVM) }
+        composable(C.Screen.USER_PROFILE) {
+          UserProfile(
+              userVM, { topAppBar("Your Profile") }, { bottomAppBar(this@navigation.route ?: "") })
+        }
         composable(C.Screen.BOOK_PROFILE) { backStackEntry ->
           val bookId = backStackEntry.arguments?.getString("bookId")?.let { UUID.fromString(it) }
 

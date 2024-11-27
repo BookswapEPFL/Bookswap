@@ -23,6 +23,7 @@ import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.android.bookswap.model.UserViewModel
@@ -47,6 +48,8 @@ fun UserProfile(
 ) {
 
   var user = userVM.getUser()
+  val context = LocalContext.current
+  var addrStr = userVM.getLocationPlace(LocalContext.current).collectAsState().value
   var showEditProfile by remember { mutableStateOf(false) }
 
   var needRecompose by remember { mutableStateOf(false) }
@@ -72,8 +75,8 @@ fun UserProfile(
         },
         dataUser = user)
   }
-
-  LaunchedEffect(userVM.uuid, needRecompose) {
+  //LaunchedEffect(Unit){addrStr = userVM.getLocationPlace(context).}
+  LaunchedEffect(userVM.uuid, userVM.lat, userVM.lon, needRecompose) {
     user = userVM.getUser()
     needRecompose = false
   }
@@ -85,7 +88,10 @@ fun UserProfile(
       bottomBar = bottomAppBar) {
         // Column layout to stack input fields vertically with spacing
         Row(
-            modifier = Modifier.padding(it).consumeWindowInsets(it).fillMaxWidth(),
+            modifier = Modifier
+			  .padding(it)
+			  .consumeWindowInsets(it)
+			  .fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(5f.dp)) {
               Column(modifier = Modifier.fillMaxWidth(0.25f)) {
                 Box {
@@ -94,16 +100,22 @@ fun UserProfile(
                       modifier = Modifier.aspectRatio(1f)) {
                         Box(
                             modifier =
-                                Modifier.padding(2.5f.dp)
-                                    .border(3.5f.dp, Color(0xFFA98467), CircleShape)) {
+							Modifier
+							  .padding(2.5f.dp)
+							  .border(3.5f.dp, Color(0xFFA98467), CircleShape)) {
                               Image(
                                   imageVector = Icons.Rounded.AccountCircle,
                                   contentDescription = "",
-                                  modifier = Modifier.fillMaxSize().scale(1.2f).clipToBounds(),
+                                  modifier = Modifier
+									.fillMaxSize()
+									.scale(1.2f)
+									.clipToBounds(),
                                   colorFilter = ColorFilter.tint(Color(0xFF6C584C)))
                             }
                         Box(
-                            modifier = Modifier.fillMaxSize().padding(0f.dp),
+                            modifier = Modifier
+							  .fillMaxSize()
+							  .padding(0f.dp),
                             contentAlignment = Alignment.TopEnd) {
                               Image(
                                   imageVector = Icons.Outlined.Edit,
@@ -113,7 +125,10 @@ fun UserProfile(
                       }
                 }
               }
-              Column(Modifier.fillMaxHeight().fillMaxWidth(), Arrangement.spacedBy(8.dp)) {
+              Column(
+				Modifier
+				  .fillMaxHeight()
+				  .fillMaxWidth(), Arrangement.spacedBy(8.dp)) {
                 // Full name text
                 Text(
                     text = "${user.greeting} ${user.firstName} ${user.lastName}",
@@ -127,7 +142,7 @@ fun UserProfile(
 
                 // User address
                 Text(
-                    text = "${user.latitude}, ${user.longitude}",
+                    text = "${addrStr}",
                     modifier = Modifier.testTag(C.Tag.UserProfile.address))
 
                 // Edit Button
