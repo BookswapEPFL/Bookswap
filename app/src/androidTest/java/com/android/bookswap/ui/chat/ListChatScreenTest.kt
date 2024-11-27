@@ -14,11 +14,8 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.navigation.compose.rememberNavController
 import com.android.bookswap.data.DataUser
 import com.android.bookswap.data.MessageBox
-
 import com.android.bookswap.model.chat.ContactViewModel
-
 import com.android.bookswap.resources.C
-
 import com.android.bookswap.ui.components.TopAppBarComponent
 import com.android.bookswap.ui.navigation.BottomNavigationMenu
 import com.android.bookswap.ui.navigation.List_Navigation_Bar_Destinations

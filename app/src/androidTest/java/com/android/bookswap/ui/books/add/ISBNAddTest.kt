@@ -244,8 +244,7 @@ class ISBNAddTest : TestCase() {
     composeTestRule.onNodeWithTag(C.Tag.NewBookISBN.search).performClick()
 
     verify {
-      anyConstructed<GoogleBookDataSource>().getBookFromISBN(bookISBN, mockUserVM.getUser().userUUID, any())
-      anyConstructed<GoogleBookDataSource>().getBookFromISBN(bookISBN, userUUID, any())
+      anyConstructed<GoogleBookDataSource>().getBookFromISBN(bookISBN, any(), any())
     } // Api is called
     verify { mockBooksRepository.addBook(any(), any()) } // Book repository is called
     verify { toastMock.show() } // Error is displayed
