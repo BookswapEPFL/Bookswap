@@ -8,6 +8,7 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.navigation.compose.rememberNavController
 import com.android.bookswap.model.map.BookFilter
+import com.android.bookswap.resources.C
 import com.android.bookswap.ui.navigation.NavigationActions
 import org.junit.Rule
 import org.junit.Test
@@ -22,20 +23,20 @@ class FilterMapScreenTest {
       val navigationActions = NavigationActions(navController)
       FilterMapScreen(navigationActions, BookFilter())
     }
-    composeTestRule.onNodeWithTag("filter_filterScreenTitle").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("filter_filterScreenTitle").assertTextEquals("Filters")
+    composeTestRule.onNodeWithTag(C.Tag.TopAppBar.screen_title).assertIsDisplayed()
+    composeTestRule.onNodeWithTag(C.Tag.TopAppBar.screen_title).assertTextEquals("Filters")
 
-    composeTestRule.onNodeWithTag("filter_applyButton").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("filter_applyButton").assertHasClickAction()
-    composeTestRule.onNodeWithTag("filter_applyButton").assertTextEquals("Apply")
+    composeTestRule.onNodeWithTag(C.Tag.MapFilter.apply).assertIsDisplayed()
+    composeTestRule.onNodeWithTag(C.Tag.MapFilter.apply).assertHasClickAction()
+    composeTestRule.onNodeWithTag(C.Tag.MapFilter.apply).assertTextEquals("Apply")
   }
 
   @Test
   fun testButtonBlock() {
     composeTestRule.setContent { ButtonBlock(listOf("test"), listOf()) {} }
-    composeTestRule.onNodeWithTag("filter_buttonFilter_test").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("filter_buttonFilter_test").assertHasClickAction()
-    composeTestRule.onNodeWithTag("filter_buttonFilter_test").assertTextEquals("test")
+    composeTestRule.onNodeWithTag("test" + C.Tag.MapFilter.filter).assertIsDisplayed()
+    composeTestRule.onNodeWithTag("test" + C.Tag.MapFilter.filter).assertHasClickAction()
+    composeTestRule.onNodeWithTag("test" + C.Tag.MapFilter.filter).assertTextEquals("test")
   }
 
   @Test
@@ -50,7 +51,7 @@ class FilterMapScreenTest {
     }
 
     composeTestRule
-        .onNodeWithTag("filter_buttonFilter_test1")
+        .onNodeWithTag("test1" + C.Tag.MapFilter.filter)
         .assertIsDisplayed()
         .assertHasClickAction()
         .performClick()
@@ -58,7 +59,7 @@ class FilterMapScreenTest {
     assert(!selected.contains("test1"))
 
     composeTestRule
-        .onNodeWithTag("filter_buttonFilter_test2")
+        .onNodeWithTag("test2" + C.Tag.MapFilter.filter)
         .assertIsDisplayed()
         .assertHasClickAction()
         .performClick()

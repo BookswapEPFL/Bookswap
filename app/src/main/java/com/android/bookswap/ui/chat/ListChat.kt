@@ -35,8 +35,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.bookswap.data.MessageBox
 import com.android.bookswap.model.chat.ContactViewModel
+import com.android.bookswap.resources.C
 import com.android.bookswap.ui.navigation.NavigationActions
-import com.android.bookswap.ui.navigation.Screen
 import com.android.bookswap.ui.theme.ColorVariable
 
 /** This is the main screen for the chat feature. It displays the list of messages */
@@ -52,7 +52,7 @@ fun ListChatScreen(
   val messageBoxMap by contactViewModel.messageBoxMap.collectAsState()
   val messageList = messageBoxMap.values.toList()
   Scaffold(
-      modifier = Modifier.testTag("chat_listScreen"),
+      modifier = Modifier.testTag(C.Tag.chat_list_screen_container),
       topBar = topAppBar,
       content = { pv ->
         LazyColumn(
@@ -60,7 +60,7 @@ fun ListChatScreen(
             modifier =
                 Modifier.fillMaxSize()
                     .background(color = ColorVariable.BackGround)
-                    .testTag("chat_messageList")) {
+                    .testTag(C.Tag.ChatList.scrollable)) {
               item { MessageDivider() }
               if (messageBoxMap.isEmpty()) {
                 item {
@@ -77,7 +77,7 @@ fun ListChatScreen(
                   val messageBox = messageList[index]
                   MessageBoxDisplay(messageBox) {
                     navigationActions.navigateTo(
-                        Screen.CHAT, messageBox.contact.userUUID.toString())
+                        C.Screen.CHAT, messageBox.contact.userUUID.toString())
                   }
                   MessageDivider()
                 }
@@ -95,7 +95,7 @@ fun MessageBoxDisplay(message: MessageBox, onClick: () -> Unit = {}) {
           .height(55.dp)
           .background(color = ColorVariable.BackGround)
           .clickable(onClick = onClick)
-          .testTag("chat_messageBox"),
+          .testTag(C.Tag.ChatList.item),
   ) {
     Icon(
         imageVector = Icons.Filled.Person,
@@ -113,12 +113,12 @@ fun MessageBoxDisplay(message: MessageBox, onClick: () -> Unit = {}) {
                     fontWeight = FontWeight.Medium,
                     fontSize = 18.sp,
                     color = ColorVariable.Accent,
-                    modifier = Modifier.testTag("chat_messageContactName"))
+                    modifier = Modifier.testTag(C.Tag.ChatList.contact))
                 Text(
                     text = message.date.takeUnless { it.isNullOrEmpty() } ?: "",
                     fontSize = 14.sp,
                     color = ColorVariable.AccentSecondary,
-                    modifier = Modifier.testTag("chat_messageDate"))
+                    modifier = Modifier.testTag(C.Tag.ChatList.timestamp))
               }
 
           Text(
@@ -127,7 +127,7 @@ fun MessageBoxDisplay(message: MessageBox, onClick: () -> Unit = {}) {
               color = ColorVariable.AccentSecondary,
               maxLines = 1,
               overflow = TextOverflow.Ellipsis,
-              modifier = Modifier.testTag("chat_messageContent"))
+              modifier = Modifier.testTag(C.Tag.ChatList.message))
         }
   }
 }
