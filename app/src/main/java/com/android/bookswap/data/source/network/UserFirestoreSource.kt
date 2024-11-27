@@ -37,7 +37,8 @@ class UserFirestoreSource(private val db: FirebaseFirestore) : UsersRepository {
    */
   override fun getUser(uuid: UUID, callback: (Result<DataUser>) -> Unit) {
 
-    db.collection(COLLECTION_NAME).whereEqualTo("UUID", uuid).get().addOnCompleteListener { task ->
+    db.collection(COLLECTION_NAME).whereEqualTo("userUUID", uuid).get().addOnCompleteListener { task
+      ->
       if (task.isSuccessful) {
         // Maps Firestore documents to DataUser objects or returns an empty list
         callback(
@@ -122,6 +123,7 @@ class UserFirestoreSource(private val db: FirebaseFirestore) : UsersRepository {
       // Log.d("TAG_DOC2USR", "GUID: $googleUid")
       val bookList =
           (document.get("bookList") as List<Map<String, Long>>).map { bookMap ->
+            Log.d("TAG_BOOK_MAP", "bookMap: $bookMap")
             val mostSigBits = bookMap["mostSignificantBits"]
             val leastSigBits = bookMap["leastSignificantBits"]
             if (mostSigBits != null && leastSigBits != null) {
@@ -130,6 +132,14 @@ class UserFirestoreSource(private val db: FirebaseFirestore) : UsersRepository {
               null
             }
           }
+      val contactList =
+          try {
+            (document.get("contactList") as? List<String>) ?: emptyList()
+          } catch (e: Exception) {
+            Log.e("TAG_CONTACT_LIST_ERROR", "Error parsing contactList: ${e.message}")
+            emptyList()
+          }
+
       if (bookList.any { it == null }) {
         throw IllegalArgumentException("Book list contains null UUIDs")
       }
@@ -146,7 +156,8 @@ class UserFirestoreSource(private val db: FirebaseFirestore) : UsersRepository {
               longitude,
               profilePicture,
               bookList.filterNotNull(),
-              googleUid))
+              googleUid,
+              contactList.filterNotNull()))
     } catch (e: Exception) {
       Log.e("FirestoreSource", "Error converting document to User: ${e.message}")
       Result.failure(e)

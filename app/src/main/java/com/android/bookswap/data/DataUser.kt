@@ -28,7 +28,8 @@ data class DataUser(
     var longitude: Double = 0.0,
     var profilePictureUrl: String = "",
     var bookList: List<UUID> = emptyList(),
-    var googleUid: String = ""
+    var googleUid: String = "",
+    var contactList: List<String> = emptyList()
 ) {
   /**
    * Returns the full name of the user in the format: "greeting firstName lastName".

@@ -28,6 +28,7 @@ import com.android.bookswap.data.source.network.MessageFirestoreSource
 import com.android.bookswap.data.source.network.PhotoFirebaseStorageSource
 import com.android.bookswap.data.source.network.UserFirestoreSource
 import com.android.bookswap.model.UserViewModel
+import com.android.bookswap.model.chat.ContactViewModel
 import com.android.bookswap.model.chat.OfflineMessageStorage
 import com.android.bookswap.model.chat.PermissionHandler
 import com.android.bookswap.model.map.BookFilter
@@ -129,6 +130,8 @@ class MainActivity : ComponentActivity() {
     if (currentUser != null) {
       userVM.getUserByGoogleUid(currentUser.uid) // This will scrap the user from the database
     }
+    // Message part
+    val contactViewModel = ContactViewModel(userVM, userRepository, messageRepository)
     // Book part
     val bookFilter = BookFilter()
     val bookManagerViewModel =
@@ -226,15 +229,14 @@ class MainActivity : ComponentActivity() {
       navigation(startDestination = C.Screen.CHAT_LIST, route = C.Route.CHAT_LIST) {
         composable(C.Screen.CHAT_LIST) {
           ListChatScreen(
-              placeHolder,
               navigationActions,
               topAppBar = { topAppBar("Messages") },
-              bottomAppBar = { bottomAppBar(this@navigation.route ?: "") })
+              bottomAppBar = { bottomAppBar(this@navigation.route ?: "") },
+              contactViewModel = contactViewModel)
         }
         composable("$ {C.Screen.CHAT}/{user2}") { backStackEntry ->
           val user2UUID = UUID.fromString(backStackEntry.arguments?.getString("user2"))
-          val user2 = placeHolder.firstOrNull { it.contact.userUUID == user2UUID }?.contact
-
+          val user2: DataUser? = contactViewModel.getUserInMessageBoxMap(user2UUID)
           if (user2 != null) {
             ChatScreen(
                 messageRepository,
@@ -273,18 +275,19 @@ class MainActivity : ComponentActivity() {
         composable(C.Screen.ADD_BOOK_MANUALLY) {
           AddToBookScreen(
               bookRepository,
+              userVM,
               topAppBar = { topAppBar("Add your Book") },
-              bottomAppBar = { bottomAppBar(this@navigation.route ?: "") },
-              userId = currentUserUUID)
+              bottomAppBar = { bottomAppBar(this@navigation.route ?: "") })
         }
         composable(C.Screen.ADD_BOOK_SCAN) { /*Todo*/}
         composable(C.Screen.ADD_BOOK_ISBN) {
           AddISBNScreen(
               navigationActions,
               bookRepository,
+              userVM,
               topAppBar = { topAppBar(null) },
               bottomAppBar = { bottomAppBar(this@navigation.route ?: "") },
-              userId = currentUserUUID)
+          )
         }
       }
       navigation(startDestination = C.Screen.USER_PROFILE, route = C.Route.USER_PROFILE) {
