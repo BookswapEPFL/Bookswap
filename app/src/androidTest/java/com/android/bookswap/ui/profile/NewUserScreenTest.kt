@@ -115,8 +115,6 @@ class NewUserScreenTest {
 
   @Test
   fun clickOnCreateButtonWithEmptyFieldsShowsErrors() {
-
-    composeTestRule.onNodeWithTag(C.Tag.NewUser.confirm).performScrollTo()
     composeTestRule.waitForIdle()
     composeTestRule.onNodeWithTag(C.Tag.NewUser.confirm).performClick()
 
