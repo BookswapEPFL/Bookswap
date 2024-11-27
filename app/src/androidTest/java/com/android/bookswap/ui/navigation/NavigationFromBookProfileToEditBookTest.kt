@@ -47,7 +47,9 @@ class NavigationFromBookProfileToEditBookTest {
             BookLanguages.ENGLISH,
             "1234567890",
             listOf(BookGenres.FICTION),
-            currentUserId)
+            currentUserId,
+            false,
+            false)
 
     val mockBookRepo = mockk<BooksRepository>(relaxed = true)
     coEvery { mockBookRepo.getBook(eq(testBookId), any(), any()) } answers
@@ -138,7 +140,9 @@ class NavigationFromBookProfileToEditBookTest {
             BookLanguages.ENGLISH,
             "1234567890",
             listOf(BookGenres.FICTION),
-            bookUserId // Different from currentUserId
+            bookUserId,
+            false,
+            false // Different from currentUserId
             )
 
     val mockBookRepo = mockk<BooksRepository>(relaxed = true)

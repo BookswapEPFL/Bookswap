@@ -103,7 +103,9 @@ class ISBNAddTest : TestCase() {
             BookLanguages.OTHER,
             bookISBN,
             emptyList(),
-            userUUID)
+            userUUID,
+            false,
+            false)
 
     // Mock call to api
     mockkConstructor(GoogleBookDataSource::class)
@@ -186,7 +188,9 @@ class ISBNAddTest : TestCase() {
             BookLanguages.OTHER,
             bookISBN,
             emptyList(),
-            userUUID)
+            userUUID,
+            false,
+            false)
 
     // Mock call to api
     mockkConstructor(GoogleBookDataSource::class)
