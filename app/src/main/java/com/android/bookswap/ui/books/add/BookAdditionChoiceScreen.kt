@@ -155,23 +155,20 @@ fun ButtonWithIcon(
                     imageVector = leftIcon,
                     contentDescription = null,
                     modifier =
-                        Modifier.size(iconSize)
-                            .testTag(text + C.Tag.NewBookChoice.btnWIcon.icon))
+                        Modifier.size(iconSize).testTag(text + C.Tag.NewBookChoice.btnWIcon.icon))
               } else if (leftIconPainter != null) {
                 Image(
                     painter = leftIconPainter,
                     contentDescription = null,
                     modifier =
-                        Modifier.size(pngSize)
-                            .testTag(text + C.Tag.NewBookChoice.btnWIcon.png))
+                        Modifier.size(pngSize).testTag(text + C.Tag.NewBookChoice.btnWIcon.png))
               }
               Text(text, fontSize = textSize)
               Icon(
                   imageVector = Icons.AutoMirrored.Filled.ArrowForward,
                   contentDescription = null,
                   modifier =
-                      Modifier.size(iconSize)
-                          .testTag(text + C.Tag.NewBookChoice.btnWIcon.arrow))
+                      Modifier.size(iconSize).testTag(text + C.Tag.NewBookChoice.btnWIcon.arrow))
             }
       }
 }

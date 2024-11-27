@@ -29,9 +29,15 @@ class BookAdditionChoiceScreenTest {
           booksRepository = booksRepository,
           userUUID = UUID.randomUUID())
     }
-    composeTestRule.onNodeWithTag("Manually" + C.Tag.NewBookChoice.btnWIcon.button).assertIsDisplayed()
-    composeTestRule.onNodeWithTag("From ISBN" + C.Tag.NewBookChoice.btnWIcon.button).assertIsDisplayed()
-    composeTestRule.onNodeWithTag("From Photo" + C.Tag.NewBookChoice.btnWIcon.button).assertIsDisplayed()
+    composeTestRule
+        .onNodeWithTag("Manually" + C.Tag.NewBookChoice.btnWIcon.button)
+        .assertIsDisplayed()
+    composeTestRule
+        .onNodeWithTag("From ISBN" + C.Tag.NewBookChoice.btnWIcon.button)
+        .assertIsDisplayed()
+    composeTestRule
+        .onNodeWithTag("From Photo" + C.Tag.NewBookChoice.btnWIcon.button)
+        .assertIsDisplayed()
   }
 
   @Test
@@ -43,8 +49,14 @@ class BookAdditionChoiceScreenTest {
           booksRepository = booksRepository,
           userUUID = UUID.randomUUID())
     }
-    composeTestRule.onNodeWithTag("Manually" + C.Tag.NewBookChoice.btnWIcon.button).assertHasClickAction()
-    composeTestRule.onNodeWithTag("From ISBN" + C.Tag.NewBookChoice.btnWIcon.button).assertHasClickAction()
-    composeTestRule.onNodeWithTag("From Photo" + C.Tag.NewBookChoice.btnWIcon.button).assertHasClickAction()
+    composeTestRule
+        .onNodeWithTag("Manually" + C.Tag.NewBookChoice.btnWIcon.button)
+        .assertHasClickAction()
+    composeTestRule
+        .onNodeWithTag("From ISBN" + C.Tag.NewBookChoice.btnWIcon.button)
+        .assertHasClickAction()
+    composeTestRule
+        .onNodeWithTag("From Photo" + C.Tag.NewBookChoice.btnWIcon.button)
+        .assertHasClickAction()
   }
 }
