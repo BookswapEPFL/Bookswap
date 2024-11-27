@@ -7,6 +7,7 @@ import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performTextInput
 import com.android.bookswap.model.UserViewModel
 import com.android.bookswap.resources.C
@@ -28,11 +29,11 @@ class NewUserScreenTest {
   fun setUp() {
     navigationActions = mockk(relaxed = true)
     userVM = mockk(relaxed = true)
+    composeTestRule.setContent { NewUserScreen(navigationActions, userVM) }
   }
 
   @Test
   fun allComponentsAreDisplayedWithCorrectTexts() {
-    composeTestRule.setContent { NewUserScreen(navigationActions, userVM) }
     composeTestRule
         .onNodeWithTag(C.Tag.TopAppBar.screen_title)
         .assertExists()
@@ -92,8 +93,6 @@ class NewUserScreenTest {
   @Test
   fun clickOnCreateButtonWithInvalidEmailDoesNotNavigate() {
 
-    composeTestRule.setContent { NewUserScreen(navigationActions, userVM) }
-
     composeTestRule.waitForIdle()
     composeTestRule.onNodeWithTag(C.Tag.NewUser.confirm).performClick()
 
@@ -121,8 +120,8 @@ class NewUserScreenTest {
     justRun {
       userVM.updateUser(any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any())
     }
-    composeTestRule.setContent { NewUserScreen(navigationActions, userVM) }
 
+    composeTestRule.onNodeWithTag(C.Tag.NewUser.confirm).performScrollTo()
     composeTestRule.waitForIdle()
     composeTestRule.onNodeWithTag(C.Tag.NewUser.confirm).performClick()
 
