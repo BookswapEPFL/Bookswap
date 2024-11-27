@@ -5,6 +5,7 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.navigation.compose.rememberNavController
+import com.android.bookswap.resources.C
 import com.android.bookswap.ui.navigation.NavigationActions
 import io.mockk.mockk
 import org.junit.Before
@@ -28,9 +29,15 @@ class BookAdditionChoiceScreenTest {
       val navigationActions = NavigationActions(navController)
       BookAdditionChoiceScreen(navigationActions)
     }
-    composeTestRule.onNodeWithTag("button_Manually").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("button_From ISBN").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("button_From Photo").assertIsDisplayed()
+    composeTestRule
+        .onNodeWithTag(C.Screen.ADD_BOOK_MANUALLY + C.Tag.NewBookChoice.btnWIcon.button)
+        .assertIsDisplayed()
+    composeTestRule
+        .onNodeWithTag(C.Screen.ADD_BOOK_ISBN + C.Tag.NewBookChoice.btnWIcon.button)
+        .assertIsDisplayed()
+    composeTestRule
+        .onNodeWithTag(C.Screen.ADD_BOOK_SCAN + C.Tag.NewBookChoice.btnWIcon.button)
+        .assertIsDisplayed()
   }
 
   @Test
@@ -40,8 +47,14 @@ class BookAdditionChoiceScreenTest {
       val navigationActions = NavigationActions(navController)
       BookAdditionChoiceScreen(navigationActions)
     }
-    composeTestRule.onNodeWithTag("button_Manually").assertHasClickAction()
-    composeTestRule.onNodeWithTag("button_From ISBN").assertHasClickAction()
-    composeTestRule.onNodeWithTag("button_From Photo").assertHasClickAction()
+    composeTestRule
+        .onNodeWithTag(C.Screen.ADD_BOOK_MANUALLY + C.Tag.NewBookChoice.btnWIcon.button)
+        .assertHasClickAction()
+    composeTestRule
+        .onNodeWithTag(C.Screen.ADD_BOOK_ISBN + C.Tag.NewBookChoice.btnWIcon.button)
+        .assertHasClickAction()
+    composeTestRule
+        .onNodeWithTag(C.Screen.ADD_BOOK_SCAN + C.Tag.NewBookChoice.btnWIcon.button)
+        .assertHasClickAction()
   }
 }

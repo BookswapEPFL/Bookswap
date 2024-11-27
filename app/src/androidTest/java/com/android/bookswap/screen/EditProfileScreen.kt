@@ -1,19 +1,20 @@
 package com.android.bookswap.screen
 
 import androidx.compose.ui.test.SemanticsNodeInteractionsProvider
+import com.android.bookswap.resources.C
 import io.github.kakaocup.compose.node.element.ComposeScreen
 import io.github.kakaocup.compose.node.element.KNode
 
 class EditProfileScreen(semanticsProvider: SemanticsNodeInteractionsProvider) :
     ComposeScreen<EditProfileScreen>(
         semanticsProvider = semanticsProvider,
-        viewBuilderAction = { hasTestTag("editProfileContainer") }) {
-  val titleTxt: KNode = child { hasTestTag("editProfileTitleTxt") }
-  val greetingTbx: KNode = child { hasTestTag("greetingTbx") }
-  val firstnameTbx: KNode = child { hasTestTag("firstnameTbx") }
-  val lastnameTbx: KNode = child { hasTestTag("lastnameTbx") }
-  val emailTbx: KNode = child { hasTestTag("emailTbx") }
-  val phoneNumberTbx: KNode = child { hasTestTag("phoneTbx") }
-  val confirmBtn: KNode = child { hasTestTag("confirmBtn") }
-  val dismissBtn: KNode = child { hasTestTag("dismissBtn") }
+        viewBuilderAction = { hasTestTag(C.Tag.edit_profile_screen_container) }) {
+  val titleTxt: KNode = child { hasTestTag(C.Tag.TopAppBar.screen_title) }
+  val greetingTbx: KNode = child { hasTestTag(C.Tag.EditProfile.greeting) }
+  val firstnameTbx: KNode = child { hasTestTag(C.Tag.EditProfile.firstname) }
+  val lastnameTbx: KNode = child { hasTestTag(C.Tag.EditProfile.lastname) }
+  val emailTbx: KNode = child { hasTestTag(C.Tag.EditProfile.email) }
+  val phoneNumberTbx: KNode = child { hasTestTag(C.Tag.EditProfile.phone) }
+  val confirmBtn: KNode = child { hasTestTag(C.Tag.EditProfile.confirm) }
+  val dismissBtn: KNode = child { hasTestTag(C.Tag.EditProfile.dismiss) }
 }

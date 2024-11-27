@@ -20,9 +20,11 @@ data class DataMessage(
     val receiverUUID: UUID,
     val timestamp: Long = 0L
 )
-
 /** Enum representing the type of a message. */
 enum class MessageType {
   TEXT,
   IMAGE
 }
+
+/** Data class for the message box */
+data class MessageBox(val contact: DataUser, val message: String? = null, val date: String? = null)

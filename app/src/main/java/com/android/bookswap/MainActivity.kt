@@ -28,6 +28,7 @@ import com.android.bookswap.data.source.network.MessageFirestoreSource
 import com.android.bookswap.data.source.network.PhotoFirebaseStorageSource
 import com.android.bookswap.data.source.network.UserFirestoreSource
 import com.android.bookswap.model.UserViewModel
+import com.android.bookswap.model.chat.ContactViewModel
 import com.android.bookswap.model.chat.OfflineMessageStorage
 import com.android.bookswap.model.chat.PermissionHandler
 import com.android.bookswap.model.map.BookFilter
@@ -50,14 +51,11 @@ import com.android.bookswap.ui.map.MapScreen
 import com.android.bookswap.ui.navigation.BottomNavigationMenu
 import com.android.bookswap.ui.navigation.List_Navigation_Bar_Destinations
 import com.android.bookswap.ui.navigation.NavigationActions
-import com.android.bookswap.ui.navigation.Route
-import com.android.bookswap.ui.navigation.Screen
 import com.android.bookswap.ui.profile.NewUserScreen
 import com.android.bookswap.ui.profile.UserProfile
 import com.android.bookswap.ui.theme.BookSwapAppTheme
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
-import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import java.util.UUID
@@ -97,13 +95,14 @@ class MainActivity : ComponentActivity() {
           modifier = Modifier.fillMaxSize().semantics { testTag = C.Tag.main_screen_container },
           color = MaterialTheme.colorScheme.background) {
             BookSwapApp(
-                messageRepository = messageRepository,
-                bookRepository = bookRepository,
-                userRepository = userDataSource,
-                photoStorage = photoStorage,
-                messageStorage = messageStorage,
-                geolocation = geolocation,
-                context = context)
+                messageRepository,
+                bookRepository,
+                userDataSource,
+                C.Route.AUTH,
+                photoStorage,
+                messageStorage,
+                geolocation,
+                context)
           }
     }
   }
@@ -113,7 +112,7 @@ class MainActivity : ComponentActivity() {
       messageRepository: MessageRepository,
       bookRepository: BooksRepository,
       userRepository: UsersRepository,
-      startDestination: String = Route.AUTH,
+      startDestination: String = C.Route.AUTH,
       photoStorage: PhotoFirebaseStorageSource,
       messageStorage: OfflineMessageStorage,
       geolocation: IGeolocation = DefaultGeolocation(),
@@ -131,6 +130,8 @@ class MainActivity : ComponentActivity() {
     if (currentUser != null) {
       userVM.getUserByGoogleUid(currentUser.uid) // This will scrap the user from the database
     }
+    // Message part
+    val contactViewModel = ContactViewModel(userVM, userRepository, messageRepository)
     // Book part
     val bookFilter = BookFilter()
     val bookManagerViewModel =
@@ -221,22 +222,21 @@ class MainActivity : ComponentActivity() {
         }
 
     NavHost(navController = navController, startDestination = startDestination) {
-      navigation(startDestination = Screen.AUTH, route = Route.AUTH) {
-        composable(Screen.AUTH) { SignInScreen(navigationActions, userVM) }
-        composable(Screen.NEW_USER) { NewUserScreen(navigationActions, userVM) }
+      navigation(startDestination = C.Screen.AUTH, route = C.Route.AUTH) {
+        composable(C.Screen.AUTH) { SignInScreen(navigationActions, userVM) }
+        composable(C.Screen.NEW_USER) { NewUserScreen(navigationActions, userVM) }
       }
-      navigation(startDestination = Screen.CHATLIST, route = Route.CHAT) {
-        composable(Screen.CHATLIST) {
+      navigation(startDestination = C.Screen.CHAT_LIST, route = C.Route.CHAT_LIST) {
+        composable(C.Screen.CHAT_LIST) {
           ListChatScreen(
-              placeHolder,
               navigationActions,
               topAppBar = { topAppBar("Messages") },
-              bottomAppBar = { bottomAppBar(this@navigation.route ?: "") })
+              bottomAppBar = { bottomAppBar(this@navigation.route ?: "") },
+              contactViewModel = contactViewModel)
         }
-        composable("${Screen.CHAT}/{user2}") { backStackEntry ->
+        composable("$ {C.Screen.CHAT}/{user2}") { backStackEntry ->
           val user2UUID = UUID.fromString(backStackEntry.arguments?.getString("user2"))
-          val user2 = placeHolder.firstOrNull { it.contact.userUUID == user2UUID }?.contact
-
+          val user2: DataUser? = contactViewModel.getUserInMessageBoxMap(user2UUID)
           if (user2 != null) {
             ChatScreen(
                 messageRepository,
@@ -254,8 +254,8 @@ class MainActivity : ComponentActivity() {
           }
         }
       }
-      navigation(startDestination = Screen.MAP, route = Route.MAP) {
-        composable(Screen.MAP) {
+      navigation(startDestination = C.Screen.MAP, route = C.Route.MAP) {
+        composable(C.Screen.MAP) {
           MapScreen(
               bookManagerViewModel,
               navigationActions = navigationActions,
@@ -263,35 +263,36 @@ class MainActivity : ComponentActivity() {
               topAppBar = { topAppBar("Map") },
               bottomAppBar = { bottomAppBar(this@navigation.route ?: "") })
         }
-        composable(Screen.FILTER) { FilterMapScreen(navigationActions, bookFilter) }
+        composable(C.Screen.MAP_FILTER) { FilterMapScreen(navigationActions, bookFilter) }
       }
-      navigation(startDestination = Screen.NEWBOOK, route = Route.NEWBOOK) {
-        composable(Screen.NEWBOOK) {
+      navigation(startDestination = C.Screen.NEW_BOOK, route = C.Route.NEW_BOOK) {
+        composable(C.Screen.NEW_BOOK) {
           BookAdditionChoiceScreen(
               navigationActions,
               topAppBar = { topAppBar("Add a Book") },
               bottomAppBar = { bottomAppBar(this@navigation.route ?: "") })
         }
-        composable(Screen.ADD_BOOK_MANUALLY) {
+        composable(C.Screen.ADD_BOOK_MANUALLY) {
           AddToBookScreen(
               bookRepository,
+              userVM,
               topAppBar = { topAppBar("Add your Book") },
-              bottomAppBar = { bottomAppBar(this@navigation.route ?: "") },
-              userId = currentUserUUID)
+              bottomAppBar = { bottomAppBar(this@navigation.route ?: "") })
         }
-        composable(Screen.ADD_BOOK_SCAN) { /*Todo*/}
-        composable(Screen.ADD_BOOK_ISBN) {
+        composable(C.Screen.ADD_BOOK_SCAN) { /*Todo*/}
+        composable(C.Screen.ADD_BOOK_ISBN) {
           AddISBNScreen(
               navigationActions,
               bookRepository,
+              userVM,
               topAppBar = { topAppBar(null) },
               bottomAppBar = { bottomAppBar(this@navigation.route ?: "") },
-              userId = currentUserUUID)
+          )
         }
       }
-      navigation(startDestination = Screen.PROFILE, route = Route.PROFILE) {
-        composable(Screen.PROFILE) { UserProfile(userVM) }
-        composable(Screen.BOOK_PROFILE) { backStackEntry ->
+      navigation(startDestination = C.Screen.USER_PROFILE, route = C.Route.USER_PROFILE) {
+        composable(C.Screen.USER_PROFILE) { UserProfile(userVM) }
+        composable(C.Screen.BOOK_PROFILE) { backStackEntry ->
           val bookId = backStackEntry.arguments?.getString("bookId")?.let { UUID.fromString(it) }
 
           if (bookId != null) {
@@ -305,7 +306,7 @@ class MainActivity : ComponentActivity() {
             Log.e("Navigation", "Invalid bookId passed to BookProfileScreen")
           }
         }
-        composable("${Screen.EDIT_BOOK}/{bookId}") { backStackEntry ->
+        composable("${C.Screen.EDIT_BOOK}/{bookId}") { backStackEntry ->
           val bookId = backStackEntry.arguments?.getString("bookId")?.let { UUID.fromString(it) }
           var book: DataBook? = null // How to create a book that will be assigned after ?
           // Fetch book data

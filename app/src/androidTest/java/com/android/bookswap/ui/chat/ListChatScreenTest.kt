@@ -14,11 +14,18 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.navigation.compose.rememberNavController
 import com.android.bookswap.data.DataUser
 import com.android.bookswap.data.MessageBox
+import com.android.bookswap.model.chat.ContactViewModel
+import com.android.bookswap.resources.C
 import com.android.bookswap.ui.components.TopAppBarComponent
 import com.android.bookswap.ui.navigation.BottomNavigationMenu
 import com.android.bookswap.ui.navigation.List_Navigation_Bar_Destinations
 import com.android.bookswap.ui.navigation.NavigationActions
+import io.mockk.every
+import io.mockk.just
+import io.mockk.mockk
+import io.mockk.runs
 import java.util.UUID
+import kotlinx.coroutines.flow.MutableStateFlow
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -26,30 +33,44 @@ import org.junit.Test
 class ListChatScreenTest {
 
   @get:Rule val composeTestRule = createComposeRule()
-  private lateinit var placeHolderData: List<MessageBox>
-  private lateinit var placeHolderDataEmpty: List<MessageBox>
+  private lateinit var placeHolderData: ContactViewModel
+  private lateinit var messageBoxMapStateFlow: MutableStateFlow<Map<UUID, MessageBox>>
+  private lateinit var placeHolderDataEmpty: ContactViewModel
 
   @Before
   fun setUp() {
-    placeHolderData =
-        List(12) {
-          MessageBox(
-              DataUser(
-                  UUID.randomUUID(),
-                  "Hello",
-                  "First ${it + 1}",
-                  "Last ${it + 1}",
-                  "",
-                  "",
-                  0.0,
-                  0.0,
-                  "",
-                  emptyList(),
-                  "googleUid"),
-              "Test message $it test for the feature of ellipsis in the message",
-              "01.01.24")
-        }
-    placeHolderDataEmpty = emptyList()
+    // Not empty mocking data
+    placeHolderData = mockk()
+    val generatedMap =
+        List(12) { index ->
+              UUID.randomUUID() to
+                  MessageBox(
+                      DataUser(
+                          userUUID = UUID.randomUUID(),
+                          greeting = "Hello",
+                          firstName = "First ${index + 1}",
+                          lastName = "Last ${index + 1}",
+                          email = "",
+                          phoneNumber = "",
+                          latitude = 0.0,
+                          longitude = 0.0,
+                          profilePictureUrl = "",
+                          bookList = emptyList(),
+                          googleUid = "googleUid"),
+                      message =
+                          "Test message $index test for the feature of ellipsis in the message",
+                      date = "01.01.24")
+            }
+            .toMap()
+    messageBoxMapStateFlow = MutableStateFlow(generatedMap)
+    every { placeHolderData.messageBoxMap } returns messageBoxMapStateFlow
+    every { placeHolderData.updateMessageBoxMap() } just runs
+    // Empty mocking data
+    placeHolderDataEmpty = mockk()
+    val generatedMapEmpty = emptyMap<UUID, MessageBox>()
+    messageBoxMapStateFlow = MutableStateFlow(generatedMapEmpty)
+    every { placeHolderDataEmpty.messageBoxMap } returns messageBoxMapStateFlow
+    every { placeHolderDataEmpty.updateMessageBoxMap() } just runs
   }
 
   @Test
@@ -58,7 +79,6 @@ class ListChatScreenTest {
       val navController = rememberNavController()
       val navigationActions = NavigationActions(navController)
       ListChatScreen(
-          placeHolderData,
           navigationActions,
           { TopAppBarComponent(Modifier, navigationActions, "Messages") },
           {
@@ -66,15 +86,16 @@ class ListChatScreenTest {
                 onTabSelect = { destination -> navigationActions.navigateTo(destination) },
                 tabList = List_Navigation_Bar_Destinations,
                 selectedItem = navigationActions.currentRoute())
-          })
+          },
+          contactViewModel = placeHolderData)
     }
-    composeTestRule.onNodeWithTag("TopAppBar").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("profileIconButton").assertIsDisplayed()
+    composeTestRule.onNodeWithTag(C.Tag.top_app_bar_container).assertIsDisplayed()
+    composeTestRule.onNodeWithTag(C.Tag.TopAppBar.profile_button).assertIsDisplayed()
     composeTestRule.onNodeWithContentDescription("Profile Icon").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("chat_messageList").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("bottomNavigationMenu").assertIsDisplayed()
+    composeTestRule.onNodeWithTag(C.Tag.ChatList.scrollable).assertIsDisplayed()
+    composeTestRule.onNodeWithTag(C.Tag.bottom_navigation_menu_container).assertIsDisplayed()
 
-    composeTestRule.onNodeWithTag("TopAppBar_Title").assertTextEquals("Messages")
+    composeTestRule.onNodeWithTag(C.Tag.TopAppBar.screen_title).assertTextEquals("Messages")
   }
 
   @Test
@@ -83,7 +104,6 @@ class ListChatScreenTest {
       val navController = rememberNavController()
       val navigationActions = NavigationActions(navController)
       ListChatScreen(
-          placeHolderDataEmpty,
           navigationActions,
           { TopAppBarComponent(Modifier, navigationActions, "Messages") },
           {
@@ -91,16 +111,20 @@ class ListChatScreenTest {
                 onTabSelect = { destination -> navigationActions.navigateTo(destination) },
                 tabList = List_Navigation_Bar_Destinations,
                 selectedItem = navigationActions.currentRoute())
-          })
+          },
+          contactViewModel = placeHolderDataEmpty)
     }
-    composeTestRule.onNodeWithTag("TopAppBar").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("profileIconButton").assertIsDisplayed()
+    composeTestRule.onNodeWithTag(C.Tag.top_app_bar_container).assertIsDisplayed()
+    composeTestRule.onNodeWithTag(C.Tag.TopAppBar.profile_button).assertIsDisplayed()
     composeTestRule.onNodeWithContentDescription("Profile Icon").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("chat_messageList").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("bottomNavigationMenu").assertIsDisplayed()
+    composeTestRule.onNodeWithTag(C.Tag.ChatList.scrollable).assertIsDisplayed()
+    composeTestRule.onNodeWithTag(C.Tag.bottom_navigation_menu_container).assertIsDisplayed()
 
-    composeTestRule.onNodeWithTag("TopAppBar_Title").assertTextEquals("Messages")
-    composeTestRule.onNodeWithTag("chat_messageList").onChild().assertTextEquals("No messages yet")
+    composeTestRule.onNodeWithTag(C.Tag.TopAppBar.screen_title).assertTextEquals("Messages")
+    composeTestRule
+        .onNodeWithTag(C.Tag.ChatList.scrollable)
+        .onChild()
+        .assertTextEquals("No messages yet")
   }
 
   @Test
@@ -109,7 +133,6 @@ class ListChatScreenTest {
       val navController = rememberNavController()
       val navigationActions = NavigationActions(navController)
       ListChatScreen(
-          placeHolderData,
           navigationActions,
           { TopAppBarComponent(Modifier, navigationActions, "Messages") },
           {
@@ -117,9 +140,10 @@ class ListChatScreenTest {
                 onTabSelect = { destination -> navigationActions.navigateTo(destination) },
                 tabList = List_Navigation_Bar_Destinations,
                 selectedItem = navigationActions.currentRoute())
-          })
+          },
+          contactViewModel = placeHolderData)
     }
-    composeTestRule.onNodeWithTag("profileIconButton").assertHasClickAction()
+    composeTestRule.onNodeWithTag(C.Tag.TopAppBar.profile_button).assertHasClickAction()
   }
 
   @Test
@@ -128,7 +152,6 @@ class ListChatScreenTest {
       val navController = rememberNavController()
       val navigationActions = NavigationActions(navController)
       ListChatScreen(
-          placeHolderData,
           navigationActions,
           { TopAppBarComponent(Modifier, navigationActions, "Messages") },
           {
@@ -136,10 +159,11 @@ class ListChatScreenTest {
                 onTabSelect = { destination -> navigationActions.navigateTo(destination) },
                 tabList = List_Navigation_Bar_Destinations,
                 selectedItem = navigationActions.currentRoute())
-          })
+          },
+          contactViewModel = placeHolderData)
     }
 
-    val messageNodes = composeTestRule.onAllNodesWithTag("chat_messageBox")
+    val messageNodes = composeTestRule.onAllNodesWithTag(C.Tag.ChatList.item)
     assert(messageNodes.fetchSemanticsNodes().isNotEmpty())
     messageNodes.assertAll(hasClickAction())
   }

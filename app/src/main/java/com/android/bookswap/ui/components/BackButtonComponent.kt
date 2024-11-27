@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
+import com.android.bookswap.resources.C
 import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.theme.ColorVariable
 
@@ -19,11 +20,12 @@ import com.android.bookswap.ui.theme.ColorVariable
  */
 @Composable
 fun BackButtonComponent(navActions: NavigationActions) {
-  IconButton(onClick = { navActions.goBack() }, modifier = Modifier.testTag("backButton")) {
-    Icon(
-        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-        tint = ColorVariable.Accent,
-        contentDescription = "Back",
-        modifier = Modifier.testTag("backIcon").size(32.dp))
-  }
+  IconButton(
+      onClick = { navActions.goBack() }, modifier = Modifier.testTag(C.Tag.TopAppBar.back_button)) {
+        Icon(
+            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+            tint = ColorVariable.Accent,
+            contentDescription = "Back",
+            modifier = Modifier.testTag(C.Tag.TopAppBar.back_icon).size(32.dp))
+      }
 }
