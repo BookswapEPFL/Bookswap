@@ -12,13 +12,11 @@ import androidx.compose.ui.test.performTextInput
 import com.android.bookswap.model.UserViewModel
 import com.android.bookswap.resources.C
 import com.android.bookswap.ui.navigation.NavigationActions
-import io.mockk.justRun
 import io.mockk.mockk
 import io.mockk.verify
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.kotlin.any
 
 class NewUserScreenTest {
   @get:Rule val composeTestRule = createComposeRule()
@@ -117,9 +115,6 @@ class NewUserScreenTest {
 
   @Test
   fun clickOnCreateButtonWithEmptyFieldsShowsErrors() {
-    justRun {
-      userVM.updateUser(any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any())
-    }
 
     composeTestRule.onNodeWithTag(C.Tag.NewUser.confirm).performScrollTo()
     composeTestRule.waitForIdle()
