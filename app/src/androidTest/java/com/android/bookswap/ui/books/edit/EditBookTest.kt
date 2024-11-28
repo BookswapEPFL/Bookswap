@@ -150,7 +150,7 @@ class EditBookScreenTest {
         .onNodeWithTag(C.Tag.EditBook.language)
         .assertTextContains(sampleBook.language.toString())
   }
-/*
+
   @Test
   fun genreDropdownWorks() {
     composeTestRule.setContent { EditBookScreen(booksRepository, navigationActions, sampleBook) }
@@ -162,6 +162,4 @@ class EditBookScreenTest {
     // verify the selected genre
     composeTestRule.onNodeWithTag(C.Tag.EditBook.genres).assertTextContains("Fantasy")
   }
-  */
-
 }

@@ -72,7 +72,6 @@ class MainActivity : ComponentActivity() {
 
   @Composable
   fun BookSwapApp() {
-
     // Initialize a Firebase Firestore database instance
     val db = FirebaseFirestore.getInstance()
     val storage = FirebaseStorage.getInstance()
