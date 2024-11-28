@@ -33,6 +33,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asAndroidBitmap
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.TextStyle
@@ -41,9 +42,9 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.android.bookswap.model.InputVerification
 import coil.compose.AsyncImage
 import com.android.bookswap.data.source.network.PhotoFirebaseStorageSource
+import com.android.bookswap.model.InputVerification
 import com.android.bookswap.model.PhotoRequester
 import com.android.bookswap.model.UserViewModel
 import com.android.bookswap.resources.C
@@ -96,7 +97,6 @@ fun NewUserScreen(
   val firstNameError = remember { mutableStateOf<String?>("First name required") }
   val lastNameError = remember { mutableStateOf<String?>("Last name required") }
 
-
   var firstAttempt = true
 
   val profilPicture = remember { mutableStateOf<String?>(null) }
@@ -124,32 +124,6 @@ fun NewUserScreen(
             })
       }
   photoRequester.Init()
-
-  fun validateEmail(input: String): Boolean {
-    return android.util.Patterns.EMAIL_ADDRESS.matcher(input).matches()
-  }
-
-  fun validatePhone(input: String): Boolean {
-    return input.matches(Regex("^\\+?\\d{10,15}$")) // Matches phone numbers with 10 to 15 digits
-  }
-
-  fun validateNonEmpty(input: String): Boolean {
-    return input.isNotBlank()
-  }
-
-  fun validateForm(): Boolean {
-    emailError.value = if (validateEmail(email.value)) null else "Invalid email format"
-    phoneError.value = if (validatePhone(phone.value)) null else "Invalid phone number"
-    firstNameError.value = if (validateNonEmpty(firstName.value)) null else "First name required"
-    lastNameError.value = if (validateNonEmpty(lastName.value)) null else "Last name required"
-
-    return emailError.value == null &&
-        phoneError.value == null &&
-        firstNameError.value == null &&
-        lastNameError.value == null
-  }
-
-
   LazyColumn(
       contentPadding = PaddingValues(CONTENT_PADDING),
       modifier =
@@ -208,7 +182,8 @@ fun NewUserScreen(
                               AsyncImage(
                                   model = profilPicture.value,
                                   contentDescription = "profile picture",
-                                  modifier = Modifier.size(ICON_SIZE).clip(CircleShape))
+                                  modifier = Modifier.size(ICON_SIZE).clip(CircleShape),
+                                  contentScale = ContentScale.Crop)
                             }
                           }
                       OutlinedTextField(

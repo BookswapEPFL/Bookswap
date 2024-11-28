@@ -74,8 +74,10 @@ fun UserProfile(
                   bitmap = image.asAndroidBitmap(),
                   callback = { result ->
                     result.fold(
-                        onSuccess = { url -> userVM.updateUser(picURL = url)
-                                    showEditPicture.value = false },
+                        onSuccess = { url ->
+                          userVM.updateUser(picURL = url)
+                          showEditPicture.value = false
+                        },
                         onFailure = { exception ->
                           Log.e("NewUserScreen", "Error uploading photo: $exception")
                           Toast.makeText(context, "Error uploading photo", Toast.LENGTH_SHORT)
