@@ -55,6 +55,7 @@ class UserFirestoreSourceTest {
 
     every { mockQuerySnapshot.documents } returns listOf(mockDocumentSnapshot)
 
+    every { mockDocumentSnapshot.id } returns testUser.userUUID.toString()
     every { mockDocumentSnapshot.getLong("userUUID.mostSignificantBits") } returns
         testUser.userUUID.mostSignificantBits
     every { mockDocumentSnapshot.getLong("userUUID.leastSignificantBits") } returns
