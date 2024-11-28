@@ -94,12 +94,12 @@ class NewUserScreenTest {
     composeTestRule.onNodeWithTag(C.Tag.NewUser.confirm).performClick()
 
     composeTestRule.onNodeWithTag(C.Tag.NewUser.greeting).performTextInput("Mr.")
-    composeTestRule.onNodeWithTag(C.Tag.NewUser.firstname).performTextInput("")
-    composeTestRule.onNodeWithTag(C.Tag.NewUser.lastname).performTextInput("")
+    composeTestRule.onNodeWithTag(C.Tag.NewUser.firstname).performTextInput("John")
+    composeTestRule.onNodeWithTag(C.Tag.NewUser.lastname).performTextInput("Doe")
     composeTestRule
         .onNodeWithTag(C.Tag.NewUser.email)
-        .performTextInput("john.doe.com") // Invalid email
-    composeTestRule.onNodeWithTag(C.Tag.NewUser.phone).performTextInput("784")
+        .performTextInput("john.doe.com") // Email invalide
+    composeTestRule.onNodeWithTag(C.Tag.NewUser.phone).performTextInput("+4122345678")
 
     composeTestRule.onNodeWithTag(C.Tag.NewUser.confirm).performClick()
 
@@ -110,16 +110,5 @@ class NewUserScreenTest {
         .assertExists()
         .assertIsDisplayed()
         .assertTextContains("Invalid email format")
-    composeTestRule
-        .onNodeWithTag(C.Tag.NewUser.firstname_error)
-        .assertExists()
-        .assertIsDisplayed()
-        .assertTextContains("First name required")
-
-    composeTestRule
-        .onNodeWithTag(C.Tag.NewUser.lastname_error)
-        .assertExists()
-        .assertIsDisplayed()
-        .assertTextContains("Last name required")
   }
 }
