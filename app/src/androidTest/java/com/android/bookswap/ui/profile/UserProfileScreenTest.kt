@@ -1,10 +1,13 @@
 package com.android.bookswap.ui.profile
 
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.navigation.compose.rememberNavController
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.android.bookswap.data.DataUser
+import com.android.bookswap.model.AppConfig
+import com.android.bookswap.model.LocalAppConfig
 import com.android.bookswap.model.UserViewModel
 import com.android.bookswap.screen.UserProfileScreen
 import com.android.bookswap.ui.components.TopAppBarComponent
@@ -49,7 +52,9 @@ class UserProfileScreenTest : TestCase() {
     composeTestRule.setContent {
       val navController = rememberNavController()
       val navigationActions = NavigationActions(navController)
-      UserProfile({ TopAppBarComponent(Modifier, navigationActions, "Messages") })
+      CompositionLocalProvider(LocalAppConfig provides AppConfig(userViewModel = userVM)) {
+        UserProfile({ TopAppBarComponent(Modifier, navigationActions, "Messages") })
+      }
     }
   }
 
