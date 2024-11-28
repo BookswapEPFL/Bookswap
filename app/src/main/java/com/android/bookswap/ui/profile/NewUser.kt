@@ -235,10 +235,10 @@ fun NewUserScreen(navigationActions: NavigationActions, userVM: UserViewModel) {
           Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
             Button(
                 onClick = {
-                  if (emailError.value == null &&
-                      phoneError.value == null &&
-                      firstNameError.value == null &&
-                      lastNameError.value == null) {
+                  if (verification.validateEmail(email.value) &&
+                      verification.validatePhone(phone.value) &&
+                      verification.validateNonEmpty(firstName.value) &&
+                      verification.validateNonEmpty(lastName.value)) {
                     userVM.updateUser(
                         greeting = greeting.value,
                         firstName = firstName.value,
