@@ -65,15 +65,15 @@ class BooksFirestoreSource(private val db: FirebaseFirestore) : BooksRepository 
     db.collection(collectionBooks).get().addOnCompleteListener { task ->
       if (task.isSuccessful) {
         // Maps Firestore documents to DataBook objects or returns an empty list
-        val books = task.result?.mapNotNull { document -> documentToBooks(document) } ?: emptyList()
-        callback(Result.success(task.result?.mapNotNull { documentToBooks(it) } ?: emptyList()))
+        val books = task.result?.mapNotNull { document -> documentToBook(document) } ?: emptyList()
+        callback(Result.success(books))
       } else {
         task.exception?.let { e -> callback(Result.failure(e)) }
       }
     }
   }
 
-  override fun getBook(uuid: UUID, OnSucess: (DataBook) -> Unit, onFailure: (Exception) -> Unit) {
+  override fun getBook(uuid: UUID, onSuccess: (DataBook) -> Unit, onFailure: (Exception) -> Unit) {
     // Log the UUID bits for debugging
     // val (mostSigBits, leastSigBits) = Pair(uuid.mostSignificantBits, uuid.leastSignificantBits)
     Log.d(
@@ -85,39 +85,12 @@ class BooksFirestoreSource(private val db: FirebaseFirestore) : BooksRepository 
       if (task.isSuccessful) {
         val document = task.result
         if (document != null && document.exists()) {
-          try {
-            // Parse the fields and handle genres mapping separately
-            val genresList = document.get("genres") as? List<String> ?: emptyList()
-            val bookGenres =
-                genresList.mapNotNull { genre ->
-                  try {
-                    BookGenres.valueOf(genre) // Attempt to map each string to BookGenres
-                  } catch (e: IllegalArgumentException) {
-                    Log.w("BooksFirestoreRepository", "Unknown genre: $genre")
-                    null // Skip if genre is not valid in the BookGenres enum
-                  }
-                }
-
-            // Create the DataBook object
-            val dataBook =
-                DataBook(
-                    uuid = UUID.fromString(document.getString("uuid")),
-                    title = document.getString("title") ?: "",
-                    author = document.getString("author"),
-                    description = document.getString("description"),
-                    rating = document.getLong("rating")?.toInt(),
-                    photo = document.getString("photo"),
-                    language =
-                        document.getString("language")?.let { BookLanguages.valueOf(it) }
-                            ?: BookLanguages.ENGLISH, // Default or adjust based on requirements
-                    isbn = document.getString("isbn"),
-                    genres = bookGenres,
-                    userId = UUID.fromString(document.getString("userId")))
-            OnSucess(dataBook)
-          } catch (e: Exception) {
-            Log.e("BooksFirestoreRepository", "Error parsing book document: ${e.message}", e)
-            onFailure(e)
-          }
+		  val book = documentToBook(document)
+		  if (book == null) {
+			onFailure(Exception("DataBook is null!"))
+		  } else {
+			onSuccess(book)
+		  }
         } else {
           Log.e("BooksFirestoreRepository", "Book with UUID $uuid not found in Firestore.")
           onFailure(IllegalArgumentException("Book not found"))
@@ -205,11 +178,11 @@ class BooksFirestoreSource(private val db: FirebaseFirestore) : BooksRepository 
    * @param document The Firestore document to be converted.
    * @return A DataBook object if all required fields are present, null otherwise.
    */
-  fun documentToBooks(document: DocumentSnapshot): DataBook? {
+  fun documentToBook(document: DocumentSnapshot): DataBook? {
     return try {
       // val mostSignificantBits = document.getString("uuid.mostSignificantBits") ?: return null
       // val leastSignificantBits = document.getString("uuid.leastSignificantBits") ?: return null
-      val bookuuid = document.getString("uuid") ?: return null
+      val bookuuid = document.getString("uuid") ?: document.id
       val title = document.getString("title") ?: return null
       val author = document.getString("author")
       val description = document.getString("description")
@@ -226,8 +199,7 @@ class BooksFirestoreSource(private val db: FirebaseFirestore) : BooksRepository 
               null
             }
           }
-	  val tuid = document.getString("userid")
-      val userid = UUID.fromString(tuid?:UUID.randomUUID().toString())
+      val userid = UUID.fromString(document.getString("userid"))
       DataBook(
           UUID.fromString(bookuuid),
           title,
