@@ -64,7 +64,7 @@ import java.util.UUID
 
 class MainActivity : ComponentActivity() {
 
-    override fun onCreate(savedInstanceState: Bundle?) {
+  override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     // permissionHandler = PermissionHandler(this)
     // permissionHandler.askNotificationPermission()
