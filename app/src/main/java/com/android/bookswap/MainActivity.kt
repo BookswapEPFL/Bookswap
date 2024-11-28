@@ -33,7 +33,6 @@ import com.android.bookswap.model.LocalAppConfig
 import com.android.bookswap.model.UserViewModel
 import com.android.bookswap.model.chat.ContactViewModel
 import com.android.bookswap.model.chat.OfflineMessageStorage
-import com.android.bookswap.model.chat.PermissionHandler
 import com.android.bookswap.model.map.BookFilter
 import com.android.bookswap.model.map.BookManagerViewModel
 import com.android.bookswap.model.map.DefaultGeolocation
@@ -65,9 +64,7 @@ import java.util.UUID
 
 class MainActivity : ComponentActivity() {
 
-  private lateinit var permissionHandler: PermissionHandler
-
-  override fun onCreate(savedInstanceState: Bundle?) {
+    override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     // permissionHandler = PermissionHandler(this)
     // permissionHandler.askNotificationPermission()
@@ -237,7 +234,7 @@ class MainActivity : ComponentActivity() {
 
             if (bookId != null) {
               BookProfileScreen(
-                  bookId = bookId ?: UUID.randomUUID(), // Default for testing
+                  bookId = bookId, // Default for testing
                   booksRepository = BooksFirestoreSource(FirebaseFirestore.getInstance()),
                   navController = NavigationActions(navController),
                   currentUserId = UUID.randomUUID() // Pass the actual logged-in user ID
