@@ -57,7 +57,10 @@ class UserProfileScreenTest : TestCase() {
     composeTestRule.setContent {
       val navController = rememberNavController()
       val navigationActions = NavigationActions(navController)
-      UserProfile(userVM = userVM, photoStorage = photoStorage,{ TopAppBarComponent(Modifier, navigationActions, "Messages") })
+      UserProfile(
+          userVM = userVM,
+          photoStorage = photoStorage,
+          { TopAppBarComponent(Modifier, navigationActions, "Messages") })
     }
   }
 
@@ -95,10 +98,10 @@ class UserProfileScreenTest : TestCase() {
   @Test
   fun testTakePhoto() {
     composeTestRule.onNodeWithTag(C.Tag.UserProfile.profileImage).assertExists()
-      composeTestRule.onNodeWithTag(C.Tag.UserProfile.profileImage).performClick()
-      composeTestRule.onNodeWithTag(C.Tag.UserProfile.profileImageBox).assertExists()
+    composeTestRule.onNodeWithTag(C.Tag.UserProfile.profileImage).performClick()
+    composeTestRule.onNodeWithTag(C.Tag.UserProfile.profileImageBox).assertExists()
     composeTestRule.onNodeWithTag(C.Tag.UserProfile.take_photo).assertExists()
-    }
+  }
 
   @Test
   fun testEdit() {

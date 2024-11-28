@@ -6,7 +6,6 @@ import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextEquals
-import androidx.compose.ui.test.filter
 import androidx.compose.ui.test.hasClickAction
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithContentDescription
@@ -57,7 +56,10 @@ class ListChatScreenTest {
                           phoneNumber = "",
                           latitude = 0.0,
                           longitude = 0.0,
-                          profilePictureUrl = if (index % 2 == 0) "" else "https://i.pinimg.com/236x/54/72/d1/5472d1b09d3d724228109d381d617326.jpg",
+                          profilePictureUrl =
+                              if (index % 2 == 0) ""
+                              else
+                                  "https://i.pinimg.com/236x/54/72/d1/5472d1b09d3d724228109d381d617326.jpg",
                           bookList = emptyList(),
                           googleUid = "googleUid"),
                       message =
@@ -148,8 +150,8 @@ class ListChatScreenTest {
     }
     composeTestRule.onAllNodesWithContentDescription("Contact Icon").assertCountEquals(2)
     composeTestRule.onAllNodesWithContentDescription("Contact Icon empty").assertCountEquals(2)
-
   }
+
   @Test
   fun hasClickableComponents() {
     composeTestRule.setContent {

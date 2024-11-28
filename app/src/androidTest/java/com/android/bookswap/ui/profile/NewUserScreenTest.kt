@@ -9,12 +9,10 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import com.android.bookswap.data.source.network.PhotoFirebaseStorageSource
-import com.android.bookswap.model.PhotoRequester
 import com.android.bookswap.model.UserViewModel
 import com.android.bookswap.resources.C
 import com.android.bookswap.ui.navigation.NavigationActions
 import io.mockk.mockk
-import io.mockk.mockkConstructor
 import io.mockk.verify
 import org.junit.Before
 import org.junit.Rule
@@ -30,7 +28,7 @@ class NewUserScreenTest {
   fun setUp() {
     navigationActions = mockk(relaxed = true)
     userVM = mockk(relaxed = true)
-     photoStorage = mockk(relaxed = true)
+    photoStorage = mockk(relaxed = true)
     composeTestRule.setContent { NewUserScreen(navigationActions, userVM, photoStorage) }
   }
 
@@ -90,8 +88,8 @@ class NewUserScreenTest {
         .assertIsDisplayed()
         .assertTextEquals("Create")
         .assertHasClickAction()
-
   }
+
   @Test
   fun clickOnCreateButtonWithInvalidEmailDoesNotNavigate() {
 

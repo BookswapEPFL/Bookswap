@@ -110,8 +110,7 @@ fun MessageBoxDisplay(message: MessageBox, onClick: () -> Unit = {}) {
                   .align(Alignment.CenterVertically)
                   .fillMaxHeight()
                   .clip(CircleShape),
-          contentScale = ContentScale.Crop
-      )
+          contentScale = ContentScale.Crop)
     } else {
       Icon(
           imageVector = Icons.Filled.Person,
