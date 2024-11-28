@@ -88,11 +88,10 @@ fun MapScreen(
     bottomAppBar: @Composable () -> Unit = {},
     userVM: UserViewModel
 ) {
-  geolocation.startLocationUpdates()
   val cameraPositionState = rememberCameraPositionState()
   // Get the user's current location
-  val latitude = geolocation.latitude.collectAsState()
-  val longitude = geolocation.longitude.collectAsState()
+  val latitude = geolocation.latitude.collectAsState().value
+  val longitude = geolocation.longitude.collectAsState().value
   // Start location and books updates
   LaunchedEffect(Unit) {
     bookManagerViewModel.startUpdatingBooks()
@@ -102,7 +101,7 @@ fun MapScreen(
   }
   // Stop location and books updates when the screen is disposed
   DisposableEffect(Unit) {
-    onDispose { android.util.Log.d("TAG_MAP","${latitude.value},${longitude.value};${geolocation.latitude.value},${geolocation.longitude.value}")
+    onDispose {
       userVM.lat = geolocation.latitude.value
       userVM.lon = geolocation.longitude.value
       geolocation.stopLocationUpdates()
@@ -157,6 +156,9 @@ fun MapScreen(
             Modifier.padding(
                 top = pd.calculateTopPadding(), bottom = pd.calculateBottomPadding())) {
               GoogleMap(
+				onMapLoaded = {
+				  cameraPositionState.position =
+					CameraPosition.fromLatLngZoom(LatLng(geolocation.latitude.value, geolocation.longitude.value), INIT_ZOOM)},
                   onMapClick = { mutableStateSelectedUser = NO_USER_SELECTED },
                   modifier =
 				  Modifier
@@ -169,9 +171,9 @@ fun MapScreen(
                   uiSettings = MapUiSettings(zoomControlsEnabled = false),
               ) {
                 // Marker for user's current location
-                if (!latitude.value.isNaN() && !longitude.value.isNaN()) {
+                if (!latitude.isNaN() && !longitude.isNaN()) {
                   Marker(
-                      state = MarkerState(position = LatLng(latitude.value, longitude.value)),
+                      state = MarkerState(position = LatLng(latitude, longitude)),
                       title = "Your Location",
                       icon =
                           BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE))
@@ -333,35 +335,41 @@ private fun DraggableMenu(listAllBooks: List<DataBook>) {
 
   Box(
       modifier =
-          Modifier.offset {
-                IntOffset(
-                    0,
-                    sheetOffsetY
-                        .toPx()
-                        .roundToInt()
-                        .coerceIn(
-                            0,
-                            (maxSheetOffsetY - HEIGHT_RETRACTED_DRAGGABLE_MENU_DP.dp)
-                                .toPx()
-                                .toInt()))
-              }
-              .fillMaxWidth()
-              .height(
-                  (maxSheetOffsetY - sheetOffsetY).coerceIn(maxSheetOffsetY / 10, maxSheetOffsetY))
-              .pointerInput(Unit) {
-                detectVerticalDragGestures { change, dragAmount ->
-                  change.consume()
-                  val dragAmountInDp = dragAmount / density
-                  sheetOffsetY = (sheetOffsetY + dragAmountInDp.dp)
-                }
-              }
-              .background(
-                  color = ColorVariable.BackGround,
-                  shape =
-                      RoundedCornerShape(
-                          topStart = HEIGHT_RETRACTED_DRAGGABLE_MENU_DP.dp,
-                          topEnd = HEIGHT_RETRACTED_DRAGGABLE_MENU_DP.dp))
-              .testTag(C.Tag.Map.bottom_drawer_container)) {
+	  Modifier
+		.offset {
+		  IntOffset(
+			0,
+			sheetOffsetY
+			  .toPx()
+			  .roundToInt()
+			  .coerceIn(
+				0,
+				(maxSheetOffsetY - HEIGHT_RETRACTED_DRAGGABLE_MENU_DP.dp)
+				  .toPx()
+				  .toInt()
+			  )
+		  )
+		}
+		.fillMaxWidth()
+		.height(
+		  (maxSheetOffsetY - sheetOffsetY).coerceIn(maxSheetOffsetY / 10, maxSheetOffsetY)
+		)
+		.pointerInput(Unit) {
+		  detectVerticalDragGestures { change, dragAmount ->
+			change.consume()
+			val dragAmountInDp = dragAmount / density
+			sheetOffsetY = (sheetOffsetY + dragAmountInDp.dp)
+		  }
+		}
+		.background(
+		  color = ColorVariable.BackGround,
+		  shape =
+		  RoundedCornerShape(
+			topStart = HEIGHT_RETRACTED_DRAGGABLE_MENU_DP.dp,
+			topEnd = HEIGHT_RETRACTED_DRAGGABLE_MENU_DP.dp
+		  )
+		)
+		.testTag(C.Tag.Map.bottom_drawer_container)) {
         Column(modifier = Modifier.fillMaxWidth().testTag(C.Tag.Map.bottom_drawer_layout)) {
           // draggable handle
           Spacer(modifier = Modifier.height(HANDLE_HEIGHT_DP.dp))
