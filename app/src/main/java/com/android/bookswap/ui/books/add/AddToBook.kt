@@ -32,6 +32,12 @@ import com.android.bookswap.data.repository.BooksRepository
 import com.android.bookswap.model.InputVerification
 import com.android.bookswap.model.UserViewModel
 import com.android.bookswap.resources.C
+import com.android.bookswap.ui.MAXLENGTHAUTHOR
+import com.android.bookswap.ui.MAXLENGTHDESCRIPTION
+import com.android.bookswap.ui.MAXLENGTHISBN
+import com.android.bookswap.ui.MAXLENGTHPHOTO
+import com.android.bookswap.ui.MAXLENGTHRATING
+import com.android.bookswap.ui.MAXLENGTHTITLE
 import com.android.bookswap.ui.components.ButtonComponent
 import com.android.bookswap.ui.components.FieldComponent
 import com.android.bookswap.ui.theme.ColorVariable.BackGround
@@ -72,13 +78,6 @@ fun AddToBookScreen(
   val context = LocalContext.current
   val inputVerification = InputVerification()
 
-  val maxLengthTitle = 50
-  val maxLengthAuthor = 50
-  val maxLengthDescription = 10000
-  val maxLengthRating = 1
-  val maxLengthPhoto = 50
-  val maxLengthISBN = 17
-
   // Scaffold to provide basic UI structure with a top app bar
   Scaffold(
       modifier = Modifier.testTag(C.Tag.new_book_manual_screen_container),
@@ -101,7 +100,7 @@ fun AddToBookScreen(
                           .padding(horizontal = HORIZONTAL_PADDING.dp),
                   labelText = "Title*",
                   value = title,
-                  maxLength = maxLengthTitle) {
+                  maxLength = MAXLENGTHTITLE) {
                     title = it
                   }
               ExposedDropdownMenuBox(
@@ -145,7 +144,7 @@ fun AddToBookScreen(
                           .padding(horizontal = HORIZONTAL_PADDING.dp),
                   labelText = "Author",
                   value = author,
-                  maxLength = maxLengthAuthor) {
+                  maxLength = MAXLENGTHAUTHOR) {
                     author = it
                   }
               FieldComponent(
@@ -155,7 +154,7 @@ fun AddToBookScreen(
                           .padding(horizontal = HORIZONTAL_PADDING.dp),
                   labelText = "Description",
                   value = description,
-                  maxLength = maxLengthDescription) {
+                  maxLength = MAXLENGTHDESCRIPTION) {
                     description = it
                   }
               FieldComponent(
@@ -165,7 +164,7 @@ fun AddToBookScreen(
                           .padding(horizontal = HORIZONTAL_PADDING.dp),
                   labelText = "Rating",
                   value = rating,
-                  maxLength = maxLengthRating) {
+                  maxLength = MAXLENGTHRATING) {
                     rating = it
                   }
               FieldComponent(
@@ -175,7 +174,7 @@ fun AddToBookScreen(
                           .padding(horizontal = HORIZONTAL_PADDING.dp),
                   labelText = "ISBN*",
                   value = isbn,
-                  maxLength = maxLengthISBN) {
+                  maxLength = MAXLENGTHISBN) {
                     if (inputVerification.testIsbn(it)) {
                       isbn = it
                       Log.d("ISBN Input", "Updated ISBN: $isbn")
@@ -188,7 +187,7 @@ fun AddToBookScreen(
                           .padding(horizontal = HORIZONTAL_PADDING.dp),
                   labelText = "Photo",
                   value = photo,
-                  maxLength = maxLengthPhoto) {
+                  maxLength = MAXLENGTHPHOTO) {
                     photo = it
                   }
               /*

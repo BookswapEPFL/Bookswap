@@ -18,6 +18,11 @@ import androidx.compose.ui.window.DialogProperties
 import com.android.bookswap.data.DataUser
 import com.android.bookswap.model.InputVerification
 import com.android.bookswap.resources.C
+import com.android.bookswap.ui.MAXLENGTHEMAIL
+import com.android.bookswap.ui.MAXLENGTHFIRSTNAME
+import com.android.bookswap.ui.MAXLENGTHGREETING
+import com.android.bookswap.ui.MAXLENGTHLASTNAME
+import com.android.bookswap.ui.MAXLENGTHPHONE
 import com.android.bookswap.ui.theme.BookSwapAppTheme
 
 /**
@@ -36,12 +41,6 @@ fun EditProfileDialog(onDismiss: () -> Unit, onSave: (DataUser) -> Unit, dataUse
   val _greeting = remember { mutableStateOf<String>(dataUser.greeting) }
   val _firstName = remember { mutableStateOf<String>(dataUser.firstName) }
   val _lastName = remember { mutableStateOf<String>(dataUser.lastName) }
-
-  val maxLengthGreetings = 5
-  val maxLengthFirstName = 100
-  val maxLengthLastName = 300
-  val maxLengthPhone = 20
-  val maxLengthEmail = 320
 
   val verification = InputVerification()
 
@@ -62,7 +61,7 @@ fun EditProfileDialog(onDismiss: () -> Unit, onSave: (DataUser) -> Unit, dataUse
               OutlinedTextField(
                   value = _greeting.value,
                   onValueChange = {
-                    if (it.length <= maxLengthGreetings) {
+                    if (it.length <= MAXLENGTHGREETING) {
                       _greeting.value = it
                       dataUser.greeting = _greeting.value
                       greetingError.value = false
@@ -81,7 +80,7 @@ fun EditProfileDialog(onDismiss: () -> Unit, onSave: (DataUser) -> Unit, dataUse
               OutlinedTextField(
                   value = _firstName.value,
                   onValueChange = {
-                    if (it.length <= maxLengthFirstName) {
+                    if (it.length <= MAXLENGTHFIRSTNAME) {
                       _firstName.value = it
                       dataUser.firstName = _firstName.value
                       firstNameError.value = false
@@ -99,7 +98,7 @@ fun EditProfileDialog(onDismiss: () -> Unit, onSave: (DataUser) -> Unit, dataUse
               OutlinedTextField(
                   value = _lastName.value,
                   onValueChange = {
-                    if (it.length <= maxLengthLastName) {
+                    if (it.length <= MAXLENGTHLASTNAME) {
                       _lastName.value = it
                       dataUser.lastName = _lastName.value
                       lastNameError.value = false
@@ -117,7 +116,7 @@ fun EditProfileDialog(onDismiss: () -> Unit, onSave: (DataUser) -> Unit, dataUse
               OutlinedTextField(
                   value = _email.value,
                   onValueChange = {
-                    if (it.length <= maxLengthEmail) {
+                    if (it.length <= MAXLENGTHEMAIL) {
                       _email.value = it
                       emailError.value = false
                       if (verification.validateEmail(_email.value)) {
@@ -137,7 +136,7 @@ fun EditProfileDialog(onDismiss: () -> Unit, onSave: (DataUser) -> Unit, dataUse
               OutlinedTextField(
                   value = _phone.value,
                   onValueChange = {
-                    if (it.length <= maxLengthPhone) {
+                    if (it.length <= MAXLENGTHPHONE) {
                       _phone.value = it
                       phoneError.value = false
                       if (verification.validatePhone(_phone.value)) {

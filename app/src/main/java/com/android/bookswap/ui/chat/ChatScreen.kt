@@ -68,6 +68,7 @@ import com.android.bookswap.data.repository.PhotoFirebaseStorageRepository
 import com.android.bookswap.model.PhotoRequester
 import com.android.bookswap.model.chat.OfflineMessageStorage
 import com.android.bookswap.resources.C
+import com.android.bookswap.ui.MAXLENGTHMESSAGE
 import com.android.bookswap.ui.components.BackButtonComponent
 import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.theme.ColorVariable
@@ -105,7 +106,6 @@ fun ChatScreen(
   val padding8 = 8.dp
   val padding24 = 24.dp
   val padding36 = 36.dp
-  val maxLength = 100000
   val photoReq =
       PhotoRequester(context) { result ->
         if (result.isSuccess) {
@@ -232,8 +232,7 @@ fun ChatScreen(
               BasicTextField(
                   value = newMessageText,
                   onValueChange = {
-                    if (it.text.length <=
-                        maxLength) { // Check if the input length is within the maxLength
+                    if (it.text.length <= MAXLENGTHMESSAGE) {
                       newMessageText = it
                     }
                   },

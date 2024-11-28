@@ -31,6 +31,7 @@ import com.android.bookswap.data.source.api.GoogleBookDataSource
 import com.android.bookswap.model.InputVerification
 import com.android.bookswap.model.UserViewModel
 import com.android.bookswap.resources.C
+import com.android.bookswap.ui.MAXLENGTHISBN
 import com.android.bookswap.ui.components.ButtonComponent
 import com.android.bookswap.ui.components.FieldComponent
 import com.android.bookswap.ui.navigation.NavigationActions
@@ -49,7 +50,6 @@ fun AddISBNScreen(
     bottomAppBar: @Composable () -> Unit = {}
 ) {
   val context = LocalContext.current
-  val maxLengthISBN = 17
   val inputVerification = InputVerification()
   val user = userVM.getUser()
   Scaffold(
@@ -70,7 +70,7 @@ fun AddISBNScreen(
                         modifier = Modifier.testTag(C.Tag.NewBookISBN.isbn),
                         labelText = "ISBN*",
                         value = isbn,
-                        maxLength = maxLengthISBN) {
+                        maxLength = MAXLENGTHISBN) {
                           if (inputVerification.testIsbn(it)) {
                             isbn = it
                             Log.d("ISBN Input", "Updated ISBN: $isbn")
