@@ -117,7 +117,7 @@ class BooksFirestoreSourceTest {
     bookSource.updateBook(testBook) { result -> assertTrue(result.isSuccess) }
 
     // Verify Firestore update operation
-    verify { mockDocumentReference.set(testBook) }
+    verify { mockDocumentReference.set(bookSource.bookToDocument(testBook)) }
   }
 
   @Test

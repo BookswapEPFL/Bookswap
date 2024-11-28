@@ -94,7 +94,7 @@ class PhotoFirestoreSourceTest {
           assert(result.isSuccess)
         })
     // Verify Firestore set operation
-    verify { mockDocumentReference.set(testPhoto) }
+    verify { mockDocumentReference.set(photoFirestoreSource.photoToDocument(testPhoto)) }
   }
 
   @Test
