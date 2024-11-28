@@ -172,6 +172,7 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
     implementation(libs.firebase.messaging.ktx)
     implementation(libs.firebase.storage.ktx)
+    implementation(project(":app"))
     testImplementation(libs.junit)
     testImplementation(libs.mockito.core)
     testImplementation(libs.mockito.kotlin)

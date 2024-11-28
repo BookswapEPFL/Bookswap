@@ -38,7 +38,9 @@ class BooksFirestoreSourceTest {
           photo = "http://example.com/photo.jpg",
           language = BookLanguages.ENGLISH,
           isbn = "1234567890",
-          userId = UUID.randomUUID())
+          userId = UUID.randomUUID(),
+          archived = false,
+          exchange = false)
 
   @Before
   fun setUp() {
@@ -59,6 +61,8 @@ class BooksFirestoreSourceTest {
     every { mockDocumentSnapshot.getString("userid") }.returns(testBook.userId.toString())
 
     every { mockDocumentReference.set(any<Map<String, Any>>()) }.returns(Tasks.forResult(null))
+    every { mockDocumentReference.delete() }.returns(Tasks.forResult(null))
+    every { mockDocumentReference.get() }.returns(Tasks.forResult(mockDocumentSnapshot))
   }
 
   @Test
@@ -158,5 +162,49 @@ class BooksFirestoreSourceTest {
 
     // Assert
     assertNull(result) // Should return null due to invalid language
+  }
+
+  @Test
+  fun `getFromArchivedBooks retrieves book from archive`() {
+    val bookSource = BooksFirestoreSource(mockFirestore)
+
+    // Act
+    bookSource.getFromArchivedBooks(
+        testBook.uuid,
+        { retrievedBook -> assertEquals(testBook.title, retrievedBook.title) },
+        { exception -> fail("Failed to retrieve book: ${exception.message}") })
+
+    // Assert
+    verify { mockDocumentReference.get() }
+  }
+
+  @Test
+  fun `deleteFromArchivedBooks deletes book from archive`() {
+    val bookSource = BooksFirestoreSource(mockFirestore)
+
+    // Act
+    bookSource.deleteFromArchivedBooks(testBook) { result -> assertTrue(result.isSuccess) }
+
+    // Assert
+    verify { mockDocumentReference.delete() }
+  }
+
+  @Test
+  fun `TakeBackFromArchives takes book back from archive`() {
+    val bookSource = BooksFirestoreSource(mockFirestore)
+
+    // Arrange
+    val userUUID = UUID.randomUUID()
+    every { mockDocumentReference.get() }.returns(Tasks.forResult(mockDocumentSnapshot))
+
+    // Act
+    bookSource.TakeBackFromArchives(testBook.uuid, userUUID) { result ->
+      assertTrue(result.isSuccess)
+    }
+
+    // Assert
+    verify { mockDocumentReference.get() }
+    verify { mockDocumentReference.delete() }
+    verify { mockDocumentReference.set(any<Map<String, Any>>()) }
   }
 }

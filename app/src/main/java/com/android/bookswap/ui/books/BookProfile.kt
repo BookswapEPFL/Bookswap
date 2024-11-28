@@ -1,5 +1,6 @@
 package com.android.bookswap.ui.books
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -16,6 +17,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -35,6 +37,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
@@ -46,6 +49,7 @@ import com.android.bookswap.resources.C
 import com.android.bookswap.ui.components.ButtonComponent
 import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.theme.ColorVariable
+import junit.framework.TestCase.assertTrue
 import java.util.UUID
 
 /**
@@ -275,11 +279,37 @@ fun BookProfileScreen(
                     Spacer(
                         modifier = Modifier.height(0.dp).testTag(C.Tag.BookProfile.scrollable_end))
                   }
+                    item {
+                        ButtonComponent(
+                            onClick = {
+                            booksRepository.exchangeBook(dataBook, currentUserId){
+                                Toast.makeText(LocalContext.current, "Book exchanged successfully", Toast.LENGTH_SHORT).show()}
+                            },
+                            modifier = Modifier.padding(8.dp).testTag(C.Tag.BookProfile.edit)) {
+                            Text("Exchange Book")
+
+                        }
+                    }
+                    item {
+                        ButtonComponent(
+                            onClick = {
+                                booksRepository.moveBookToArchive(dataBook)
+                                Toast.makeText(LocalContext.current, "Book archived successfully", Toast.LENGTH_SHORT).show()
+                            },
+                            modifier = Modifier.padding(8.dp).testTag(C.Tag.BookProfile.edit)) {
+                            Text("Archived Book")
+
+                        }
+                    }
+                    }
+
                 }
+
               }
+
             }
       }
-}
+
 /**
  * Composable function to display a text with a specific style and test tag.
  *

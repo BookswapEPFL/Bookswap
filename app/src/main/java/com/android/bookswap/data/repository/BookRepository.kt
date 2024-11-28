@@ -1,5 +1,6 @@
 package com.android.bookswap.data.repository
 
+import androidx.compose.runtime.Composable
 import com.android.bookswap.data.DataBook
 import java.util.UUID
 
@@ -53,4 +54,33 @@ interface BooksRepository {
    * @param callback A callback function that receives an exception if the operation fails.
    */
   fun deleteBooks(uuid: UUID, dataBook: DataBook, callback: (Result<Unit>) -> Unit)
+  /**
+   * Deletes a book from the archived books collection in Firestore.
+   *
+   * @param dataBook The DataBook object containing the book details.
+   * @param callback Callback to be invoked with the result of the operation. The result is Unit on
+   *   success, or an exception on failure.
+   */
+  fun deleteFromArchivedBooks(dataBook: DataBook, callback: (Result<Unit>) -> Unit)
+  /**
+   * Retrieves a book from the archived books collection in Firestore.
+   *
+   * @param uuid The unique identifier of the book to be retrieved.
+   * @param OnSucess Callback to be invoked with the retrieved DataBook object on success.
+   * @param onFailure Callback to be invoked with an exception on failure.
+   */
+  fun getFromArchivedBooks(uuid: UUID, OnSucess: (DataBook) -> Unit, onFailure: (Exception) -> Unit)
+  /**
+   * Moves a book to the archived books collection in Firestore.
+   *
+   * @param book The DataBook object containing the book details to be archived.
+   */
+  fun moveBookToArchive(book: DataBook)
+  /**
+   * Function to exchange a book in the repository.
+   *
+   * @param book The DataBook object containing the book details to be exchanged.
+   * @param callback A callback function that receives the result of the operation. The result is Unit on success, or an exception on failure.
+   */
+  fun exchangeBook(book: DataBook,otherUUID: UUID, callback: @Composable (Result<Unit>) -> Unit)
 }

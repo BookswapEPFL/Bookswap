@@ -47,7 +47,9 @@ val longListBook =
           BookLanguages.ENGLISH,
           "123-456-789",
           listOf(BookGenres.FICTION, BookGenres.NONFICTION),
-          userId)
+          userId,
+          false,
+          false)
     }
 
 val books =
@@ -62,7 +64,9 @@ val books =
             BookLanguages.ENGLISH,
             "123-456-789",
             listOf(BookGenres.FICTION, BookGenres.HORROR),
-            userId),
+            userId,
+            false,
+            false),
         DataBook(
             UUID(2000, 1000),
             "Book 2",
@@ -73,7 +77,9 @@ val books =
             BookLanguages.FRENCH,
             "234-567-890",
             listOf(BookGenres.FICTION),
-            userId))
+            userId,
+            false,
+            false))
 
 class MapScreenTest {
   private val user = listOf(DataUser(bookList = listOf(UUID(1000, 1000), UUID(2000, 1000))))
