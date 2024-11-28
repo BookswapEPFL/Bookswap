@@ -124,7 +124,7 @@ fun UserProfile(
     Dialog(
         onDismissRequest = { showEditPicture.value = false },
         properties = DialogProperties(dismissOnBackPress = true, dismissOnClickOutside = true)) {
-          Card(Modifier.testTag(C.Tag.UserProfile.profileImage).padding(16.dp)) {
+          Card(Modifier.testTag(C.Tag.UserProfile.profileImageBox).padding(16.dp)) {
             Column(
                 Modifier.fillMaxWidth().padding(16.dp),
                 Arrangement.Center,
@@ -153,7 +153,7 @@ fun UserProfile(
                 Box {
                   IconButton(
                       onClick = { showEditPicture.value = true },
-                      modifier = Modifier.aspectRatio(1f)) {
+                      modifier = Modifier.aspectRatio(1f).testTag(C.Tag.UserProfile.profileImage)) {
                         Box(
                             modifier =
                                 Modifier.padding(2.5f.dp)
@@ -161,7 +161,7 @@ fun UserProfile(
                               if (user.profilePictureUrl.isEmpty()) {
                                 Image(
                                     imageVector = Icons.Rounded.AccountCircle,
-                                    contentDescription = "",
+                                    contentDescription = "No profile picture",
                                     modifier = Modifier.fillMaxSize().scale(1.2f).clipToBounds(),
                                     colorFilter = ColorFilter.tint(Color(0xFF6C584C)))
                               } else {

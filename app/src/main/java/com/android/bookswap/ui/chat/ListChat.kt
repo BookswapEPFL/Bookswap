@@ -115,7 +115,7 @@ fun MessageBoxDisplay(message: MessageBox, onClick: () -> Unit = {}) {
     } else {
       Icon(
           imageVector = Icons.Filled.Person,
-          contentDescription = "Contact Icon",
+          contentDescription = "Contact Icon empty",
           modifier = Modifier.size(40.dp).align(Alignment.CenterVertically).fillMaxHeight(),
       )
     }

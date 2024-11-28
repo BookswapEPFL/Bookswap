@@ -175,7 +175,7 @@ fun NewUserScreen(
                             if (profilPicture.value == null) {
                               Icon(
                                   imageVector = Icons.Default.AccountCircle,
-                                  contentDescription = "profile picture",
+                                  contentDescription = "no profile picture",
                                   tint = ColorVariable.Accent,
                                   modifier = Modifier.size(ICON_SIZE))
                             } else {

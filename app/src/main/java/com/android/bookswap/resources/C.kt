@@ -122,6 +122,7 @@ object C {
       const val edit = S.EDIT_PROFILE + UI_T.BUTTON
       const val profileImage = "profile" + UI_T.IMAGE
       const val take_photo = A.NEW + UI_T.BUTTON + UI_T.IMAGE
+      const val profileImageBox = "profile_image_box" + UI_T.CONTAINER
     }
 
     // Edit User Profile Screen specific tags (EditProfile.kt)
