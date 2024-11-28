@@ -43,8 +43,8 @@ class Geolocation(private val activity: Activity) : IGeolocation {
   private val fusedLocationClient: FusedLocationProviderClient =
       LocationServices.getFusedLocationProviderClient(activity)
   val isRunning = mutableStateOf(false)
-  override val latitude = MutableStateFlow(0.0)
-  override val longitude = MutableStateFlow(0.0)
+  override val latitude = MutableStateFlow(Double.NaN)
+  override val longitude = MutableStateFlow(Double.NaN)
 
   /** Location request settings */
   private val locationRequest: LocationRequest =
