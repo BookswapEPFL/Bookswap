@@ -39,6 +39,7 @@ import androidx.compose.ui.unit.dp
 import com.android.bookswap.data.BookGenres
 import com.android.bookswap.data.DataBook
 import com.android.bookswap.data.repository.BooksRepository
+import com.android.bookswap.resources.C
 import com.android.bookswap.ui.books.add.createDataBook
 import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.theme.ColorVariable
@@ -83,17 +84,26 @@ fun EditBookScreen(
   var selectedGenre by remember { mutableStateOf<BookGenres?>(null) } // Genre selection state
   var expanded by remember { mutableStateOf(false) } // State for dropdown menu
 
+  val maxLengthTitle = 50
+  val maxLengthAuthor = 50
+  val maxLengthDescription = 10000
+  val maxLengthRating = 1
+  val maxLengthPhoto = 50
+
   val context = LocalContext.current
 
   Scaffold(
-      modifier = Modifier.testTag("editBookScreen").background(ColorVariable.BackGround),
+      modifier =
+          Modifier.testTag(C.Tag.edit_book_screen_container).background(ColorVariable.BackGround),
       containerColor = ColorVariable.BackGround, // Sets entire Scaffold background color
       topBar = {
         TopAppBar(
-            title = { Text("Edit your Book", modifier = Modifier.testTag("editBookTitle")) },
+            title = {
+              Text("Edit your Book", modifier = Modifier.testTag(C.Tag.TopAppBar.screen_title))
+            },
             navigationIcon = {
               IconButton(
-                  modifier = Modifier.testTag("goBackButton"),
+                  modifier = Modifier.testTag(C.Tag.TopAppBar.back_button),
                   onClick = { navigationActions.goBack() }) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
@@ -110,16 +120,16 @@ fun EditBookScreen(
                     .padding(SCREEN_PADDING)
                     .widthIn(max = columnMaxWidth)
                     .background(ColorVariable.BackGround)
-                    .testTag("editBookScreenColumn"),
+                    .testTag(C.Tag.EditBook.scrollable),
             verticalArrangement = Arrangement.spacedBy(ELEMENT_SPACING)) {
               // Title Edit Field
               item {
                 OutlinedTextField(
                     value = title,
-                    onValueChange = { title = it },
+                    onValueChange = { if (it.length <= maxLengthTitle) title = it },
                     label = { Text("Title") },
                     placeholder = { Text("Enter the book title") },
-                    modifier = Modifier.fillMaxWidth().testTag("inputBookTitle"),
+                    modifier = Modifier.fillMaxWidth().testTag(C.Tag.EditBook.title),
                     colors =
                         TextFieldDefaults.outlinedTextFieldColors(
                             containerColor = ColorVariable.Secondary,
@@ -132,7 +142,7 @@ fun EditBookScreen(
                 ExposedDropdownMenuBox(
                     expanded = expanded,
                     onExpandedChange = { expanded = !expanded },
-                    modifier = Modifier.fillMaxWidth().testTag("GenreDropdown")) {
+                    modifier = Modifier.fillMaxWidth().testTag(C.Tag.EditBook.genres)) {
                       OutlinedTextField(
                           value = selectedGenre?.Genre ?: "Select Genre",
                           onValueChange = {},
@@ -141,7 +151,8 @@ fun EditBookScreen(
                           trailingIcon = {
                             ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
                           },
-                          modifier = Modifier.menuAnchor().testTag("SelectedGenre"),
+                          modifier =
+                              Modifier.menuAnchor().testTag("selected" + C.Tag.EditBook.genre),
                           colors =
                               TextFieldDefaults.outlinedTextFieldColors(
                                   containerColor = ColorVariable.Secondary,
@@ -152,7 +163,7 @@ fun EditBookScreen(
                             BookGenres.values().forEach { genre ->
                               DropdownMenuItem(
                                   text = { Text(text = genre.Genre) },
-                                  modifier = Modifier.testTag("GenreDropdownItem_${genre.Genre}"),
+                                  modifier = Modifier.testTag(genre.Genre + C.Tag.EditBook.genre),
                                   onClick = {
                                     selectedGenre = genre
                                     genres = listOf(genre) // Update genres list with selected genre
@@ -167,10 +178,10 @@ fun EditBookScreen(
                 // Author Edit Field
                 OutlinedTextField(
                     value = author,
-                    onValueChange = { author = it },
+                    onValueChange = { if (it.length <= maxLengthAuthor) author = it },
                     label = { Text("Author") },
                     placeholder = { Text("Enter the author's name") },
-                    modifier = Modifier.fillMaxWidth().testTag("inputBookAuthor"),
+                    modifier = Modifier.fillMaxWidth().testTag(C.Tag.EditBook.author),
                     colors =
                         TextFieldDefaults.outlinedTextFieldColors(
                             containerColor = ColorVariable.Secondary,
@@ -182,10 +193,10 @@ fun EditBookScreen(
                 // Description Edit Field
                 OutlinedTextField(
                     value = description,
-                    onValueChange = { description = it },
+                    onValueChange = { if (it.length <= maxLengthDescription) description = it },
                     label = { Text("Description") },
                     placeholder = { Text("Provide a description of the book") },
-                    modifier = Modifier.fillMaxWidth().testTag("inputBookDescription"),
+                    modifier = Modifier.fillMaxWidth().testTag(C.Tag.EditBook.synopsis),
                     colors =
                         TextFieldDefaults.outlinedTextFieldColors(
                             containerColor = ColorVariable.Secondary,
@@ -197,34 +208,25 @@ fun EditBookScreen(
                 // Rating Edit Field
                 OutlinedTextField(
                     value = rating,
-                    onValueChange = { rating = it },
+                    onValueChange = { if (it.length <= maxLengthRating) rating = it },
                     label = { Text("Rating") },
                     placeholder = { Text("Rate the book (e.g. 4.5)") },
-                    modifier = Modifier.fillMaxWidth().testTag("inputBookRating"),
+                    modifier = Modifier.fillMaxWidth().testTag(C.Tag.EditBook.rating),
                     colors =
                         TextFieldDefaults.outlinedTextFieldColors(
                             containerColor = ColorVariable.Secondary,
                             focusedBorderColor = Color.Black,
                             unfocusedBorderColor = Color.Black))
               }
-              // ISBN Edit Field
-              /*OutlinedTextField(
-                  value = isbn,
-                  onValueChange = { isbn = it },
-                  label = { Text("ISBN") },
-                  placeholder = { Text("ISBN Number") },
-                  modifier = Modifier.fillMaxWidth().testTag("inputBookISBN")
-              )*/
-              // Remove for now but could be added later
 
               item {
                 // Photo Edit Field
                 OutlinedTextField(
                     value = photo,
-                    onValueChange = { photo = it },
+                    onValueChange = { if (it.length <= maxLengthPhoto) photo = it },
                     label = { Text("Photo ") },
                     placeholder = { Text("Enter a photo of the books") },
-                    modifier = Modifier.testTag("inputBookPhoto"),
+                    modifier = Modifier.testTag(C.Tag.EditBook.image),
                     colors =
                         TextFieldDefaults.outlinedTextFieldColors(
                             containerColor = ColorVariable.Secondary,
@@ -239,7 +241,7 @@ fun EditBookScreen(
                     onValueChange = { language = it },
                     label = { Text("Language ") },
                     placeholder = { Text("In which language are the book") },
-                    modifier = Modifier.testTag("inputBookLanguage"),
+                    modifier = Modifier.testTag(C.Tag.EditBook.language),
                     colors =
                         TextFieldDefaults.outlinedTextFieldColors(
                             containerColor = ColorVariable.Secondary,
@@ -303,7 +305,7 @@ fun EditBookScreen(
                         Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
                       }
                     },
-                    modifier = Modifier.fillMaxWidth().testTag("bookSave"),
+                    modifier = Modifier.fillMaxWidth().testTag(C.Tag.EditBook.save),
                     enabled = title.isNotBlank(),
                     colors = ButtonDefaults.buttonColors(containerColor = ColorVariable.Primary)) {
                       Text("Save", color = Color.White)
@@ -325,7 +327,7 @@ fun EditBookScreen(
                             }
                           })
                     },
-                    modifier = Modifier.fillMaxWidth().testTag("bookDelete"),
+                    modifier = Modifier.fillMaxWidth().testTag(C.Tag.EditBook.delete),
                     colors = ButtonDefaults.buttonColors(containerColor = ColorVariable.Primary)) {
                       Text("Delete", color = Color.White)
                     }

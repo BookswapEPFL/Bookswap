@@ -14,6 +14,8 @@ import androidx.navigation.compose.rememberNavController
 import com.android.bookswap.data.BookGenres
 import com.android.bookswap.data.BookLanguages
 import com.android.bookswap.data.repository.BooksRepository
+import com.android.bookswap.model.UserViewModel
+import com.android.bookswap.resources.C
 import com.android.bookswap.ui.navigation.NavigationActions
 import io.mockk.every
 import io.mockk.mockk
@@ -29,6 +31,7 @@ class AddToBookTest {
   @get:Rule val composeTestRule = createComposeRule()
   private val mockContext: Context = mockk()
   private val mockBooksRepository: BooksRepository = mockk()
+  private val mockUserVM: UserViewModel = mockk(relaxed = true)
 
   @Before
   fun init() {
@@ -43,11 +46,11 @@ class AddToBookTest {
     composeTestRule.setContent {
       val navController = rememberNavController()
       val navigationActions = NavigationActions(navController)
-      val userId = UUID.randomUUID()
-      AddToBookScreen(mockBooksRepository, userId = userId)
+      AddToBookScreen(mockBooksRepository, mockUserVM)
     }
+
     // Check if the Save button is initially disabled
-    composeTestRule.onNodeWithTag("save_button").assertIsNotEnabled()
+    composeTestRule.onNodeWithTag(C.Tag.NewBookManually.save).assertIsNotEnabled()
   }
 
   @Test
@@ -55,15 +58,15 @@ class AddToBookTest {
     composeTestRule.setContent {
       val navController = rememberNavController()
       val navigationActions = NavigationActions(navController)
-      val userId = UUID.randomUUID()
-      AddToBookScreen(mockBooksRepository, userId = userId)
+      AddToBookScreen(mockBooksRepository, mockUserVM)
     }
+
     // Fill in the Title and ISBN fields
-    composeTestRule.onNodeWithTag("title_field").performTextInput("My Book Title")
-    composeTestRule.onNodeWithTag("isbn_field").performTextInput("1234567890")
+    composeTestRule.onNodeWithTag(C.Tag.NewBookManually.title).performTextInput("My Book Title")
+    composeTestRule.onNodeWithTag(C.Tag.NewBookManually.isbn).performTextInput("978-3-16-148410-0")
     // Check if the Save button is now enabled
-    composeTestRule.onNodeWithTag("save_button").performClick()
-    composeTestRule.onNodeWithTag("save_button").assertIsEnabled()
+    composeTestRule.onNodeWithTag(C.Tag.NewBookManually.save).performClick()
+    composeTestRule.onNodeWithTag(C.Tag.NewBookManually.save).assertIsEnabled()
   }
 
   @Test
@@ -71,17 +74,17 @@ class AddToBookTest {
     // Test with valid data
     val book =
         createDataBook(
-            context = mockContext,
-            uuid = UUID.randomUUID(),
-            title = "My Book",
-            author = "Author Name",
-            description = "This is a description",
-            ratingStr = "4",
-            photo = "https://example.com/photo.jpg",
-            bookLanguageStr = "ENGLISH",
-            isbn = "1234567890",
-            genres = listOf(BookGenres.TRAVEL),
-            userId = UUID.randomUUID(),
+            mockContext,
+            UUID.randomUUID(),
+            "My Book",
+            "Author Name",
+            "This is a description",
+            "4",
+            "https://example.com/photo.jpg",
+            "ENGLISH",
+            "1234567890",
+            listOf(BookGenres.TRAVEL),
+            UUID.randomUUID(),
         )
 
     // Assert the book is created correctly
@@ -99,17 +102,17 @@ class AddToBookTest {
     // Test with invalid data (empty title)
     var book =
         createDataBook(
-            context = mockContext,
-            uuid = UUID.randomUUID(),
-            title = "",
-            author = "Author Name",
-            description = "This is a description",
-            ratingStr = "4",
-            photo = "https://example.com/photo.jpg",
-            bookLanguageStr = "ENGLISH",
-            isbn = "1234567890",
-            genres = listOf(BookGenres.TRAVEL),
-            userId = UUID.randomUUID(),
+            mockContext,
+            UUID.randomUUID(),
+            "",
+            "Author Name",
+            "This is a description",
+            "4",
+            "https://example.com/photo.jpg",
+            "ENGLISH",
+            "1234567890",
+            listOf(BookGenres.TRAVEL),
+            UUID.randomUUID(),
         )
 
     // Assert that the book is null due to invalid title
@@ -118,17 +121,17 @@ class AddToBookTest {
     // Test with invalid rating
     book =
         createDataBook(
-            context = mockContext,
-            uuid = UUID.randomUUID(),
-            title = "My Book",
-            author = "Author Name",
-            description = "This is a description",
-            ratingStr = "invalid_rating",
-            photo = "https://example.com/photo.jpg",
-            bookLanguageStr = "ENGLISH",
-            isbn = "1234567890",
-            genres = listOf(BookGenres.TRAVEL),
-            userId = UUID.randomUUID(),
+            mockContext,
+            UUID.randomUUID(),
+            "My Book",
+            "Author Name",
+            "This is a description",
+            "invalid_rating",
+            "https://example.com/photo.jpg",
+            "ENGLISH",
+            "1234567890",
+            listOf(BookGenres.TRAVEL),
+            UUID.randomUUID(),
         )
 
     // Assert that the book is null due to invalid rating
@@ -137,17 +140,17 @@ class AddToBookTest {
     // Test with invalid language
     book =
         createDataBook(
-            context = mockContext,
-            uuid = UUID.randomUUID(),
-            title = "My Book",
-            author = "Author Name",
-            description = "This is a description",
-            ratingStr = "4",
-            photo = "https://example.com/photo.jpg",
-            bookLanguageStr = "INVALID_LANGUAGE",
-            isbn = "1234567890",
-            genres = listOf(BookGenres.TRAVEL),
-            userId = UUID.randomUUID(),
+            mockContext,
+            UUID.randomUUID(),
+            "My Book",
+            "Author Name",
+            "This is a description",
+            "4",
+            "https://example.com/photo.jpg",
+            "INVALID_LANGUAGE",
+            "1234567890",
+            listOf(BookGenres.TRAVEL),
+            UUID.randomUUID(),
         )
 
     // Assert that the book is null due to invalid language
@@ -159,33 +162,33 @@ class AddToBookTest {
     composeTestRule.setContent {
       val navController = rememberNavController()
       val navigationActions = NavigationActions(navController)
-      val userId = UUID.randomUUID()
-      AddToBookScreen(mockBooksRepository, userId = userId)
+
+      AddToBookScreen(mockBooksRepository, mockUserVM)
     }
     // Fill in the ISBN field but leave the Title field empty
-    composeTestRule.onNodeWithTag("isbn_field").performTextInput("1234567890")
+    composeTestRule.onNodeWithTag(C.Tag.NewBookManually.isbn).performTextInput("1234567890")
 
     // Check if the Save button is still disabled
-    composeTestRule.onNodeWithTag("save_button").assertIsNotEnabled()
+    composeTestRule.onNodeWithTag(C.Tag.NewBookManually.save).assertIsNotEnabled()
   }
 
   @Test
   fun testDropdownMenuIsInitiallyClosed() {
     val userId = UUID.randomUUID()
-    composeTestRule.setContent { AddToBookScreen(mockBooksRepository, userId = userId) }
+    composeTestRule.setContent { AddToBookScreen(mockBooksRepository, mockUserVM) }
 
     // Verify that the dropdown menu is initially not expanded
-    composeTestRule.onNodeWithTag("language_field").assertIsDisplayed()
+    composeTestRule.onNodeWithTag(C.Tag.NewBookManually.language).assertIsDisplayed()
     composeTestRule.onNodeWithText("Language*").assertIsDisplayed()
   }
 
   @Test
   fun testDropdownMenuOpensOnClick() {
     val userId = UUID.randomUUID()
-    composeTestRule.setContent { AddToBookScreen(mockBooksRepository, userId = userId) }
+    composeTestRule.setContent { AddToBookScreen(mockBooksRepository, mockUserVM) }
 
     // Simulate clicking the dropdown to expand it
-    composeTestRule.onNodeWithTag("language_field").performClick()
+    composeTestRule.onNodeWithTag(C.Tag.NewBookManually.language).performClick()
 
     // Verify that dropdown items are displayed:
     composeTestRule.onNodeWithText("French").assertIsDisplayed()
@@ -201,10 +204,10 @@ class AddToBookTest {
   fun testDropdownMenuItemSelection() {
     val userId = UUID.randomUUID()
 
-    composeTestRule.setContent { AddToBookScreen(mockBooksRepository, userId = userId) }
+    composeTestRule.setContent { AddToBookScreen(mockBooksRepository, mockUserVM) }
 
     // Expand the dropdown menu:
-    composeTestRule.onNodeWithTag("language_field").performClick()
+    composeTestRule.onNodeWithTag(C.Tag.NewBookManually.language).performClick()
 
     // Click on a specific language ("English")
     composeTestRule.onNodeWithText("English").performClick()
@@ -217,10 +220,10 @@ class AddToBookTest {
   fun testDropdownMenuClosesAfterSelection() {
     val userId = UUID.randomUUID()
 
-    composeTestRule.setContent { AddToBookScreen(mockBooksRepository, userId = userId) }
+    composeTestRule.setContent { AddToBookScreen(mockBooksRepository, mockUserVM) }
 
     // Expand the dropdown menu
-    composeTestRule.onNodeWithTag("language_field").performClick()
+    composeTestRule.onNodeWithTag(C.Tag.NewBookManually.language).performClick()
 
     // Select a language to close the dropdown
     composeTestRule.onNodeWithText("English").performClick()

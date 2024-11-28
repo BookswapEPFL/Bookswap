@@ -44,9 +44,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.bookswap.R
 import com.android.bookswap.model.UserViewModel
+import com.android.bookswap.resources.C
 import com.android.bookswap.ui.navigation.NavigationActions
-import com.android.bookswap.ui.navigation.Screen
-import com.android.bookswap.ui.navigation.TopLevelDestinations
 import com.android.bookswap.ui.theme.ColorVariable
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
@@ -75,7 +74,7 @@ fun SignInScreen(
   // Check if user is already signed in
   LaunchedEffect(Unit) {
     if (Firebase.auth.currentUser != null) {
-      navigationActions.navigateTo(TopLevelDestinations.MAP)
+      navigationActions.navigateTo(C.Screen.MAP)
     }
   }
 
@@ -97,16 +96,16 @@ fun SignInScreen(
 
   LaunchedEffect(isStored) {
     when (isStored) {
-      true -> navigationActions.navigateTo(TopLevelDestinations.MAP)
+      true -> navigationActions.navigateTo(C.Screen.MAP)
       false -> {
-        navigationActions.navigateTo(Screen.NEW_USER)
+        navigationActions.navigateTo(C.Screen.NEW_USER)
       }
       null -> {}
     }
   }
 
   Scaffold(
-      modifier = Modifier.fillMaxSize().testTag("SignInScreen"),
+      modifier = Modifier.fillMaxSize().testTag(C.Tag.sign_in_screen_container),
       containerColor = ColorVariable.BackGround, // Set the background color
       content = { padding ->
         Column(
@@ -124,7 +123,7 @@ fun SignInScreen(
 
           // First part of the title:
           Text(
-              modifier = Modifier.testTag("login_loginTitle1"),
+              modifier = Modifier.testTag(C.Tag.TopAppBar.screen_title),
               text = "Welcome to",
               style =
                   TextStyle(
@@ -140,7 +139,7 @@ fun SignInScreen(
 
           // Second part of the logo:
           Text(
-              modifier = Modifier.testTag("login_loginTitle2"),
+              modifier = Modifier.testTag(C.Tag.SignIn.app_name),
               text = "BookSwap",
               style =
                   TextStyle(
@@ -188,7 +187,7 @@ fun GoogleSignInButton(onSignInClick: () -> Unit) {
       modifier =
           Modifier.padding(8.dp)
               .height(48.dp) // Adjust height as needed
-              .testTag("loginButton")) {
+              .testTag(C.Tag.SignIn.signIn)) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center,
