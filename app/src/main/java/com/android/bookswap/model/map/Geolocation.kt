@@ -48,9 +48,9 @@ class Geolocation(private val activity: Activity) : IGeolocation {
 
   /** Location request settings */
   private val locationRequest: LocationRequest =
-	LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY,500)
-	  .setMinUpdateDistanceMeters(20f)
-	  .build()
+      LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 500)
+          .setMinUpdateDistanceMeters(20f)
+          .build()
   /**
    * Callback for location updates.
    *
@@ -156,7 +156,7 @@ object GeoLocVewModel : ViewModel() {
             }
         android.util.Log.d("TAG_GEOLOCATION", "address:|${addressStr.value}|")
       } else {
-        //android.util.Log.wtf("TAG_GEOLOCATION", "Address list empty !")
+        // android.util.Log.wtf("TAG_GEOLOCATION", "Address list empty !")
       }
     }
 

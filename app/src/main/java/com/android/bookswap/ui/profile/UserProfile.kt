@@ -75,7 +75,7 @@ fun UserProfile(
         },
         dataUser = user)
   }
-  //LaunchedEffect(Unit){addrStr = userVM.getLocationPlace(context).}
+  // LaunchedEffect(Unit){addrStr = userVM.getLocationPlace(context).}
   LaunchedEffect(userVM.uuid, userVM.lat, userVM.lon, needRecompose) {
     user = userVM.getUser()
     needRecompose = false
@@ -88,10 +88,7 @@ fun UserProfile(
       bottomBar = bottomAppBar) {
         // Column layout to stack input fields vertically with spacing
         Row(
-            modifier = Modifier
-			  .padding(it)
-			  .consumeWindowInsets(it)
-			  .fillMaxWidth(),
+            modifier = Modifier.padding(it).consumeWindowInsets(it).fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(5f.dp)) {
               Column(modifier = Modifier.fillMaxWidth(0.25f)) {
                 Box {
@@ -100,22 +97,16 @@ fun UserProfile(
                       modifier = Modifier.aspectRatio(1f)) {
                         Box(
                             modifier =
-							Modifier
-							  .padding(2.5f.dp)
-							  .border(3.5f.dp, Color(0xFFA98467), CircleShape)) {
+                                Modifier.padding(2.5f.dp)
+                                    .border(3.5f.dp, Color(0xFFA98467), CircleShape)) {
                               Image(
                                   imageVector = Icons.Rounded.AccountCircle,
                                   contentDescription = "",
-                                  modifier = Modifier
-									.fillMaxSize()
-									.scale(1.2f)
-									.clipToBounds(),
+                                  modifier = Modifier.fillMaxSize().scale(1.2f).clipToBounds(),
                                   colorFilter = ColorFilter.tint(Color(0xFF6C584C)))
                             }
                         Box(
-                            modifier = Modifier
-							  .fillMaxSize()
-							  .padding(0f.dp),
+                            modifier = Modifier.fillMaxSize().padding(0f.dp),
                             contentAlignment = Alignment.TopEnd) {
                               Image(
                                   imageVector = Icons.Outlined.Edit,
@@ -125,10 +116,7 @@ fun UserProfile(
                       }
                 }
               }
-              Column(
-				Modifier
-				  .fillMaxHeight()
-				  .fillMaxWidth(), Arrangement.spacedBy(8.dp)) {
+              Column(Modifier.fillMaxHeight().fillMaxWidth(), Arrangement.spacedBy(8.dp)) {
                 // Full name text
                 Text(
                     text = "${user.greeting} ${user.firstName} ${user.lastName}",
@@ -141,9 +129,7 @@ fun UserProfile(
                 Text(text = user.phoneNumber, modifier = Modifier.testTag(C.Tag.UserProfile.phone))
 
                 // User address
-                Text(
-                    text = "${addrStr}",
-                    modifier = Modifier.testTag(C.Tag.UserProfile.address))
+                Text(text = "${addrStr}", modifier = Modifier.testTag(C.Tag.UserProfile.address))
 
                 // Edit Button
                 ButtonComponent(

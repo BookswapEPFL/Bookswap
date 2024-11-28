@@ -147,7 +147,9 @@ class UserFirestoreSource(private val db: FirebaseFirestore) : UsersRepository {
               bookList.filterNotNull(),
               googleUid))
     } catch (e: Exception) {
-      Log.e("FirestoreSourceError", "Error converting document ${document.id} to User\n${e.message} : ${e.stackTraceToString()}")
+      Log.e(
+          "FirestoreSourceError",
+          "Error converting document ${document.id} to User\n${e.message} : ${e.stackTraceToString()}")
       Result.failure(e)
     }
   }

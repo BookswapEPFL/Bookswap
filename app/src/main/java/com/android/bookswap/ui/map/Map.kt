@@ -97,7 +97,8 @@ fun MapScreen(
     bookManagerViewModel.startUpdatingBooks()
     geolocation.startLocationUpdates()
     cameraPositionState.position =
-        CameraPosition.fromLatLngZoom(LatLng(geolocation.latitude.value, geolocation.longitude.value), INIT_ZOOM)
+        CameraPosition.fromLatLngZoom(
+            LatLng(geolocation.latitude.value, geolocation.longitude.value), INIT_ZOOM)
   }
   // Stop location and books updates when the screen is disposed
   DisposableEffect(Unit) {
@@ -156,17 +157,17 @@ fun MapScreen(
             Modifier.padding(
                 top = pd.calculateTopPadding(), bottom = pd.calculateBottomPadding())) {
               GoogleMap(
-				onMapLoaded = {
-				  cameraPositionState.position =
-					CameraPosition.fromLatLngZoom(LatLng(geolocation.latitude.value, geolocation.longitude.value), INIT_ZOOM)},
+                  onMapLoaded = {
+                    cameraPositionState.position =
+                        CameraPosition.fromLatLngZoom(
+                            LatLng(geolocation.latitude.value, geolocation.longitude.value),
+                            INIT_ZOOM)
+                  },
                   onMapClick = { mutableStateSelectedUser = NO_USER_SELECTED },
                   modifier =
-				  Modifier
-					.fillMaxSize()
-					.testTag(C.Tag.Map.google_map)
-					.semantics {
-					  cameraPosition = cameraPositionState
-					},
+                      Modifier.fillMaxSize().testTag(C.Tag.Map.google_map).semantics {
+                        cameraPosition = cameraPositionState
+                      },
                   cameraPositionState = cameraPositionState,
                   uiSettings = MapUiSettings(zoomControlsEnabled = false),
               ) {
@@ -244,37 +245,32 @@ const val SECONDARY_TEXT_FONT_SP = 16
 private fun CustomInfoWindow(modifier: Modifier = Modifier, userBooks: List<DataBook>) {
   Card(
       modifier =
-	  modifier
-		.wrapContentSize()
-		.width(CARD_WIDTH_DP.dp)
-		.border(
-		  BorderStroke(width = DIVIDER_THICKNESS_DP.dp, color = ColorVariable.Accent),
-		  shape =
-		  RoundedCornerShape(
-			0.dp,
-			CARD_CORNER_RADIUS.dp,
-			CARD_CORNER_RADIUS.dp,
-			CARD_CORNER_RADIUS.dp
-		  )
-		)
-		.heightIn(max = CARD_HEIGHT_DP.dp)
-		.testTag(C.Tag.Map.Marker.info_window_container)
-		.background(Color.Transparent),
+          modifier
+              .wrapContentSize()
+              .width(CARD_WIDTH_DP.dp)
+              .border(
+                  BorderStroke(width = DIVIDER_THICKNESS_DP.dp, color = ColorVariable.Accent),
+                  shape =
+                      RoundedCornerShape(
+                          0.dp,
+                          CARD_CORNER_RADIUS.dp,
+                          CARD_CORNER_RADIUS.dp,
+                          CARD_CORNER_RADIUS.dp))
+              .heightIn(max = CARD_HEIGHT_DP.dp)
+              .testTag(C.Tag.Map.Marker.info_window_container)
+              .background(Color.Transparent),
       colors = CardDefaults.cardColors(containerColor = ColorVariable.Secondary),
       shape =
           RoundedCornerShape(
               0.dp, CARD_CORNER_RADIUS.dp, CARD_CORNER_RADIUS.dp, CARD_CORNER_RADIUS.dp)) {
         Spacer(modifier.height(CARD_CORNER_RADIUS.dp))
         LazyColumn(
-            modifier = Modifier
-			  .fillMaxWidth()
-			  .testTag(C.Tag.Map.Marker.info_window_scrollable)) {
+            modifier = Modifier.fillMaxWidth().testTag(C.Tag.Map.Marker.info_window_scrollable)) {
               itemsIndexed(userBooks) { index, book ->
                 Column(
                     modifier =
-					Modifier
-					  .padding(horizontal = PADDING_HORIZONTAL_DP.dp)
-					  .testTag(C.Tag.Map.Marker.info_window_book_container)) {
+                        Modifier.padding(horizontal = PADDING_HORIZONTAL_DP.dp)
+                            .testTag(C.Tag.Map.Marker.info_window_book_container)) {
                       Text(
                           text = book.title,
                           color = ColorVariable.Accent,
@@ -290,10 +286,9 @@ private fun CustomInfoWindow(modifier: Modifier = Modifier, userBooks: List<Data
                 if (index < userBooks.size - 1)
                     HorizontalDivider(
                         modifier =
-						Modifier
-						  .fillMaxWidth()
-						  .height(PADDING_VERTICAL_DP.dp)
-						  .testTag(C.Tag.Map.Marker.info_window_divider),
+                            Modifier.fillMaxWidth()
+                                .height(PADDING_VERTICAL_DP.dp)
+                                .testTag(C.Tag.Map.Marker.info_window_divider),
                         thickness = DIVIDER_THICKNESS_DP.dp,
                         color = ColorVariable.Accent)
               }
@@ -335,41 +330,35 @@ private fun DraggableMenu(listAllBooks: List<DataBook>) {
 
   Box(
       modifier =
-	  Modifier
-		.offset {
-		  IntOffset(
-			0,
-			sheetOffsetY
-			  .toPx()
-			  .roundToInt()
-			  .coerceIn(
-				0,
-				(maxSheetOffsetY - HEIGHT_RETRACTED_DRAGGABLE_MENU_DP.dp)
-				  .toPx()
-				  .toInt()
-			  )
-		  )
-		}
-		.fillMaxWidth()
-		.height(
-		  (maxSheetOffsetY - sheetOffsetY).coerceIn(maxSheetOffsetY / 10, maxSheetOffsetY)
-		)
-		.pointerInput(Unit) {
-		  detectVerticalDragGestures { change, dragAmount ->
-			change.consume()
-			val dragAmountInDp = dragAmount / density
-			sheetOffsetY = (sheetOffsetY + dragAmountInDp.dp)
-		  }
-		}
-		.background(
-		  color = ColorVariable.BackGround,
-		  shape =
-		  RoundedCornerShape(
-			topStart = HEIGHT_RETRACTED_DRAGGABLE_MENU_DP.dp,
-			topEnd = HEIGHT_RETRACTED_DRAGGABLE_MENU_DP.dp
-		  )
-		)
-		.testTag(C.Tag.Map.bottom_drawer_container)) {
+          Modifier.offset {
+                IntOffset(
+                    0,
+                    sheetOffsetY
+                        .toPx()
+                        .roundToInt()
+                        .coerceIn(
+                            0,
+                            (maxSheetOffsetY - HEIGHT_RETRACTED_DRAGGABLE_MENU_DP.dp)
+                                .toPx()
+                                .toInt()))
+              }
+              .fillMaxWidth()
+              .height(
+                  (maxSheetOffsetY - sheetOffsetY).coerceIn(maxSheetOffsetY / 10, maxSheetOffsetY))
+              .pointerInput(Unit) {
+                detectVerticalDragGestures { change, dragAmount ->
+                  change.consume()
+                  val dragAmountInDp = dragAmount / density
+                  sheetOffsetY = (sheetOffsetY + dragAmountInDp.dp)
+                }
+              }
+              .background(
+                  color = ColorVariable.BackGround,
+                  shape =
+                      RoundedCornerShape(
+                          topStart = HEIGHT_RETRACTED_DRAGGABLE_MENU_DP.dp,
+                          topEnd = HEIGHT_RETRACTED_DRAGGABLE_MENU_DP.dp))
+              .testTag(C.Tag.Map.bottom_drawer_container)) {
         Column(modifier = Modifier.fillMaxWidth().testTag(C.Tag.Map.bottom_drawer_layout)) {
           // draggable handle
           Spacer(modifier = Modifier.height(HANDLE_HEIGHT_DP.dp))

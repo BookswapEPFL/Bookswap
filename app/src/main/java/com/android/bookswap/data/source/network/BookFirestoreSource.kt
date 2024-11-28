@@ -85,12 +85,12 @@ class BooksFirestoreSource(private val db: FirebaseFirestore) : BooksRepository 
       if (task.isSuccessful) {
         val document = task.result
         if (document != null && document.exists()) {
-		  val book = documentToBook(document)
-		  if (book == null) {
-			onFailure(Exception("DataBook is null!"))
-		  } else {
-			onSuccess(book)
-		  }
+          val book = documentToBook(document)
+          if (book == null) {
+            onFailure(Exception("DataBook is null!"))
+          } else {
+            onSuccess(book)
+          }
         } else {
           Log.e("BooksFirestoreRepository", "Book with UUID $uuid not found in Firestore.")
           onFailure(IllegalArgumentException("Book not found"))

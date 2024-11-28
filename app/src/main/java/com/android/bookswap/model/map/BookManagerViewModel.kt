@@ -96,39 +96,38 @@ class BookManagerViewModel(
     var successBooks = false
     var successUsers = false
     var currentAttempt = 0
-	var queryUser = false
-	var queryBooks = false
+    var queryUser = false
+    var queryBooks = false
     while ((!successBooks || !successUsers) && currentAttempt < MAXIMUM_RETRIES) {
-	  if (!successUsers && !queryUser) {
-		queryUser = true
-		userRepository.getUsers { users ->
-		  if (users.isSuccess) {
-			_allUsers.value = users.getOrThrow()
-			successUsers = true
-		  } else {
-			Log.e("BookManagerViewModel", "Failed to fetch users.")
-		  }
-		  queryUser = false
-		}
-	  }
-	  if (!successBooks && !queryBooks){
-		queryBooks = true
-		booksRepository.getBooks{ result ->
-		  if (result.isSuccess) {
-			_allBooks.value = result.getOrThrow()
-			successBooks = true
-		  } else {
-			Log.e(
-			  "BookManagerViewModel",
-			  "Failed to fetch books: ${result.exceptionOrNull()!!.message}"
-			)
-		  }
-		  queryBooks = false
-		}
-	  }
+      if (!successUsers && !queryUser) {
+        queryUser = true
+        userRepository.getUsers { users ->
+          if (users.isSuccess) {
+            _allUsers.value = users.getOrThrow()
+            successUsers = true
+          } else {
+            Log.e("BookManagerViewModel", "Failed to fetch users.")
+          }
+          queryUser = false
+        }
+      }
+      if (!successBooks && !queryBooks) {
+        queryBooks = true
+        booksRepository.getBooks { result ->
+          if (result.isSuccess) {
+            _allBooks.value = result.getOrThrow()
+            successBooks = true
+          } else {
+            Log.e(
+                "BookManagerViewModel",
+                "Failed to fetch books: ${result.exceptionOrNull()!!.message}")
+          }
+          queryBooks = false
+        }
+      }
 
       if ((!successBooks || !successUsers) && !queryBooks && !queryUser) {
-		currentAttempt++
+        currentAttempt++
         delay(RETRY_TIME_DELAY)
       }
       if (currentAttempt == MAXIMUM_RETRIES) {

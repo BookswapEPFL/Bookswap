@@ -2,7 +2,6 @@ package com.android.bookswap.model
 
 import android.content.Context
 import android.util.Log
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
@@ -30,11 +29,17 @@ open class UserViewModel(
   private val _isStored = MutableStateFlow<Boolean>(false)
   val isStored: StateFlow<Boolean> = _isStored
   var lat
-	get() = dataUser.latitude
-	set(v){dataUser.latitude = v}
+    get() = dataUser.latitude
+    set(v) {
+      dataUser.latitude = v
+    }
+
   var lon
-	get() = dataUser.longitude
-	set(v){dataUser.longitude = v}
+    get() = dataUser.longitude
+    set(v) {
+      dataUser.longitude = v
+    }
+
   private val userRepository: UsersRepository = repository
 
   open fun getUser(force: Boolean = false): DataUser {
