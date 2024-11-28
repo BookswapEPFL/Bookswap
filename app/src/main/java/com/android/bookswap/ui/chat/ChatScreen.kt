@@ -189,7 +189,13 @@ fun ChatScreen(
           },
           navigationIcon = { BackButtonComponent(navController) },
           actions = {
-            IconButton(onClick = { /* Handle profile icon click */}) {
+            IconButton(onClick = {
+                navController.navigateTo(
+                    screen = C.Screen.OTHERS_USER_PROFILE,
+                    UUID = otherUser.userUUID.toString()
+                )
+            }) {
+            //* Handle profile icon click */}) {
               AsyncImage(
                   model = otherUser.profilePictureUrl,
                   contentDescription = "Profile Picture",

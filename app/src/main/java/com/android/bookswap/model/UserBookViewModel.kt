@@ -10,7 +10,7 @@ class UserBookViewModel(
     )
 {
     fun getBooks(bookList: List<UUID>): List<DataBook> {
-        var DataBookList = mutableListOf<DataBook>()
+        val DataBookList = mutableListOf<DataBook>()
         for (bookId in bookList) {
             booksRepository.getBook(
                 bookId,

@@ -1,13 +1,17 @@
 package com.android.bookswap.ui.profile
 
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.navigation.compose.rememberNavController
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.android.bookswap.data.DataUser
+import com.android.bookswap.data.repository.BooksRepository
+import com.android.bookswap.model.UserBookViewModel
 import com.android.bookswap.model.UserViewModel
 import com.android.bookswap.ui.components.TopAppBarComponent
 import com.android.bookswap.ui.navigation.NavigationActions
+import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
 import io.mockk.every
 import io.mockk.mockk
 import org.junit.Before
@@ -21,7 +25,7 @@ import java.util.UUID
  * This is a test class for the OtherUserProfileScreen.
  */
 @RunWith(AndroidJUnit4::class)
-class OthersUserProfileTest {
+class OthersUserProfileTest : TestCase() {
 
     @get:Rule
     val composeTestRule = createComposeRule()
@@ -47,7 +51,10 @@ class OthersUserProfileTest {
         composeTestRule.setContent {
             val navController = rememberNavController()
             val navigationActions = NavigationActions(navController)
-            OthersUserProfileScreen(userId = testUserId ,userVM = userVM, { TopAppBarComponent(Modifier, navigationActions, "Messages") })
+
+            val mockBooksRepository: BooksRepository = mockk()
+            val mockbookVM: UserBookViewModel = mockk()
+            OthersUserProfileScreen(userId = testUserId , otherUserVM = userVM, booksRepository = mockBooksRepository,mockbookVM , { TopAppBarComponent(Modifier, navigationActions, "Messages") })
         }
     }
 

@@ -358,8 +358,8 @@ class MainActivity : ComponentActivity() {
   }
 
     private fun addMessages(messageRepository: MessageRepository) {
-        val currentUserUUID = UUID.fromString("2f1574d9-bfb9-4fbf-bb57-a2b13b736015")
-        val otherUserUUID = UUID.fromString("7ebed2b4-1649-4b48-8ea6-db971210c06a")
+        val currentUserUUID = UUID.fromString("2d085e58-d94b-4037-ba5e-f470c22fb364")
+        val otherUserUUID = UUID.fromString("b0f03c68-9a90-4984-9e11-75839050f068")
 
         val testMessages = listOf(
             DataMessage(
