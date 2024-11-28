@@ -116,7 +116,8 @@ class UserFirestoreSourceTest {
   @Test
   fun addUser() {
     // Arrange
-    every { mockDocumentReference.set(testUser) } returns Tasks.forResult(null)
+    every { mockDocumentReference.set(userFirestoreSource.userToDocument(testUser)) } returns
+        Tasks.forResult(null)
 
     // Act
     userFirestoreSource.addUser(testUser) { result ->
@@ -139,7 +140,7 @@ class UserFirestoreSourceTest {
     }
 
     // Verify Firestore collection was accessed
-    verify { mockDocumentReference.set(testUser) }
+    verify { mockDocumentReference.set(userFirestoreSource.userToDocument(testUser)) }
   }
 
   @Test

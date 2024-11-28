@@ -84,7 +84,8 @@ class PhotoFirestoreSourceTest {
   @Test
   fun `addPhoto call set and success`() {
     // Arrange
-    every { mockDocumentReference.set(testPhoto) } returns Tasks.forResult(null)
+    every { mockDocumentReference.set(photoFirestoreSource.photoToDocument(testPhoto)) } returns
+        Tasks.forResult(null)
 
     // Act
     photoFirestoreSource.addPhoto(
