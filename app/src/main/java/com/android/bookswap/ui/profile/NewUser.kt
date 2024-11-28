@@ -43,7 +43,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
-import com.android.bookswap.data.source.network.PhotoFirebaseStorageSource
+import com.android.bookswap.data.repository.PhotoFirebaseStorageRepository
 import com.android.bookswap.model.InputVerification
 import com.android.bookswap.model.PhotoRequester
 import com.android.bookswap.model.UserViewModel
@@ -57,7 +57,6 @@ import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.theme.ColorVariable
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
-import com.google.firebase.storage.storage
 
 // Constants for magic numbers used in the UI layout
 private val CONTENT_PADDING = 16.dp
@@ -81,7 +80,7 @@ private val ERROR_FONT_SIZE = 12.sp
 fun NewUserScreen(
     navigationActions: NavigationActions,
     userVM: UserViewModel,
-    photoStorage: PhotoFirebaseStorageSource = PhotoFirebaseStorageSource(Firebase.storage)
+    photoStorage: PhotoFirebaseStorageRepository
 ) {
   val context = LocalContext.current
   val verification = InputVerification()

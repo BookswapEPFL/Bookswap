@@ -33,14 +33,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import coil.compose.AsyncImage
-import com.android.bookswap.data.source.network.PhotoFirebaseStorageSource
+import com.android.bookswap.data.repository.PhotoFirebaseStorageRepository
 import com.android.bookswap.model.PhotoRequester
 import com.android.bookswap.model.UserViewModel
 import com.android.bookswap.resources.C
 import com.android.bookswap.ui.components.ButtonComponent
 import com.android.bookswap.ui.theme.*
-import com.google.firebase.Firebase
-import com.google.firebase.storage.storage
 
 /**
  * Composable function to display the user profile screen.
@@ -54,7 +52,7 @@ import com.google.firebase.storage.storage
 @Composable
 fun UserProfile(
     userVM: UserViewModel = UserViewModel(java.util.UUID.randomUUID()),
-    photoStorage: PhotoFirebaseStorageSource = PhotoFirebaseStorageSource(Firebase.storage),
+    photoStorage: PhotoFirebaseStorageRepository,
     topAppBar: @Composable () -> Unit = {},
     bottomAppBar: @Composable () -> Unit = {}
 ) {
