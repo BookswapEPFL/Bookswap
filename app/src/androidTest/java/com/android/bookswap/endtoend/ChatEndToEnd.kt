@@ -25,6 +25,7 @@ import com.android.bookswap.data.MessageBox
 import com.android.bookswap.data.MessageType
 import com.android.bookswap.data.repository.MessageRepository
 import com.android.bookswap.data.repository.PhotoFirebaseStorageRepository
+import com.android.bookswap.data.source.network.UserFirestoreSource
 import com.android.bookswap.model.UserViewModel
 import com.android.bookswap.model.chat.ContactViewModel
 import com.android.bookswap.model.chat.OfflineMessageStorage
@@ -54,6 +55,7 @@ class ChatEndToEnd {
   private lateinit var mockMessageRepository: MockMessageRepository
   private lateinit var mockPhotoStorage: PhotoFirebaseStorageRepository
   private lateinit var mockMessageStorage: OfflineMessageStorage
+  private lateinit var mockUserRepository: UserFirestoreSource
   private lateinit var mockContext: Context
   private val navigateToChatScreen = mutableStateOf(false)
   private lateinit var mockUserVM: UserViewModel
@@ -66,6 +68,7 @@ class ChatEndToEnd {
     mockPhotoStorage = mockk()
     mockMessageStorage = mockk()
     mockContext = mockk()
+    mockUserRepository = mockk()
 
     // Initialize the mock message repository with placeholder messages
     mockMessageRepository = MockMessageRepository()
@@ -160,6 +163,7 @@ class ChatEndToEnd {
       if (navigateToChatScreen.value) {
         ChatScreen(
             mockMessageRepository,
+            mockUserRepository,
             DataUser(currentUserUUID, "Mr.", "John", "Doe", "", "", 0.0, 0.0, "", emptyList(), ""),
             DataUser(otherUserUUID, "Mr.", "Tester", "User", "", "", 0.0, 0.0, "", emptyList(), ""),
             mockNavigationActions,
