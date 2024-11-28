@@ -1,5 +1,6 @@
 package com.android.bookswap.ui.navigation
 
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.hasTestTag
@@ -16,10 +17,14 @@ import com.android.bookswap.data.BookGenres
 import com.android.bookswap.data.BookLanguages
 import com.android.bookswap.data.DataBook
 import com.android.bookswap.data.repository.BooksRepository
+import com.android.bookswap.model.AppConfig
+import com.android.bookswap.model.LocalAppConfig
+import com.android.bookswap.model.UserViewModel
 import com.android.bookswap.resources.C
 import com.android.bookswap.ui.books.BookProfileScreen
 import com.android.bookswap.ui.books.edit.EditBookScreen
 import io.mockk.coEvery
+import io.mockk.every
 import io.mockk.mockk
 import java.util.UUID
 import org.junit.Rule
@@ -35,6 +40,8 @@ class NavigationFromBookProfileToEditBookTest {
   fun EditBookScreen_allows_editing_when_currentUser_is_bookUser() {
     // Arrange
     val currentUserId = UUID.randomUUID()
+      val mockUserViewModel: UserViewModel = mockk()
+      every { mockUserViewModel.uuid } returns currentUserId
     val testBookId = UUID.randomUUID()
     val testBook =
         DataBook(
@@ -58,23 +65,24 @@ class NavigationFromBookProfileToEditBookTest {
 
     composeTestRule.setContent {
       val navController = rememberNavController()
+        CompositionLocalProvider(LocalAppConfig provides AppConfig(userViewModel = mockUserViewModel    )) {
+            // Add a NavHost to handle navigation
+            NavHost(navController, C.Screen.BOOK_PROFILE) {
+                composable(C.Screen.BOOK_PROFILE) {
+                    BookProfileScreen(
+                        testBookId,
+                        mockBookRepo,
+                        NavigationActions(navController))
+                }
+                composable("${C.Screen.EDIT_BOOK}/{bookId}") { backStackEntry ->
+                    val bookId = backStackEntry.arguments?.getString("bookId")?.let { UUID.fromString(it) }
+                    if (bookId != null) {
+                        EditBookScreen(
+                            mockBookRepo, NavigationActions(navController), testBook.copy(uuid = bookId))
+                    }
+                }
+        }
 
-      // Add a NavHost to handle navigation
-      NavHost(navController, C.Screen.BOOK_PROFILE) {
-        composable(C.Screen.BOOK_PROFILE) {
-          BookProfileScreen(
-              testBookId,
-              mockBookRepo,
-              NavigationActions(navController),
-              currentUserId = currentUserId)
-        }
-        composable("${C.Screen.EDIT_BOOK}/{bookId}") { backStackEntry ->
-          val bookId = backStackEntry.arguments?.getString("bookId")?.let { UUID.fromString(it) }
-          if (bookId != null) {
-            EditBookScreen(
-                mockBookRepo, NavigationActions(navController), testBook.copy(uuid = bookId))
-          }
-        }
       }
     }
     // This is juste temporary as when Matias will do the MainActivity part for the navigation
@@ -152,7 +160,7 @@ class NavigationFromBookProfileToEditBookTest {
     composeTestRule.setContent {
       val navController = rememberNavController()
       val navigationActions = NavigationActions(navController)
-      BookProfileScreen(testBookId, mockBookRepo, navigationActions, currentUserId = currentUserId)
+      BookProfileScreen(testBookId, mockBookRepo, navigationActions)
     }
 
     composeTestRule

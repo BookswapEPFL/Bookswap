@@ -14,26 +14,24 @@ import androidx.navigation.compose.rememberNavController
 import com.android.bookswap.data.BookGenres
 import com.android.bookswap.data.BookLanguages
 import com.android.bookswap.data.repository.BooksRepository
-import com.android.bookswap.model.UserViewModel
 import com.android.bookswap.resources.C
 import com.android.bookswap.ui.navigation.NavigationActions
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkStatic
-import java.util.UUID
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertNull
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import java.util.UUID
 
 class AddToBookTest {
   @get:Rule val composeTestRule = createComposeRule()
   private val mockContext: Context = mockk()
   private val mockBooksRepository: BooksRepository = mockk()
-  private val mockUserVM: UserViewModel = mockk(relaxed = true)
 
-  @Before
+    @Before
   fun init() {
     mockkStatic(Toast::class)
     val toastMock = mockk<Toast>()
@@ -44,9 +42,7 @@ class AddToBookTest {
   @Test
   fun testSaveButtonDisabledInitially() {
     composeTestRule.setContent {
-      val navController = rememberNavController()
-      val navigationActions = NavigationActions(navController)
-      AddToBookScreen(mockBooksRepository, mockUserVM)
+      AddToBookScreen(mockBooksRepository)
     }
 
     // Check if the Save button is initially disabled
@@ -56,9 +52,7 @@ class AddToBookTest {
   @Test
   fun testSaveButtonEnabledWhenRequiredFieldsAreFilled() {
     composeTestRule.setContent {
-      val navController = rememberNavController()
-      val navigationActions = NavigationActions(navController)
-      AddToBookScreen(mockBooksRepository, mockUserVM)
+      AddToBookScreen(mockBooksRepository)
     }
 
     // Fill in the Title and ISBN fields
@@ -161,9 +155,9 @@ class AddToBookTest {
   fun testSaveButtonDisabledWhenTitleIsEmpty() {
     composeTestRule.setContent {
       val navController = rememberNavController()
-      val navigationActions = NavigationActions(navController)
+        NavigationActions(navController)
 
-      AddToBookScreen(mockBooksRepository, mockUserVM)
+      AddToBookScreen(mockBooksRepository)
     }
     // Fill in the ISBN field but leave the Title field empty
     composeTestRule.onNodeWithTag(C.Tag.NewBookManually.isbn).performTextInput("1234567890")
@@ -174,8 +168,7 @@ class AddToBookTest {
 
   @Test
   fun testDropdownMenuIsInitiallyClosed() {
-    val userId = UUID.randomUUID()
-    composeTestRule.setContent { AddToBookScreen(mockBooksRepository, mockUserVM) }
+    composeTestRule.setContent { AddToBookScreen(mockBooksRepository) }
 
     // Verify that the dropdown menu is initially not expanded
     composeTestRule.onNodeWithTag(C.Tag.NewBookManually.language).assertIsDisplayed()
@@ -184,8 +177,7 @@ class AddToBookTest {
 
   @Test
   fun testDropdownMenuOpensOnClick() {
-    val userId = UUID.randomUUID()
-    composeTestRule.setContent { AddToBookScreen(mockBooksRepository, mockUserVM) }
+    composeTestRule.setContent { AddToBookScreen(mockBooksRepository) }
 
     // Simulate clicking the dropdown to expand it
     composeTestRule.onNodeWithTag(C.Tag.NewBookManually.language).performClick()
@@ -202,9 +194,7 @@ class AddToBookTest {
 
   @Test
   fun testDropdownMenuItemSelection() {
-    val userId = UUID.randomUUID()
-
-    composeTestRule.setContent { AddToBookScreen(mockBooksRepository, mockUserVM) }
+    composeTestRule.setContent { AddToBookScreen(mockBooksRepository) }
 
     // Expand the dropdown menu:
     composeTestRule.onNodeWithTag(C.Tag.NewBookManually.language).performClick()
@@ -218,9 +208,7 @@ class AddToBookTest {
 
   @Test
   fun testDropdownMenuClosesAfterSelection() {
-    val userId = UUID.randomUUID()
-
-    composeTestRule.setContent { AddToBookScreen(mockBooksRepository, mockUserVM) }
+    composeTestRule.setContent { AddToBookScreen(mockBooksRepository) }
 
     // Expand the dropdown menu
     composeTestRule.onNodeWithTag(C.Tag.NewBookManually.language).performClick()

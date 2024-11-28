@@ -49,7 +49,7 @@ class UserProfileScreenTest : TestCase() {
     composeTestRule.setContent {
       val navController = rememberNavController()
       val navigationActions = NavigationActions(navController)
-      UserProfile(userVM = userVM, { TopAppBarComponent(Modifier, navigationActions, "Messages") })
+      UserProfile({ TopAppBarComponent(Modifier, navigationActions, "Messages") })
     }
   }
 

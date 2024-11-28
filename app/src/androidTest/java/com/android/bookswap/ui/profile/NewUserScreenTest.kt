@@ -26,7 +26,7 @@ class NewUserScreenTest {
   fun setUp() {
     navigationActions = mockk(relaxed = true)
     userVM = mockk(relaxed = true)
-    composeTestRule.setContent { NewUserScreen(navigationActions, userVM) }
+    composeTestRule.setContent { NewUserScreen(navigationActions) }
   }
 
   @Test

@@ -26,8 +26,8 @@ class BookAdditionChoiceScreenTest {
       BookAdditionChoiceScreen(
           mockNavigationActions,
           photoFirebaseStorageRepository = mockPhotoFirebaseStorageRepository,
-          booksRepository = booksRepository,
-          userUUID = UUID.randomUUID())
+          booksRepository = booksRepository
+      )
     }
     composeTestRule
         .onNodeWithTag("Manually" + C.Tag.NewBookChoice.btnWIcon.button)
@@ -46,8 +46,8 @@ class BookAdditionChoiceScreenTest {
       BookAdditionChoiceScreen(
           mockNavigationActions,
           photoFirebaseStorageRepository = mockPhotoFirebaseStorageRepository,
-          booksRepository = booksRepository,
-          userUUID = UUID.randomUUID())
+          booksRepository = booksRepository
+      )
     }
     composeTestRule
         .onNodeWithTag("Manually" + C.Tag.NewBookChoice.btnWIcon.button)
