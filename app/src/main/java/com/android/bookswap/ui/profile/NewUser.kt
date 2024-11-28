@@ -99,7 +99,7 @@ fun NewUserScreen(
   var firstAttempt = true
 
   val profilPicture = remember { mutableStateOf<String?>(null) }
-
+  // This is the photo requester that will be used to take a photo
   val photoRequester =
       PhotoRequester(context) { result ->
         result.fold(
@@ -122,7 +122,7 @@ fun NewUserScreen(
               Toast.makeText(context, "Error taking photo", Toast.LENGTH_SHORT).show()
             })
       }
-  photoRequester.Init()
+  photoRequester.Init() // This is the initialization of the photo requester
   LazyColumn(
       contentPadding = PaddingValues(CONTENT_PADDING),
       modifier =
@@ -171,6 +171,7 @@ fun NewUserScreen(
                       IconButton(
                           onClick = { photoRequester.requestPhoto() },
                           modifier = Modifier.size(ICON_SIZE).testTag(C.Tag.NewUser.profile_pic)) {
+                            // Show either the profile picture or the default icon
                             if (profilPicture.value == null) {
                               Icon(
                                   imageVector = Icons.Default.AccountCircle,

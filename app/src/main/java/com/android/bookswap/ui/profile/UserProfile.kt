@@ -62,7 +62,7 @@ fun UserProfile(
   var showEditProfile by remember { mutableStateOf(false) }
 
   var needRecompose by remember { mutableStateOf(false) }
-
+  // Create a PhotoRequester instance
   val photoRequester =
       PhotoRequester(context) { result ->
         result.fold(
@@ -88,7 +88,7 @@ fun UserProfile(
               Toast.makeText(context, "Error taking photo", Toast.LENGTH_SHORT).show()
             })
       }
-  photoRequester.Init()
+  photoRequester.Init() // Initialize the photoRequester
 
   if (showEditProfile) {
     EditProfileDialog(
@@ -156,6 +156,7 @@ fun UserProfile(
                             modifier =
                                 Modifier.padding(2.5f.dp)
                                     .border(3.5f.dp, Color(0xFFA98467), CircleShape)) {
+                              // show either the profile picture or the default icon
                               if (user.profilePictureUrl.isEmpty()) {
                                 Image(
                                     imageVector = Icons.Rounded.AccountCircle,

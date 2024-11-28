@@ -102,6 +102,7 @@ fun MessageBoxDisplay(message: MessageBox, onClick: () -> Unit = {}) {
           .testTag(C.Tag.ChatList.item),
   ) {
     if (message.contact.profilePictureUrl.isNotEmpty()) {
+      // Show the profile picture of the contact or the default icon
       AsyncImage(
           model = message.contact.profilePictureUrl,
           contentDescription = "Contact Icon",
