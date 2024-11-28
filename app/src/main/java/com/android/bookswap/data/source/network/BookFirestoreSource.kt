@@ -97,7 +97,10 @@ class BooksFirestoreSource(private val db: FirebaseFirestore) : BooksRepository 
                     null // Skip if genre is not valid in the BookGenres enum
                   }
                 }
+            var archived = document.getBoolean("archived") ?: false
+            var exchange = document.getBoolean("exchange") ?: false
 
+            val userId = UUID.fromString(document.getString("userId"))
             // Create the DataBook object
             val dataBook =
                 DataBook(
@@ -112,7 +115,9 @@ class BooksFirestoreSource(private val db: FirebaseFirestore) : BooksRepository 
                             ?: BookLanguages.ENGLISH, // Default or adjust based on requirements
                     isbn = document.getString("isbn"),
                     genres = bookGenres,
-                    userId = UUID.fromString(document.getString("userId")))
+                    userId = userId,
+                    archived = archived,
+                    exchange = exchange)
             OnSucess(dataBook)
           } catch (e: Exception) {
             Log.e("BooksFirestoreRepository", "Error parsing book document: ${e.message}", e)
@@ -218,6 +223,9 @@ class BooksFirestoreSource(private val db: FirebaseFirestore) : BooksRepository 
       val isbn = document.getString("isbn")
       val languageBook = BookLanguages.valueOf(document.getString("language") ?: return null)
       val genres = document.get("genres") as? List<String> ?: emptyList()
+
+      val archived = document.getBoolean("archived") ?: false
+      val exchange = document.getBoolean("exchange") ?: false
       val bookGenres =
           genres.mapNotNull { genre ->
             try {
@@ -237,7 +245,9 @@ class BooksFirestoreSource(private val db: FirebaseFirestore) : BooksRepository 
           languageBook,
           isbn,
           bookGenres,
-          userid)
+          userid,
+          archived,
+          exchange)
     } catch (e: Exception) {
       null // Return null in case of any exception during the conversion
     }
