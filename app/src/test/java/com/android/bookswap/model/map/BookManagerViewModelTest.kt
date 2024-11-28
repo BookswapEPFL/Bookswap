@@ -99,7 +99,7 @@ class BookManagerViewModelTest {
 
   @Before
   fun setup() {
-    every { mockBookRepository.getBook(any()) } answers
+    every { mockBookRepository.getBooks(any()) } answers
         {
           firstArg<(Result<List<DataBook>>) -> Unit>().invoke(Result.success(books))
         }

@@ -64,7 +64,7 @@ class BooksFirestoreSourceTest {
   @Test
   fun `book get returns correct result`() {
     val bookSource = BooksFirestoreSource(mockFirestore)
-    bookSource.getBook(
+    bookSource.getBooks(
         callback = { result ->
           assertTrue(result.isSuccess)
           val books = result.getOrThrow()
@@ -125,7 +125,7 @@ class BooksFirestoreSourceTest {
     val bookSource = BooksFirestoreSource(mockFirestore)
 
     // Act
-    val result = bookSource.documentToBooks(mockDocumentSnapshot)
+    val result = bookSource.documentToBook(mockDocumentSnapshot)
 
     // Assert
     assertNotNull(result)
@@ -140,7 +140,7 @@ class BooksFirestoreSourceTest {
     every { mockDocumentSnapshot.getString("title") }.returns(null)
 
     // Act
-    val result = bookSource.documentToBooks(mockDocumentSnapshot)
+    val result = bookSource.documentToBook(mockDocumentSnapshot)
 
     // Assert
     assertNull(result)
@@ -154,7 +154,7 @@ class BooksFirestoreSourceTest {
     every { mockDocumentSnapshot.getString("language") }.returns("INVALID_LANGUAGE")
 
     // Act
-    val result = bookSource.documentToBooks(mockDocumentSnapshot)
+    val result = bookSource.documentToBook(mockDocumentSnapshot)
 
     // Assert
     assertNull(result) // Should return null due to invalid language
