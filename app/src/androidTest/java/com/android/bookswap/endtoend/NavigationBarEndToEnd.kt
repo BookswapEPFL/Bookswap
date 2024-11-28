@@ -37,7 +37,7 @@ class NavigationBarEndToEnd {
     mockBookRepository = mockk()
     mockMessageStorage = mockk()
     mockContext = mockk()
-    every { mockBookRepository.getBook(any()) } just runs
+    every { mockBookRepository.getBooks(any()) } just runs
     mockUserRepository = mockk()
     every { mockUserRepository.getUsers(any()) } just runs
 
