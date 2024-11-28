@@ -19,6 +19,7 @@ import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.Priority
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
@@ -47,11 +48,9 @@ class Geolocation(private val activity: Activity) : IGeolocation {
 
   /** Location request settings */
   private val locationRequest: LocationRequest =
-      LocationRequest.create().apply {
-        interval = 10000 // Update interval in milliseconds
-        fastestInterval = 5000 // Fastest update interval in milliseconds
-        priority = LocationRequest.PRIORITY_HIGH_ACCURACY
-      }
+	LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY,500)
+	  .setMinUpdateDistanceMeters(20f)
+	  .build()
   /**
    * Callback for location updates.
    *
