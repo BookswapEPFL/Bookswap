@@ -8,6 +8,7 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
+import com.android.bookswap.data.source.network.PhotoFirebaseStorageSource
 import com.android.bookswap.model.UserViewModel
 import com.android.bookswap.resources.C
 import com.android.bookswap.ui.navigation.NavigationActions
@@ -21,12 +22,14 @@ class NewUserScreenTest {
   @get:Rule val composeTestRule = createComposeRule()
   private lateinit var navigationActions: NavigationActions
   private lateinit var userVM: UserViewModel
+  private lateinit var photoStorage: PhotoFirebaseStorageSource
 
   @Before
   fun setUp() {
     navigationActions = mockk(relaxed = true)
     userVM = mockk(relaxed = true)
-    composeTestRule.setContent { NewUserScreen(navigationActions, userVM) }
+    photoStorage = mockk(relaxed = true)
+    composeTestRule.setContent { NewUserScreen(navigationActions, userVM, photoStorage) }
   }
 
   @Test
