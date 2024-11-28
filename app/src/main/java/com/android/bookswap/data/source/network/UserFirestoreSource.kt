@@ -77,8 +77,9 @@ class UserFirestoreSource(private val db: FirebaseFirestore) : UsersRepository {
 
   /** Adds a new user to the Firestore collection */
   override fun addUser(dataUser: DataUser, callback: (Result<Unit>) -> Unit) {
+    val userDocument = userToDocument(dataUser)
     performFirestoreOperation(
-        db.collection(COLLECTION_NAME).document(dataUser.userUUID.toString()).set(dataUser),
+        db.collection(COLLECTION_NAME).document(dataUser.userUUID.toString()).set(userDocument),
         callback,
     )
   }
@@ -87,8 +88,9 @@ class UserFirestoreSource(private val db: FirebaseFirestore) : UsersRepository {
    * performFirestoreOperation to handle success and failure
    */
   override fun updateUser(dataUser: DataUser, callback: (Result<Unit>) -> Unit) {
+    val userDocument = userToDocument(dataUser)
     performFirestoreOperation(
-        db.collection(COLLECTION_NAME).document(dataUser.userUUID.toString()).set(dataUser),
+        db.collection(COLLECTION_NAME).document(dataUser.userUUID.toString()).set(userDocument),
         callback)
   }
 
@@ -109,8 +111,7 @@ class UserFirestoreSource(private val db: FirebaseFirestore) : UsersRepository {
   fun documentToUser(document: DocumentSnapshot): Result<DataUser> {
 
     return try {
-      val mostSignificantBits = document.getLong("userUUID.mostSignificantBits")!!
-      val leastSignificantBits = document.getLong("userUUID.leastSignificantBits")!!
+      val userUUID = UUID.fromString(document.getString("userUUID")!!)
       val greeting = document.getString("greeting")!!
       val firstname = document.getString("firstName")!!
       val lastname = document.getString("lastName")!!
@@ -120,25 +121,8 @@ class UserFirestoreSource(private val db: FirebaseFirestore) : UsersRepository {
       val longitude = document.getDouble("longitude")!!
       val profilePicture = document.getString("profilePictureUrl")!!
       val googleUid = document.getString("googleUid")!!
-      // Log.d("TAG_DOC2USR", "GUID: $googleUid")
-      val bookList =
-          (document.get("bookList") as List<Map<String, Long>>).map { bookMap ->
-            Log.d("TAG_BOOK_MAP", "bookMap: $bookMap")
-            val mostSigBits = bookMap["mostSignificantBits"]
-            val leastSigBits = bookMap["leastSignificantBits"]
-            if (mostSigBits != null && leastSigBits != null) {
-              UUID(mostSigBits, leastSigBits)
-            } else {
-              null
-            }
-          }
-      val contactList =
-          try {
-            (document.get("contactList") as? List<String>) ?: emptyList()
-          } catch (e: Exception) {
-            Log.e("TAG_CONTACT_LIST_ERROR", "Error parsing contactList: ${e.message}")
-            emptyList()
-          }
+      val bookList = (document.get("bookList") as List<String>).map { UUID.fromString(it) }
+      val contactList = (document.get("contactList") as List<String>).map { UUID.fromString(it) }
 
       if (bookList.any { it == null }) {
         throw IllegalArgumentException("Book list contains null UUIDs")
@@ -146,7 +130,7 @@ class UserFirestoreSource(private val db: FirebaseFirestore) : UsersRepository {
 
       Result.success(
           DataUser(
-              UUID(mostSignificantBits, leastSignificantBits),
+              userUUID,
               greeting,
               firstname,
               lastname,
@@ -162,6 +146,30 @@ class UserFirestoreSource(private val db: FirebaseFirestore) : UsersRepository {
       Log.e("FirestoreSource", "Error converting document to User: ${e.message}")
       Result.failure(e)
     }
+  }
+
+  /**
+   * Maps a DataUser object to a Firebase document-like Map
+   *
+   * @param dataUser The object to convert into a Map
+   * @return Map<String,Any?> A Mapping of each of the DataUser object fields to it's value,
+   *   properly formatted for storing
+   */
+  fun userToDocument(dataUser: DataUser): Map<String, Any?> {
+    return mapOf(
+        "userUUID" to dataUser.userUUID.toString(),
+        "greeting" to dataUser.greeting,
+        "firstName" to dataUser.firstName,
+        "lastName" to dataUser.lastName,
+        "email" to dataUser.email,
+        "phoneNumber" to dataUser.phoneNumber,
+        "latitude" to dataUser.latitude,
+        "longitude" to dataUser.longitude,
+        "profilePictureUrl" to dataUser.profilePictureUrl,
+        "bookList" to dataUser.bookList.map { it.toString() },
+        "contactList" to dataUser.contactList.map { it.toString() },
+        "googleUid" to dataUser.googleUid,
+    )
   }
   /**
    * Helper function to perform Firestore operations (add, update, delete) Executes the provided
