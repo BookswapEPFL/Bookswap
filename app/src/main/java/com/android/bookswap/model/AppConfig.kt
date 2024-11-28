@@ -19,5 +19,7 @@ val LocalAppConfig = staticCompositionLocalOf {
   AppConfig(
       userViewModel =
           UserViewModel(
-              UUID.fromString("550e8400-e29b-41d4-a716-446655440000"))) // By default the user doesn't really exist thus the random UUID
+              UUID.fromString(
+                  "550e8400-e29b-41d4-a716-446655440000"))) // By default the user doesn't really
+                                                            // exist thus the random UUID
 }

@@ -205,8 +205,8 @@ class MainActivity : ComponentActivity() {
                 navigationActions = navigationActions,
                 geolocation = geolocation,
                 topAppBar = { topAppBar("Map") },
-			    bottomAppBar = { bottomAppBar(this@navigation.route ?: "") },
-			    userVM = userVM)
+                bottomAppBar = { bottomAppBar(this@navigation.route ?: "") },
+                userVM = userVM)
           }
           composable(C.Screen.MAP_FILTER) { FilterMapScreen(navigationActions, bookFilter) }
         }
