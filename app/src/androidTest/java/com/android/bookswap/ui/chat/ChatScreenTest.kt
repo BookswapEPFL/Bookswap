@@ -90,6 +90,8 @@ class ChatScreenTest {
     every { mockMessageStorage.extractMessages(any(), any()) } returns placeHolderData
     every { mockMessageStorage.addMessage(any()) } just Runs
     every { mockMessageStorage.setMessages() } just Runs
+    every { mockUserRepository.getUser(any<String>(), any()) } just Runs
+    every { mockUserRepository.getUser(any<UUID>(), any()) } just Runs
   }
 
   private val palette =

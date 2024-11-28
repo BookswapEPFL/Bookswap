@@ -154,6 +154,8 @@ class ChatEndToEnd {
     every { mockMessageStorage.extractMessages(any(), any()) } returns placeholderMessages
     every { mockMessageStorage.addMessage(any()) } just Runs
     every { mockMessageStorage.setMessages() } just Runs
+    every { mockUserRepository.getUser(any<String>(), any()) } just Runs
+    every { mockUserRepository.getUser(any<UUID>(), any()) } just Runs
   }
 
   @Test
