@@ -116,7 +116,7 @@ fun ChatScreen(
                 result
                     .onSuccess { url ->
                       messageRepository.sendMessage(
-                          message =
+                          dataMessage =
                               DataMessage(
                                   messageType = MessageType.IMAGE,
                                   uuid = messageRepository.getNewUUID(),
@@ -281,7 +281,7 @@ fun ChatScreen(
                               timestamp = System.currentTimeMillis())
                       // Send the message
                       messageRepository.sendMessage(
-                          message = newMessage,
+                          dataMessage = newMessage,
                       ) { result ->
                         if (result.isSuccess) {
                           newMessageText = TextFieldValue("")
