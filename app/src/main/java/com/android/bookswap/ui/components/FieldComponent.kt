@@ -68,11 +68,16 @@ fun FieldComponent(
     labelText: String,
     value: String,
     modifier: Modifier = Modifier,
+    maxLength: Int,
     onValueChange: (String) -> Unit = {}
 ) {
   FieldComponent(
       value = value,
-      onValueChange = onValueChange,
+      onValueChange = {
+        if (it.length <= maxLength) { // Check if the input length is within the maxLength
+          onValueChange(it)
+        }
+      },
       modifier = modifier,
       label = { Text(labelText) })
 }
