@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.semantics
@@ -137,75 +138,7 @@ class MainActivity : ComponentActivity() {
     val bookManagerViewModel =
         BookManagerViewModel(geolocation, bookRepository, userRepository, bookFilter)
 
-    val currentUserUUID = UUID.fromString("77942cd7-8b99-41ba-a0a5-147214703434")
-    val otherUserUUID = UUID.fromString("7284fd9d-3edc-458b-93cd-2b0c4a8c0fc0")
-    val testUserUUID = UUID.fromString("550e8400-e29b-41d4-a716-446655440002")
-    val currentUserPlaceholder =
-        DataUser(
-            currentUserUUID,
-            "Mr.",
-            "Jaime",
-            "Oliver Pastor",
-            "",
-            "",
-            42.5717,
-            0.5471,
-            "https://media.istockphoto.com/id/693813718/photo/the-fortress-of-jaca-soain.jpg?s=612x612&w=0&k=20&c=MdnKl1VJIKQRwGdrGwBFx_L00vS8UVphR9J-nS6J90c=",
-            emptyList(),
-            "googleUid")
 
-    val otherUser =
-        DataUser(
-            otherUserUUID,
-            "Mr.",
-            "Théo",
-            "Schlaeppi",
-            "",
-            "",
-            46.3,
-            6.43,
-            "https://www.shutterstock.com/image-photo/wonderful-epesses-fairtytale-village-middle-600nw-2174791585.jpg",
-            emptyList(),
-            "googleUid")
-    val testUser =
-        DataUser(
-            testUserUUID,
-            "Mr.",
-            "John",
-            "Doe",
-            "john.doe@hotmail.com",
-            "+41999999999",
-            0.0,
-            0.0,
-            "john_doe.jpg",
-            emptyList(),
-            "googleUid")
-
-    val placeHolder =
-        listOf(
-            MessageBox(otherUser, message = "Welcome message for user124", date = "01.01.24"),
-            MessageBox(
-                currentUserPlaceholder,
-                message = "Welcome message for user123",
-                date = "01.01.24")) +
-            List(5) {
-              MessageBox(
-                  DataUser(
-                      UUID.randomUUID(),
-                      "Hello",
-                      "First ${it + 1}",
-                      "Last ${it + 1}",
-                      "",
-                      "",
-                      0.0,
-                      0.0,
-                      "",
-                      emptyList(),
-                      "googleUid"),
-                  message = "Test message $it test for the feature of ellipsis in the message",
-                  date = "01.01.24")
-            } +
-            listOf(MessageBox(testUser, message = "Welcome message for test", date = "01.01.24"))
     val topAppBar =
         @Composable { s: String? ->
           TopAppBarComponent(
@@ -253,7 +186,7 @@ class MainActivity : ComponentActivity() {
                 bottomAppBar = { bottomAppBar(this@navigation.route ?: "") },
                 photoFirebaseStorageRepository = photoStorage,
                 booksRepository = bookRepository,
-                userUUID = currentUserUUID)
+                userUUID = userVM.uuid)
           }
         }
       }
@@ -276,7 +209,7 @@ class MainActivity : ComponentActivity() {
               bottomAppBar = { bottomAppBar(this@navigation.route ?: "") },
               photoFirebaseStorageRepository = photoStorage,
               booksRepository = bookRepository,
-              userUUID = currentUserUUID)
+              userUUID = userVM.uuid)
         }
         composable(C.Screen.ADD_BOOK_MANUALLY) {
           AddToBookScreen(
