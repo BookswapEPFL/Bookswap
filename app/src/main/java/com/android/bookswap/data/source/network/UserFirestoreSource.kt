@@ -60,7 +60,6 @@ class UserFirestoreSource(private val db: FirebaseFirestore) : UsersRepository {
         .get()
         .addOnCompleteListener { task ->
           if (task.isSuccessful) {
-            Log.d("TAG_USR_GET_BY_GUID", "usr count: ${task.result?.size()}")
             val user = task.result?.firstNotNullOfOrNull { documentToUser(it).getOrNull() }
             if (user != null) {
               callback(Result.success(user))
@@ -120,7 +119,6 @@ class UserFirestoreSource(private val db: FirebaseFirestore) : UsersRepository {
       val longitude = document.getDouble("longitude")!!
       val profilePicture = document.getString("profilePictureUrl")!!
       val googleUid = document.getString("googleUid")!!
-      // Log.d("TAG_DOC2USR", "GUID: $googleUid")
       val bookList =
           (document.get("bookList") as List<Map<String, Long>>).map { bookMap ->
             val mostSigBits = bookMap["mostSignificantBits"]
@@ -149,7 +147,7 @@ class UserFirestoreSource(private val db: FirebaseFirestore) : UsersRepository {
               bookList.filterNotNull(),
               googleUid))
     } catch (e: Exception) {
-      Log.e("FirestoreSource", "Error converting document to User: ${e.message}")
+      Log.e("FirestoreSourceError", "Error converting document ${document.id} to User\n${e.message} : ${e.stackTraceToString()}")
       Result.failure(e)
     }
   }
