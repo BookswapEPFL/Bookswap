@@ -38,7 +38,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.bookswap.model.InputVerification
-import com.android.bookswap.model.UserViewModel
+import com.android.bookswap.model.LocalAppConfig
 import com.android.bookswap.resources.C
 import com.android.bookswap.ui.MAXLENGTHEMAIL
 import com.android.bookswap.ui.MAXLENGTHFIRSTNAME
@@ -69,7 +69,7 @@ private val ERROR_FONT_SIZE = 12.sp
  * @param navigationActions: NavigationActions
  */
 @Composable
-fun NewUserScreen(navigationActions: NavigationActions, userVM: UserViewModel) {
+fun NewUserScreen(navigationActions: NavigationActions) {
   val context = LocalContext.current
   val verification = InputVerification()
 
@@ -84,6 +84,7 @@ fun NewUserScreen(navigationActions: NavigationActions, userVM: UserViewModel) {
   val firstNameError = remember { mutableStateOf<String?>("First name required") }
   val lastNameError = remember { mutableStateOf<String?>("Last name required") }
 
+  val appConfig = LocalAppConfig.current
   var firstAttempt = true
 
   LazyColumn(
@@ -239,7 +240,7 @@ fun NewUserScreen(navigationActions: NavigationActions, userVM: UserViewModel) {
                       verification.validatePhone(phone.value) &&
                       verification.validateNonEmpty(firstName.value) &&
                       verification.validateNonEmpty(lastName.value)) {
-                    userVM.updateUser(
+                    appConfig.userViewModel.updateUser(
                         greeting = greeting.value,
                         firstName = firstName.value,
                         lastName = lastName.value,

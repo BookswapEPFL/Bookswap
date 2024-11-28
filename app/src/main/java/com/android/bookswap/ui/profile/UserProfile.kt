@@ -25,7 +25,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
-import com.android.bookswap.model.UserViewModel
+import com.android.bookswap.model.LocalAppConfig
 import com.android.bookswap.resources.C
 import com.android.bookswap.ui.components.ButtonComponent
 import com.android.bookswap.ui.theme.*
@@ -40,13 +40,10 @@ import com.android.bookswap.ui.theme.*
  *   composable.
  */
 @Composable
-fun UserProfile(
-    userVM: UserViewModel = UserViewModel(java.util.UUID.randomUUID()),
-    topAppBar: @Composable () -> Unit = {},
-    bottomAppBar: @Composable () -> Unit = {}
-) {
+fun UserProfile(topAppBar: @Composable () -> Unit = {}, bottomAppBar: @Composable () -> Unit = {}) {
 
-  var user = userVM.getUser()
+  val appConfig = LocalAppConfig.current
+  var userData = appConfig.userViewModel.getUser()
   var showEditProfile by remember { mutableStateOf(false) }
 
   var needRecompose by remember { mutableStateOf(false) }
@@ -58,23 +55,22 @@ fun UserProfile(
           needRecompose = true
         },
         onSave = {
-          userVM.updateUser(
+          appConfig.userViewModel.updateUser(
               greeting = it.greeting,
               firstName = it.firstName,
               lastName = it.lastName,
               email = it.email,
               phone = it.phoneNumber,
-              user.latitude,
-              user.longitude,
-              picURL = user.profilePictureUrl)
+              userData.latitude,
+              userData.longitude,
+              picURL = userData.profilePictureUrl)
           showEditProfile = false
           needRecompose = true
-        },
-        dataUser = user)
+        })
   }
 
-  LaunchedEffect(userVM.uuid, needRecompose) {
-    user = userVM.getUser()
+  LaunchedEffect(appConfig.userViewModel.uuid, needRecompose) {
+    userData = appConfig.userViewModel.getUser()
     needRecompose = false
   }
 
@@ -116,18 +112,20 @@ fun UserProfile(
               Column(Modifier.fillMaxHeight().fillMaxWidth(), Arrangement.spacedBy(8.dp)) {
                 // Full name text
                 Text(
-                    text = "${user.greeting} ${user.firstName} ${user.lastName}",
+                    text = "${userData.greeting} ${userData.firstName} ${userData.lastName}",
                     modifier = Modifier.testTag(C.Tag.UserProfile.fullname))
 
                 // Email text
-                Text(text = user.email, modifier = Modifier.testTag(C.Tag.UserProfile.email))
+                Text(text = userData.email, modifier = Modifier.testTag(C.Tag.UserProfile.email))
 
                 // Phone number text
-                Text(text = user.phoneNumber, modifier = Modifier.testTag(C.Tag.UserProfile.phone))
+                Text(
+                    text = userData.phoneNumber,
+                    modifier = Modifier.testTag(C.Tag.UserProfile.phone))
 
                 // User address
                 Text(
-                    text = "${user.latitude}, ${user.longitude}",
+                    text = "${userData.latitude}, ${userData.longitude}",
                     modifier = Modifier.testTag(C.Tag.UserProfile.address))
 
                 // Edit Button

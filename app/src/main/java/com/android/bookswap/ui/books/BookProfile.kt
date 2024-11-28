@@ -17,7 +17,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -42,6 +41,7 @@ import androidx.compose.ui.unit.dp
 import com.android.bookswap.R
 import com.android.bookswap.data.DataBook
 import com.android.bookswap.data.repository.BooksRepository
+import com.android.bookswap.model.LocalAppConfig
 import com.android.bookswap.resources.C
 import com.android.bookswap.ui.components.ButtonComponent
 import com.android.bookswap.ui.navigation.NavigationActions
@@ -56,15 +56,13 @@ import java.util.UUID
  * @param topAppBar A composable function to display the top app bar.
  * @param bottomAppBar A composable function to display the bottom app bar.
  */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BookProfileScreen(
     bookId: UUID,
     booksRepository: BooksRepository,
     navController: NavigationActions,
     topAppBar: @Composable () -> Unit = {},
-    bottomAppBar: @Composable () -> Unit = {},
-    currentUserId: UUID
+    bottomAppBar: @Composable () -> Unit = {}
 ) {
   val columnPadding = 8.dp
   val pictureWidth = (LocalConfiguration.current.screenWidthDp.dp * (0.60f))
@@ -74,6 +72,7 @@ fun BookProfileScreen(
   val imagesDescription = listOf("Isabel La Catolica", "Felipe II")
   var currentImageIndex by remember { mutableIntStateOf(0) }
 
+  val appConfig = LocalAppConfig.current
   // State to hold the book data and loading status
   val (dataBook, setDataBook) = remember { mutableStateOf<DataBook?>(null) }
   val (isLoading, setLoading) = remember { mutableStateOf(true) }
@@ -259,7 +258,7 @@ fun BookProfileScreen(
                     }
                   }
                   // Conditionally display the "Edit Book" button if the current user owns the book
-                  if (dataBook.userId == currentUserId) {
+                  if (dataBook.userId == appConfig.userViewModel.uuid) {
                     item { Spacer(modifier = Modifier.height(columnPadding)) }
                     item {
                       ButtonComponent(
