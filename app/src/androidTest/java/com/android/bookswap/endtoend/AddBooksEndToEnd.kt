@@ -76,8 +76,10 @@ class AddBooksEndToEnd {
     } answers
         {
           val callback = thirdArg<(Result<DataBook>) -> Unit>()
-          callback(Result.success(mockedBook)) // Simulation de succès avec `mockedBook`
+          callback(Result.success(mockedBook))
         }
+
+    every { mockUserRepository.getUser(uuid = any(), any()) } just runs
 
     composeTestRule.setContent {
       MainActivity()
@@ -97,9 +99,7 @@ class AddBooksEndToEnd {
 
     composeTestRule.onNodeWithTag(C.Tag.new_book_choice_screen_container).assertExists()
 
-    composeTestRule
-        .onNodeWithTag(C.Screen.ADD_BOOK_ISBN + C.Tag.NewBookChoice.btnWIcon.button)
-        .performClick()
+    composeTestRule.onNodeWithTag("From ISBN" + C.Tag.NewBookChoice.btnWIcon.button).performClick()
     composeTestRule.onNodeWithTag(C.Tag.NewBookISBN.isbn).assertExists()
     composeTestRule.onNodeWithTag(C.Tag.NewBookISBN.isbn).performTextInput("9780743273565")
     composeTestRule.onNodeWithTag(C.Tag.NewBookISBN.search).performClick()
@@ -111,9 +111,7 @@ class AddBooksEndToEnd {
 
     composeTestRule.onNodeWithTag(C.Tag.TopAppBar.back_button).performClick()
 
-    composeTestRule
-        .onNodeWithTag(C.Screen.ADD_BOOK_MANUALLY + C.Tag.NewBookChoice.btnWIcon.button)
-        .performClick()
+    composeTestRule.onNodeWithTag("Manually" + C.Tag.NewBookChoice.btnWIcon.button).performClick()
     composeTestRule.onNodeWithTag(C.Tag.new_book_manual_screen_container).assertExists()
 
     composeTestRule.onNodeWithTag(C.Tag.NewBookManually.title).performTextInput("Test Book Title")
