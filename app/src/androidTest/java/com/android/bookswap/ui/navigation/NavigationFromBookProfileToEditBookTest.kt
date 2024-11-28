@@ -40,8 +40,8 @@ class NavigationFromBookProfileToEditBookTest {
   fun EditBookScreen_allows_editing_when_currentUser_is_bookUser() {
     // Arrange
     val currentUserId = UUID.randomUUID()
-      val mockUserViewModel: UserViewModel = mockk()
-      every { mockUserViewModel.uuid } returns currentUserId
+    val mockUserViewModel: UserViewModel = mockk()
+    every { mockUserViewModel.uuid } returns currentUserId
     val testBookId = UUID.randomUUID()
     val testBook =
         DataBook(
@@ -65,25 +65,23 @@ class NavigationFromBookProfileToEditBookTest {
 
     composeTestRule.setContent {
       val navController = rememberNavController()
-        CompositionLocalProvider(LocalAppConfig provides AppConfig(userViewModel = mockUserViewModel    )) {
+      CompositionLocalProvider(
+          LocalAppConfig provides AppConfig(userViewModel = mockUserViewModel)) {
             // Add a NavHost to handle navigation
             NavHost(navController, C.Screen.BOOK_PROFILE) {
-                composable(C.Screen.BOOK_PROFILE) {
-                    BookProfileScreen(
-                        testBookId,
-                        mockBookRepo,
-                        NavigationActions(navController))
+              composable(C.Screen.BOOK_PROFILE) {
+                BookProfileScreen(testBookId, mockBookRepo, NavigationActions(navController))
+              }
+              composable("${C.Screen.EDIT_BOOK}/{bookId}") { backStackEntry ->
+                val bookId =
+                    backStackEntry.arguments?.getString("bookId")?.let { UUID.fromString(it) }
+                if (bookId != null) {
+                  EditBookScreen(
+                      mockBookRepo, NavigationActions(navController), testBook.copy(uuid = bookId))
                 }
-                composable("${C.Screen.EDIT_BOOK}/{bookId}") { backStackEntry ->
-                    val bookId = backStackEntry.arguments?.getString("bookId")?.let { UUID.fromString(it) }
-                    if (bookId != null) {
-                        EditBookScreen(
-                            mockBookRepo, NavigationActions(navController), testBook.copy(uuid = bookId))
-                    }
-                }
-        }
-
-      }
+              }
+            }
+          }
     }
     // This is juste temporary as when Matias will do the MainActivity part for the navigation
     // from the Profile to the BookProfile then I will finish the navigation in the main from the

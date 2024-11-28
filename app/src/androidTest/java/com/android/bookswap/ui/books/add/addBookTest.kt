@@ -19,19 +19,19 @@ import com.android.bookswap.ui.navigation.NavigationActions
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkStatic
+import java.util.UUID
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertNull
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import java.util.UUID
 
 class AddToBookTest {
   @get:Rule val composeTestRule = createComposeRule()
   private val mockContext: Context = mockk()
   private val mockBooksRepository: BooksRepository = mockk()
 
-    @Before
+  @Before
   fun init() {
     mockkStatic(Toast::class)
     val toastMock = mockk<Toast>()
@@ -41,9 +41,7 @@ class AddToBookTest {
 
   @Test
   fun testSaveButtonDisabledInitially() {
-    composeTestRule.setContent {
-      AddToBookScreen(mockBooksRepository)
-    }
+    composeTestRule.setContent { AddToBookScreen(mockBooksRepository) }
 
     // Check if the Save button is initially disabled
     composeTestRule.onNodeWithTag(C.Tag.NewBookManually.save).assertIsNotEnabled()
@@ -51,9 +49,7 @@ class AddToBookTest {
 
   @Test
   fun testSaveButtonEnabledWhenRequiredFieldsAreFilled() {
-    composeTestRule.setContent {
-      AddToBookScreen(mockBooksRepository)
-    }
+    composeTestRule.setContent { AddToBookScreen(mockBooksRepository) }
 
     // Fill in the Title and ISBN fields
     composeTestRule.onNodeWithTag(C.Tag.NewBookManually.title).performTextInput("My Book Title")
@@ -155,7 +151,7 @@ class AddToBookTest {
   fun testSaveButtonDisabledWhenTitleIsEmpty() {
     composeTestRule.setContent {
       val navController = rememberNavController()
-        NavigationActions(navController)
+      NavigationActions(navController)
 
       AddToBookScreen(mockBooksRepository)
     }

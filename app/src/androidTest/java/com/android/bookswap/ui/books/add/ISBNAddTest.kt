@@ -28,7 +28,6 @@ import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
 import io.mockk.Runs
 import io.mockk.andThenJust
 import io.mockk.every
-import io.mockk.impl.annotations.SpyK
 import io.mockk.just
 import io.mockk.mockk
 import io.mockk.mockkConstructor
@@ -55,30 +54,33 @@ class ISBNAddTest : TestCase() {
     toastMock = mockk<Toast>()
     every { toastMock.show() } returns Unit
     every { Toast.makeText(any(), any<String>(), any()) } returns toastMock
-      val userUUid = UUID.randomUUID()
+    val userUUid = UUID.randomUUID()
 
-      val dataUser = DataUser(
-          userUUid,
-          "Hello",
-          "John",
-          "Doe",
-          "eleanorroosevelt@myownpersonaldomain.com",
-          "+1234567890",
-          0.0,
-          0.0,
-          "https://www.example.com/profile.jpg",
-          listOf(UUID.randomUUID()),
-          "googleUID",
-          listOf("contact1", "contact2")
-      )
+    val dataUser =
+        DataUser(
+            userUUid,
+            "Hello",
+            "John",
+            "Doe",
+            "eleanorroosevelt@myownpersonaldomain.com",
+            "+1234567890",
+            0.0,
+            0.0,
+            "https://www.example.com/profile.jpg",
+            listOf(UUID.randomUUID()),
+            "googleUID",
+            listOf("contact1", "contact2"))
 
-      val mockUserRepository: UsersRepository = mockk()
+    val mockUserRepository: UsersRepository = mockk()
 
-      mockUserVM = spyk(UserViewModel(userUUid, mockUserRepository, dataUser))
+    mockUserVM = spyk(UserViewModel(userUUid, mockUserRepository, dataUser))
 
-      every { mockUserVM.uuid } returns userUUid
-      every { mockUserVM.getUser() } returns dataUser
-      every { mockUserVM.updateUser(any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any()) } just runs
+    every { mockUserVM.uuid } returns userUUid
+    every { mockUserVM.getUser() } returns dataUser
+    every {
+      mockUserVM.updateUser(
+          any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any())
+    } just runs
   }
 
   @Test
@@ -119,53 +121,53 @@ class ISBNAddTest : TestCase() {
         isbnField.fetchSemanticsNode().config[SemanticsProperties.EditableText].text)
   }
 
-    @Suppress("TestFunctionName")
-    @Test
-    fun ISBNRequestSucceeded() {
-      val dataBook =
-          DataBook(
-              uuid = UUID.randomUUID(),
-              title = "Flowers for Algernon",
-              author = null,
-              description = null,
-              rating = null,
-              photo = null,
-              language = BookLanguages.OTHER,
-              isbn = "9780435123437",
-              userId = mockUserVM.uuid
-          )
+  @Suppress("TestFunctionName")
+  @Test
+  fun ISBNRequestSucceeded() {
+    val dataBook =
+        DataBook(
+            uuid = UUID.randomUUID(),
+            title = "Flowers for Algernon",
+            author = null,
+            description = null,
+            rating = null,
+            photo = null,
+            language = BookLanguages.OTHER,
+            isbn = "9780435123437",
+            userId = mockUserVM.uuid)
 
-      // Mock call to repository
-      val mockBooksRepository: BooksRepository = mockk()
-      every { mockBooksRepository.addBook(matchDataBook(dataBook), any()) } answers
-          {
-            secondArg<(Result<Unit>) -> Unit>()(Result.success(Unit))
-          } andThenJust
-          Runs
+    // Mock call to repository
+    val mockBooksRepository: BooksRepository = mockk()
+    every { mockBooksRepository.addBook(matchDataBook(dataBook), any()) } answers
+        {
+          secondArg<(Result<Unit>) -> Unit>()(Result.success(Unit))
+        } andThenJust
+        Runs
 
     // Mock call to api
     mockkConstructor(GoogleBookDataSource::class)
-    every {
-      anyConstructed<GoogleBookDataSource>().getBookFromISBN(any(), any(), any())
-    } answers { thirdArg<(Result<DataBook>) -> Unit>()(Result.success(dataBook)) } andThenJust Runs
+    every { anyConstructed<GoogleBookDataSource>().getBookFromISBN(any(), any(), any()) } answers
+        {
+          thirdArg<(Result<DataBook>) -> Unit>()(Result.success(dataBook))
+        } andThenJust
+        Runs
 
-
-      // Mock the navigation
-      val mockNavigationActions: NavigationActions = mockk()
-      every { mockNavigationActions.navigateTo(any(TopLevelDestination::class)) } just Runs
+    // Mock the navigation
+    val mockNavigationActions: NavigationActions = mockk()
+    every { mockNavigationActions.navigateTo(any(TopLevelDestination::class)) } just Runs
 
     composeTestRule.setContent {
-        CompositionLocalProvider(LocalAppConfig provides AppConfig(userViewModel = mockUserVM)) {
-            AddISBNScreen(mockNavigationActions, mockBooksRepository)
-        }
-
+      CompositionLocalProvider(LocalAppConfig provides AppConfig(userViewModel = mockUserVM)) {
+        AddISBNScreen(mockNavigationActions, mockBooksRepository)
+      }
     }
 
     composeTestRule.onNodeWithTag(C.Tag.NewBookISBN.isbn).performTextInput(dataBook.isbn!!)
     composeTestRule.onNodeWithTag(C.Tag.NewBookISBN.search).performClick()
 
     verify {
-      anyConstructed<GoogleBookDataSource>().getBookFromISBN(dataBook.isbn!!, dataBook.userId, any())
+      anyConstructed<GoogleBookDataSource>()
+          .getBookFromISBN(dataBook.isbn!!, dataBook.userId, any())
     } // Api is called
     verify { mockBooksRepository.addBook(matchDataBook(dataBook), any()) } // Book is added
     verify {
@@ -189,9 +191,7 @@ class ISBNAddTest : TestCase() {
     // Mock call to repository
     val mockBooksRepository: BooksRepository = mockk()
 
-    composeTestRule.setContent {
-      AddISBNScreen(mockNavigationActions, mockBooksRepository)
-    }
+    composeTestRule.setContent { AddISBNScreen(mockNavigationActions, mockBooksRepository) }
 
     composeTestRule.onNodeWithTag(C.Tag.NewBookISBN.isbn).performTextInput("BAD_ISBN")
     composeTestRule.onNodeWithTag(C.Tag.NewBookISBN.search).performClick()
@@ -239,9 +239,9 @@ class ISBNAddTest : TestCase() {
     val mockNavigationActions: NavigationActions = mockk()
 
     composeTestRule.setContent {
-        CompositionLocalProvider(LocalAppConfig provides AppConfig(userViewModel = mockUserVM)) {
-            AddISBNScreen(mockNavigationActions, mockBooksRepository)
-        }
+      CompositionLocalProvider(LocalAppConfig provides AppConfig(userViewModel = mockUserVM)) {
+        AddISBNScreen(mockNavigationActions, mockBooksRepository)
+      }
     }
 
     composeTestRule.onNodeWithTag(C.Tag.NewBookISBN.isbn).performTextInput(bookISBN)

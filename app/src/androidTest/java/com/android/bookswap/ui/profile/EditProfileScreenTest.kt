@@ -4,7 +4,6 @@ import android.util.Log
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.android.bookswap.data.DataUser
 import com.android.bookswap.model.AppConfig
 import com.android.bookswap.model.LocalAppConfig
 import com.android.bookswap.model.UserViewModel
@@ -13,8 +12,8 @@ import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
 import io.github.kakaocup.compose.node.element.ComposeScreen
 import io.mockk.every
 import io.mockk.mockk
-import org.junit.Before
 import java.util.UUID
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -33,18 +32,20 @@ class EditProfileScreenTest : TestCase() {
   fun setup() {
     every { mockUserViewModel.uuid } returns UUID.randomUUID()
   }
+
   @get:Rule val composeTestRule = createComposeRule()
 
   @Test
   fun testDisplay() =
       run(testName = "test alert display") {
         composeTestRule.setContent {
-          CompositionLocalProvider(LocalAppConfig provides AppConfig(userViewModel = mockUserViewModel)) {
-            EditProfileDialog(
-              { Log.d("EditProfileTest_Dismiss", "User info discarded") },
-              { Log.d("EditProfileTest_Save", "User info saved ${it.printFullname()}") },
-            )
-          }
+          CompositionLocalProvider(
+              LocalAppConfig provides AppConfig(userViewModel = mockUserViewModel)) {
+                EditProfileDialog(
+                    { Log.d("EditProfileTest_Dismiss", "User info discarded") },
+                    { Log.d("EditProfileTest_Save", "User info saved ${it.printFullname()}") },
+                )
+              }
         }
         step("try displaying the alert box") {
           ComposeScreen.onComposeScreen<EditProfileScreen>(composeTestRule) {
@@ -105,12 +106,12 @@ class EditProfileScreenTest : TestCase() {
   fun testEdit() =
       run(testName = "test alert edit") {
         composeTestRule.setContent {
-          CompositionLocalProvider(LocalAppConfig provides AppConfig(userViewModel = mockUserViewModel)) {
-            EditProfileDialog(
-              { Log.d("EditProfileTest_Dismiss", "User info discarded") },
-              { Log.d("EditProfileTest_Save", "User info saved ${it.printFullname()}") }
-            )
-          }
+          CompositionLocalProvider(
+              LocalAppConfig provides AppConfig(userViewModel = mockUserViewModel)) {
+                EditProfileDialog(
+                    { Log.d("EditProfileTest_Dismiss", "User info discarded") },
+                    { Log.d("EditProfileTest_Save", "User info saved ${it.printFullname()}") })
+              }
         }
         step("try editing the textbox values") {
           ComposeScreen.onComposeScreen<EditProfileScreen>(composeTestRule) {
@@ -181,12 +182,12 @@ class EditProfileScreenTest : TestCase() {
   fun testEditConfirm() =
       run(testName = "test edit and confirm") {
         composeTestRule.setContent {
-          CompositionLocalProvider(LocalAppConfig provides AppConfig(userViewModel = mockUserViewModel)) {
-            EditProfileDialog(
-              { Log.d("EditProfileTest_Dismiss", "User info discarded") },
-              { Log.d("EditProfileTest_Save", "User info saved ${it.printFullname()}") }
-            )
-          }
+          CompositionLocalProvider(
+              LocalAppConfig provides AppConfig(userViewModel = mockUserViewModel)) {
+                EditProfileDialog(
+                    { Log.d("EditProfileTest_Dismiss", "User info discarded") },
+                    { Log.d("EditProfileTest_Save", "User info saved ${it.printFullname()}") })
+              }
         }
         step("try editing the textbox values then confirming the changes") {
           ComposeScreen.onComposeScreen<EditProfileScreen>(composeTestRule) {
@@ -290,13 +291,12 @@ class EditProfileScreenTest : TestCase() {
   fun testEditDismiss() =
       run(testName = "test alert display") {
         composeTestRule.setContent {
-          CompositionLocalProvider(LocalAppConfig provides AppConfig(userViewModel = mockUserViewModel)) {
-
-            EditProfileDialog(
-              { Log.d("EditProfileTest_Dismiss", "User info discarded") },
-              { Log.d("EditProfileTest_Save", "User info saved ${it.printFullname()}") }
-            )
-          }
+          CompositionLocalProvider(
+              LocalAppConfig provides AppConfig(userViewModel = mockUserViewModel)) {
+                EditProfileDialog(
+                    { Log.d("EditProfileTest_Dismiss", "User info discarded") },
+                    { Log.d("EditProfileTest_Save", "User info saved ${it.printFullname()}") })
+              }
         }
         step("try editing the textbox values then cancelling the changes") {
           ComposeScreen.onComposeScreen<EditProfileScreen>(composeTestRule) {

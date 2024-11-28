@@ -35,12 +35,12 @@ class BookProfileScreenTest {
   private val mockUserViewModel: UserViewModel = mockk()
   private lateinit var testBook: DataBook
 
-    @Before
-    fun setup() {
-        val userUUID = UUID.randomUUID()
-        every { mockUserViewModel.uuid } returns userUUID
-        testBook =
-            DataBook(
+  @Before
+  fun setup() {
+    val userUUID = UUID.randomUUID()
+    every { mockUserViewModel.uuid } returns userUUID
+    testBook =
+        DataBook(
             testBookId,
             "Historia de España",
             "Jose Ignacio Pastor Iglesias",
@@ -50,9 +50,8 @@ class BookProfileScreenTest {
             BookLanguages.SPANISH,
             "978-84-09025-23-5",
             listOf(BookGenres.HISTORICAL, BookGenres.NONFICTION, BookGenres.BIOGRAPHY),
-            mockUserViewModel.uuid
-            )
-    }
+            mockUserViewModel.uuid)
+  }
 
   @Before
   fun setUp() {
@@ -72,9 +71,10 @@ class BookProfileScreenTest {
     composeTestRule.setContent {
       val navController = rememberNavController()
       val navigationActions = NavigationActions(navController)
-        CompositionLocalProvider(LocalAppConfig provides AppConfig(userViewModel = mockUserViewModel)) {
+      CompositionLocalProvider(
+          LocalAppConfig provides AppConfig(userViewModel = mockUserViewModel)) {
             BookProfileScreen(testBookId, mockBookRepo, navigationActions)
-        }
+          }
     }
 
     composeTestRule.onNodeWithTag(C.Tag.BookProfile.title).assertIsDisplayed()
@@ -100,9 +100,10 @@ class BookProfileScreenTest {
     composeTestRule.setContent {
       val navController = rememberNavController()
       val navigationActions = NavigationActions(navController)
-        CompositionLocalProvider(LocalAppConfig provides AppConfig(userViewModel = mockUserViewModel)) {
+      CompositionLocalProvider(
+          LocalAppConfig provides AppConfig(userViewModel = mockUserViewModel)) {
             BookProfileScreen(testBookId, mockBookRepo, navigationActions)
-        }
+          }
     }
 
     composeTestRule.onNodeWithTag(C.Tag.BookProfile.previous_image).assertHasClickAction()
@@ -114,9 +115,10 @@ class BookProfileScreenTest {
     composeTestRule.setContent {
       val navController = rememberNavController()
       val navigationActions = NavigationActions(navController)
-        CompositionLocalProvider(LocalAppConfig provides AppConfig(userViewModel = mockUserViewModel)) {
+      CompositionLocalProvider(
+          LocalAppConfig provides AppConfig(userViewModel = mockUserViewModel)) {
             BookProfileScreen(testBookId, mockBookRepo, navigationActions)
-        }
+          }
     }
 
     // Verify the first picture is displayed

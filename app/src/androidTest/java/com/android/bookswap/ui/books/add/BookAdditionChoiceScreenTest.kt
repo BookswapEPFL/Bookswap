@@ -9,7 +9,6 @@ import com.android.bookswap.data.repository.PhotoFirebaseStorageRepository
 import com.android.bookswap.resources.C
 import com.android.bookswap.ui.navigation.NavigationActions
 import io.mockk.mockk
-import java.util.UUID
 import org.junit.Rule
 import org.junit.Test
 
@@ -26,8 +25,7 @@ class BookAdditionChoiceScreenTest {
       BookAdditionChoiceScreen(
           mockNavigationActions,
           photoFirebaseStorageRepository = mockPhotoFirebaseStorageRepository,
-          booksRepository = booksRepository
-      )
+          booksRepository = booksRepository)
     }
     composeTestRule
         .onNodeWithTag("Manually" + C.Tag.NewBookChoice.btnWIcon.button)
@@ -46,8 +44,7 @@ class BookAdditionChoiceScreenTest {
       BookAdditionChoiceScreen(
           mockNavigationActions,
           photoFirebaseStorageRepository = mockPhotoFirebaseStorageRepository,
-          booksRepository = booksRepository
-      )
+          booksRepository = booksRepository)
     }
     composeTestRule
         .onNodeWithTag("Manually" + C.Tag.NewBookChoice.btnWIcon.button)
