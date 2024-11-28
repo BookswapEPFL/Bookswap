@@ -1,5 +1,6 @@
 package com.android.bookswap.ui.profile
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -13,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
@@ -28,7 +30,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.TextStyle
@@ -38,6 +42,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.bookswap.model.InputVerification
+import coil.compose.AsyncImage
+import com.android.bookswap.data.source.network.PhotoFirebaseStorageSource
+import com.android.bookswap.model.PhotoRequester
 import com.android.bookswap.model.UserViewModel
 import com.android.bookswap.resources.C
 import com.android.bookswap.ui.MAXLENGTHEMAIL
@@ -49,6 +56,7 @@ import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.theme.ColorVariable
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
+import com.google.firebase.storage.storage
 
 // Constants for magic numbers used in the UI layout
 private val CONTENT_PADDING = 16.dp
@@ -69,7 +77,11 @@ private val ERROR_FONT_SIZE = 12.sp
  * @param navigationActions: NavigationActions
  */
 @Composable
-fun NewUserScreen(navigationActions: NavigationActions, userVM: UserViewModel) {
+fun NewUserScreen(
+    navigationActions: NavigationActions,
+    userVM: UserViewModel,
+    photoStorage: PhotoFirebaseStorageSource = PhotoFirebaseStorageSource(Firebase.storage)
+) {
   val context = LocalContext.current
   val verification = InputVerification()
 
@@ -84,7 +96,59 @@ fun NewUserScreen(navigationActions: NavigationActions, userVM: UserViewModel) {
   val firstNameError = remember { mutableStateOf<String?>("First name required") }
   val lastNameError = remember { mutableStateOf<String?>("Last name required") }
 
+
   var firstAttempt = true
+
+  val profilPicture = remember { mutableStateOf<String?>(null) }
+
+  val photoRequester =
+      PhotoRequester(context) { result ->
+        result.fold(
+            onSuccess = { image ->
+              photoStorage.addPhotoToStorage(
+                  photoId = "profile",
+                  bitmap = image.asAndroidBitmap(),
+                  callback = { result ->
+                    result.fold(
+                        onSuccess = { url -> profilPicture.value = url },
+                        onFailure = { exception ->
+                          Log.e("NewUserScreen", "Error uploading photo: $exception")
+                          Toast.makeText(context, "Error uploading photo", Toast.LENGTH_SHORT)
+                              .show()
+                        })
+                  })
+            },
+            onFailure = { exception ->
+              Log.e("NewUserScreen", "Error taking photo: $exception")
+              Toast.makeText(context, "Error taking photo", Toast.LENGTH_SHORT).show()
+            })
+      }
+  photoRequester.Init()
+
+  fun validateEmail(input: String): Boolean {
+    return android.util.Patterns.EMAIL_ADDRESS.matcher(input).matches()
+  }
+
+  fun validatePhone(input: String): Boolean {
+    return input.matches(Regex("^\\+?\\d{10,15}$")) // Matches phone numbers with 10 to 15 digits
+  }
+
+  fun validateNonEmpty(input: String): Boolean {
+    return input.isNotBlank()
+  }
+
+  fun validateForm(): Boolean {
+    emailError.value = if (validateEmail(email.value)) null else "Invalid email format"
+    phoneError.value = if (validatePhone(phone.value)) null else "Invalid phone number"
+    firstNameError.value = if (validateNonEmpty(firstName.value)) null else "First name required"
+    lastNameError.value = if (validateNonEmpty(lastName.value)) null else "Last name required"
+
+    return emailError.value == null &&
+        phoneError.value == null &&
+        firstNameError.value == null &&
+        lastNameError.value == null
+  }
+
 
   LazyColumn(
       contentPadding = PaddingValues(CONTENT_PADDING),
@@ -132,13 +196,20 @@ fun NewUserScreen(navigationActions: NavigationActions, userVM: UserViewModel) {
                     Arrangement.Center,
                     Alignment.CenterHorizontally) {
                       IconButton(
-                          onClick = { /* TODO */},
+                          onClick = { photoRequester.requestPhoto() },
                           modifier = Modifier.size(ICON_SIZE).testTag(C.Tag.NewUser.profile_pic)) {
-                            Icon(
-                                imageVector = Icons.Default.AccountCircle,
-                                contentDescription = "profile picture",
-                                tint = ColorVariable.Accent,
-                                modifier = Modifier.size(ICON_SIZE))
+                            if (profilPicture.value == null) {
+                              Icon(
+                                  imageVector = Icons.Default.AccountCircle,
+                                  contentDescription = "profile picture",
+                                  tint = ColorVariable.Accent,
+                                  modifier = Modifier.size(ICON_SIZE))
+                            } else {
+                              AsyncImage(
+                                  model = profilPicture.value,
+                                  contentDescription = "profile picture",
+                                  modifier = Modifier.size(ICON_SIZE).clip(CircleShape))
+                            }
                           }
                       OutlinedTextField(
                           greeting.value,
@@ -245,6 +316,7 @@ fun NewUserScreen(navigationActions: NavigationActions, userVM: UserViewModel) {
                         lastName = lastName.value,
                         email = email.value,
                         phone = phone.value,
+                        picURL = profilPicture.value ?: "",
                         googleUid = Firebase.auth.currentUser?.uid ?: "")
                     navigationActions.navigateTo(C.Route.MAP)
                   } else {
