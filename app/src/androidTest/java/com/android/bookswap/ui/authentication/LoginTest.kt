@@ -47,7 +47,7 @@ class LoginTest : TestCase() {
 
   @Test
   fun titleAndButtonAreCorrectlyDisplayed() {
-    every { userVM.isStored } returns MutableStateFlow(null)
+    every { userVM.isStored } returns MutableStateFlow(false)
     composeTestRule.setContent {
       val navController = rememberNavController()
       val navigationActions = NavigationActions(navController)
@@ -64,7 +64,7 @@ class LoginTest : TestCase() {
 
   @Test
   fun googleSignInReturnsValidActivityResult() {
-    every { userVM.isStored } returns MutableStateFlow(null)
+    every { userVM.isStored } returns MutableStateFlow(false)
     composeTestRule.setContent {
       val navController = rememberNavController()
       val navigationActions = NavigationActions(navController)
