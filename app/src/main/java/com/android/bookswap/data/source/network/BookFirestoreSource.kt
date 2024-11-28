@@ -151,21 +151,10 @@ class BooksFirestoreSource(private val db: FirebaseFirestore) : BooksRepository 
     Log.d("BooksFirestoreRepository", "Attempting to add book: ${dataBook.title}")
 
     // Attempt to add book to Firestore
-    val bookMap =
-        mapOf(
-            "uuid" to dataBook.uuid.toString(),
-            "title" to dataBook.title,
-            "author" to dataBook.author,
-            "description" to dataBook.description,
-            "rating" to dataBook.rating,
-            "photo" to dataBook.photo,
-            "language" to dataBook.language.toString(),
-            "isbn" to dataBook.isbn,
-            "genres" to dataBook.genres.map { it.toString() },
-            "userId" to dataBook.userId.toString())
-
+    val bookDocument = bookToDocument(dataBook)
     performFirestoreOperation(
-        db.collection(collectionBooks).document(dataBook.uuid.toString()).set(bookMap)) { result ->
+        db.collection(collectionBooks).document(dataBook.uuid.toString()).set(bookDocument)) {
+            result ->
           if (result.isSuccess)
               Log.d("BooksFirestoreRepository", "Book added successfully: ${dataBook.title}")
           else {
@@ -183,8 +172,10 @@ class BooksFirestoreSource(private val db: FirebaseFirestore) : BooksRepository 
    *   success, or an exception on failure.
    */
   override fun updateBook(dataBook: DataBook, callback: (Result<Unit>) -> Unit) {
+    val bookDocument = bookToDocument(dataBook)
     performFirestoreOperation(
-        db.collection(collectionBooks).document(dataBook.uuid.toString()).set(dataBook), callback)
+        db.collection(collectionBooks).document(dataBook.uuid.toString()).set(bookDocument),
+        callback)
   }
   /**
    * Deletes a book from the Firestore database.
@@ -197,6 +188,27 @@ class BooksFirestoreSource(private val db: FirebaseFirestore) : BooksRepository 
   override fun deleteBooks(uuid: UUID, dataBook: DataBook, callback: (Result<Unit>) -> Unit) {
     performFirestoreOperation(
         db.collection(collectionBooks).document(dataBook.uuid.toString()).delete(), callback)
+  }
+
+  /**
+   * Maps a DataBook object to a Firebase document-like Map
+   *
+   * @param dataBook The object to convert into a Map
+   * @return Map<String,Any?> A Mapping of each of the DataBook object fields to it's value,
+   *   properly formatted for storing
+   */
+  fun bookToDocument(dataBook: DataBook): Map<String, Any?> {
+    return mapOf(
+        "uuid" to dataBook.uuid.toString(),
+        "title" to dataBook.title,
+        "author" to dataBook.author,
+        "description" to dataBook.description,
+        "rating" to dataBook.rating,
+        "photo" to dataBook.photo,
+        "language" to dataBook.language.toString(),
+        "isbn" to dataBook.isbn,
+        "genres" to dataBook.genres.map { it.toString() },
+        "userId" to dataBook.userId.toString())
   }
   /**
    * Maps a Firestore document to a DataBook object. If any required field is missing, returns null
