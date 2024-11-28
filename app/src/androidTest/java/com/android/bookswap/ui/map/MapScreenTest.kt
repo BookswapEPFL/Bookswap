@@ -18,6 +18,7 @@ import com.android.bookswap.data.BookLanguages
 import com.android.bookswap.data.DataBook
 import com.android.bookswap.data.DataUser
 import com.android.bookswap.data.UserBooksWithLocation
+import com.android.bookswap.model.UserViewModel
 import com.android.bookswap.model.map.BookManagerViewModel
 import com.android.bookswap.model.map.DefaultGeolocation
 import com.android.bookswap.resources.C
@@ -91,6 +92,7 @@ class MapScreenTest {
   @get:Rule val composeTestRule = createComposeRule()
 
   private val mockBookManagerViewModel: BookManagerViewModel = mockk()
+  private val mockUserVM: UserViewModel = mockk()
 
   @Before
   fun setup() {
@@ -108,7 +110,7 @@ class MapScreenTest {
     composeTestRule.setContent {
       val navController = rememberNavController()
       val navigationActions = NavigationActions(navController)
-      MapScreen(mockBookManagerViewModel, navigationActions, 0)
+      MapScreen(mockBookManagerViewModel, navigationActions, 0, userVM = mockUserVM)
     }
     composeTestRule.onNodeWithTag(C.Tag.map_screen_container).assertIsDisplayed()
     composeTestRule.onNodeWithTag(C.Tag.Map.google_map).assertIsDisplayed()
@@ -151,7 +153,7 @@ class MapScreenTest {
     composeTestRule.setContent {
       val navController = rememberNavController()
       val navigationActions = NavigationActions(navController)
-      MapScreen(mockBookManagerViewModel, navigationActions, 0)
+      MapScreen(mockBookManagerViewModel, navigationActions, 0, userVM = mockUserVM)
     }
 
     // Assert that the marker info window is displayed, but without book entries
@@ -168,7 +170,7 @@ class MapScreenTest {
     composeTestRule.setContent {
       val navController = rememberNavController()
       val navigationActions = NavigationActions(navController)
-      MapScreen(mockBookManagerViewModel, navigationActions)
+      MapScreen(mockBookManagerViewModel, navigationActions, userVM = mockUserVM)
     }
 
     // Assert that the map is displayed but no marker and info window is shown
@@ -185,7 +187,7 @@ class MapScreenTest {
     composeTestRule.setContent {
       val navController = rememberNavController()
       val navigationActions = NavigationActions(navController)
-      MapScreen(mockBookManagerViewModel, navigationActions)
+      MapScreen(mockBookManagerViewModel, navigationActions, userVM = mockUserVM)
     }
     // Assert that the marker info window is displayed, but without book entries
     composeTestRule.onNodeWithTag(C.Tag.Map.bottom_drawer_container).assertIsDisplayed()
@@ -203,7 +205,7 @@ class MapScreenTest {
     composeTestRule.setContent {
       val navController = rememberNavController()
       val navigationActions = NavigationActions(navController)
-      MapScreen(mockBookManagerViewModel, navigationActions)
+      MapScreen(mockBookManagerViewModel, navigationActions, userVM = mockUserVM)
     }
 
     // Assert that no info window is displayed when no user is selected
@@ -218,7 +220,7 @@ class MapScreenTest {
     composeTestRule.setContent {
       val navController = rememberNavController()
       val navigationActions = NavigationActions(navController)
-      MapScreen(mockBookManagerViewModel, navigationActions, 0)
+      MapScreen(mockBookManagerViewModel, navigationActions, 0, userVM = mockUserVM)
     }
     // Ensure the DraggableMenu is initially displayed
     composeTestRule.onNodeWithTag(C.Tag.Map.bottom_drawer_container).assertIsDisplayed()
@@ -251,7 +253,7 @@ class MapScreenTest {
     composeTestRule.setContent {
       val navController = rememberNavController()
       val navigationActions = NavigationActions(navController)
-      MapScreen(mockBookManagerViewModel, navigationActions, 0)
+      MapScreen(mockBookManagerViewModel, navigationActions, 0, userVM = mockUserVM)
     }
 
     // Assert initial state: Only first item(s) are visible
@@ -281,7 +283,7 @@ class MapScreenTest {
     composeTestRule.setContent {
       val navController = rememberNavController()
       val navigationActions = NavigationActions(navController)
-      MapScreen(mockBookManagerViewModel, navigationActions, 0)
+      MapScreen(mockBookManagerViewModel, navigationActions, 0, userVM = mockUserVM)
     }
     val node1 = composeTestRule.onNodeWithTag(C.Tag.Map.google_map).fetchSemanticsNode()
     val cameraPositionState: CameraPositionState? = node1.config.getOrNull(CameraPositionKey)
