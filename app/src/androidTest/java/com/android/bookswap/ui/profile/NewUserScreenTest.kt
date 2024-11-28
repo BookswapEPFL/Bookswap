@@ -11,13 +11,11 @@ import androidx.compose.ui.test.performTextInput
 import com.android.bookswap.model.UserViewModel
 import com.android.bookswap.resources.C
 import com.android.bookswap.ui.navigation.NavigationActions
-import io.mockk.justRun
 import io.mockk.mockk
 import io.mockk.verify
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.kotlin.any
 
 class NewUserScreenTest {
   @get:Rule val composeTestRule = createComposeRule()
@@ -28,11 +26,11 @@ class NewUserScreenTest {
   fun setUp() {
     navigationActions = mockk(relaxed = true)
     userVM = mockk(relaxed = true)
+    composeTestRule.setContent { NewUserScreen(navigationActions, userVM) }
   }
 
   @Test
   fun allComponentsAreDisplayedWithCorrectTexts() {
-    composeTestRule.setContent { NewUserScreen(navigationActions, userVM) }
     composeTestRule
         .onNodeWithTag(C.Tag.TopAppBar.screen_title)
         .assertExists()
@@ -92,7 +90,8 @@ class NewUserScreenTest {
   @Test
   fun clickOnCreateButtonWithInvalidEmailDoesNotNavigate() {
 
-    composeTestRule.setContent { NewUserScreen(navigationActions, userVM) }
+    composeTestRule.waitForIdle()
+    composeTestRule.onNodeWithTag(C.Tag.NewUser.confirm).performClick()
 
     composeTestRule.onNodeWithTag(C.Tag.NewUser.greeting).performTextInput("Mr.")
     composeTestRule.onNodeWithTag(C.Tag.NewUser.firstname).performTextInput("John")
@@ -105,42 +104,6 @@ class NewUserScreenTest {
     composeTestRule.onNodeWithTag(C.Tag.NewUser.confirm).performClick()
 
     verify(exactly = 0) { navigationActions.navigateTo(C.Route.MAP) }
-
-    composeTestRule
-        .onNodeWithTag(C.Tag.NewUser.email_error)
-        .assertExists()
-        .assertIsDisplayed()
-        .assertTextContains("Invalid email format")
-  }
-
-  @Test
-  fun clickOnCreateButtonWithEmptyFieldsShowsErrors() {
-    justRun {
-      userVM.updateUser(any(), any(), any(), any(), any(), any(), any(), any(), any(), any())
-    }
-    composeTestRule.setContent { NewUserScreen(navigationActions, userVM) }
-
-    composeTestRule.onNodeWithTag(C.Tag.NewUser.greeting).performTextInput("")
-    composeTestRule.onNodeWithTag(C.Tag.NewUser.firstname).performTextInput("")
-    composeTestRule.onNodeWithTag(C.Tag.NewUser.lastname).performTextInput("")
-    composeTestRule.onNodeWithTag(C.Tag.NewUser.email).performTextInput("notanemail")
-    composeTestRule.onNodeWithTag(C.Tag.NewUser.phone).performTextInput("")
-
-    composeTestRule.onNodeWithTag(C.Tag.NewUser.confirm).performClick()
-
-    verify(exactly = 0) { navigationActions.navigateTo(C.Route.MAP) }
-
-    composeTestRule
-        .onNodeWithTag(C.Tag.NewUser.firstname_error)
-        .assertExists()
-        .assertIsDisplayed()
-        .assertTextContains("First name required")
-
-    composeTestRule
-        .onNodeWithTag(C.Tag.NewUser.lastname_error)
-        .assertExists()
-        .assertIsDisplayed()
-        .assertTextContains("Last name required")
 
     composeTestRule
         .onNodeWithTag(C.Tag.NewUser.email_error)

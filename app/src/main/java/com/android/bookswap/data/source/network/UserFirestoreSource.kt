@@ -129,6 +129,14 @@ class UserFirestoreSource(private val db: FirebaseFirestore) : UsersRepository {
               null
             }
           }
+      val contactList =
+          try {
+            (document.get("contactList") as? List<String>) ?: emptyList()
+          } catch (e: Exception) {
+            Log.e("TAG_CONTACT_LIST_ERROR", "Error parsing contactList: ${e.message}")
+            emptyList()
+          }
+
       if (bookList.any { it == null }) {
         throw IllegalArgumentException("Book list contains null UUIDs")
       }
@@ -145,7 +153,8 @@ class UserFirestoreSource(private val db: FirebaseFirestore) : UsersRepository {
               longitude,
               profilePicture,
               bookList.filterNotNull(),
-              googleUid))
+              googleUid,
+              contactList.filterNotNull()))
     } catch (e: Exception) {
       Log.e(
           "FirestoreSourceError",

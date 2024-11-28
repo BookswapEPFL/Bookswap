@@ -93,7 +93,7 @@ class UserFirestoreSourceTest {
   @Test
   fun getUser() {
     // Arrange
-    every { mockCollectionReference.whereEqualTo("UUID", any()) } returns mockQuery
+    every { mockCollectionReference.whereEqualTo("userUUID", any()) } returns mockQuery
     every { mockQuery.get() } returns Tasks.forResult(mockQuerySnapshot)
 
     // Act
@@ -107,7 +107,7 @@ class UserFirestoreSourceTest {
     }
 
     // Verify Firestore collection was accessed
-    verify { mockCollectionReference.whereEqualTo("UUID", any()) }
+    verify { mockCollectionReference.whereEqualTo("userUUID", any()) }
   }
 
   @Test
