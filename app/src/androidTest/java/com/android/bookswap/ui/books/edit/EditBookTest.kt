@@ -6,7 +6,6 @@ import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollToNode
 import com.android.bookswap.data.BookGenres
 import com.android.bookswap.data.BookLanguages
@@ -150,7 +149,7 @@ class EditBookScreenTest {
         .onNodeWithTag(C.Tag.EditBook.language)
         .assertTextContains(sampleBook.language.toString())
   }
-/*
+  /*
   @Test
   fun genreDropdownWorks() {
     composeTestRule.setContent { EditBookScreen(booksRepository, navigationActions, sampleBook) }

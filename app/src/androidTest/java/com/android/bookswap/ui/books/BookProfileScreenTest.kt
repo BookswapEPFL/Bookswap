@@ -1,11 +1,9 @@
 package com.android.bookswap.ui.books
 
-import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollToNode
 import androidx.navigation.compose.rememberNavController
 import com.android.bookswap.data.BookGenres
@@ -82,7 +80,7 @@ class BookProfileScreenTest {
     composeTestRule.onNodeWithTag(C.Tag.BookProfile.editorial).assertIsDisplayed()
     composeTestRule.onNodeWithTag(C.Tag.BookProfile.location).assertIsDisplayed()
   }
-/*
+  /*
   @Test
   fun iconsAreClickable() {
     composeTestRule.setContent {
