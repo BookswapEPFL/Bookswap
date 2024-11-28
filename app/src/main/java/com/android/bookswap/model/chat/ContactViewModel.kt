@@ -50,15 +50,15 @@ class ContactViewModel(
       }
 
       userVM.getUser().contactList.forEach { contactUUID ->
-        userFirestoreSource.getUser(UUID.fromString(contactUUID)) { userResult ->
+        userFirestoreSource.getUser(contactUUID) { userResult ->
           userResult.fold(
               onSuccess = { contactUser ->
                 val filtered =
                     messages
                         .filter { message ->
                           (message.senderUUID == userVM.getUser().userUUID &&
-                              message.receiverUUID == UUID.fromString(contactUUID)) ||
-                              (message.senderUUID == UUID.fromString(contactUUID) &&
+                              message.receiverUUID == contactUUID) ||
+                              (message.senderUUID == contactUUID &&
                                   message.receiverUUID == userVM.getUser().userUUID)
                         }
                         .sortedBy { it.timestamp }
@@ -68,7 +68,7 @@ class ContactViewModel(
 
                 _messageBoxMap.value =
                     _messageBoxMap.value.toMutableMap().apply {
-                      this[UUID.fromString(contactUUID)] =
+                      this[contactUUID] =
                           MessageBox(contactUser, lastMessageText, lastMessageTimestamp)
                     }
               },

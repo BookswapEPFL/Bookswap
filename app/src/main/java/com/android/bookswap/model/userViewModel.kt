@@ -60,7 +60,7 @@ open class UserViewModel(
       picURL: String = dataUser.profilePictureUrl,
       bookList: List<UUID> = dataUser.bookList,
       googleUid: String = dataUser.googleUid,
-      contactList: List<String> = dataUser.contactList
+      contactList: List<UUID> = dataUser.contactList
   ) {
     updateUser(
         DataUser(
