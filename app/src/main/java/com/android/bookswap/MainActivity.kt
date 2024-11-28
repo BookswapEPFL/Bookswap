@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.semantics
@@ -18,8 +19,10 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
 import com.android.bookswap.data.DataBook
+import com.android.bookswap.data.DataMessage
 import com.android.bookswap.data.DataUser
 import com.android.bookswap.data.MessageBox
+import com.android.bookswap.data.MessageType
 import com.android.bookswap.data.repository.BooksRepository
 import com.android.bookswap.data.repository.MessageRepository
 import com.android.bookswap.data.repository.UsersRepository
@@ -52,6 +55,7 @@ import com.android.bookswap.ui.navigation.BottomNavigationMenu
 import com.android.bookswap.ui.navigation.List_Navigation_Bar_Destinations
 import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.profile.NewUserScreen
+import com.android.bookswap.ui.profile.OthersUserProfileScreen
 import com.android.bookswap.ui.profile.UserProfile
 import com.android.bookswap.ui.theme.BookSwapAppTheme
 import com.google.firebase.Firebase
@@ -220,6 +224,9 @@ class MainActivity : ComponentActivity() {
               tabList = List_Navigation_Bar_Destinations,
               selectedItem = s ?: "")
         }
+      LaunchedEffect(Unit) {
+          addMessages(messageRepository)
+      }  
 
     NavHost(navController = navController, startDestination = startDestination) {
       navigation(startDestination = C.Screen.AUTH, route = C.Route.AUTH) {
@@ -325,6 +332,61 @@ class MainActivity : ComponentActivity() {
           }
         }
       }
+        navigation(startDestination = C.Screen.OTHERS_USER_PROFILE, route = C.Route.OTHERS_USER_PROFILE) {
+            // OthersUserProfileScreen :
+            composable("${C.Screen.OTHERS_USER_PROFILE}/{userId}") { backStackEntry ->
+                val userId =
+                    backStackEntry.arguments?.getString("userId")?.let { UUID.fromString(it) }
+                if (userId != null) {
+                    OthersUserProfileScreen(
+                        userId = userId,
+                        booksRepository = bookRepository,
+                        topAppBar = { topAppBar("User Profile") },
+                        bottomAppBar = { bottomAppBar(this@navigation.route ?: "") }
+                    )
+                } else {
+                    Log.e("Navigation", "Invalid userId passed to OthersUserProfileScreen")
+                }
+            }
+        }
     }
   }
+
+    private fun addMessages(messageRepository: MessageRepository) {
+        val currentUserUUID = UUID.fromString("2f1574d9-bfb9-4fbf-bb57-a2b13b736015")
+        val otherUserUUID = UUID.fromString("7ebed2b4-1649-4b48-8ea6-db971210c06a")
+
+        val testMessages = listOf(
+            DataMessage(
+                uuid = UUID.randomUUID(),
+                text = "Hello! This is a test message from the other user.",
+                senderUUID = otherUserUUID,
+                receiverUUID = currentUserUUID,
+                messageType = MessageType.TEXT,
+                timestamp = System.currentTimeMillis()
+            ),
+            DataMessage(
+                uuid = UUID.randomUUID(),
+                text = "Hi! Nice to meet you.",
+                senderUUID = currentUserUUID,
+                receiverUUID = otherUserUUID,
+                messageType = MessageType.TEXT,
+                timestamp = System.currentTimeMillis() - 60000
+            )
+        )
+
+        testMessages.forEach { message ->
+            messageRepository.sendMessage(
+                message = message,
+                callback = { result ->
+                    if (result.isSuccess) {
+                        Log.e("Add message", "Message added successfully: ${message.text}")
+                    } else {
+                        Log.e("Add message", "Failed to add message: ${message.text}")
+                    }
+                }
+            )
+        }
+    }
+
 }
