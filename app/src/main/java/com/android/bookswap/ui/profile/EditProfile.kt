@@ -16,7 +16,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.android.bookswap.data.DataUser
+import com.android.bookswap.model.InputVerification
 import com.android.bookswap.resources.C
+import com.android.bookswap.ui.MAXLENGTHEMAIL
+import com.android.bookswap.ui.MAXLENGTHFIRSTNAME
+import com.android.bookswap.ui.MAXLENGTHGREETING
+import com.android.bookswap.ui.MAXLENGTHLASTNAME
+import com.android.bookswap.ui.MAXLENGTHPHONE
 import com.android.bookswap.ui.theme.BookSwapAppTheme
 
 /**
@@ -36,6 +42,14 @@ fun EditProfileDialog(onDismiss: () -> Unit, onSave: (DataUser) -> Unit, dataUse
   val _firstName = remember { mutableStateOf<String>(dataUser.firstName) }
   val _lastName = remember { mutableStateOf<String>(dataUser.lastName) }
 
+  val verification = InputVerification()
+
+  val greetingError = remember { mutableStateOf(false) }
+  val emailError = remember { mutableStateOf(false) }
+  val phoneError = remember { mutableStateOf(false) }
+  val firstNameError = remember { mutableStateOf(false) }
+  val lastNameError = remember { mutableStateOf(false) }
+
   BookSwapAppTheme {
     Dialog({ onDismiss() }, DialogProperties(true, true)) {
       Card(Modifier.testTag(C.Tag.edit_profile_screen_container).padding(16.dp)) {
@@ -45,64 +59,99 @@ fun EditProfileDialog(onDismiss: () -> Unit, onSave: (DataUser) -> Unit, dataUse
             Alignment.CenterHorizontally) {
               Text("Edit Profile", Modifier.testTag(C.Tag.TopAppBar.screen_title))
               OutlinedTextField(
-                  _greeting.value,
-                  {
-                    _greeting.value = it
-                    dataUser.greeting = _greeting.value
+                  value = _greeting.value,
+                  onValueChange = {
+                    if (it.length <= MAXLENGTHGREETING) {
+                      _greeting.value = it
+                      dataUser.greeting = _greeting.value
+                      greetingError.value = false
+                    } else {
+                      greetingError.value = true
+                    }
                   },
                   Modifier.testTag(C.Tag.EditProfile.greeting).fillMaxWidth().padding(8.dp, 4.dp),
                   label = { Text("Greeting") },
                   placeholder = { Text("Mr.", Modifier, Color.Gray) },
                   keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-                  singleLine = true)
+                  singleLine = true,
+                  isError = greetingError.value,
+              )
 
               OutlinedTextField(
-                  _firstName.value,
-                  {
-                    _firstName.value = it
-                    dataUser.firstName = _firstName.value
+                  value = _firstName.value,
+                  onValueChange = {
+                    if (it.length <= MAXLENGTHFIRSTNAME) {
+                      _firstName.value = it
+                      dataUser.firstName = _firstName.value
+                      firstNameError.value = false
+                    } else {
+                      firstNameError.value = true
+                    }
                   },
                   Modifier.testTag(C.Tag.EditProfile.firstname).fillMaxWidth().padding(8.dp, 4.dp),
                   label = { Text("Firstname") },
                   placeholder = { Text("John", Modifier, Color.Gray) },
                   keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-                  singleLine = true)
+                  singleLine = true,
+                  isError = firstNameError.value)
 
               OutlinedTextField(
-                  _lastName.value,
-                  {
-                    _lastName.value = it
-                    dataUser.lastName = _lastName.value
+                  value = _lastName.value,
+                  onValueChange = {
+                    if (it.length <= MAXLENGTHLASTNAME) {
+                      _lastName.value = it
+                      dataUser.lastName = _lastName.value
+                      lastNameError.value = false
+                    } else {
+                      lastNameError.value = true
+                    }
                   },
                   Modifier.testTag(C.Tag.EditProfile.lastname).fillMaxWidth().padding(8.dp, 4.dp),
                   label = { Text("Lastname") },
                   placeholder = { Text("Doe", Modifier, Color.Gray) },
                   keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-                  singleLine = true)
+                  singleLine = true,
+                  isError = lastNameError.value)
 
               OutlinedTextField(
-                  _email.value,
-                  {
-                    _email.value = it
-                    dataUser.email = _email.value
+                  value = _email.value,
+                  onValueChange = {
+                    if (it.length <= MAXLENGTHEMAIL) {
+                      _email.value = it
+                      emailError.value = false
+                      if (verification.validateEmail(_email.value)) {
+                        dataUser.email = _email.value
+                      }
+                    } else {
+                      emailError.value = true
+                    }
                   },
                   Modifier.testTag(C.Tag.EditProfile.email).fillMaxWidth().padding(8.dp, 4.dp),
                   label = { Text("Email") },
                   placeholder = { Text("John.Doe@example.com", Modifier, Color.Gray) },
                   keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-                  singleLine = true)
+                  singleLine = true,
+                  isError = emailError.value)
 
               OutlinedTextField(
-                  _phone.value,
-                  {
-                    _phone.value = it
-                    dataUser.phoneNumber = _phone.value
+                  value = _phone.value,
+                  onValueChange = {
+                    if (it.length <= MAXLENGTHPHONE) {
+                      _phone.value = it
+                      phoneError.value = false
+                      if (verification.validatePhone(_phone.value)) {
+                        dataUser.phoneNumber = _phone.value
+                      }
+                    } else {
+                      phoneError.value = true
+                    }
                   },
                   Modifier.testTag(C.Tag.EditProfile.phone).fillMaxWidth().padding(8.dp, 4.dp),
                   label = { Text("Phone") },
                   placeholder = { Text("+4122345678", Modifier, Color.Gray) },
                   keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
-                  singleLine = true)
+                  singleLine = true,
+                  isError = phoneError.value)
 
               Row(Modifier.fillMaxWidth().padding(8.dp), Arrangement.SpaceEvenly) {
                 Button(

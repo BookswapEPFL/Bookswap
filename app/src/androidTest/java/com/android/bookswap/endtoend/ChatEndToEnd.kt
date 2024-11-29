@@ -25,6 +25,8 @@ import com.android.bookswap.data.MessageBox
 import com.android.bookswap.data.MessageType
 import com.android.bookswap.data.repository.MessageRepository
 import com.android.bookswap.data.repository.PhotoFirebaseStorageRepository
+import com.android.bookswap.model.UserViewModel
+import com.android.bookswap.model.chat.ContactViewModel
 import com.android.bookswap.model.chat.OfflineMessageStorage
 import com.android.bookswap.resources.C
 import com.android.bookswap.ui.chat.ChatScreen
@@ -37,7 +39,9 @@ import io.mockk.Runs
 import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
+import io.mockk.runs
 import java.util.UUID
+import kotlinx.coroutines.flow.MutableStateFlow
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
@@ -52,6 +56,8 @@ class ChatEndToEnd {
   private lateinit var mockMessageStorage: OfflineMessageStorage
   private lateinit var mockContext: Context
   private val navigateToChatScreen = mutableStateOf(false)
+  private lateinit var mockUserVM: UserViewModel
+  private lateinit var mockContactVM: ContactViewModel
   private val currentUserUUID = UUID.fromString("550e8400-e29b-41d4-a716-446655440002") // John Doe
   private val otherUserUUID = UUID.fromString("550e8400-e29b-41d4-a716-446655440001") // Other user
 
@@ -115,6 +121,33 @@ class ChatEndToEnd {
 
     placeholderMessages.forEach { mockMessageRepository.sendMessage(it) { /* No-op */} }
 
+    // mock UserViewModel and ContactViewModel
+    mockUserVM = mockk()
+    mockContactVM = mockk()
+
+    val contactMap =
+        MutableStateFlow(
+            mapOf(
+                currentUserUUID to
+                    MessageBox(
+                        contact =
+                            DataUser(
+                                userUUID = currentUserUUID,
+                                greeting = "Mr.",
+                                firstName = "John",
+                                lastName = "Doe",
+                                email = "",
+                                phoneNumber = "",
+                                longitude = 0.0,
+                                latitude = 0.0,
+                                profilePictureUrl = "",
+                                bookList = emptyList(),
+                                googleUid = ""),
+                        message = "Hello",
+                        date = "Today")))
+
+    every { mockContactVM.updateMessageBoxMap() } just runs
+    every { mockContactVM.messageBoxMap } returns contactMap
     every { mockMessageStorage.extractMessages(any(), any()) } returns placeholderMessages
     every { mockMessageStorage.addMessage(any()) } just Runs
     every { mockMessageStorage.setMessages() } just Runs
@@ -136,25 +169,10 @@ class ChatEndToEnd {
         )
       } else {
         ListChatScreen(
-            listOf(
-                MessageBox(
-                    DataUser(
-                        currentUserUUID,
-                        "Mr.",
-                        "John",
-                        "Doe",
-                        "",
-                        "",
-                        0.0,
-                        0.0,
-                        "",
-                        emptyList(),
-                        ""),
-                    "Hello",
-                    "Today")),
-            mockNavigationActions,
-            {},
-            {})
+            navigationActions = mockNavigationActions,
+            topAppBar = {},
+            bottomAppBar = {},
+            contactViewModel = mockContactVM)
       }
     }
     // Simulate navigating to the chat screen by clicking on John Doe's message box

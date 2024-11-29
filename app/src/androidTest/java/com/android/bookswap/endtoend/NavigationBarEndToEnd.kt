@@ -11,12 +11,14 @@ import com.android.bookswap.data.repository.BooksRepository
 import com.android.bookswap.data.repository.UsersRepository
 import com.android.bookswap.data.source.network.MessageFirestoreSource
 import com.android.bookswap.data.source.network.PhotoFirebaseStorageSource
+import com.android.bookswap.model.chat.ContactViewModel
 import com.android.bookswap.model.chat.OfflineMessageStorage
 import com.android.bookswap.resources.C
 import com.google.firebase.firestore.FirebaseFirestore
 import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
+import io.mockk.mockkConstructor
 import io.mockk.runs
 import org.junit.Before
 import org.junit.Rule
@@ -47,8 +49,11 @@ class NavigationBarEndToEnd {
     mockUserRepository = mockk()
     every { mockUserRepository.getUsers(any()) } just runs
 
+    mockkConstructor(ContactViewModel::class)
+    every { anyConstructed<ContactViewModel>().updateMessageBoxMap() } just runs
+
     composeTestRule.setContent {
-      val db = FirebaseFirestore.getInstance()
+      val db: FirebaseFirestore = mockk(relaxed = true)
 
       val messageRepository = MessageFirestoreSource(db)
       MainActivity()

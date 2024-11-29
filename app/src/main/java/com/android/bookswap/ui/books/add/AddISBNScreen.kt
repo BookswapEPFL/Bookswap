@@ -28,7 +28,10 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.android.bookswap.data.repository.BooksRepository
 import com.android.bookswap.data.source.api.GoogleBookDataSource
+import com.android.bookswap.model.InputVerification
+import com.android.bookswap.model.UserViewModel
 import com.android.bookswap.resources.C
+import com.android.bookswap.ui.MAXLENGTHISBN
 import com.android.bookswap.ui.components.ButtonComponent
 import com.android.bookswap.ui.components.FieldComponent
 import com.android.bookswap.ui.navigation.NavigationActions
@@ -42,11 +45,13 @@ import java.util.UUID
 fun AddISBNScreen(
     navigationActions: NavigationActions,
     booksRepository: BooksRepository,
+    userVM: UserViewModel = UserViewModel(UUID.randomUUID()),
     topAppBar: @Composable () -> Unit = {},
-    bottomAppBar: @Composable () -> Unit = {},
-    userId: UUID
+    bottomAppBar: @Composable () -> Unit = {}
 ) {
   val context = LocalContext.current
+  val inputVerification = InputVerification()
+  val user = userVM.getUser()
   Scaffold(
       modifier = Modifier.testTag(C.Tag.new_book_isbn_screen_container),
       topBar = topAppBar,
@@ -64,8 +69,9 @@ fun AddISBNScreen(
                     FieldComponent(
                         modifier = Modifier.testTag(C.Tag.NewBookISBN.isbn),
                         labelText = "ISBN*",
-                        value = isbn) {
-                          if (it.all { c -> c.isDigit() } && it.length <= 13) {
+                        value = isbn,
+                        maxLength = MAXLENGTHISBN) {
+                          if (inputVerification.testIsbn(it)) {
                             isbn = it
                             Log.d("ISBN Input", "Updated ISBN: $isbn")
                           }
@@ -73,7 +79,8 @@ fun AddISBNScreen(
                     ButtonComponent(
                         modifier = Modifier.testTag(C.Tag.NewBookISBN.search),
                         onClick = {
-                          GoogleBookDataSource(context).getBookFromISBN(isbn, userId) { result ->
+                          GoogleBookDataSource(context).getBookFromISBN(isbn, user.userUUID) {
+                              result ->
                             if (result.isFailure) {
                               Toast.makeText(context, "Search unsuccessful", Toast.LENGTH_LONG)
                                   .show()
@@ -83,6 +90,13 @@ fun AddISBNScreen(
                                   result.getOrThrow(),
                                   callback = { res ->
                                     if (res.isSuccess) {
+                                      val newBookList = user.bookList + result.getOrNull()?.uuid!!
+                                      userVM.updateUser(bookList = newBookList)
+                                      Toast.makeText(
+                                              context,
+                                              "${result.getOrNull()?.title} added",
+                                              Toast.LENGTH_LONG)
+                                          .show()
                                       navigationActions.navigateTo(TopLevelDestinations.NEW_BOOK)
                                     } else {
                                       val error = res.exceptionOrNull()!!
