@@ -63,7 +63,7 @@ class AddToBookTest {
 
     // Fill in the Title and ISBN fields
     composeTestRule.onNodeWithTag(C.Tag.NewBookManually.title).performTextInput("My Book Title")
-    composeTestRule.onNodeWithTag(C.Tag.NewBookManually.isbn).performTextInput("1234567890")
+    composeTestRule.onNodeWithTag(C.Tag.NewBookManually.isbn).performTextInput("978-3-16-148410-0")
     // Check if the Save button is now enabled
     composeTestRule.onNodeWithTag(C.Tag.NewBookManually.save).performClick()
     composeTestRule.onNodeWithTag(C.Tag.NewBookManually.save).assertIsEnabled()
