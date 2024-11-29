@@ -92,21 +92,21 @@ fun MapScreen(
   val cameraPositionState = rememberCameraPositionState()
   // Get the user's current location
   val latitude = geolocation.latitude.collectAsState()
-    val context = LocalContext.current
-    var isOnline = remember { isNetworkAvailable(context) }
+  val context = LocalContext.current
+  var isOnline = remember { isNetworkAvailable(context) }
   val longitude = geolocation.longitude.collectAsState()
   // Start location and books updates
-    LaunchedEffect(Unit) {
-        if (isOnline) {
-            bookManagerViewModel.startUpdatingBooks()
-        } else {
-            Toast.makeText(context, "Please connect to Internet to actualise", Toast.LENGTH_SHORT).show()
-        }
-        geolocation.startLocationUpdates()
-        cameraPositionState.position =
-            CameraPosition.fromLatLngZoom(LatLng(latitude.value, longitude.value), INIT_ZOOM)
-        isOnline = isNetworkAvailable(context)
+  LaunchedEffect(Unit) {
+    if (isOnline) {
+      bookManagerViewModel.startUpdatingBooks()
+    } else {
+      Toast.makeText(context, "Please connect to Internet to actualise", Toast.LENGTH_SHORT).show()
     }
+    geolocation.startLocationUpdates()
+    cameraPositionState.position =
+        CameraPosition.fromLatLngZoom(LatLng(latitude.value, longitude.value), INIT_ZOOM)
+    isOnline = isNetworkAvailable(context)
+  }
   // Stop location and books updates when the screen is disposed
   DisposableEffect(Unit) {
     onDispose {
