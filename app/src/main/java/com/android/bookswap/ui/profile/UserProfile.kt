@@ -36,7 +36,6 @@ import coil.compose.AsyncImage
 import com.android.bookswap.data.repository.PhotoFirebaseStorageRepository
 import com.android.bookswap.model.LocalAppConfig
 import com.android.bookswap.model.PhotoRequester
-import com.android.bookswap.model.UserViewModel
 import com.android.bookswap.resources.C
 import com.android.bookswap.ui.components.ButtonComponent
 import com.android.bookswap.ui.theme.*
@@ -57,8 +56,8 @@ fun UserProfile(
     bottomAppBar: @Composable () -> Unit = {}
 ) {
   val context = LocalContext.current
-    val appConfig = LocalAppConfig.current
-    var userData = appConfig.userViewModel.getUser()
+  val appConfig = LocalAppConfig.current
+  var userData = appConfig.userViewModel.getUser()
   val showEditPicture = remember { mutableStateOf(false) }
   var showEditProfile by remember { mutableStateOf(false) }
 
@@ -121,8 +120,7 @@ fun UserProfile(
 
     Dialog(
         onDismissRequest = { showEditPicture.value = false },
-        properties = DialogProperties(dismissOnBackPress = true, dismissOnClickOutside = true)
-    ) {
+        properties = DialogProperties(dismissOnBackPress = true, dismissOnClickOutside = true)) {
           Card(Modifier.testTag(C.Tag.UserProfile.profileImageBox).padding(16.dp)) {
             Column(
                 Modifier.fillMaxWidth().padding(16.dp),
