@@ -1,7 +1,5 @@
 package com.android.bookswap.ui.authentication
 
-// import com.android.bookswap.ui.navigation.NavigationActions
-// import com.android.bookswap.ui.navigation.TopLevelDestinations
 import android.content.Intent
 import android.util.Log
 import android.widget.Toast
@@ -64,8 +62,7 @@ import kotlinx.coroutines.tasks.await
  * @param userVM ViewModel for user-related operations.
  */
 @Composable
-fun SignInScreen(navigationActions: NavigationActions) { // Add this when navigation is
-  // implemented
+fun SignInScreen(navigationActions: NavigationActions) {
   val context = LocalContext.current
   val appConfig = LocalAppConfig.current
   var googleUid = ""
@@ -100,7 +97,7 @@ fun SignInScreen(navigationActions: NavigationActions) { // Add this when naviga
       false -> {
         navigationActions.navigateTo(C.Screen.NEW_USER)
       }
-      null -> {} // Attendre que `isStored` soit défini
+      null -> {}
     }
   }
 

@@ -1,5 +1,6 @@
 package com.android.bookswap.ui.map
 
+import android.Manifest
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.semantics.getOrNull
 import androidx.compose.ui.test.assertCountEquals
@@ -13,6 +14,7 @@ import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.swipe
 import androidx.compose.ui.test.swipeUp
 import androidx.navigation.compose.rememberNavController
+import androidx.test.rule.GrantPermissionRule
 import com.android.bookswap.data.BookGenres
 import com.android.bookswap.data.BookLanguages
 import com.android.bookswap.data.DataBook
@@ -89,12 +91,17 @@ class MapScreenTest {
   private val userWithoutBooks =
       listOf(UserBooksWithLocation(UUID.randomUUID(), 0.0, 0.0, emptyList()))
   @get:Rule val composeTestRule = createComposeRule()
+  @get:Rule
+  val grantPermissionRule: GrantPermissionRule =
+      GrantPermissionRule.grant(
+          Manifest.permission.ACCESS_FINE_LOCATION,
+          Manifest.permission.ACCESS_COARSE_LOCATION,
+          Manifest.permission.ACCESS_BACKGROUND_LOCATION)
 
   private val mockBookManagerViewModel: BookManagerViewModel = mockk()
 
   @Before
   fun setup() {
-
     every { mockBookManagerViewModel.filteredBooks } returns MutableStateFlow(books)
 
     every { mockBookManagerViewModel.filteredUsers } returns
