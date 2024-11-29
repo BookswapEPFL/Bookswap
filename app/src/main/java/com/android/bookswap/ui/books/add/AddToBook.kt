@@ -30,7 +30,7 @@ import com.android.bookswap.data.BookLanguages
 import com.android.bookswap.data.DataBook
 import com.android.bookswap.data.repository.BooksRepository
 import com.android.bookswap.model.InputVerification
-import com.android.bookswap.model.UserViewModel
+import com.android.bookswap.model.LocalAppConfig
 import com.android.bookswap.resources.C
 import com.android.bookswap.ui.MAXLENGTHAUTHOR
 import com.android.bookswap.ui.MAXLENGTHDESCRIPTION
@@ -55,11 +55,9 @@ private const val HORIZONTAL_PADDING = 30
 @Composable
 fun AddToBookScreen(
     repository: BooksRepository,
-    userVM: UserViewModel = UserViewModel(UUID.randomUUID()),
     topAppBar: @Composable () -> Unit = {},
     bottomAppBar: @Composable () -> Unit = {}
 ) {
-  var user = userVM.getUser()
   // State variables to store the values entered by the user
   var title by remember { mutableStateOf("") }
   var author by remember { mutableStateOf("") }
@@ -77,6 +75,8 @@ fun AddToBookScreen(
   // Getting the context for showing Toast messages
   val context = LocalContext.current
   val inputVerification = InputVerification()
+
+  val appConfig = LocalAppConfig.current
 
   // Scaffold to provide basic UI structure with a top app bar
   Scaffold(
@@ -255,7 +255,7 @@ fun AddToBookScreen(
                               selectedLanguage.toString(),
                               isbn,
                               listOf(selectedGenre!!),
-                              user.userUUID)
+                              appConfig.userViewModel.uuid)
 
                       if (book == null) {
                         Log.e("AddToBookScreen", "Invalid argument")
@@ -266,8 +266,9 @@ fun AddToBookScreen(
                             book,
                             callback = {
                               if (it.isSuccess) {
-                                val newBookList = user.bookList + book.uuid
-                                userVM.updateUser(bookList = newBookList)
+                                val newBookList =
+                                    appConfig.userViewModel.getUser().bookList + book.uuid
+                                appConfig.userViewModel.updateUser(bookList = newBookList)
                                 Toast.makeText(context, "${book.title} added", Toast.LENGTH_LONG)
                                     .show()
                               } else {

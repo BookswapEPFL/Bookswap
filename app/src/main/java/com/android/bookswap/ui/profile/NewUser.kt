@@ -1,5 +1,6 @@
 package com.android.bookswap.ui.profile
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -13,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
@@ -28,7 +30,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asAndroidBitmap
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.TextStyle
@@ -37,8 +42,11 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
+import com.android.bookswap.data.repository.PhotoFirebaseStorageRepository
 import com.android.bookswap.model.InputVerification
-import com.android.bookswap.model.UserViewModel
+import com.android.bookswap.model.LocalAppConfig
+import com.android.bookswap.model.PhotoRequester
 import com.android.bookswap.resources.C
 import com.android.bookswap.ui.MAXLENGTHEMAIL
 import com.android.bookswap.ui.MAXLENGTHFIRSTNAME
@@ -69,7 +77,10 @@ private val ERROR_FONT_SIZE = 12.sp
  * @param navigationActions: NavigationActions
  */
 @Composable
-fun NewUserScreen(navigationActions: NavigationActions, userVM: UserViewModel) {
+fun NewUserScreen(
+    navigationActions: NavigationActions,
+    photoStorage: PhotoFirebaseStorageRepository
+) {
   val context = LocalContext.current
   val verification = InputVerification()
 
@@ -84,8 +95,34 @@ fun NewUserScreen(navigationActions: NavigationActions, userVM: UserViewModel) {
   val firstNameError = remember { mutableStateOf<String?>("First name required") }
   val lastNameError = remember { mutableStateOf<String?>("Last name required") }
 
+  val appConfig = LocalAppConfig.current
   var firstAttempt = true
 
+  val profilPicture = remember { mutableStateOf<String?>(null) }
+  // This is the photo requester that will be used to take a photo
+  val photoRequester =
+      PhotoRequester(context) { result ->
+        result.fold(
+            onSuccess = { image ->
+              photoStorage.addPhotoToStorage(
+                  photoId = "profile",
+                  bitmap = image.asAndroidBitmap(),
+                  callback = { result ->
+                    result.fold(
+                        onSuccess = { url -> profilPicture.value = url },
+                        onFailure = { exception ->
+                          Log.e("NewUserScreen", "Error uploading photo: $exception")
+                          Toast.makeText(context, "Error uploading photo", Toast.LENGTH_SHORT)
+                              .show()
+                        })
+                  })
+            },
+            onFailure = { exception ->
+              Log.e("NewUserScreen", "Error taking photo: $exception")
+              Toast.makeText(context, "Error taking photo", Toast.LENGTH_SHORT).show()
+            })
+      }
+  photoRequester.Init() // This is the initialization of the photo requester
   LazyColumn(
       contentPadding = PaddingValues(CONTENT_PADDING),
       modifier =
@@ -132,13 +169,22 @@ fun NewUserScreen(navigationActions: NavigationActions, userVM: UserViewModel) {
                     Arrangement.Center,
                     Alignment.CenterHorizontally) {
                       IconButton(
-                          onClick = { /* TODO */},
+                          onClick = { photoRequester.requestPhoto() },
                           modifier = Modifier.size(ICON_SIZE).testTag(C.Tag.NewUser.profile_pic)) {
-                            Icon(
-                                imageVector = Icons.Default.AccountCircle,
-                                contentDescription = "profile picture",
-                                tint = ColorVariable.Accent,
-                                modifier = Modifier.size(ICON_SIZE))
+                            // Show either the profile picture or the default icon
+                            if (profilPicture.value == null) {
+                              Icon(
+                                  imageVector = Icons.Default.AccountCircle,
+                                  contentDescription = "no profile picture",
+                                  tint = ColorVariable.Accent,
+                                  modifier = Modifier.size(ICON_SIZE))
+                            } else {
+                              AsyncImage(
+                                  model = profilPicture.value,
+                                  contentDescription = "profile picture",
+                                  modifier = Modifier.size(ICON_SIZE).clip(CircleShape),
+                                  contentScale = ContentScale.Crop)
+                            }
                           }
                       OutlinedTextField(
                           greeting.value,
@@ -239,12 +285,13 @@ fun NewUserScreen(navigationActions: NavigationActions, userVM: UserViewModel) {
                       verification.validatePhone(phone.value) &&
                       verification.validateNonEmpty(firstName.value) &&
                       verification.validateNonEmpty(lastName.value)) {
-                    userVM.updateUser(
+                    appConfig.userViewModel.updateUser(
                         greeting = greeting.value,
                         firstName = firstName.value,
                         lastName = lastName.value,
                         email = email.value,
                         phone = phone.value,
+                        picURL = profilPicture.value ?: "",
                         googleUid = Firebase.auth.currentUser?.uid ?: "")
                     navigationActions.navigateTo(C.Route.MAP)
                   } else {
