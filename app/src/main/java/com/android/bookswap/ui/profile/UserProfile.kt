@@ -34,8 +34,8 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import coil.compose.AsyncImage
 import com.android.bookswap.data.repository.PhotoFirebaseStorageRepository
+import com.android.bookswap.model.LocalAppConfig
 import com.android.bookswap.model.PhotoRequester
-import com.android.bookswap.model.UserViewModel
 import com.android.bookswap.resources.C
 import com.android.bookswap.ui.components.ButtonComponent
 import com.android.bookswap.ui.theme.*
@@ -51,13 +51,13 @@ import com.android.bookswap.ui.theme.*
  */
 @Composable
 fun UserProfile(
-    userVM: UserViewModel = UserViewModel(java.util.UUID.randomUUID()),
     photoStorage: PhotoFirebaseStorageRepository,
     topAppBar: @Composable () -> Unit = {},
     bottomAppBar: @Composable () -> Unit = {}
 ) {
   val context = LocalContext.current
-  var user = userVM.getUser()
+  val appConfig = LocalAppConfig.current
+  var userData = appConfig.userViewModel.getUser()
   val showEditPicture = remember { mutableStateOf(false) }
   var showEditProfile by remember { mutableStateOf(false) }
 
@@ -73,7 +73,7 @@ fun UserProfile(
                   callback = { result ->
                     result.fold(
                         onSuccess = { url ->
-                          userVM.updateUser(picURL = url)
+                          appConfig.userViewModel.updateUser(picURL = url)
                           showEditPicture.value = false
                         },
                         onFailure = { exception ->
@@ -97,23 +97,22 @@ fun UserProfile(
           needRecompose = true
         },
         onSave = {
-          userVM.updateUser(
+          appConfig.userViewModel.updateUser(
               greeting = it.greeting,
               firstName = it.firstName,
               lastName = it.lastName,
               email = it.email,
               phone = it.phoneNumber,
-              user.latitude,
-              user.longitude,
-              picURL = user.profilePictureUrl)
+              userData.latitude,
+              userData.longitude,
+              picURL = userData.profilePictureUrl)
           showEditProfile = false
           needRecompose = true
-        },
-        dataUser = user)
+        })
   }
 
-  LaunchedEffect(userVM.uuid, needRecompose) {
-    user = userVM.getUser()
+  LaunchedEffect(appConfig.userViewModel.uuid, needRecompose) {
+    userData = appConfig.userViewModel.getUser()
     needRecompose = false
   }
 
@@ -157,7 +156,7 @@ fun UserProfile(
                                 Modifier.padding(2.5f.dp)
                                     .border(3.5f.dp, Color(0xFFA98467), CircleShape)) {
                               // show either the profile picture or the default icon
-                              if (user.profilePictureUrl.isEmpty()) {
+                              if (userData.profilePictureUrl.isEmpty()) {
                                 Image(
                                     imageVector = Icons.Rounded.AccountCircle,
                                     contentDescription = "No profile picture",
@@ -165,7 +164,7 @@ fun UserProfile(
                                     colorFilter = ColorFilter.tint(Color(0xFF6C584C)))
                               } else {
                                 AsyncImage(
-                                    model = user.profilePictureUrl,
+                                    model = userData.profilePictureUrl,
                                     contentDescription = "profile picture",
                                     modifier =
                                         Modifier.fillMaxSize()
@@ -188,18 +187,20 @@ fun UserProfile(
               Column(Modifier.fillMaxHeight().fillMaxWidth(), Arrangement.spacedBy(8.dp)) {
                 // Full name text
                 Text(
-                    text = "${user.greeting} ${user.firstName} ${user.lastName}",
+                    text = "${userData.greeting} ${userData.firstName} ${userData.lastName}",
                     modifier = Modifier.testTag(C.Tag.UserProfile.fullname))
 
                 // Email text
-                Text(text = user.email, modifier = Modifier.testTag(C.Tag.UserProfile.email))
+                Text(text = userData.email, modifier = Modifier.testTag(C.Tag.UserProfile.email))
 
                 // Phone number text
-                Text(text = user.phoneNumber, modifier = Modifier.testTag(C.Tag.UserProfile.phone))
+                Text(
+                    text = userData.phoneNumber,
+                    modifier = Modifier.testTag(C.Tag.UserProfile.phone))
 
                 // User address
                 Text(
-                    text = "${user.latitude}, ${user.longitude}",
+                    text = "${userData.latitude}, ${userData.longitude}",
                     modifier = Modifier.testTag(C.Tag.UserProfile.address))
 
                 // Edit Button
