@@ -101,7 +101,7 @@ class BooksFirestoreSource(private val db: FirebaseFirestore) : BooksRepository 
                   try {
                     BookGenres.valueOf(genre) // Attempt to map each string to BookGenres
                   } catch (e: IllegalArgumentException) {
-                    Log.w("BooksFirestoreRepository", "Unknown genre: $genre")
+                    Log.e("BooksFirestoreRepository", "Unknown genre: $genre")
                     null // Skip if genre is not valid in the BookGenres enum
                   }
                 }

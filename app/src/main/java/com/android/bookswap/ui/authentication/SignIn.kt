@@ -84,8 +84,6 @@ fun SignInScreen(
             val googleUserName = result.user?.displayName ?: ""
             googleUid = result.user?.uid ?: ""
             userVM.getUserByGoogleUid(googleUid)
-            Log.d("SignInScreen", "isStored: ${userVM.isStored}")
-            Log.d("SignInScreen", "User signed in: $googleUserName")
             Toast.makeText(context, "Welcome $googleUserName!", Toast.LENGTH_LONG).show()
           },
           onAuthError = {
@@ -102,7 +100,7 @@ fun SignInScreen(
       false -> {
         navigationActions.navigateTo(C.Screen.NEW_USER)
       }
-      null -> {} // Attendre que `isStored` soit défini
+      null -> {}
     }
   }
 

@@ -156,7 +156,7 @@ class MainActivity : ComponentActivity() {
       NavHost(navController = navController, startDestination = startDestination) {
         navigation(startDestination = C.Screen.AUTH, route = C.Route.AUTH) {
           composable(C.Screen.AUTH) { SignInScreen(navigationActions, userVM) }
-          composable(C.Screen.NEW_USER) { NewUserScreen(navigationActions, userVM) }
+          composable(C.Screen.NEW_USER) { NewUserScreen(navigationActions, userVM, photoStorage) }
         }
         navigation(startDestination = C.Screen.CHAT_LIST, route = C.Route.CHAT_LIST) {
           composable(C.Screen.CHAT_LIST) {
@@ -228,10 +228,9 @@ class MainActivity : ComponentActivity() {
           }
         }
         navigation(startDestination = C.Screen.USER_PROFILE, route = C.Route.USER_PROFILE) {
-          composable(C.Screen.USER_PROFILE) { UserProfile(userVM) }
+          composable(C.Screen.USER_PROFILE) { UserProfile(userVM, photoStorage) }
           composable(C.Screen.BOOK_PROFILE) { backStackEntry ->
             val bookId = backStackEntry.arguments?.getString("bookId")?.let { UUID.fromString(it) }
-
             if (bookId != null) {
               BookProfileScreen(
                   bookId = bookId, // Default for testing
@@ -252,7 +251,7 @@ class MainActivity : ComponentActivity() {
               bookRepository.getBook(
                   uuid = bookId,
                   OnSucess = { fetchedbook -> book = fetchedbook },
-                  onFailure = { Log.d("EditScreen", "Error while loading the book") })
+                  onFailure = { Log.e("EditScreen", "Error while loading the book") })
               EditBookScreen(
                   booksRepository = bookRepository,
                   navigationActions = NavigationActions(navController),
