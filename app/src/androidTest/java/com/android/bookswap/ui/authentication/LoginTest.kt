@@ -1,5 +1,6 @@
 package com.android.bookswap.ui.authentication
 
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextEquals
@@ -11,6 +12,8 @@ import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.intent.Intents.intended
 import androidx.test.espresso.intent.matcher.IntentMatchers.toPackage
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.android.bookswap.model.AppConfig
+import com.android.bookswap.model.LocalAppConfig
 import com.android.bookswap.model.UserViewModel
 import com.android.bookswap.resources.C
 import com.android.bookswap.ui.navigation.NavigationActions
@@ -51,7 +54,9 @@ class LoginTest : TestCase() {
     composeTestRule.setContent {
       val navController = rememberNavController()
       val navigationActions = NavigationActions(navController)
-      SignInScreen(navigationActions, userVM)
+      CompositionLocalProvider(LocalAppConfig provides AppConfig(userViewModel = userVM)) {
+        SignInScreen(navigationActions)
+      }
     }
     composeTestRule.onNodeWithTag(C.Tag.TopAppBar.screen_title).assertIsDisplayed()
     composeTestRule.onNodeWithTag(C.Tag.TopAppBar.screen_title).assertTextEquals("Welcome to")
@@ -68,7 +73,9 @@ class LoginTest : TestCase() {
     composeTestRule.setContent {
       val navController = rememberNavController()
       val navigationActions = NavigationActions(navController)
-      SignInScreen(navigationActions, userVM)
+      CompositionLocalProvider(LocalAppConfig provides AppConfig(userViewModel = userVM)) {
+        SignInScreen(navigationActions)
+      }
     }
     composeTestRule.onNodeWithTag(C.Tag.SignIn.signIn).performClick()
     composeTestRule.waitForIdle()
@@ -79,7 +86,11 @@ class LoginTest : TestCase() {
   @Test
   fun navigateToNewUserScreenWhenUserIsNotStored() {
     every { userVM.isStored } returns MutableStateFlow(false)
-    composeTestRule.setContent { SignInScreen(mocknavi, userVM) }
+    composeTestRule.setContent {
+      CompositionLocalProvider(LocalAppConfig provides AppConfig(userViewModel = userVM)) {
+        SignInScreen(mocknavi)
+      }
+    }
     composeTestRule.onNodeWithTag(C.Tag.SignIn.signIn).performClick()
     composeTestRule.waitForIdle()
     verify { mocknavi.navigateTo(C.Screen.NEW_USER) }

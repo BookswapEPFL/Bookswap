@@ -45,8 +45,8 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.android.bookswap.data.repository.PhotoFirebaseStorageRepository
 import com.android.bookswap.model.InputVerification
+import com.android.bookswap.model.LocalAppConfig
 import com.android.bookswap.model.PhotoRequester
-import com.android.bookswap.model.UserViewModel
 import com.android.bookswap.resources.C
 import com.android.bookswap.ui.MAXLENGTHEMAIL
 import com.android.bookswap.ui.MAXLENGTHFIRSTNAME
@@ -79,7 +79,6 @@ private val ERROR_FONT_SIZE = 12.sp
 @Composable
 fun NewUserScreen(
     navigationActions: NavigationActions,
-    userVM: UserViewModel,
     photoStorage: PhotoFirebaseStorageRepository
 ) {
   val context = LocalContext.current
@@ -96,6 +95,7 @@ fun NewUserScreen(
   val firstNameError = remember { mutableStateOf<String?>("First name required") }
   val lastNameError = remember { mutableStateOf<String?>("Last name required") }
 
+  val appConfig = LocalAppConfig.current
   var firstAttempt = true
 
   val profilPicture = remember { mutableStateOf<String?>(null) }
@@ -285,7 +285,7 @@ fun NewUserScreen(
                       verification.validatePhone(phone.value) &&
                       verification.validateNonEmpty(firstName.value) &&
                       verification.validateNonEmpty(lastName.value)) {
-                    userVM.updateUser(
+                    appConfig.userViewModel.updateUser(
                         greeting = greeting.value,
                         firstName = firstName.value,
                         lastName = lastName.value,
