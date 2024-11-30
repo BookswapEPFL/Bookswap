@@ -34,7 +34,47 @@ class ChatGPTApiService(context: Context, mode: Boolean = true) : ApiService {
       onSuccess: (String) -> Unit,
       onError: (String) -> Unit
   ) {
-    val messageList = userMessages.map { m -> ChatGPTMessage(role = "user", content = m) }
+    val messageList =
+        userMessages.map { m ->
+          if (m.contains("The image URL: ")) {
+            val parts = m.split("The image URL: ")
+            val textContent = parts[0].trim()
+            val imageUrl = parts.getOrNull(1)?.trim() ?: ""
+            ChatGPTMessage(
+                role = "user",
+                content =
+                    JSONArray()
+                        .apply {
+                          put(
+                              JSONObject().apply {
+                                put("type", "text")
+                                put("text", textContent)
+                              })
+                          put(
+                              JSONObject().apply {
+                                put("type", "image_url")
+                                put("image_url", JSONObject().apply { put("url", imageUrl) })
+                              })
+                        }
+                        .toString() // Convert JSONArray to String
+                )
+          } else {
+            ChatGPTMessage(
+                role = "user",
+                content =
+                    JSONArray()
+                        .apply {
+                          put(
+                              JSONObject().apply {
+                                put("type", "text")
+                                put("text", m)
+                              })
+                        }
+                        .toString() // Convert JSONArray to String
+                )
+          }
+        }
+
     val chatGPTRequest = ChatGPTRequest(model = "gpt-4o-mini", messages = messageList)
 
     // Create the JSON body for the request
@@ -45,14 +85,21 @@ class ChatGPTApiService(context: Context, mode: Boolean = true) : ApiService {
               "messages",
               JSONArray().apply {
                 chatGPTRequest.messages.forEach { message ->
+                  val content =
+                      try {
+                        JSONArray(message.content) // Parse as JSONArray
+                      } catch (e: Exception) {
+                        message.content
+                      }
                   put(
                       JSONObject().apply {
                         put("role", message.role)
-                        put("content", message.content)
+                        put("content", content)
                       })
                 }
               })
         }
+    Log.i("ChatGPTApiService", "Request to openAI API with: $jsonBody")
 
     // Create the request and listen for the response
     val jsonObjectRequest =
@@ -74,13 +121,32 @@ class ChatGPTApiService(context: Context, mode: Boolean = true) : ApiService {
                   }
                 },
                 Response.ErrorListener { error ->
-                  Log.e("ChatGPTApiService", "Error: ${error.localizedMessage}")
-                  onError("Request error: ${error.localizedMessage}")
+                  Log.e("ChatGPTApiService", "Full error details: ", error)
+
+                  if (error.networkResponse != null) {
+                    val statusCode = error.networkResponse.statusCode
+                    val responseBody =
+                        error.networkResponse.data?.let { String(it) } ?: "No response body"
+                    Log.e(
+                        "ChatGPTApiService",
+                        "Status Code: $statusCode, Response Body: $responseBody")
+                  }
+
+                  val errorMessage = error.localizedMessage ?: "Unknown error"
+                  Log.e("ChatGPTApiService", "Error message: $errorMessage")
+                  onError("Request error: $errorMessage")
                 }) {
           // Add the API key and content type to the request headers
           override fun getHeaders(): MutableMap<String, String> {
             return hashMapOf(
                 "Authorization" to "Bearer $apiKey", "Content-Type" to "application/json")
+          }
+          // Override the default timeout (in milliseconds)
+          override fun getRetryPolicy(): com.android.volley.RetryPolicy {
+            return com.android.volley.DefaultRetryPolicy(
+                30000, // Timeout in milliseconds (e.g., 30 seconds)
+                com.android.volley.DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                com.android.volley.DefaultRetryPolicy.DEFAULT_BACKOFF_MULT)
           }
         }
     requestQueue.add(jsonObjectRequest)
