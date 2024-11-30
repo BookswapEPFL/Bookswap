@@ -96,7 +96,7 @@ class NavigationActionsTest {
 
   @Test
   fun `go back when previous route is AUTH does nothing`() {
-    val mockPreviousBackStackEntry : NavBackStackEntry? = mockk()
+    val mockPreviousBackStackEntry: NavBackStackEntry? = mockk()
     every { mockPreviousBackStackEntry?.destination?.route } returns C.Route.AUTH
 
     every { navHostController.previousBackStackEntry } returns mockPreviousBackStackEntry

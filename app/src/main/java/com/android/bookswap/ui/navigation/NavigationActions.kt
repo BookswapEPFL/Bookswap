@@ -98,7 +98,6 @@ open class NavigationActions(
     if (previousBackStackEntry?.destination?.route != C.Route.AUTH) {
       navController.popBackStack()
     }
-
   }
 
   /**
