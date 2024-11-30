@@ -1,8 +1,11 @@
 package com.android.bookswap.ui.components
 
+import android.util.Log
 import androidx.compose.foundation.gestures.ScrollableDefaults
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -11,8 +14,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import com.android.bookswap.data.DataBook
 import com.android.bookswap.resources.C
 
@@ -33,28 +38,13 @@ fun BookListComponent(
     modifier: Modifier = Modifier,
     bookList: List<DataBook> = emptyList(),
 ) {
-  LazyColumn(
-      modifier = modifier.fillMaxWidth().testTag(C.Tag.BookListComp.book_list_container),
-      state = rememberLazyListState(),
-      contentPadding = PaddingValues(PADDING_HORIZONTAL_DP, PADDING_VERTICAL_DP),
-      horizontalAlignment = Alignment.CenterHorizontally,
-      flingBehavior = ScrollableDefaults.flingBehavior(),
-      userScrollEnabled = true,
-  ) {
-    if (bookList.isEmpty()) {
-      item {
-        Text(text = "No books to display", Modifier.testTag(C.Tag.BookListComp.empty_list_text))
-      }
-    } else {
-      itemsIndexed(bookList) { i, book ->
-        BookDisplayComponent(
-            Modifier.testTag("${i}_" + C.Tag.BookDisplayComp.book_display_container), book = book)
-        if (i < bookList.size - 1) {
-          HorizontalDivider(
-              modifier = Modifier.testTag(C.Tag.BookListComp.divider),
-          )
+    Column(modifier = modifier) {
+        for (book in bookList) {
+            Text(
+                text = "Title: ${book.title}",
+                color = Color.Black,
+                modifier = Modifier.padding(8.dp)
+            )
         }
-      }
     }
-  }
 }

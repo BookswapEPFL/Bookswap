@@ -224,9 +224,7 @@ class MainActivity : ComponentActivity() {
               tabList = List_Navigation_Bar_Destinations,
               selectedItem = s ?: "")
         }
-      LaunchedEffect(Unit) {
-          addMessages(messageRepository)
-      }  
+    LaunchedEffect(Unit) { addMessages(messageRepository) }
 
     NavHost(navController = navController, startDestination = startDestination) {
       navigation(startDestination = C.Screen.AUTH, route = C.Route.AUTH) {
@@ -337,61 +335,58 @@ class MainActivity : ComponentActivity() {
           }
         }
       }
-        navigation(startDestination = C.Screen.OTHERS_USER_PROFILE, route = C.Route.OTHERS_USER_PROFILE) {
+      navigation(
+          startDestination = C.Screen.OTHERS_USER_PROFILE, route = C.Route.OTHERS_USER_PROFILE) {
             // OthersUserProfileScreen :
             composable("${C.Screen.OTHERS_USER_PROFILE}/{userId}") { backStackEntry ->
-                val userId =
-                    backStackEntry.arguments?.getString("userId")?.let { UUID.fromString(it) }
-                if (userId != null) {
-                    OthersUserProfileScreen(
-                        userId = userId,
-                        booksRepository = bookRepository,
-                        topAppBar = { topAppBar("User Profile") },
-                        bottomAppBar = { bottomAppBar(this@navigation.route ?: "") }
-                    )
-                } else {
-                    Log.e("Navigation", "Invalid userId passed to OthersUserProfileScreen")
-                }
+              val userId =
+                  backStackEntry.arguments?.getString("userId")?.let { UUID.fromString(it) }
+              Log.e("Main Launch OthersUserProfile", "userId: $userId")
+              if (userId != null) {
+                OthersUserProfileScreen(
+                    userId = userId,
+                    booksRepository = bookRepository,
+                    topAppBar = { topAppBar("User Profile") },
+                    bottomAppBar = { bottomAppBar(this@navigation.route ?: "") })
+              } else {
+                Log.e("Navigation", "Invalid userId passed to OthersUserProfileScreen")
+              }
             }
-        }
+          }
     }
   }
 
-    private fun addMessages(messageRepository: MessageRepository) {
-        val currentUserUUID = UUID.fromString("2d085e58-d94b-4037-ba5e-f470c22fb364")
-        val otherUserUUID = UUID.fromString("b0f03c68-9a90-4984-9e11-75839050f068")
+  private fun addMessages(messageRepository: MessageRepository) {
+    val currentUserUUID = UUID.fromString("2d085e58-d94b-4037-ba5e-f470c22fb364")
+    val otherUserUUID = UUID.fromString("77942cd7-8b99-41ba-a0a5-147214703434")
 
-        val testMessages = listOf(
+    val testMessages =
+        listOf(
             DataMessage(
                 uuid = UUID.randomUUID(),
                 text = "Hello! This is a test message from the other user.",
                 senderUUID = otherUserUUID,
                 receiverUUID = currentUserUUID,
                 messageType = MessageType.TEXT,
-                timestamp = System.currentTimeMillis()
-            ),
+                timestamp = System.currentTimeMillis()),
             DataMessage(
                 uuid = UUID.randomUUID(),
                 text = "Hi! Nice to meet you.",
                 senderUUID = currentUserUUID,
                 receiverUUID = otherUserUUID,
                 messageType = MessageType.TEXT,
-                timestamp = System.currentTimeMillis() - 60000
-            )
-        )
+                timestamp = System.currentTimeMillis() - 60000))
 
-        testMessages.forEach { message ->
-            messageRepository.sendMessage(
-                message = message,
-                callback = { result ->
-                    if (result.isSuccess) {
-                        Log.e("Add message", "Message added successfully: ${message.text}")
-                    } else {
-                        Log.e("Add message", "Failed to add message: ${message.text}")
-                    }
-                }
-            )
-        }
+    testMessages.forEach { message ->
+      messageRepository.sendMessage(
+          message = message,
+          callback = { result ->
+            if (result.isSuccess) {
+              Log.e("Add message", "Message added successfully: ${message.text}")
+            } else {
+              Log.e("Add message", "Failed to add message: ${message.text}")
+            }
+          })
     }
-
+  }
 }

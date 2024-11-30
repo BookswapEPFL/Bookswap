@@ -183,11 +183,14 @@ fun MapScreen(
                             coroutineScope.launch {
                               computePositionOfMarker(cameraPositionState, markerState.position)
                             }
-                              // Navigate to the user profile
-                              navigationActions.navigateTo(
-                                  screen = C.Screen.USER_PROFILE,
-                                  UUID = item.userUUID.toString() // Assuming `item` has a unique UUID field called `id`
-                              )
+                            // Navigate to the user profile
+                            navigationActions.navigateTo(
+                                screen = C.Screen.USER_PROFILE,
+                                UUID =
+                                    item.userUUID
+                                        .toString() // Assuming `item` has a unique UUID field
+                                // called `id`
+                                )
                             false
                           })
                     }
