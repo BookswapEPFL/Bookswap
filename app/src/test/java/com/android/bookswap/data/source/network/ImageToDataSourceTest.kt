@@ -123,7 +123,7 @@ class ImageToDataSourceTest {
 
     imageToDataSource.analyzeImage(
         imageUrl,
-        onSuccess = { fail("Expected error callback but got success with data: $it") },
-        onError = { error -> assertTrue(error.contains("Parsing error")) })
+        onSuccess = { result -> assertEquals(result["title"], ImageToDataSource.UNDEFINED_ATTRIBUTE) },
+        onError = { fail("Expected error callback but got error: $it") })
   }
 }
