@@ -67,45 +67,50 @@ fun AddISBNScreen(
                         labelText = "ISBN*",
                         value = isbn,
                         maxLength = MAXLENGTHISBN) {
-                          if (inputVerification.testIsbn(it)) {
-                            isbn = it
-                            Log.d("ISBN Input", "Updated ISBN: $isbn")
-                          }
+                          isbn = it
+                          Log.d("ISBN Input", "Updated ISBN: $isbn")
                         }
                     ButtonComponent(
                         modifier = Modifier.testTag(C.Tag.NewBookISBN.search),
                         onClick = {
-                          GoogleBookDataSource(context).getBookFromISBN(
-                              isbn, appConfig.userViewModel.uuid) { result ->
-                                if (result.isFailure) {
-                                  Toast.makeText(context, "Search unsuccessful", Toast.LENGTH_LONG)
-                                      .show()
-                                  Log.e("AddBook", result.exceptionOrNull().toString())
-                                } else {
-                                  booksRepository.addBook(
-                                      result.getOrThrow(),
-                                      callback = { res ->
-                                        if (res.isSuccess) {
-                                          val newBookList =
-                                              appConfig.userViewModel.getUser().bookList +
-                                                  result.getOrNull()?.uuid!!
-                                          appConfig.userViewModel.updateUser(bookList = newBookList)
-                                          Toast.makeText(
-                                                  context,
-                                                  "${result.getOrNull()?.title} added",
-                                                  Toast.LENGTH_LONG)
-                                              .show()
-                                          navigationActions.navigateTo(
-                                              TopLevelDestinations.NEW_BOOK)
-                                        } else {
-                                          val error = res.exceptionOrNull()!!
-                                          Log.e("AddBook", res.toString())
-                                          Toast.makeText(context, error.message, Toast.LENGTH_LONG)
-                                              .show()
-                                        }
-                                      })
+                          if (inputVerification.testIsbn(isbn)) {
+                            GoogleBookDataSource(context).getBookFromISBN(
+                                isbn, appConfig.userViewModel.uuid) { result ->
+                                  if (result.isFailure) {
+                                    Toast.makeText(
+                                            context, "Search unsuccessful", Toast.LENGTH_LONG)
+                                        .show()
+                                    Log.e("AddBook", result.exceptionOrNull().toString())
+                                  } else {
+                                    booksRepository.addBook(
+                                        result.getOrThrow(),
+                                        callback = { res ->
+                                          if (res.isSuccess) {
+                                            val newBookList =
+                                                appConfig.userViewModel.getUser().bookList +
+                                                    result.getOrNull()?.uuid!!
+                                            appConfig.userViewModel.updateUser(
+                                                bookList = newBookList)
+                                            Toast.makeText(
+                                                    context,
+                                                    "${result.getOrNull()?.title} added",
+                                                    Toast.LENGTH_LONG)
+                                                .show()
+                                            navigationActions.navigateTo(
+                                                TopLevelDestinations.NEW_BOOK)
+                                          } else {
+                                            val error = res.exceptionOrNull()!!
+                                            Log.e("AddBook", res.toString())
+                                            Toast.makeText(
+                                                    context, error.message, Toast.LENGTH_LONG)
+                                                .show()
+                                          }
+                                        })
+                                  }
                                 }
-                              }
+                          } else {
+                            Toast.makeText(context, "Invalid ISBN", Toast.LENGTH_LONG).show()
+                          }
                         }) {
                           Row(verticalAlignment = Alignment.CenterVertically) {
                             Text("Search")
