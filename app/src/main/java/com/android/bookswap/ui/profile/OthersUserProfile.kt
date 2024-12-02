@@ -45,7 +45,7 @@ fun OthersUserProfileScreen(
     userId: UUID,
     otherUserVM: OthersUserViewModel = OthersUserViewModel(userId),
     booksRepository: BooksRepository,
-    UserBookViewModel: UserBookViewModel = UserBookViewModel(booksRepository),
+    userBookViewModel: UserBookViewModel = UserBookViewModel(booksRepository),
     topAppBar: @Composable () -> Unit = {},
     bottomAppBar: @Composable () -> Unit = {}
 ) {
@@ -72,7 +72,7 @@ fun OthersUserProfileScreen(
 
     isBooksLoading = true
     try {
-      bookListData.value = UserBookViewModel.getBooks(user.bookList)
+      bookListData.value = userBookViewModel.getBooks(user.bookList)
     } catch (exception: Exception) {
       Log.e("OtherUserProfileScreen", "Error fetching books: $exception")
     } finally {
@@ -119,56 +119,20 @@ fun OthersUserProfileScreen(
                             modifier = Modifier.size(80.dp),
                             tint = ColorVariable.Accent)
                       }
-                    } /*
-                      Column(
-                          modifier = Modifier.fillMaxHeight().fillMaxWidth(),
-                          verticalArrangement = Arrangement.spacedBy(4.dp),
-                          horizontalAlignment = Alignment.CenterHorizontally
-                      ) {*/
+                    }
 
-                // Full Name
-
+                // Full Name:
                 LabeledText(
-                    label = "Name:", value = "${user.greeting} ${user.firstName} ${user.lastName}")
+                    label = "Name:", value = "${user.firstName} ${user.lastName}")
 
-                // Email
+                // Email:
                 LabeledText(label = "Email:", value = user.email)
 
-                // Phone Number
+                // Phone Number:
                 LabeledText(label = "Phone:", value = user.phoneNumber)
 
-                // Address
+                // Address:
                 LabeledText(label = "Address:", value = "${user.latitude}, ${user.longitude}")
-                // }
-
-                // }
-
-                val testBooks =
-                    listOf(
-                        DataBook(
-                            uuid = UUID.randomUUID(),
-                            title = "Test Book 1",
-                            author = "Author 1",
-                            description = "Description 1",
-                            rating = 4,
-                            photo = null,
-                            language = BookLanguages.OTHER,
-                            isbn = null,
-                            genres = emptyList(),
-                            userId = UUID.randomUUID()),
-                        DataBook(
-                            uuid = UUID.randomUUID(),
-                            title = "Test Book 2",
-                            author = "Author 2",
-                            description = "Description 2",
-                            rating = 5,
-                            photo = null,
-                            language = BookLanguages.OTHER,
-                            isbn = null,
-                            genres = emptyList(),
-                            userId = UUID.randomUUID()))
-
-                BookListComponent(modifier = Modifier.fillMaxWidth(), bookList = testBooks)
 
                 // Book List
                 if (isBooksLoading) {
@@ -187,14 +151,6 @@ fun OthersUserProfileScreen(
                       // .border(2.dp, Color.Red),    // Debug border,
                       bookList = bookListData.value)
                 }
-                /*
-                BookListComponent(
-                    modifier = Modifier.testTag("otherUserBookList"),
-                    bookList = bookListData,
-                    // bc it is a list of UUIDs I maybe need to retrieve each book before
-                    // or maybe the retrieval of the books should be done in the booklist composable
-                )
-                */
               }
         }
       }
