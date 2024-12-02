@@ -183,15 +183,12 @@ class BookManagerViewModel(
   private fun computeDistanceOfUsers() {
     computeDistanceOfUsersJob =
         scope.launch {
-          combine(_allUsers, geolocation.latitude, geolocation.longitude) {
-                  users,
-                  latitude,
-                  longitude ->
+          combine(_allUsers, geolocation.userLocation.filterNotNull()) { users, userLoc ->
                 val userDistance =
                     users.map { user ->
                       user to
                           computingDistanceMethod(
-                              latitude, longitude, user.latitude, user.longitude)
+                              userLoc.latitude, userLoc.longitude, user.latitude, user.longitude)
                     }
                 userDistance.sortedBy { it.second }
               }
