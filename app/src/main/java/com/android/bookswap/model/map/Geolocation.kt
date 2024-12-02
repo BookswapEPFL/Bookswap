@@ -10,6 +10,7 @@ import android.location.Geocoder
 import android.os.Build
 import android.os.Looper
 import androidx.annotation.RequiresApi
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.ViewModel
@@ -20,13 +21,17 @@ import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
+import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 const val REQUEST_LOCATION_PERMISSION = 1
 const val BACKGROUND_LOCATION_PERMISSION_REQUEST_CODE = 2
+const val LOCATION_REFRESH_DELAY = 500L
+const val MIN_UPDATE_DISTANCE_METERS = 20F
 
 /**
  * Geolocation class manages the geolocation functionality and handles the required permissions for
@@ -43,13 +48,14 @@ class Geolocation(private val activity: Activity) : IGeolocation {
   private val fusedLocationClient: FusedLocationProviderClient =
       LocationServices.getFusedLocationProviderClient(activity)
   val isRunning = mutableStateOf(false)
-  override val latitude = MutableStateFlow(Double.NaN)
-  override val longitude = MutableStateFlow(Double.NaN)
+  private val _userLoc = MutableStateFlow<LatLng?>(null)
+
+  override val userLocation = _userLoc.asStateFlow()
 
   /** Location request settings */
   private val locationRequest: LocationRequest =
-      LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 500)
-          .setMinUpdateDistanceMeters(20f)
+      LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, LOCATION_REFRESH_DELAY)
+          .setMinUpdateDistanceMeters(MIN_UPDATE_DISTANCE_METERS)
           .build()
   /**
    * Callback for location updates.
@@ -60,18 +66,9 @@ class Geolocation(private val activity: Activity) : IGeolocation {
   private val locationCallback =
       object : LocationCallback() {
         override fun onLocationResult(p0: LocationResult) {
-          p0.lastLocation.let { location ->
+          p0.lastLocation?.let {
             // Handle the updated location here
-            when ((location != null)) {
-              true -> {
-                latitude.value = location.latitude
-                longitude.value = location.longitude
-              }
-              false -> {
-                latitude.value = 0.0
-                longitude.value = 0.0
-              }
-            }
+            _userLoc.value = LatLng(it.latitude, it.longitude)
           }
         }
       }
@@ -115,6 +112,9 @@ class Geolocation(private val activity: Activity) : IGeolocation {
           requestBackgroundPermissions()
         }
         // can run without ACCESS_BACKGROUND_LOCATION but it is better if we have the permission
+        fusedLocationClient.lastLocation.addOnSuccessListener {
+          _userLoc.compareAndSet(null, LatLng(it.latitude, it.longitude))
+        }
         fusedLocationClient.requestLocationUpdates(
             locationRequest, locationCallback, Looper.getMainLooper())
         isRunning.value = true
@@ -132,21 +132,22 @@ class Geolocation(private val activity: Activity) : IGeolocation {
   /** Stop location updates */
   override fun stopLocationUpdates() {
     fusedLocationClient.removeLocationUpdates(locationCallback)
+    _userLoc.value = null
     isRunning.value = false
   }
 }
 
-object GeoLocVewModel : ViewModel() {
+object GeoLocViewModel : ViewModel() {
   lateinit var address: Address
-  var addressStr = MutableStateFlow("")
+  private val _addressStr = MutableStateFlow("")
+  val addressStr = _addressStr.asStateFlow()
 
-  fun getPlace(latitude: Double, longitude: Double, context: Context): String {
+  fun getPlace(latitude: Double, longitude: Double, context: Context) {
 
-    android.util.Log.d("TAG_GEOLOCATION", "getPlace($latitude,$longitude)")
     val handleAddresses: (MutableList<Address>?) -> Unit = {
       if (!it.isNullOrEmpty()) {
         address = it.first()
-        addressStr.value =
+        _addressStr.value =
             address.let {
               var s = ""
               for (i in 0..it.maxAddressLineIndex) {
@@ -154,7 +155,6 @@ object GeoLocVewModel : ViewModel() {
               }
               s
             }
-        android.util.Log.d("TAG_GEOLOCATION", "address:|${addressStr.value}|")
       } else {
         // android.util.Log.wtf("TAG_GEOLOCATION", "Address list empty !")
       }
@@ -172,6 +172,5 @@ object GeoLocVewModel : ViewModel() {
         }
       }
     }
-    return addressStr.value
   }
 }

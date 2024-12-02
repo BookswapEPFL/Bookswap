@@ -1,6 +1,7 @@
 package com.android.bookswap.model.map
 
-import kotlinx.coroutines.flow.MutableStateFlow
+import com.google.android.gms.maps.model.LatLng
+import kotlinx.coroutines.flow.StateFlow
 
 /**
  * Interface for providing geolocation data, with basic location management functionality.
@@ -12,8 +13,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
  * the use of mock or fake data sources.
  */
 interface IGeolocation {
-  val latitude: MutableStateFlow<Double>
-  val longitude: MutableStateFlow<Double>
+  val userLocation: StateFlow<LatLng?>
+
   /**
    * Starts location updates.
    *

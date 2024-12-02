@@ -2,7 +2,9 @@ package com.android.bookswap.model.map
 
 import android.util.Log
 import androidx.compose.runtime.mutableStateOf
+import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 
 /**
  * Mock implementation of [IGeolocation] for testing purposes.
@@ -17,8 +19,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
  *   environment.
  */
 class DefaultGeolocation : IGeolocation {
-  override val latitude = MutableStateFlow(0.0)
-  override val longitude = MutableStateFlow(0.0)
+  private val _userLoc = MutableStateFlow(LatLng(0.0, 0.0))
+  override val userLocation = _userLoc.asStateFlow()
   private val isRunning = mutableStateOf(false)
   /**
    * Starts location updates.
@@ -48,8 +50,7 @@ class DefaultGeolocation : IGeolocation {
    */
   fun moveLocation(latitude: Double, longitude: Double) {
     if (isRunning.value) {
-      this.latitude.value = latitude
-      this.longitude.value = longitude
+      this._userLoc.value = LatLng(latitude, longitude)
     } else {
       Log.d("DefaultGeolocation", "Location updates are not running")
     }
