@@ -33,28 +33,28 @@ fun BookListComponent(
     modifier: Modifier = Modifier,
     bookList: List<DataBook> = emptyList(),
 ) {
-    LazyColumn(
-        modifier = modifier.fillMaxWidth().testTag(C.Tag.BookListComp.book_list_container),
-        state = rememberLazyListState(),
-        contentPadding = PaddingValues(PADDING_HORIZONTAL_DP, PADDING_VERTICAL_DP),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        flingBehavior = ScrollableDefaults.flingBehavior(),
-        userScrollEnabled = true,
-    ) {
-        if (bookList.isEmpty()) {
-            item {
-                Text(text = "No books to display", Modifier.testTag(C.Tag.BookListComp.empty_list_text))
-            }
-        } else {
-            itemsIndexed(bookList) { i, book ->
-                BookDisplayComponent(
-                    Modifier.testTag("${i}_" + C.Tag.BookDisplayComp.book_display_container), book = book)
-                if (i < bookList.size - 1) {
-                    HorizontalDivider(
-                        modifier = Modifier.testTag(C.Tag.BookListComp.divider),
-                    )
-                }
-            }
+  LazyColumn(
+      modifier = modifier.fillMaxWidth().testTag(C.Tag.BookListComp.book_list_container),
+      state = rememberLazyListState(),
+      contentPadding = PaddingValues(PADDING_HORIZONTAL_DP, PADDING_VERTICAL_DP),
+      horizontalAlignment = Alignment.CenterHorizontally,
+      flingBehavior = ScrollableDefaults.flingBehavior(),
+      userScrollEnabled = true,
+  ) {
+    if (bookList.isEmpty()) {
+      item {
+        Text(text = "No books to display", Modifier.testTag(C.Tag.BookListComp.empty_list_text))
+      }
+    } else {
+      itemsIndexed(bookList) { i, book ->
+        BookDisplayComponent(
+            Modifier.testTag("${i}_" + C.Tag.BookDisplayComp.book_display_container), book = book)
+        if (i < bookList.size - 1) {
+          HorizontalDivider(
+              modifier = Modifier.testTag(C.Tag.BookListComp.divider),
+          )
         }
+      }
     }
+  }
 }

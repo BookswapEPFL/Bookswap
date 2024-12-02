@@ -56,86 +56,85 @@ val STAR_SIZE_DP = 26.dp
  */
 @Composable
 fun BookDisplayComponent(modifier: Modifier = Modifier, book: DataBook) {
-    Row(
-        modifier =
-        modifier
-            .fillMaxWidth()
-            .heightIn(
-                min = IMAGE_HEIGHT_DP + PADDING_VERTICAL_DP * 2,
-                max = IMAGE_HEIGHT_DP + PADDING_VERTICAL_DP * 2)
-            .padding(PADDING_HORIZONTAL_DP, PADDING_VERTICAL_DP),
-        horizontalArrangement = Arrangement.Start,
-        verticalAlignment = Alignment.CenterVertically) {
-
+  Row(
+      modifier =
+          modifier
+              .fillMaxWidth()
+              .heightIn(
+                  min = IMAGE_HEIGHT_DP + PADDING_VERTICAL_DP * 2,
+                  max = IMAGE_HEIGHT_DP + PADDING_VERTICAL_DP * 2)
+              .padding(PADDING_HORIZONTAL_DP, PADDING_VERTICAL_DP),
+      horizontalArrangement = Arrangement.Start,
+      verticalAlignment = Alignment.CenterVertically) {
         Log.d("BookDisplayComponent", "Displaying book: ${book.title} by ${book.author}")
         // Image Box
         Box(
             modifier =
-            Modifier.height(IMAGE_HEIGHT_DP)
-                .width(IMAGE_WIDTH_DP)
-                .testTag(C.Tag.BookDisplayComp.image),
+                Modifier.height(IMAGE_HEIGHT_DP)
+                    .width(IMAGE_WIDTH_DP)
+                    .testTag(C.Tag.BookDisplayComp.image),
             contentAlignment = Alignment.Center,
         ) {
-            // Image of the books, will be added at a later date
-            // We didn't discussed about how we will store the image or how we
-            // will
-            // encode them
-            Box(
-                modifier = Modifier.fillMaxSize().background(Color.Gray) // Placeholder for the image
-            )
+          // Image of the books, will be added at a later date
+          // We didn't discussed about how we will store the image or how we
+          // will
+          // encode them
+          Box(
+              modifier = Modifier.fillMaxSize().background(Color.Gray) // Placeholder for the image
+              )
         }
         Row(verticalAlignment = Alignment.CenterVertically) {
 
-            // Column for Title and Author text components
-            Column(
-                modifier =
-                Modifier.weight(1f, true)
-                    .padding(horizontal = PADDING_HORIZONTAL_DP)
-                    .heightIn(max = IMAGE_HEIGHT_DP + PADDING_VERTICAL_DP * 2)
-                    .testTag(C.Tag.BookDisplayComp.middle_container)) {
+          // Column for Title and Author text components
+          Column(
+              modifier =
+                  Modifier.weight(1f, true)
+                      .padding(horizontal = PADDING_HORIZONTAL_DP)
+                      .heightIn(max = IMAGE_HEIGHT_DP + PADDING_VERTICAL_DP * 2)
+                      .testTag(C.Tag.BookDisplayComp.middle_container)) {
                 Text(
                     text = book.title,
                     overflow = TextOverflow.Ellipsis,
                     style = MaterialTheme.typography.titleLarge,
                     color = ColorVariable.Accent,
                     modifier =
-                    Modifier.weight(1f, true)
-                        // .padding(bottom = PADDING_VERTICAL_DP)
-                        .testTag(C.Tag.BookDisplayComp.title))
+                        Modifier.weight(1f, true)
+                            // .padding(bottom = PADDING_VERTICAL_DP)
+                            .testTag(C.Tag.BookDisplayComp.title))
                 Text(
                     text = book.author ?: "",
                     overflow = TextOverflow.Ellipsis,
                     color = ColorVariable.AccentSecondary,
                     maxLines = 1,
                     modifier = Modifier.testTag(C.Tag.BookDisplayComp.author))
-            }
+              }
 
-            // Column for rating and genres
-            Column(
-                modifier =
-                Modifier.requiredWidth(STAR_SIZE_DP * MAX_RATING + PADDING_HORIZONTAL_DP * 2)
-                    .width(STAR_SIZE_DP * MAX_RATING + PADDING_HORIZONTAL_DP * 2)
-                    .testTag(C.Tag.BookDisplayComp.right_container),
-                horizontalAlignment = Alignment.CenterHorizontally) {
+          // Column for rating and genres
+          Column(
+              modifier =
+                  Modifier.requiredWidth(STAR_SIZE_DP * MAX_RATING + PADDING_HORIZONTAL_DP * 2)
+                      .width(STAR_SIZE_DP * MAX_RATING + PADDING_HORIZONTAL_DP * 2)
+                      .testTag(C.Tag.BookDisplayComp.right_container),
+              horizontalAlignment = Alignment.CenterHorizontally) {
                 Row(
                     modifier = Modifier.fillMaxWidth().testTag(C.Tag.BookDisplayComp.rating),
                     horizontalArrangement = Arrangement.Center) {
-                    // leave all stars empty if no rating
-                    DisplayStarReview(book.rating ?: 0)
-                }
+                      // leave all stars empty if no rating
+                      DisplayStarReview(book.rating ?: 0)
+                    }
                 // text for the tags of the book, will be added at a later date
                 // It isn't decided how we will handle the tag for the books
                 Text(
                     text = book.genres.joinToString(separator = ", ") { it.Genre },
                     modifier =
-                    Modifier.fillMaxWidth()
-                        .clipToBounds()
-                        .testTag(C.Tag.BookDisplayComp.genres),
+                        Modifier.fillMaxWidth()
+                            .clipToBounds()
+                            .testTag(C.Tag.BookDisplayComp.genres),
                     overflow = TextOverflow.Ellipsis,
                     color = ColorVariable.AccentSecondary)
-            }
+              }
         }
-    }
+      }
 }
 /**
  * Displays a star rating for a book.
@@ -147,26 +146,26 @@ fun BookDisplayComponent(modifier: Modifier = Modifier, book: DataBook) {
  */
 @Composable
 private fun DisplayStarReview(rating: Int) {
-    for (i in 1..rating) {
-        Box(modifier = Modifier.width(STAR_SIZE_DP).testTag(C.Tag.BookDisplayComp.filled_star)) {
-            Icon(
-                imageVector = Icons.Filled.Star,
-                contentDescription = "Star Icon",
-                tint =
-                MaterialTheme.colorScheme.outline.let {
-                    it.copy(1f, it.red * 0.75f, it.green * 0.75f, it.blue * 0.75f)
-                },
-                modifier = Modifier.size(STAR_SIZE_DP))
-        }
+  for (i in 1..rating) {
+    Box(modifier = Modifier.width(STAR_SIZE_DP).testTag(C.Tag.BookDisplayComp.filled_star)) {
+      Icon(
+          imageVector = Icons.Filled.Star,
+          contentDescription = "Star Icon",
+          tint =
+              MaterialTheme.colorScheme.outline.let {
+                it.copy(1f, it.red * 0.75f, it.green * 0.75f, it.blue * 0.75f)
+              },
+          modifier = Modifier.size(STAR_SIZE_DP))
     }
-    for (i in rating + 1..MAX_RATING) {
-        // Hollow star
-        Box(modifier = Modifier.width(STAR_SIZE_DP).testTag(C.Tag.BookDisplayComp.hollow_star)) {
-            Icon(
-                imageVector = Icons.TwoTone.Star,
-                contentDescription = "Star Icon",
-                tint = MaterialTheme.colorScheme.outline,
-                modifier = Modifier.size(STAR_SIZE_DP))
-        }
+  }
+  for (i in rating + 1..MAX_RATING) {
+    // Hollow star
+    Box(modifier = Modifier.width(STAR_SIZE_DP).testTag(C.Tag.BookDisplayComp.hollow_star)) {
+      Icon(
+          imageVector = Icons.TwoTone.Star,
+          contentDescription = "Star Icon",
+          tint = MaterialTheme.colorScheme.outline,
+          modifier = Modifier.size(STAR_SIZE_DP))
     }
+  }
 }
