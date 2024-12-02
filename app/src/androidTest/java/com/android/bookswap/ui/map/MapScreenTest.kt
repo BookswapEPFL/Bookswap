@@ -295,7 +295,9 @@ class MapScreenTest {
     val node1 = composeTestRule.onNodeWithTag(C.Tag.Map.google_map).fetchSemanticsNode()
     val cameraPositionState: CameraPositionState? = node1.config.getOrNull(CameraPositionKey)
 
-    assertEquals(geolocation.userLocation.value.latitude, cameraPositionState?.position?.target?.latitude)
-    assertEquals(geolocation.userLocation.value.longitude, cameraPositionState?.position?.target?.longitude)
+    assertEquals(
+        geolocation.userLocation.value.latitude, cameraPositionState?.position?.target?.latitude)
+    assertEquals(
+        geolocation.userLocation.value.longitude, cameraPositionState?.position?.target?.longitude)
   }
 }

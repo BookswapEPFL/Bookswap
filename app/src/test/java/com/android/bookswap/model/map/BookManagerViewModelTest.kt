@@ -14,7 +14,6 @@ import java.util.UUID
 import junit.framework.TestCase.assertEquals
 import kotlin.math.abs
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
@@ -111,9 +110,15 @@ class BookManagerViewModelTest {
           firstArg<(Result<List<DataUser>>) -> Unit>().invoke(Result.success(users))
         }
 
-    every { mockGeolocation1.userLocation } answers { MutableStateFlow(LatLng(geolocation1[1],geolocation1[0])).asStateFlow() }
+    every { mockGeolocation1.userLocation } answers
+        {
+          MutableStateFlow(LatLng(geolocation1[1], geolocation1[0])).asStateFlow()
+        }
 
-    every { mockGeolocation2.userLocation } answers { MutableStateFlow(LatLng(geolocation2[1],geolocation2[0])).asStateFlow() }
+    every { mockGeolocation2.userLocation } answers
+        {
+          MutableStateFlow(LatLng(geolocation2[1], geolocation2[0])).asStateFlow()
+        }
 
     every { mockBookFilter.genresFilter } answers { MutableStateFlow(listOf(BookGenres.HORROR)) }
     every { mockBookFilter.languagesFilter } answers

@@ -161,8 +161,7 @@ fun MapScreen(
               GoogleMap(
                   onMapLoaded = {
                     cameraPositionState.position =
-                        CameraPosition.fromLatLngZoom(
-                            userLoc ?: userVM.latlng, INIT_ZOOM)
+                        CameraPosition.fromLatLngZoom(userLoc ?: userVM.latlng, INIT_ZOOM)
                   },
                   onMapClick = { mutableStateSelectedUser = NO_USER_SELECTED },
                   modifier =

@@ -135,7 +135,7 @@ open class UserViewModel(
   }
 
   fun getLocationPlace(context: Context): StateFlow<String> {
-	GeoLocViewModel.getPlace(lat, lon, context)
+    GeoLocViewModel.getPlace(lat, lon, context)
     return GeoLocViewModel.addressStr
   }
 }

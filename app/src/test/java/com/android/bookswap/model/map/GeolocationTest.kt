@@ -6,7 +6,6 @@ import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Looper
 import androidx.core.app.ActivityCompat
-import coil.compose.AsyncImagePainter
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
@@ -59,9 +58,7 @@ class GeolocationTest {
     every {
       mockActivity.checkPermission(Manifest.permission.ACCESS_BACKGROUND_LOCATION, any(), any())
     } returns PackageManager.PERMISSION_GRANTED
-	every {
-	  mockFusedLocationClient.lastLocation
-	} returns Tasks.forResult(null)
+    every { mockFusedLocationClient.lastLocation } returns Tasks.forResult(null)
     every {
       mockFusedLocationClient.requestLocationUpdates(
           any(), any<LocationCallback>(), Looper.getMainLooper())
@@ -112,9 +109,7 @@ class GeolocationTest {
       ActivityCompat.checkSelfPermission(
           mockActivity, Manifest.permission.ACCESS_BACKGROUND_LOCATION)
     } returns PackageManager.PERMISSION_DENIED
-	every {
-	  mockFusedLocationClient.lastLocation
-	} returns Tasks.forResult(null)
+    every { mockFusedLocationClient.lastLocation } returns Tasks.forResult(null)
 
     // Mock ActivityCompat.requestPermissions (static method)
     mockkStatic(ActivityCompat::class)
@@ -177,9 +172,7 @@ class GeolocationTest {
       mockFusedLocationClient.requestLocationUpdates(
           any(), any<LocationCallback>(), Looper.getMainLooper())
     } returns Tasks.forResult(null)
-	every {
-	  mockFusedLocationClient.lastLocation
-	} returns Tasks.forResult(null)
+    every { mockFusedLocationClient.lastLocation } returns Tasks.forResult(null)
     every { mockFusedLocationClient.removeLocationUpdates(any<LocationCallback>()) } returns
         Tasks.forResult(null)
     every {
@@ -204,9 +197,9 @@ class GeolocationTest {
     every {
       mockActivity.checkPermission(Manifest.permission.ACCESS_BACKGROUND_LOCATION, any(), any())
     } returns PackageManager.PERMISSION_GRANTED
-	val mockDefaultLocation: Location = mockk()
-	every { mockDefaultLocation.latitude } returns 0.0
-	every { mockDefaultLocation.longitude } returns 0.0
+    val mockDefaultLocation: Location = mockk()
+    every { mockDefaultLocation.latitude } returns 0.0
+    every { mockDefaultLocation.longitude } returns 0.0
     val mockLocation: Location = mockk()
     every { mockLocation.latitude } returns 37.7749
     every { mockLocation.longitude } returns -122.4194
@@ -221,9 +214,7 @@ class GeolocationTest {
       mockFusedLocationClient.requestLocationUpdates(
           any<LocationRequest>(), capture(locationCallbackSlot), any<Looper>())
     } returns mockk()
-	every {
-	  mockFusedLocationClient.getLastLocation()
-	} returns Tasks.forResult(mockDefaultLocation)
+    every { mockFusedLocationClient.getLastLocation() } returns Tasks.forResult(mockDefaultLocation)
 
     geolocation.startLocationUpdates()
 

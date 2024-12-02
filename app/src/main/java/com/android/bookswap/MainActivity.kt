@@ -236,7 +236,7 @@ class MainActivity : ComponentActivity() {
         navigation(startDestination = C.Screen.USER_PROFILE, route = C.Route.USER_PROFILE) {
           composable(C.Screen.USER_PROFILE) {
             UserProfile(
-			  photoStorage,
+                photoStorage,
                 { topAppBar("Your Profile") },
                 { bottomAppBar(this@navigation.route ?: "") })
           }
