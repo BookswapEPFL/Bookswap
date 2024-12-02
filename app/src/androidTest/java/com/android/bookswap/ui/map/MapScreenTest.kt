@@ -25,6 +25,7 @@ import com.android.bookswap.model.map.BookManagerViewModel
 import com.android.bookswap.model.map.DefaultGeolocation
 import com.android.bookswap.resources.C
 import com.android.bookswap.ui.navigation.NavigationActions
+import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.CameraPositionState
 import io.mockk.every
 import io.mockk.just
@@ -105,7 +106,7 @@ class MapScreenTest {
   @Before
   fun setup() {
     every { mockBookManagerViewModel.filteredBooks } returns MutableStateFlow(books)
-
+    every { mockUserVM.latlng } returns LatLng(0.0, 0.0)
     every { mockBookManagerViewModel.filteredUsers } returns
         MutableStateFlow(userBooksWithLocationList)
     every { mockBookManagerViewModel.startUpdatingBooks() } just runs

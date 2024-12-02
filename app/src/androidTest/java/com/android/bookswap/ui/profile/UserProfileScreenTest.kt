@@ -129,7 +129,7 @@ class UserProfileScreenTest : TestCase() {
           }
           addressTxt {
             assertIsDisplayed()
-            assertTextEquals("0.0, 0.0")
+            assertTextEquals("address")
           }
           editProfileBtn {
             assertIsDisplayed()
