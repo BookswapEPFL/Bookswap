@@ -25,8 +25,8 @@ open class UserViewModel(
     private var dataUser: DataUser = DataUser(uuid) // Allows easier testing
 ) : ViewModel() {
   private var isLoaded = false
-  private val _isStored = MutableStateFlow<Boolean>(false)
-  val isStored: StateFlow<Boolean> = _isStored
+  private val _isStored = MutableStateFlow<Boolean?>(null)
+  val isStored: StateFlow<Boolean?> = _isStored
   var lat
     get() = dataUser.latitude
     set(v) {

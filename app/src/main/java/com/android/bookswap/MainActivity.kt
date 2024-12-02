@@ -129,14 +129,12 @@ class MainActivity : ComponentActivity() {
     val navigationActions = NavigationActions(navController)
 
     // user part
-    Firebase.auth.signOut() // Uncomment this line to test the sign in screen
+    // Firebase.auth.signOut() // Uncomment this line to test the sign in screen
     val currentUser = Firebase.auth.currentUser
     val userVM =
         UserViewModel(UUID.fromString("550e8400-e29b-41d4-a716-446655440000"), userRepository)
     if (currentUser != null) {
       userVM.getUserByGoogleUid(currentUser.uid) // This will scrap the user from the database
-    } else {
-      userVM.getUser(true)
     }
     // Message part
     val contactViewModel = ContactViewModel(userVM, userRepository, messageRepository)
