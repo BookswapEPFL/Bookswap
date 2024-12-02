@@ -2,13 +2,12 @@ package com.android.bookswap.model
 
 import android.content.Context
 import android.util.Log
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import com.android.bookswap.data.DataUser
 import com.android.bookswap.data.repository.UsersRepository
 import com.android.bookswap.data.source.network.UserFirestoreSource
-import com.android.bookswap.model.map.GeoLocVewModel
+import com.android.bookswap.model.map.GeoLocViewModel
+import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.firestore.FirebaseFirestore
 import java.util.UUID
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -39,6 +38,9 @@ open class UserViewModel(
     set(v) {
       dataUser.longitude = v
     }
+
+  val latlng
+    get() = LatLng(lat, lon)
 
   private val userRepository: UsersRepository = repository
 
@@ -137,9 +139,8 @@ open class UserViewModel(
     updateUser(dataUser)
   }
 
-  fun getLocationPlace(context: Context): MutableStateFlow<String> {
-    val place = GeoLocVewModel.getPlace(lat, lon, context)
-    android.util.Log.d("TAG_UserVM", "|$place|")
-    return GeoLocVewModel.addressStr
+  fun getLocationPlace(context: Context): StateFlow<String> {
+	GeoLocViewModel.getPlace(lat, lon, context)
+    return GeoLocViewModel.addressStr
   }
 }

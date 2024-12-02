@@ -49,7 +49,7 @@ fun UserProfile(
 
   var user = userVM.getUser()
   val context = LocalContext.current
-  var addrStr = userVM.getLocationPlace(LocalContext.current).collectAsState().value
+  val addrStr by userVM.getLocationPlace(context).collectAsState()
   var showEditProfile by remember { mutableStateOf(false) }
 
   var needRecompose by remember { mutableStateOf(false) }
@@ -75,8 +75,7 @@ fun UserProfile(
         },
         dataUser = user)
   }
-  // LaunchedEffect(Unit){addrStr = userVM.getLocationPlace(context).}
-  LaunchedEffect(userVM.uuid, userVM.lat, userVM.lon, needRecompose) {
+  LaunchedEffect(needRecompose) {
     user = userVM.getUser()
     needRecompose = false
   }
