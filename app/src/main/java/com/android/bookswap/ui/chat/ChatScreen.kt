@@ -154,7 +154,7 @@ fun ChatScreen(
         messageStorage.addMessage(message)
       }
       messageStorage.setMessages()
-      messageRepository.getMessages { result ->
+      messageRepository.getMessages(currentUser.userUUID, otherUser.userUUID) { result ->
         if (result.isSuccess) {
           messages =
               result
@@ -252,6 +252,8 @@ fun ChatScreen(
                       // Update the message
                       messageRepository.updateMessage(
                           selectedMessage!!.copy(text = newMessageText.text),
+                          currentUser.userUUID,
+                          otherUser.userUUID,
                           { result: Result<Unit> ->
                             if (result.isSuccess) {
                               Log.d("ChatScreen", "Message updated successfully")
@@ -344,6 +346,8 @@ fun ChatScreen(
                           selectedMessage?.let { message ->
                             messageRepository.deleteMessage(
                                 message.uuid,
+                                currentUser.userUUID,
+                                otherUser.userUUID,
                                 { result ->
                                   if (result.isSuccess) {
                                     Log.d("ChatScreen", "Message deleted successfully")
