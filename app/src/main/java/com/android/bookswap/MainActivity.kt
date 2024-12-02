@@ -224,7 +224,6 @@ class MainActivity : ComponentActivity() {
               tabList = List_Navigation_Bar_Destinations,
               selectedItem = s ?: "")
         }
-    LaunchedEffect(Unit) { addMessages(messageRepository) }
 
     NavHost(navController = navController, startDestination = startDestination) {
       navigation(startDestination = C.Screen.AUTH, route = C.Route.AUTH) {
@@ -355,38 +354,5 @@ class MainActivity : ComponentActivity() {
           }
     }
   }
-
-  private fun addMessages(messageRepository: MessageRepository) {
-    val currentUserUUID = UUID.fromString("2d085e58-d94b-4037-ba5e-f470c22fb364")
-    val otherUserUUID = UUID.fromString("77942cd7-8b99-41ba-a0a5-147214703434")
-
-    val testMessages =
-        listOf(
-            DataMessage(
-                uuid = UUID.randomUUID(),
-                text = "Hello! This is a test message from the other user.",
-                senderUUID = otherUserUUID,
-                receiverUUID = currentUserUUID,
-                messageType = MessageType.TEXT,
-                timestamp = System.currentTimeMillis()),
-            DataMessage(
-                uuid = UUID.randomUUID(),
-                text = "Hi! Nice to meet you.",
-                senderUUID = currentUserUUID,
-                receiverUUID = otherUserUUID,
-                messageType = MessageType.TEXT,
-                timestamp = System.currentTimeMillis() - 60000))
-
-    testMessages.forEach { message ->
-      messageRepository.sendMessage(
-          message = message,
-          callback = { result ->
-            if (result.isSuccess) {
-              Log.e("Add message", "Message added successfully: ${message.text}")
-            } else {
-              Log.e("Add message", "Failed to add message: ${message.text}")
-            }
-          })
-    }
-  }
 }
+
