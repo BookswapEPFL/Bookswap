@@ -23,9 +23,10 @@ import kotlinx.coroutines.flow.StateFlow
  * @param messageFirestoreSource MessageFirestoreSource object
  */
 class ContactViewModel(
-    val userVM: UserViewModel = UserViewModel(UUID.randomUUID()),
-    val userFirestoreSource: UsersRepository = UserFirestoreSource(FirebaseFirestore.getInstance()),
-    val messageFirestoreSource: MessageRepository =
+    val userVM: UserViewModel,
+    private val userFirestoreSource: UsersRepository =
+        UserFirestoreSource(FirebaseFirestore.getInstance()),
+    private val messageFirestoreSource: MessageRepository =
         MessageFirestoreSource(FirebaseFirestore.getInstance())
 ) : ViewModel() {
 
