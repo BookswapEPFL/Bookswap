@@ -238,7 +238,12 @@ class MainActivity : ComponentActivity() {
           }
         }
         navigation(startDestination = C.Screen.USER_PROFILE, route = C.Route.USER_PROFILE) {
-          composable(C.Screen.USER_PROFILE) { UserProfile(userVM) }
+          composable(C.Screen.USER_PROFILE) {
+            UserProfile(
+                userVM,
+                { topAppBar("Your Profile") },
+                { bottomAppBar(this@navigation.route ?: "") })
+          }
           composable(C.Screen.BOOK_PROFILE) { backStackEntry ->
             val bookId = backStackEntry.arguments?.getString("bookId")?.let { UUID.fromString(it) }
 
