@@ -158,7 +158,7 @@ class UserFirestoreSource(private val db: FirebaseFirestore) : UsersRepository {
     } catch (e: Exception) {
       Log.e(
           "FirestoreSourceError",
-          "Error converting document ${document.id} to User\n${e.message} : ${e.stackTraceToString()}")
+          "Error converting document ${document.id} to User: " + e.stackTrace.first().toString())
       Result.failure(e)
     }
   }
