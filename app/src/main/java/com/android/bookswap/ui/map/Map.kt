@@ -88,29 +88,31 @@ fun MapScreen(
     bottomAppBar: @Composable () -> Unit = {},
     userVM: UserViewModel
 ) {
-  val cameraPositionState = rememberCameraPositionState()
   // Get the user's current location
-  val latitude = geolocation.latitude.collectAsState().value
-  val longitude = geolocation.longitude.collectAsState().value
+  val userLoc by geolocation.userLocation.collectAsState()
+  val cameraPositionState =
+      rememberCameraPositionState("myCamera") {
+        this.position = CameraPosition.fromLatLngZoom(userVM.latlng, INIT_ZOOM)
+      }
+
   // Start location and books updates
   LaunchedEffect(Unit) {
     bookManagerViewModel.startUpdatingBooks()
     geolocation.startLocationUpdates()
-    cameraPositionState.position =
-        CameraPosition.fromLatLngZoom(
-            LatLng(geolocation.latitude.value, geolocation.longitude.value), INIT_ZOOM)
   }
   // Stop location and books updates when the screen is disposed
   DisposableEffect(Unit) {
     onDispose {
-      userVM.lat = geolocation.latitude.value
-      userVM.lon = geolocation.longitude.value
+      userLoc?.let {
+        userVM.lat = it.latitude
+        userVM.lon = it.longitude
+      }
       geolocation.stopLocationUpdates()
       bookManagerViewModel.stopUpdatingBooks()
     }
   }
 
-  var mutableStateSelectedUser by remember { mutableStateOf(selectedUser) }
+  var mutableStateSelectedUser by remember { mutableIntStateOf(selectedUser) }
   var markerScreenPosition by remember { mutableStateOf<Offset?>(null) }
 
   val filteredBooks = bookManagerViewModel.filteredBooks.collectAsState()
@@ -160,8 +162,7 @@ fun MapScreen(
                   onMapLoaded = {
                     cameraPositionState.position =
                         CameraPosition.fromLatLngZoom(
-                            LatLng(geolocation.latitude.value, geolocation.longitude.value),
-                            INIT_ZOOM)
+                            userLoc ?: userVM.latlng, INIT_ZOOM)
                   },
                   onMapClick = { mutableStateSelectedUser = NO_USER_SELECTED },
                   modifier =
@@ -172,9 +173,9 @@ fun MapScreen(
                   uiSettings = MapUiSettings(zoomControlsEnabled = false),
               ) {
                 // Marker for user's current location
-                if (!latitude.isNaN() && !longitude.isNaN()) {
+                userLoc?.let {
                   Marker(
-                      state = MarkerState(position = LatLng(latitude, longitude)),
+                      state = MarkerState(position = it),
                       title = "Your Location",
                       icon =
                           BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE))
