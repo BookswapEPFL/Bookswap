@@ -164,8 +164,8 @@ class MainActivity : ComponentActivity() {
     CompositionLocalProvider(LocalAppConfig provides AppConfig(userViewModel = userVM)) {
       NavHost(navController = navController, startDestination = startDestination) {
         navigation(startDestination = C.Screen.AUTH, route = C.Route.AUTH) {
-          composable(C.Screen.AUTH) { SignInScreen(navigationActions, userVM) }
-          composable(C.Screen.NEW_USER) { NewUserScreen(navigationActions, userVM) }
+          composable(C.Screen.AUTH) { SignInScreen(navigationActions) }
+          composable(C.Screen.NEW_USER) { NewUserScreen(navigationActions, photoStorage) }
         }
         navigation(startDestination = C.Screen.CHAT_LIST, route = C.Route.CHAT_LIST) {
           composable(C.Screen.CHAT_LIST) {
@@ -193,8 +193,7 @@ class MainActivity : ComponentActivity() {
                   topAppBar = { topAppBar("Add a Book") },
                   bottomAppBar = { bottomAppBar(this@navigation.route ?: "") },
                   photoFirebaseStorageRepository = photoStorage,
-                  booksRepository = bookRepository,
-                  userUUID = userVM.uuid)
+                  booksRepository = bookRepository)
             }
           }
         }
@@ -217,13 +216,11 @@ class MainActivity : ComponentActivity() {
                 topAppBar = { topAppBar("Add a Book") },
                 bottomAppBar = { bottomAppBar(this@navigation.route ?: "") },
                 photoFirebaseStorageRepository = photoStorage,
-                booksRepository = bookRepository,
-                userUUID = userVM.uuid)
+                booksRepository = bookRepository)
           }
           composable(C.Screen.ADD_BOOK_MANUALLY) {
             AddToBookScreen(
                 bookRepository,
-                userVM,
                 topAppBar = { topAppBar("Add your Book") },
                 bottomAppBar = { bottomAppBar(this@navigation.route ?: "") })
           }
@@ -231,7 +228,6 @@ class MainActivity : ComponentActivity() {
             AddISBNScreen(
                 navigationActions,
                 bookRepository,
-                userVM,
                 topAppBar = { topAppBar(null) },
                 bottomAppBar = { bottomAppBar(this@navigation.route ?: "") },
             )
@@ -240,7 +236,7 @@ class MainActivity : ComponentActivity() {
         navigation(startDestination = C.Screen.USER_PROFILE, route = C.Route.USER_PROFILE) {
           composable(C.Screen.USER_PROFILE) {
             UserProfile(
-                userVM,
+			  photoStorage,
                 { topAppBar("Your Profile") },
                 { bottomAppBar(this@navigation.route ?: "") })
           }
@@ -252,8 +248,7 @@ class MainActivity : ComponentActivity() {
                   bookId = bookId, // Default for testing
                   booksRepository = BooksFirestoreSource(FirebaseFirestore.getInstance()),
                   navController = NavigationActions(navController),
-                  currentUserId = UUID.randomUUID() // Pass the actual logged-in user ID
-                  )
+              )
             } else {
               Log.e("Navigation", "Invalid bookId passed to BookProfileScreen")
             }
@@ -267,7 +262,7 @@ class MainActivity : ComponentActivity() {
               bookRepository.getBook(
                   uuid = bookId,
                   OnSucess = { fetchedbook -> book = fetchedbook },
-                  onFailure = { Log.d("EditScreen", "Error while loading the book") })
+                  onFailure = { Log.e("EditScreen", "Error while loading the book") })
               EditBookScreen(
                   booksRepository = bookRepository,
                   navigationActions = NavigationActions(navController),

@@ -21,9 +21,9 @@ import kotlinx.coroutines.flow.StateFlow
  */
 open class UserViewModel(
     var uuid: UUID,
-    repository: UsersRepository = UserFirestoreSource(FirebaseFirestore.getInstance())
+    repository: UsersRepository = UserFirestoreSource(FirebaseFirestore.getInstance()),
+    private var dataUser: DataUser = DataUser(uuid) // Allows easier testing
 ) : ViewModel() {
-  private var dataUser = DataUser(uuid)
   private var isLoaded = false
   private val _isStored = MutableStateFlow<Boolean>(false)
   val isStored: StateFlow<Boolean> = _isStored
@@ -115,11 +115,6 @@ open class UserViewModel(
         dataUser = it
         isLoaded = true
         _isStored.value = true
-        Log.e(
-            "UserViewModel",
-            "User found {${dataUser.firstName}}{${dataUser.lastName}}{${dataUser.userUUID}}")
-        Log.e("UserViewModel", "User has books: ${dataUser.bookList}")
-        Log.i("UserViewModel", "User has contacts: ${dataUser.contactList}")
       }
       // If the user is not found, set isLoaded to false
       result.onFailure {
