@@ -11,6 +11,7 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performScrollToIndex
 import androidx.compose.ui.test.performSemanticsAction
 import androidx.compose.ui.test.performTextClearance
@@ -392,7 +393,6 @@ class ChatScreenTest {
     val messageNode =
         composeTestRule.onNodeWithTag(
             "${message.uuid}_" + C.Tag.ChatScreen.messages, useUnmergedTree = true)
-    messageNode.assertExists("Message item not found")
 
     messageNode.performSemanticsAction(SemanticsActions.OnLongClick)
 
