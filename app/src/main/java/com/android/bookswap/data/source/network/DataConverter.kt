@@ -17,7 +17,7 @@ object DataConverter {
 
   private fun parse_bits_UUID(string: String): UUID? {
     val uid =
-        string.removePrefix("{").removeSuffix( "}").let { sid ->
+        string.removePrefix("{").removeSuffix("}").let { sid ->
           buildMap<String, Long?> {
             sid.split(", ").let { comps -> // List<String> ["lsb=Long", "msb=Long"]
               comps.map { half -> // String "name=Long"
@@ -49,38 +49,43 @@ object DataConverter {
 
   fun parse_raw_UUID_list(string: String): List<UUID?> {
     val temp_string = string.removeSurrounding("[", "]").removeSurrounding("{", "}")
-	val delimiter = if(temp_string.contains("=")){"}, "}else{", "}
-	return temp_string.split(delimiter).map{ parse_raw_UUID(it) }
+    val delimiter =
+        if (temp_string.contains("=")) {
+          "}, "
+        } else {
+          ", "
+        }
+    return temp_string.split(delimiter).map { parse_raw_UUID(it) }
   }
-  
+
   fun parse_raw_long(string: String): Long? {
-	return try {
-		string.toLong()
-	} catch (e: Exception) {
-	  Log.e(
-		"BookSwap_FirestoreDataConverter",
-		"DataConverter.parse_raw_long: Error converting \"$string\" to Long, the provided string cannot be parsed as a Long")
-	  throw e
-	}
+    return try {
+      string.toLong()
+    } catch (e: Exception) {
+      Log.e(
+          "BookSwap_FirestoreDataConverter",
+          "DataConverter.parse_raw_long: Error converting \"$string\" to Long, the provided string cannot be parsed as a Long")
+      throw e
+    }
   }
-  
+
   fun parse_raw_long_list(string: String): List<Long?> {
-	return string.removeSurrounding("[", "]").split(", ").map{parse_raw_long(it)}
+    return string.removeSurrounding("[", "]").split(", ").map { parse_raw_long(it) }
   }
-  
+
   fun convert_UUID(uuid: UUID): String {
-	return uuid.toString()
+    return uuid.toString()
   }
-  
+
   fun convert_UUID_list(uuid_list: List<UUID>): List<String> {
-	return uuid_list.map { it.toString() }
+    return uuid_list.map { it.toString() }
   }
-  
+
   fun convert_Long(long: Long): String {
-	return long.toString()
+    return long.toString()
   }
-  
+
   fun convert_Long_list(long_list: List<Long>): List<String> {
-	return long_list.map { it.toString() }
+    return long_list.map { it.toString() }
   }
 }
