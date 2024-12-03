@@ -13,7 +13,7 @@ class DataConverterTest {
   fun parseRawUUID() {
     val bit_uuid = "{mostSignificantBits=16384, leastSignificantBits=-4611686018427387904}"
     val buuid = DataConverter.parse_raw_UUID(bit_uuid)
-    val suuid = DataConverter.parse_raw_UUID(str_uuid)
+    val suuid = DataConverter.parse_raw_UUID(str_uuid + "0")
     assertEquals("Converted UUIDs are not equal!", suuid, buuid)
   }
 
@@ -65,7 +65,7 @@ class DataConverterTest {
   @Test
   fun convertLongListToStringList() {
     val raw_long_list = List(3, { big_long + it })
-    val str_long_list = List(3, { raw_long_list[it] })
+    val str_long_list = List(3, { raw_long_list[it].toString() })
     val convrt_long_list = DataConverter.convert_Long_list(raw_long_list)
     assertEquals(
         "Value list $raw_long_list not converted to $str_long_list",
