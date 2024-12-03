@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.twotone.Star
@@ -24,16 +23,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
-import coil.request.ImageRequest
 import com.android.bookswap.data.DataBook
 import com.android.bookswap.resources.C
 import com.android.bookswap.ui.theme.ColorVariable
@@ -85,42 +79,9 @@ fun BookDisplayComponent(modifier: Modifier = Modifier, book: DataBook) {
           // We didn't discussed about how we will store the image or how we
           // will
           // encode them
-          val photoUrl = book.photo ?: ""
-          if (photoUrl.isNotEmpty()) {
-            Log.d("BookDisplayComponent", "Photo URL: ${photoUrl}")
-            // Show the profile picture of the contact or the default icon
-            AsyncImage(
-                model =
-                    ImageRequest.Builder(LocalContext.current)
-                        .data(photoUrl)
-                        .crossfade(true)
-                        .listener(
-                            onStart = { Log.d("Coil", "Image loading started") },
-                            onSuccess = { _, _ -> Log.d("Coil", "Image loaded successfully") },
-                            onError = { _, result ->
-                              Log.e("Coil", "Error loading image: ${result.throwable}")
-                            })
-                        .build(),
-                contentDescription = "Book Photo",
-                modifier = Modifier.size(IMAGE_HEIGHT_DP).clip(CircleShape),
-                contentScale = ContentScale.Crop)
-          } else {
-            /*
-            Icon(
-                imageVector = Icons.Filled.Person,
-                contentDescription = "Contact Icon empty",
-                modifier = Modifier.size(40.dp).fillMaxSize(),
-            )
-             */
-            Box(
-                modifier =
-                    Modifier.fillMaxSize().background(Color.Gray) // Placeholder for the image
-                )
-          }
-          /*
           Box(
               modifier = Modifier.fillMaxSize().background(Color.Gray) // Placeholder for the image
-              )*/
+              )
         }
         Row(verticalAlignment = Alignment.CenterVertically) {
 
