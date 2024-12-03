@@ -8,7 +8,6 @@ import androidx.compose.ui.test.performClick
 import androidx.navigation.compose.rememberNavController
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.android.bookswap.DefaultMockKs
-import com.android.bookswap.data.DataUser
 import com.android.bookswap.data.source.network.PhotoFirebaseStorageSource
 import com.android.bookswap.model.AppConfig
 import com.android.bookswap.model.LocalAppConfig
@@ -20,7 +19,6 @@ import com.android.bookswap.ui.navigation.NavigationActions
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
 import io.github.kakaocup.compose.node.element.ComposeScreen
 import io.mockk.mockk
-import java.util.UUID
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -37,17 +35,6 @@ class UserProfileScreenTest : TestCase() {
   private lateinit var photoStorage: PhotoFirebaseStorageSource
 
   @get:Rule val composeTestRule = createComposeRule()
-  private val standardUser =
-      DataUser(
-          UUID.randomUUID(),
-          "M.",
-          "John",
-          "Doe",
-          "John.Doe@example.com",
-          "+41223456789",
-          0.0,
-          0.0,
-          "dummyPic.png")
 
   @Before
   fun setup() {

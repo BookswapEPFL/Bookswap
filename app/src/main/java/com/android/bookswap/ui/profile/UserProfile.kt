@@ -57,9 +57,8 @@ fun UserProfile(
 ) {
   val context = LocalContext.current
   val appConfig = LocalAppConfig.current
-  val userVM = appConfig.userViewModel
-  var userData = userVM.getUser()
-  val addrStr by userVM.getLocationPlace(context).collectAsState()
+  var userData = appConfig.userViewModel.getUser()
+  val addrStr by appConfig.userViewModel.getLocationPlace(context).collectAsState()
   val showEditPicture = remember { mutableStateOf(false) }
   var showEditProfile by remember { mutableStateOf(false) }
 
@@ -113,7 +112,7 @@ fun UserProfile(
         })
   }
   LaunchedEffect(needRecompose) {
-    userData = userVM.getUser()
+    userData = appConfig.userViewModel.getUser()
     needRecompose = false
   }
 
