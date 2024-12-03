@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -28,27 +27,27 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.android.bookswap.data.repository.BooksRepository
 import com.android.bookswap.data.source.api.GoogleBookDataSource
-import com.android.bookswap.model.UserViewModel
+import com.android.bookswap.model.InputVerification
+import com.android.bookswap.model.LocalAppConfig
 import com.android.bookswap.resources.C
+import com.android.bookswap.ui.MAXLENGTHISBN
 import com.android.bookswap.ui.components.ButtonComponent
 import com.android.bookswap.ui.components.FieldComponent
 import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.navigation.TopLevelDestinations
 import com.android.bookswap.ui.theme.ColorVariable
-import java.util.UUID
 
 /** This is the main screen for the chat feature. It displays the list of messages */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddISBNScreen(
     navigationActions: NavigationActions,
     booksRepository: BooksRepository,
-    userVM: UserViewModel = UserViewModel(UUID.randomUUID()),
     topAppBar: @Composable () -> Unit = {},
     bottomAppBar: @Composable () -> Unit = {}
 ) {
   val context = LocalContext.current
-  val user = userVM.getUser()
+  val inputVerification = InputVerification()
+  val appConfig = LocalAppConfig.current
   Scaffold(
       modifier = Modifier.testTag(C.Tag.new_book_isbn_screen_container),
       topBar = topAppBar,
@@ -66,8 +65,9 @@ fun AddISBNScreen(
                     FieldComponent(
                         modifier = Modifier.testTag(C.Tag.NewBookISBN.isbn),
                         labelText = "ISBN*",
-                        value = isbn) {
-                          if (it.all { c -> c.isDigit() } && it.length <= 13) {
+                        value = isbn,
+                        maxLength = MAXLENGTHISBN) {
+                          if (inputVerification.testIsbn(it)) {
                             isbn = it
                             Log.d("ISBN Input", "Updated ISBN: $isbn")
                           }
@@ -75,34 +75,37 @@ fun AddISBNScreen(
                     ButtonComponent(
                         modifier = Modifier.testTag(C.Tag.NewBookISBN.search),
                         onClick = {
-                          GoogleBookDataSource(context).getBookFromISBN(isbn, user.userUUID) {
-                              result ->
-                            if (result.isFailure) {
-                              Toast.makeText(context, "Search unsuccessful", Toast.LENGTH_LONG)
-                                  .show()
-                              Log.e("AddBook", result.exceptionOrNull().toString())
-                            } else {
-                              booksRepository.addBook(
-                                  result.getOrThrow(),
-                                  callback = { res ->
-                                    if (res.isSuccess) {
-                                      val newBookList = user.bookList + result.getOrNull()?.uuid!!
-                                      userVM.updateUser(bookList = newBookList)
-                                      Toast.makeText(
-                                              context,
-                                              "${result.getOrNull()?.title} added",
-                                              Toast.LENGTH_LONG)
-                                          .show()
-                                      navigationActions.navigateTo(TopLevelDestinations.NEW_BOOK)
-                                    } else {
-                                      val error = res.exceptionOrNull()!!
-                                      Log.e("AddBook", res.toString())
-                                      Toast.makeText(context, error.message, Toast.LENGTH_LONG)
-                                          .show()
-                                    }
-                                  })
-                            }
-                          }
+                          GoogleBookDataSource(context).getBookFromISBN(
+                              isbn, appConfig.userViewModel.uuid) { result ->
+                                if (result.isFailure) {
+                                  Toast.makeText(context, "Search unsuccessful", Toast.LENGTH_LONG)
+                                      .show()
+                                  Log.e("AddBook", result.exceptionOrNull().toString())
+                                } else {
+                                  booksRepository.addBook(
+                                      result.getOrThrow(),
+                                      callback = { res ->
+                                        if (res.isSuccess) {
+                                          val newBookList =
+                                              appConfig.userViewModel.getUser().bookList +
+                                                  result.getOrNull()?.uuid!!
+                                          appConfig.userViewModel.updateUser(bookList = newBookList)
+                                          Toast.makeText(
+                                                  context,
+                                                  "${result.getOrNull()?.title} added",
+                                                  Toast.LENGTH_LONG)
+                                              .show()
+                                          navigationActions.navigateTo(
+                                              TopLevelDestinations.NEW_BOOK)
+                                        } else {
+                                          val error = res.exceptionOrNull()!!
+                                          Log.e("AddBook", res.toString())
+                                          Toast.makeText(context, error.message, Toast.LENGTH_LONG)
+                                              .show()
+                                        }
+                                      })
+                                }
+                              }
                         }) {
                           Row(verticalAlignment = Alignment.CenterVertically) {
                             Text("Search")

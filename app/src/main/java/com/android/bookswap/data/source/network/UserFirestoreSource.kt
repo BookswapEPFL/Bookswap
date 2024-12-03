@@ -120,7 +120,6 @@ class UserFirestoreSource(private val db: FirebaseFirestore) : UsersRepository {
       val longitude = document.getDouble("longitude")!!
       val profilePicture = document.getString("profilePictureUrl")!!
       val googleUid = document.getString("googleUid")!!
-      // Log.d("TAG_DOC2USR", "GUID: $googleUid")
       val bookList =
           (document.get("bookList") as List<String>).map { bookMap ->
             Log.d("TAG_BOOK_MAP", "bookMap: $bookMap")

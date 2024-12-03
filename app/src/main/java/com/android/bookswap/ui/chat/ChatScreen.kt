@@ -69,6 +69,7 @@ import com.android.bookswap.data.repository.PhotoFirebaseStorageRepository
 import com.android.bookswap.model.PhotoRequester
 import com.android.bookswap.model.chat.OfflineMessageStorage
 import com.android.bookswap.resources.C
+import com.android.bookswap.ui.MAXLENGTHMESSAGE
 import com.android.bookswap.ui.components.BackButtonComponent
 import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.theme.ColorVariable
@@ -248,7 +249,11 @@ fun ChatScreen(
                   }
               BasicTextField(
                   value = newMessageText,
-                  onValueChange = { newMessageText = it },
+                  onValueChange = {
+                    if (it.text.length <= MAXLENGTHMESSAGE) {
+                      newMessageText = it
+                    }
+                  },
                   modifier =
                       Modifier.weight(1f)
                           .padding(padding8)
@@ -259,7 +264,9 @@ fun ChatScreen(
               )
               Button(
                   onClick = {
-                    if (updateActive) {
+                    if (newMessageText.text.isEmpty()) {
+                      Toast.makeText(context, "Message cannot be empty", Toast.LENGTH_SHORT).show()
+                    } else if (updateActive) {
                       // Update the message
                       messageRepository.updateMessage(
                           selectedMessage!!.copy(text = newMessageText.text),

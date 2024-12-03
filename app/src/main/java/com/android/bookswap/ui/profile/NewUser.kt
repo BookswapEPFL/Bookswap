@@ -1,5 +1,6 @@
 package com.android.bookswap.ui.profile
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -13,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
@@ -28,7 +30,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asAndroidBitmap
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.TextStyle
@@ -37,8 +42,17 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.android.bookswap.model.UserViewModel
+import coil.compose.AsyncImage
+import com.android.bookswap.data.repository.PhotoFirebaseStorageRepository
+import com.android.bookswap.model.InputVerification
+import com.android.bookswap.model.LocalAppConfig
+import com.android.bookswap.model.PhotoRequester
 import com.android.bookswap.resources.C
+import com.android.bookswap.ui.MAXLENGTHEMAIL
+import com.android.bookswap.ui.MAXLENGTHFIRSTNAME
+import com.android.bookswap.ui.MAXLENGTHGREETING
+import com.android.bookswap.ui.MAXLENGTHLASTNAME
+import com.android.bookswap.ui.MAXLENGTHPHONE
 import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.theme.ColorVariable
 import com.google.firebase.Firebase
@@ -63,8 +77,12 @@ private val ERROR_FONT_SIZE = 12.sp
  * @param navigationActions: NavigationActions
  */
 @Composable
-fun NewUserScreen(navigationActions: NavigationActions, userVM: UserViewModel) {
+fun NewUserScreen(
+    navigationActions: NavigationActions,
+    photoStorage: PhotoFirebaseStorageRepository
+) {
   val context = LocalContext.current
+  val verification = InputVerification()
 
   val email = remember { mutableStateOf("") }
   val phone = remember { mutableStateOf("") }
@@ -72,35 +90,39 @@ fun NewUserScreen(navigationActions: NavigationActions, userVM: UserViewModel) {
   val firstName = remember { mutableStateOf("") }
   val lastName = remember { mutableStateOf("") }
 
-  val emailError = remember { mutableStateOf<String?>(null) }
-  val phoneError = remember { mutableStateOf<String?>(null) }
-  val firstNameError = remember { mutableStateOf<String?>(null) }
-  val lastNameError = remember { mutableStateOf<String?>(null) }
+  val emailError = remember { mutableStateOf<String?>("Invalid email format") }
+  val phoneError = remember { mutableStateOf<String?>("Invalid phone number") }
+  val firstNameError = remember { mutableStateOf<String?>("First name required") }
+  val lastNameError = remember { mutableStateOf<String?>("Last name required") }
 
-  fun validateEmail(input: String): Boolean {
-    return android.util.Patterns.EMAIL_ADDRESS.matcher(input).matches()
-  }
+  val appConfig = LocalAppConfig.current
+  var firstAttempt = true
 
-  fun validatePhone(input: String): Boolean {
-    return input.matches(Regex("^\\+?\\d{10,15}$")) // Matches phone numbers with 10 to 15 digits
-  }
-
-  fun validateNonEmpty(input: String): Boolean {
-    return input.isNotBlank()
-  }
-
-  fun validateForm(): Boolean {
-    emailError.value = if (validateEmail(email.value)) null else "Invalid email format"
-    phoneError.value = if (validatePhone(phone.value)) null else "Invalid phone number"
-    firstNameError.value = if (validateNonEmpty(firstName.value)) null else "First name required"
-    lastNameError.value = if (validateNonEmpty(lastName.value)) null else "Last name required"
-
-    return emailError.value == null &&
-        phoneError.value == null &&
-        firstNameError.value == null &&
-        lastNameError.value == null
-  }
-
+  val profilPicture = remember { mutableStateOf<String?>(null) }
+  // This is the photo requester that will be used to take a photo
+  val photoRequester =
+      PhotoRequester(context) { result ->
+        result.fold(
+            onSuccess = { image ->
+              photoStorage.addPhotoToStorage(
+                  photoId = "profile",
+                  bitmap = image.asAndroidBitmap(),
+                  callback = { result ->
+                    result.fold(
+                        onSuccess = { url -> profilPicture.value = url },
+                        onFailure = { exception ->
+                          Log.e("NewUserScreen", "Error uploading photo: $exception")
+                          Toast.makeText(context, "Error uploading photo", Toast.LENGTH_SHORT)
+                              .show()
+                        })
+                  })
+            },
+            onFailure = { exception ->
+              Log.e("NewUserScreen", "Error taking photo: $exception")
+              Toast.makeText(context, "Error taking photo", Toast.LENGTH_SHORT).show()
+            })
+      }
+  photoRequester.Init() // This is the initialization of the photo requester
   LazyColumn(
       contentPadding = PaddingValues(CONTENT_PADDING),
       modifier =
@@ -147,17 +169,26 @@ fun NewUserScreen(navigationActions: NavigationActions, userVM: UserViewModel) {
                     Arrangement.Center,
                     Alignment.CenterHorizontally) {
                       IconButton(
-                          onClick = { /* TODO */},
+                          onClick = { photoRequester.requestPhoto() },
                           modifier = Modifier.size(ICON_SIZE).testTag(C.Tag.NewUser.profile_pic)) {
-                            Icon(
-                                imageVector = Icons.Default.AccountCircle,
-                                contentDescription = "profile picture",
-                                tint = ColorVariable.Accent,
-                                modifier = Modifier.size(ICON_SIZE))
+                            // Show either the profile picture or the default icon
+                            if (profilPicture.value == null) {
+                              Icon(
+                                  imageVector = Icons.Default.AccountCircle,
+                                  contentDescription = "no profile picture",
+                                  tint = ColorVariable.Accent,
+                                  modifier = Modifier.size(ICON_SIZE))
+                            } else {
+                              AsyncImage(
+                                  model = profilPicture.value,
+                                  contentDescription = "profile picture",
+                                  modifier = Modifier.size(ICON_SIZE).clip(CircleShape),
+                                  contentScale = ContentScale.Crop)
+                            }
                           }
                       OutlinedTextField(
                           greeting.value,
-                          { greeting.value = it },
+                          { if (it.length <= MAXLENGTHGREETING) greeting.value = it },
                           Modifier.testTag(C.Tag.NewUser.greeting)
                               .fillMaxWidth()
                               .padding(TEXT_PADDING),
@@ -168,7 +199,7 @@ fun NewUserScreen(navigationActions: NavigationActions, userVM: UserViewModel) {
 
                       OutlinedTextField(
                           firstName.value,
-                          { firstName.value = it },
+                          { if (it.length <= MAXLENGTHFIRSTNAME) firstName.value = it },
                           Modifier.testTag(C.Tag.NewUser.firstname)
                               .fillMaxWidth()
                               .padding(TEXT_PADDING),
@@ -176,8 +207,9 @@ fun NewUserScreen(navigationActions: NavigationActions, userVM: UserViewModel) {
                           placeholder = { Text("John", Modifier, Color.Gray) },
                           keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                           singleLine = true,
-                          isError = firstNameError.value != null)
-                      if (firstNameError.value != null) {
+                          isError =
+                              !verification.validateNonEmpty(firstName.value) && !firstAttempt)
+                      if (!verification.validateNonEmpty(firstName.value) && !firstAttempt) {
                         Text(
                             firstNameError.value!!,
                             color = Color.Red,
@@ -187,7 +219,7 @@ fun NewUserScreen(navigationActions: NavigationActions, userVM: UserViewModel) {
 
                       OutlinedTextField(
                           lastName.value,
-                          { lastName.value = it },
+                          { if (it.length <= MAXLENGTHLASTNAME) lastName.value = it },
                           Modifier.testTag(C.Tag.NewUser.lastname)
                               .fillMaxWidth()
                               .padding(TEXT_PADDING),
@@ -195,8 +227,8 @@ fun NewUserScreen(navigationActions: NavigationActions, userVM: UserViewModel) {
                           placeholder = { Text("Doe", Modifier, Color.Gray) },
                           keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                           singleLine = true,
-                          isError = lastNameError.value != null)
-                      if (lastNameError.value != null) {
+                          isError = !verification.validateNonEmpty(lastName.value) && !firstAttempt)
+                      if (!verification.validateNonEmpty(lastName.value) && !firstAttempt) {
                         Text(
                             lastNameError.value!!,
                             color = Color.Red,
@@ -206,7 +238,7 @@ fun NewUserScreen(navigationActions: NavigationActions, userVM: UserViewModel) {
 
                       OutlinedTextField(
                           email.value,
-                          { email.value = it },
+                          { if (it.length <= MAXLENGTHEMAIL) email.value = it },
                           Modifier.testTag(C.Tag.NewUser.email)
                               .fillMaxWidth()
                               .padding(TEXT_PADDING),
@@ -214,8 +246,8 @@ fun NewUserScreen(navigationActions: NavigationActions, userVM: UserViewModel) {
                           placeholder = { Text("John.Doe@example.com", Modifier, Color.Gray) },
                           keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                           singleLine = true,
-                          isError = emailError.value != null)
-                      if (emailError.value != null) {
+                          isError = !verification.validateEmail(email.value) && !firstAttempt)
+                      if (!verification.validateEmail(email.value) && !firstAttempt) {
                         Text(
                             emailError.value!!,
                             color = Color.Red,
@@ -225,7 +257,7 @@ fun NewUserScreen(navigationActions: NavigationActions, userVM: UserViewModel) {
 
                       OutlinedTextField(
                           phone.value,
-                          { phone.value = it },
+                          { if (it.length <= MAXLENGTHPHONE) phone.value = it },
                           Modifier.testTag(C.Tag.NewUser.phone)
                               .fillMaxWidth()
                               .padding(TEXT_PADDING),
@@ -233,8 +265,8 @@ fun NewUserScreen(navigationActions: NavigationActions, userVM: UserViewModel) {
                           placeholder = { Text("+4122345678", Modifier, Color.Gray) },
                           keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
                           singleLine = true,
-                          isError = phoneError.value != null)
-                      if (phoneError.value != null) {
+                          isError = !verification.validatePhone(phone.value) && !firstAttempt)
+                      if (!verification.validatePhone(phone.value) && !firstAttempt) {
                         Text(
                             phoneError.value!!,
                             color = Color.Red,
@@ -249,16 +281,21 @@ fun NewUserScreen(navigationActions: NavigationActions, userVM: UserViewModel) {
           Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
             Button(
                 onClick = {
-                  if (validateForm()) {
-                    userVM.updateUser(
+                  if (verification.validateEmail(email.value) &&
+                      verification.validatePhone(phone.value) &&
+                      verification.validateNonEmpty(firstName.value) &&
+                      verification.validateNonEmpty(lastName.value)) {
+                    appConfig.userViewModel.updateUser(
                         greeting = greeting.value,
                         firstName = firstName.value,
                         lastName = lastName.value,
                         email = email.value,
                         phone = phone.value,
+                        picURL = profilPicture.value ?: "",
                         googleUid = Firebase.auth.currentUser?.uid ?: "")
                     navigationActions.navigateTo(C.Route.MAP)
                   } else {
+                    firstAttempt = false
                     Toast.makeText(context, "Please correct the errors", Toast.LENGTH_SHORT).show()
                   }
                 },

@@ -32,11 +32,11 @@ import com.android.bookswap.R
 import com.android.bookswap.data.repository.BooksRepository
 import com.android.bookswap.data.repository.PhotoFirebaseStorageRepository
 import com.android.bookswap.model.BookFromChatGPT
+import com.android.bookswap.model.LocalAppConfig
 import com.android.bookswap.model.PhotoRequester
 import com.android.bookswap.resources.C
 import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.theme.ColorVariable
-import java.util.UUID
 
 /**
  * Composable function to display the screen for choosing how to add a book.
@@ -54,13 +54,13 @@ fun BookAdditionChoiceScreen(
     topAppBar: @Composable () -> Unit = {},
     bottomAppBar: @Composable () -> Unit = {},
     photoFirebaseStorageRepository: PhotoFirebaseStorageRepository,
-    booksRepository: BooksRepository,
-    userUUID: UUID
+    booksRepository: BooksRepository
 ) {
   val columnPadding = 16.dp
   val context = LocalContext.current
   val buttonWidth = (LocalConfiguration.current.screenWidthDp.dp * (0.75f))
 
+  val appConfig = LocalAppConfig.current
   // When the Photo is taken execute the lambda
   val photoRequester =
       PhotoRequester(LocalContext.current) { result ->
@@ -69,7 +69,7 @@ fun BookAdditionChoiceScreen(
         BookFromChatGPT(context, photoFirebaseStorageRepository, booksRepository).addBookFromImage(
             // Display error message in a toast.
             result.getOrThrow().asAndroidBitmap(),
-            userUUID) { error ->
+            appConfig.userViewModel.uuid) { error ->
               Toast.makeText(
                       context, context.resources.getString(error.message), Toast.LENGTH_SHORT)
                   .show()

@@ -1,7 +1,5 @@
 package com.android.bookswap.ui.authentication
 
-// import com.android.bookswap.ui.navigation.NavigationActions
-// import com.android.bookswap.ui.navigation.TopLevelDestinations
 import android.content.Intent
 import android.util.Log
 import android.widget.Toast
@@ -43,7 +41,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.bookswap.R
-import com.android.bookswap.model.UserViewModel
+import com.android.bookswap.model.LocalAppConfig
 import com.android.bookswap.resources.C
 import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.theme.ColorVariable
@@ -64,12 +62,9 @@ import kotlinx.coroutines.tasks.await
  * @param userVM ViewModel for user-related operations.
  */
 @Composable
-fun SignInScreen(
-    navigationActions: NavigationActions,
-    userVM: UserViewModel
-) { // Add this when navigation is
-  // implemented
+fun SignInScreen(navigationActions: NavigationActions) {
   val context = LocalContext.current
+  val appConfig = LocalAppConfig.current
   var googleUid = ""
   // Check if user is already signed in
   LaunchedEffect(Unit) {
@@ -83,8 +78,8 @@ fun SignInScreen(
           onAuthComplete = { result ->
             val googleUserName = result.user?.displayName ?: ""
             googleUid = result.user?.uid ?: ""
-            userVM.getUserByGoogleUid(googleUid)
-            Log.d("SignInScreen", "isStored: ${userVM.isStored}")
+            appConfig.userViewModel.getUserByGoogleUid(googleUid)
+            Log.d("SignInScreen", "isStored: ${appConfig.userViewModel.isStored}")
             Log.d("SignInScreen", "User signed in: $googleUserName")
             Toast.makeText(context, "Welcome $googleUserName!", Toast.LENGTH_LONG).show()
           },
@@ -94,7 +89,7 @@ fun SignInScreen(
           })
   val token = stringResource(R.string.default_web_client_id)
 
-  val isStored by userVM.isStored.collectAsState()
+  val isStored by appConfig.userViewModel.isStored.collectAsState()
 
   LaunchedEffect(isStored) {
     when (isStored) {
@@ -102,7 +97,7 @@ fun SignInScreen(
       false -> {
         navigationActions.navigateTo(C.Screen.NEW_USER)
       }
-      null -> {} // Attendre que `isStored` soit défini
+      null -> {}
     }
   }
 

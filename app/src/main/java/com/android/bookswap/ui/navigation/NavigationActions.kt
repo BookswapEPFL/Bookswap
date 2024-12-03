@@ -93,7 +93,12 @@ open class NavigationActions(
 
   /** Navigate back to the previous screen. */
   open fun goBack() {
-    navController.popBackStack()
+    val previousBackStackEntry = navController.previousBackStackEntry
+
+    // Check if the previous route is C.Route.AUTH
+    if (previousBackStackEntry?.destination?.route != C.Route.AUTH) {
+      navController.popBackStack()
+    }
   }
 
   /**
