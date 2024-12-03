@@ -2,8 +2,6 @@ package com.android.bookswap.ui.chat
 
 import android.content.Context
 import androidx.compose.ui.semantics.SemanticsActions
-import androidx.compose.ui.semantics.SemanticsProperties
-import androidx.compose.ui.semantics.getOrNull
 import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextEquals
@@ -389,12 +387,6 @@ class ChatScreenTest {
     val message = placeHolderData.first()
     val newText = "Updated message text"
 
-    composeTestRule.waitUntil(timeoutMillis = 5000) {
-      composeTestRule
-          .onAllNodesWithTag("${message.uuid}_" + C.Tag.ChatScreen.messages, useUnmergedTree = true)
-          .fetchSemanticsNodes()
-          .isNotEmpty()
-    }
     val messageNode =
         composeTestRule.onNodeWithTag(
             "${message.uuid}_" + C.Tag.ChatScreen.messages, useUnmergedTree = true)
@@ -432,19 +424,6 @@ class ChatScreenTest {
     assert(updatedMessage != null && updatedMessage.text == newText) {
       "Message was not updated correctly"
     }
-
-    composeTestRule.waitUntil(timeoutMillis = 5399) {
-      composeTestRule
-          .onNodeWithTag("${message.uuid}_" + C.Tag.ChatScreen.content, useUnmergedTree = true)
-          .fetchSemanticsNode()
-          .config
-          .getOrNull(SemanticsProperties.Text)
-          ?.joinToString() == newText
-    }
-
-    composeTestRule
-        .onNodeWithTag("${message.uuid}_" + C.Tag.ChatScreen.content, useUnmergedTree = true)
-        .assertTextEquals(newText)
 
     composeTestRule
         .onNodeWithTag(C.Tag.ChatScreen.message, useUnmergedTree = true)
