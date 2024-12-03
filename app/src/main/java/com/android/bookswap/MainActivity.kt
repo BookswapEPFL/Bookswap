@@ -10,7 +10,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.semantics
@@ -20,10 +19,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
 import com.android.bookswap.data.DataBook
-import com.android.bookswap.data.DataMessage
 import com.android.bookswap.data.DataUser
-import com.android.bookswap.data.MessageBox
-import com.android.bookswap.data.MessageType
 import com.android.bookswap.data.repository.BooksRepository
 import com.android.bookswap.data.repository.MessageRepository
 import com.android.bookswap.data.repository.PhotoFirebaseStorageRepository
@@ -262,26 +258,25 @@ class MainActivity : ComponentActivity() {
             }
           }
         }
-      }
-      navigation(
-          startDestination = C.Screen.OTHERS_USER_PROFILE, route = C.Route.OTHERS_USER_PROFILE) {
-            // OthersUserProfileScreen :
-            composable("${C.Screen.OTHERS_USER_PROFILE}/{userId}") { backStackEntry ->
-              val userId =
-                  backStackEntry.arguments?.getString("userId")?.let { UUID.fromString(it) }
-              Log.e("Main Launch OthersUserProfile", "userId: $userId")
-              if (userId != null) {
-                OthersUserProfileScreen(
-                    userId = userId,
-                    booksRepository = bookRepository,
-                    topAppBar = { topAppBar("User Profile") },
-                    bottomAppBar = { bottomAppBar(this@navigation.route ?: "") })
-              } else {
-                Log.e("Navigation", "Invalid userId passed to OthersUserProfileScreen")
+        navigation(
+            startDestination = C.Screen.OTHERS_USER_PROFILE, route = C.Route.OTHERS_USER_PROFILE) {
+              // OthersUserProfileScreen :
+              composable("${C.Screen.OTHERS_USER_PROFILE}/{userId}") { backStackEntry ->
+                val userId =
+                    backStackEntry.arguments?.getString("userId")?.let { UUID.fromString(it) }
+                Log.e("Main Launch OthersUserProfile", "userId: $userId")
+                if (userId != null) {
+                  OthersUserProfileScreen(
+                      userId = userId,
+                      booksRepository = bookRepository,
+                      topAppBar = { topAppBar("User Profile") },
+                      bottomAppBar = { bottomAppBar(this@navigation.route ?: "") })
+                } else {
+                  Log.e("Navigation", "Invalid userId passed to OthersUserProfileScreen")
+                }
               }
             }
-          }
+      }
     }
   }
 }
-

@@ -20,7 +20,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
-import com.android.bookswap.data.BookLanguages
 import com.android.bookswap.data.DataBook
 import com.android.bookswap.data.DataUser
 import com.android.bookswap.data.repository.BooksRepository
@@ -122,8 +121,7 @@ fun OthersUserProfileScreen(
                     }
 
                 // Full Name:
-                LabeledText(
-                    label = "Name:", value = "${user.firstName} ${user.lastName}")
+                LabeledText(label = "Name:", value = "${user.firstName} ${user.lastName}")
 
                 // Email:
                 LabeledText(label = "Email:", value = user.email)
