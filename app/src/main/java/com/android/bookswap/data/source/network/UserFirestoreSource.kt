@@ -122,7 +122,7 @@ class UserFirestoreSource(private val db: FirebaseFirestore) : UsersRepository {
       val googleUid = document.getString("googleUid")!!
       val bookList =
           (document.get("bookList") as List<String>).map { bookMap ->
-            Log.d("TAG_BOOK_MAP", "bookMap: $bookMap")
+            Log.i("TAG_BOOK_MAP", "bookMap: $bookMap")
             UUID.fromString(bookMap)
           }
       val contactList =

@@ -32,7 +32,7 @@ open class OthersUserViewModel(
     usersRepository.getUser(userId) { result ->
       result
           .onSuccess { user ->
-            Log.d("OthersUserViewModel", "User fetched: $user")
+            Log.i("OthersUserViewModel", "User fetched: $user")
             callback(user) // Pass the fetched user to the callback.
           }
           .onFailure { error ->

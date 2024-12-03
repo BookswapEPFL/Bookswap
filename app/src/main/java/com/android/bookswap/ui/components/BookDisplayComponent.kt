@@ -66,7 +66,7 @@ fun BookDisplayComponent(modifier: Modifier = Modifier, book: DataBook) {
               .padding(PADDING_HORIZONTAL_DP, PADDING_VERTICAL_DP),
       horizontalArrangement = Arrangement.Start,
       verticalAlignment = Alignment.CenterVertically) {
-        Log.d("BookDisplayComponent", "Displaying book: ${book.title} by ${book.author}")
+        Log.i("BookDisplayComponent", "Displaying book: ${book.title} by ${book.author}")
         // Image Box
         Box(
             modifier =
