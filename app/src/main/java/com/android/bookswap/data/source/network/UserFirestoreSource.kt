@@ -193,17 +193,18 @@ class UserFirestoreSource(private val db: FirebaseFirestore) : UsersRepository {
    * @param contactUUID UUID of the contact to add.
    * @param callback Callback for success or failure.
    */
-  override fun addContact(userUUID: UUID, contactUUID: String, callback: (Result<Unit>) -> Unit) {
+  override fun addContact(userUUID: UUID, contactUUID: UUID, callback: (Result<Unit>) -> Unit) {
     db.collection(COLLECTION_NAME)
         .document(userUUID.toString())
         .get()
         .addOnSuccessListener { document ->
-          val currentContactList = (document.get("contactList") as? List<String>) ?: emptyList()
+          val currentContactList =
+              DataConverter.parse_raw_UUID_list(document.get("contactList").toString())
           if (!currentContactList.contains(contactUUID)) {
             val updatedContactList = currentContactList + contactUUID
             db.collection(COLLECTION_NAME)
                 .document(userUUID.toString())
-                .update("contactList", updatedContactList)
+                .update("contactList", DataConverter.convert_UUID_list(updatedContactList))
                 .addOnSuccessListener { callback(Result.success(Unit)) }
                 .addOnFailureListener { e -> callback(Result.failure(e)) }
           } else {
@@ -220,21 +221,18 @@ class UserFirestoreSource(private val db: FirebaseFirestore) : UsersRepository {
    * @param contactUUID UUID of the contact to remove.
    * @param callback Callback for success or failure.
    */
-  override fun removeContact(
-      userUUID: UUID,
-      contactUUID: String,
-      callback: (Result<Unit>) -> Unit
-  ) {
+  override fun removeContact(userUUID: UUID, contactUUID: UUID, callback: (Result<Unit>) -> Unit) {
     db.collection(COLLECTION_NAME)
         .document(userUUID.toString())
         .get()
         .addOnSuccessListener { document ->
-          val currentContactList = (document.get("contactList") as? List<String>) ?: emptyList()
+          val currentContactList =
+              DataConverter.parse_raw_UUID_list(document.get("contactList").toString())
           if (currentContactList.contains(contactUUID)) {
             val updatedContactList = currentContactList - contactUUID
             db.collection(COLLECTION_NAME)
                 .document(userUUID.toString())
-                .update("contactList", updatedContactList)
+                .update("contactList", DataConverter.convert_UUID_list(updatedContactList))
                 .addOnSuccessListener { callback(Result.success(Unit)) }
                 .addOnFailureListener { e -> callback(Result.failure(e)) }
           } else {
