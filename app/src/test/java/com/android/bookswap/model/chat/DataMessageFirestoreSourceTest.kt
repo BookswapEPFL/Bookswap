@@ -9,7 +9,10 @@ import com.google.android.gms.tasks.Tasks
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
+import com.google.firebase.firestore.EventListener
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.FirebaseFirestoreException
+import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.firestore.WriteBatch
 import io.mockk.every
@@ -583,6 +586,119 @@ class DataMessageFirestoreSourceTest {
 
     assert(result.isFailure)
     assert(result.exceptionOrNull() is Exception)
+  }
+
+  @Test
+  fun `addMessagesListener receives new messages on success`() {
+    val snapshot: QuerySnapshot = mockk()
+    val listenerRegistration: ListenerRegistration = mockk()
+
+    // Mock Firestore behavior
+    every {
+      mockFirestore
+          .collection(COLLECTION_PATH)
+          .document(chatPath)
+          .collection("messages")
+          .addSnapshotListener(any<EventListener<QuerySnapshot>>())
+    } answers
+        {
+          val listener = arg<EventListener<QuerySnapshot>>(0)
+          listener.onEvent(snapshot, null) // Simulate successful snapshot
+          listenerRegistration
+        }
+
+    every { snapshot.documents } returns listOf(mockDocumentSnapshot)
+    every { mockDocumentSnapshot.exists() } returns true
+
+    messageFirestoreSource.addMessagesListener(testMessage.receiverUUID, testMessage.senderUUID) {
+        result ->
+      assertTrue(result.isSuccess)
+      val messages = result.getOrNull()
+      assertNotNull(messages)
+      assertEquals(1, messages?.size)
+      assertEquals(testMessage, messages?.first())
+    }
+
+    verify {
+      mockFirestore
+          .collection(COLLECTION_PATH)
+          .document(chatPath)
+          .collection("messages")
+          .addSnapshotListener(any<EventListener<QuerySnapshot>>())
+    }
+  }
+
+  @Test
+  fun `addMessagesListener returns failure on error`() {
+    val exception =
+        FirebaseFirestoreException("Listener error", FirebaseFirestoreException.Code.ABORTED)
+    val listenerRegistration: ListenerRegistration = mockk()
+
+    // Mock Firestore behavior
+    every {
+      mockFirestore
+          .collection(COLLECTION_PATH)
+          .document(chatPath)
+          .collection("messages")
+          .addSnapshotListener(any<EventListener<QuerySnapshot>>())
+    } answers
+        {
+          val listener = arg<EventListener<QuerySnapshot>>(0)
+          listener.onEvent(null, exception) // Simulate an error
+          listenerRegistration
+        }
+
+    messageFirestoreSource.addMessagesListener(testMessage.receiverUUID, testMessage.senderUUID) {
+        result ->
+      assertTrue(result.isFailure)
+      assertEquals(exception, result.exceptionOrNull())
+    }
+
+    verify {
+      mockFirestore
+          .collection(COLLECTION_PATH)
+          .document(chatPath)
+          .collection("messages")
+          .addSnapshotListener(any<EventListener<QuerySnapshot>>())
+    }
+  }
+
+  @Test
+  fun `addMessagesListener returns empty list on empty snapshot`() {
+    val snapshot: QuerySnapshot = mockk()
+    val listenerRegistration: ListenerRegistration = mockk()
+
+    // Mock Firestore behavior
+    every {
+      mockFirestore
+          .collection(COLLECTION_PATH)
+          .document(chatPath)
+          .collection("messages")
+          .addSnapshotListener(any<EventListener<QuerySnapshot>>())
+    } answers
+        {
+          val listener = arg<EventListener<QuerySnapshot>>(0)
+          listener.onEvent(snapshot, null) // Simulate empty snapshot
+          listenerRegistration
+        }
+
+    every { snapshot.documents } returns emptyList() // Simulate no documents
+
+    messageFirestoreSource.addMessagesListener(testMessage.receiverUUID, testMessage.senderUUID) {
+        result ->
+      assertTrue(result.isSuccess)
+      val messages = result.getOrNull()
+      assertNotNull(messages)
+      assertTrue(messages?.isEmpty() == true)
+    }
+
+    verify {
+      mockFirestore
+          .collection(COLLECTION_PATH)
+          .document(chatPath)
+          .collection("messages")
+          .addSnapshotListener(any<EventListener<QuerySnapshot>>())
+    }
   }
 }
 

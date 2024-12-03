@@ -19,6 +19,7 @@ import com.android.bookswap.data.MessageType
 import com.android.bookswap.data.repository.MessageRepository
 import com.android.bookswap.data.repository.PhotoFirebaseStorageRepository
 import com.android.bookswap.data.source.network.UserFirestoreSource
+import com.android.bookswap.model.chat.ChatScreenViewModel
 import com.android.bookswap.model.chat.OfflineMessageStorage
 import com.android.bookswap.resources.C
 import com.android.bookswap.ui.navigation.NavigationActions
@@ -28,9 +29,6 @@ import io.mockk.Runs
 import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 import java.util.UUID
 import org.junit.Before
 import org.junit.Rule
@@ -43,6 +41,7 @@ class ChatScreenTest {
   private lateinit var mockPhotoStorage: PhotoFirebaseStorageRepository
   private lateinit var mockMessageStorage: OfflineMessageStorage
   private lateinit var mockUserRepository: UserFirestoreSource
+  private lateinit var chatScreenViewModel: ChatScreenViewModel
   private val currentUserUUID = UUID.randomUUID()
   private val otherUserUUID = UUID.randomUUID()
   private lateinit var mockNavigationActions: NavigationActions
@@ -60,6 +59,8 @@ class ChatScreenTest {
     mockMessageStorage = mockk()
     mockContext = mockk()
     mockUserRepository = mockk()
+
+    chatScreenViewModel = ChatScreenViewModel()
 
     placeHolderData =
         List(6) {
@@ -99,14 +100,6 @@ class ChatScreenTest {
           ColorVariable.Accent,
           ColorVariable.AccentSecondary,
           ColorVariable.BackGround)
-
-  @Test
-  fun testFormatTimeStamps() {
-    val timestamp = System.currentTimeMillis()
-    val formattedTimestamp = formatTimestamp(timestamp)
-    val expectedTimestamp = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date(timestamp))
-    assert(formattedTimestamp == expectedTimestamp)
-  }
 
   @Test
   fun hasRequiredComponentsWithoutMessage() {
@@ -166,7 +159,7 @@ class ChatScreenTest {
             .assertIsDisplayed()
         composeTestRule
             .onNodeWithTag("${message.uuid}_" + C.Tag.ChatScreen.timestamp, useUnmergedTree = true)
-            .assertTextEquals(formatTimestamp(message.timestamp))
+            .assertTextEquals(chatScreenViewModel.formatTimestamp(message.timestamp))
       }
     }
   }

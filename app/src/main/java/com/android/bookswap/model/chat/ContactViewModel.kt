@@ -30,6 +30,7 @@ class ContactViewModel(
         MessageFirestoreSource(FirebaseFirestore.getInstance())
 ) : ViewModel() {
 
+  private val chatScreenViewModel = ChatScreenViewModel()
   private val _messageBoxMap = MutableStateFlow<Map<UUID, MessageBox>>(emptyMap())
 
   val messageBoxMap: StateFlow<Map<UUID, MessageBox>> = _messageBoxMap
@@ -62,7 +63,8 @@ class ContactViewModel(
                         // Extract the last message details
                         val lastMessage = filteredMessages.lastOrNull()
                         val lastMessageText = lastMessage?.text ?: ""
-                        val lastMessageTimestamp = lastMessage?.timestamp?.toString() ?: ""
+                        val lastMessageTimestamp =
+                            chatScreenViewModel.formatTimestamp(lastMessage?.timestamp ?: 0)
 
                         // Update the message box map
                         _messageBoxMap.value =
