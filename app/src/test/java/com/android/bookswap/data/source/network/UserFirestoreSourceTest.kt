@@ -55,11 +55,7 @@ class UserFirestoreSourceTest {
 
     every { mockQuerySnapshot.documents } returns listOf(mockDocumentSnapshot)
 
-    every { mockDocumentSnapshot.getLong("userUUID.mostSignificantBits") } returns
-        testUser.userUUID.mostSignificantBits
-    every { mockDocumentSnapshot.getLong("userUUID.leastSignificantBits") } returns
-        testUser.userUUID.leastSignificantBits
-    every { mockDocumentSnapshot.getString("userUUID") } returns testUser.userUUID.toString()
+    every { mockDocumentSnapshot.get("userUUID") } returns testUser.userUUID.toString()
     every { mockDocumentSnapshot.getString("greeting") } returns testUser.greeting
     every { mockDocumentSnapshot.getString("firstName") } returns testUser.firstName
 
@@ -163,7 +159,7 @@ class UserFirestoreSourceTest {
     val result = userFirestoreSource.documentToUser(mockDocumentSnapshot)
 
     // Assert
-    assert(result.getOrNull() != null)
+    result.onFailure { throw it }
     result.onSuccess { assert(it.printFullname() == testUser.printFullname()) }
   }
 
