@@ -55,7 +55,7 @@ class PhotoFirestoreSourceTest {
     // Arrange snapshot
     every { mockDocumentReference.get() } returns Tasks.forResult(mockDocumentSnapshot)
     every { mockDocumentSnapshot.get("uuid") } returns testPhoto.uuid.toString()
-    every { mockDocumentSnapshot.getString("url") } returns testPhoto.url
+    every { mockDocumentSnapshot.get("url") } returns testPhoto.url.toString()
     every { mockDocumentSnapshot.get("timestamp") } returns testPhoto.timestamp
     every { mockDocumentSnapshot.getString("base64") } returns testPhoto.base64
   }
