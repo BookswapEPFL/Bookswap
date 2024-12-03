@@ -12,6 +12,7 @@ import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.intent.Intents.intended
 import androidx.test.espresso.intent.matcher.IntentMatchers.toPackage
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.android.bookswap.DefaultMockKs
 import com.android.bookswap.model.AppConfig
 import com.android.bookswap.model.LocalAppConfig
 import com.android.bookswap.model.UserViewModel
@@ -38,7 +39,7 @@ class LoginTest : TestCase() {
   @Before
   fun setUp() {
     Intents.init()
-    userVM = mockk(relaxed = true)
+    userVM = DefaultMockKs.mockKUserViewModel
     mocknavi = mockk(relaxed = true)
   }
 

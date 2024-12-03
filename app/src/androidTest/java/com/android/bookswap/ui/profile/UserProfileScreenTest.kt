@@ -7,6 +7,7 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.navigation.compose.rememberNavController
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.android.bookswap.DefaultMockKs
 import com.android.bookswap.data.DataUser
 import com.android.bookswap.data.source.network.PhotoFirebaseStorageSource
 import com.android.bookswap.model.AppConfig
@@ -18,11 +19,8 @@ import com.android.bookswap.ui.components.TopAppBarComponent
 import com.android.bookswap.ui.navigation.NavigationActions
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
 import io.github.kakaocup.compose.node.element.ComposeScreen
-import io.mockk.every
 import io.mockk.mockk
 import java.util.UUID
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -53,10 +51,7 @@ class UserProfileScreenTest : TestCase() {
 
   @Before
   fun setup() {
-    val userVM: UserViewModel = mockk()
-    every { userVM.getUser(any()) } returns standardUser
-    every { userVM.uuid } returns standardUser.userUUID
-    every { userVM.getLocationPlace(any()) } returns MutableStateFlow("address").asStateFlow()
+    val userVM: UserViewModel = DefaultMockKs.mockKUserViewModel
 
     photoStorage = mockk(relaxed = true)
 
@@ -66,7 +61,7 @@ class UserProfileScreenTest : TestCase() {
       CompositionLocalProvider(LocalAppConfig provides AppConfig(userViewModel = userVM)) {
         UserProfile(
             photoStorage = photoStorage,
-            { TopAppBarComponent(Modifier, navigationActions, "Messages") })
+            { TopAppBarComponent(Modifier, navigationActions, "Your Profile") })
       }
     }
   }

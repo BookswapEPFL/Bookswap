@@ -9,6 +9,7 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollToNode
 import androidx.navigation.compose.rememberNavController
+import com.android.bookswap.DefaultMockKs
 import com.android.bookswap.data.BookGenres
 import com.android.bookswap.data.BookLanguages
 import com.android.bookswap.data.DataBook
@@ -19,7 +20,6 @@ import com.android.bookswap.model.UserViewModel
 import com.android.bookswap.resources.C
 import com.android.bookswap.ui.navigation.NavigationActions
 import io.mockk.coEvery
-import io.mockk.every
 import io.mockk.mockk
 import java.util.UUID
 import org.junit.Before
@@ -32,13 +32,11 @@ class BookProfileScreenTest {
   private lateinit var mockNavController: NavigationActions
   private lateinit var mockBookRepo: BooksRepository
   private val testBookId = UUID.randomUUID()
-  private val mockUserViewModel: UserViewModel = mockk()
+  private val mockUserViewModel: UserViewModel = DefaultMockKs.mockKUserViewModel
   private lateinit var testBook: DataBook
 
   @Before
   fun setup() {
-    val userUUID = UUID.randomUUID()
-    every { mockUserViewModel.uuid } returns userUUID
     testBook =
         DataBook(
             testBookId,

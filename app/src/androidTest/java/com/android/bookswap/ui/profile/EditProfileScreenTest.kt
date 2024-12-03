@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.android.bookswap.DefaultMockKs
 import com.android.bookswap.model.AppConfig
 import com.android.bookswap.model.LocalAppConfig
 import com.android.bookswap.model.UserViewModel
@@ -11,7 +12,6 @@ import com.android.bookswap.screen.EditProfileScreen
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
 import io.github.kakaocup.compose.node.element.ComposeScreen
 import io.mockk.every
-import io.mockk.mockk
 import java.util.UUID
 import org.junit.Before
 import org.junit.Rule
@@ -26,7 +26,7 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class EditProfileScreenTest : TestCase() {
 
-  private val mockUserViewModel: UserViewModel = mockk(relaxed = true)
+  private val mockUserViewModel: UserViewModel = DefaultMockKs.mockKUserViewModel
 
   @Before
   fun setup() {

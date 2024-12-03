@@ -15,6 +15,7 @@ import androidx.compose.ui.test.swipe
 import androidx.compose.ui.test.swipeUp
 import androidx.navigation.compose.rememberNavController
 import androidx.test.rule.GrantPermissionRule
+import com.android.bookswap.DefaultMockKs
 import com.android.bookswap.data.BookGenres
 import com.android.bookswap.data.BookLanguages
 import com.android.bookswap.data.DataBook
@@ -25,7 +26,6 @@ import com.android.bookswap.model.map.BookManagerViewModel
 import com.android.bookswap.model.map.DefaultGeolocation
 import com.android.bookswap.resources.C
 import com.android.bookswap.ui.navigation.NavigationActions
-import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.CameraPositionState
 import io.mockk.every
 import io.mockk.just
@@ -43,11 +43,11 @@ val longListBook =
     List(20) {
       DataBook(
           UUID(2000, 2000),
-          "Book 1",
+          "Book $it",
           "Author 1",
-          "Description of Book 1",
+          "Description of Book $it",
           5,
-          "url_to_photo_1",
+          "url_to_photo_$it",
           BookLanguages.ENGLISH,
           "123-456-789",
           listOf(BookGenres.FICTION, BookGenres.NONFICTION),
@@ -101,16 +101,17 @@ class MapScreenTest {
           Manifest.permission.ACCESS_BACKGROUND_LOCATION)
 
   private val mockBookManagerViewModel: BookManagerViewModel = mockk()
-  private val mockUserVM: UserViewModel = mockk()
+  private lateinit var mockUserVM: UserViewModel
 
   @Before
   fun setup() {
     every { mockBookManagerViewModel.filteredBooks } returns MutableStateFlow(books)
-    every { mockUserVM.latlng } returns LatLng(0.0, 0.0)
     every { mockBookManagerViewModel.filteredUsers } returns
         MutableStateFlow(userBooksWithLocationList)
     every { mockBookManagerViewModel.startUpdatingBooks() } just runs
     every { mockBookManagerViewModel.stopUpdatingBooks() } just runs
+
+    mockUserVM = DefaultMockKs.mockKUserViewModel
   }
 
   @Test

@@ -11,11 +11,10 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextClearance
 import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.android.bookswap.DefaultMockKs
 import com.android.bookswap.data.BookLanguages
 import com.android.bookswap.data.DataBook
-import com.android.bookswap.data.DataUser
 import com.android.bookswap.data.repository.BooksRepository
-import com.android.bookswap.data.repository.UsersRepository
 import com.android.bookswap.data.source.api.GoogleBookDataSource
 import com.android.bookswap.model.AppConfig
 import com.android.bookswap.model.LocalAppConfig
@@ -32,8 +31,6 @@ import io.mockk.just
 import io.mockk.mockk
 import io.mockk.mockkConstructor
 import io.mockk.mockkStatic
-import io.mockk.runs
-import io.mockk.spyk
 import io.mockk.verify
 import java.util.UUID
 import org.junit.Assert
@@ -54,33 +51,8 @@ class ISBNAddTest : TestCase() {
     toastMock = mockk<Toast>()
     every { toastMock.show() } returns Unit
     every { Toast.makeText(any(), any<String>(), any()) } returns toastMock
-    val userUUid = UUID.randomUUID()
 
-    val dataUser =
-        DataUser(
-            userUUid,
-            "Hello",
-            "John",
-            "Doe",
-            "eleanorroosevelt@myownpersonaldomain.com",
-            "+1234567890",
-            0.0,
-            0.0,
-            "https://www.example.com/profile.jpg",
-            listOf(UUID.randomUUID()),
-            "googleUID",
-            listOf("contact1", "contact2"))
-
-    val mockUserRepository: UsersRepository = mockk()
-
-    mockUserVM = spyk(UserViewModel(userUUid, mockUserRepository, dataUser))
-
-    every { mockUserVM.uuid } returns userUUid
-    every { mockUserVM.getUser() } returns dataUser
-    every {
-      mockUserVM.updateUser(
-          any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any())
-    } just runs
+    mockUserVM = DefaultMockKs.mockKUserViewModel
   }
 
   @Test
@@ -206,7 +178,7 @@ class ISBNAddTest : TestCase() {
   @Test
   fun ISBNRepositoryCallFailed() {
     val bookUUID = UUID.randomUUID()
-    val userUUID = mockUserVM.getUser().userUUID
+    val userUUID = mockUserVM.uuid
     val bookISBN = "9780435123437"
     val dataBook =
         DataBook(
