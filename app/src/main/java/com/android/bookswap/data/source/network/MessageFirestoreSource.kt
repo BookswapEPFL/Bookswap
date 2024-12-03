@@ -1,8 +1,6 @@
 package com.android.bookswap.data.source.network
 
-import android.content.Context
 import android.util.Log
-import android.widget.Toast
 import com.android.bookswap.data.DataMessage
 import com.android.bookswap.data.MessageType
 import com.android.bookswap.data.repository.MessageRepository
@@ -11,13 +9,15 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
 import java.util.UUID
 
-const val COLLECTION_PATH = "messages"
+const val COLLECTION_PATH = "chats"
+const val fifteenMinutesInMillis = 15 * 60 * 1000
 /**
  * Firestore source for managing messages.
  *
  * @param db The Firestore database instance.
  */
 class MessageFirestoreSource(private val db: FirebaseFirestore) : MessageRepository {
+
   /**
    * Generates a new UUID.
    *
@@ -26,6 +26,7 @@ class MessageFirestoreSource(private val db: FirebaseFirestore) : MessageReposit
   override fun getNewUUID(): UUID {
     return UUID.randomUUID()
   }
+
   /**
    * Firestore source for managing messages.
    *
@@ -39,27 +40,37 @@ class MessageFirestoreSource(private val db: FirebaseFirestore) : MessageReposit
       callback(Result.failure(e))
     }
   }
+
   /**
    * Fetches all messages from the Firestore database.
    *
+   * @param user1UUID UUID of the first user.
+   * @param user2UUID UUID of the second user.
    * @param callback Callback to be invoked with the result of the operation. The result is a list
    *   of DataMessage objects on success, or an exception on failure.
+   * @return A list of messages between the two users.
    */
-  override fun getMessages(callback: (Result<List<DataMessage>>) -> Unit) {
-    db.collection(COLLECTION_PATH).get().addOnCompleteListener { task ->
-      if (task.isSuccessful) {
-        val documents = task.result?.documents
-        if (!documents.isNullOrEmpty()) {
-          val messages = documents.mapNotNull { documentToMessage(it).getOrNull() }
-          callback(Result.success(messages))
-        } else {
-          callback(Result.success(emptyList()))
+  override fun getMessages(
+      user1UUID: UUID,
+      user2UUID: UUID,
+      callback: (Result<List<DataMessage>>) -> Unit
+  ) {
+    val chatPath = mergeUUIDs(user1UUID, user2UUID)
+
+    db.collection(COLLECTION_PATH)
+        .document(chatPath)
+        .collection("messages")
+        .get()
+        .addOnCompleteListener { task ->
+          if (task.isSuccessful && task.result != null) {
+            val messages = task.result!!.documents.mapNotNull { documentToMessage(it).getOrNull() }
+            callback(Result.success(messages))
+          } else {
+            callback(Result.failure(task.exception ?: Exception("Error fetching messages")))
+          }
         }
-      } else {
-        callback(Result.failure(task.exception ?: Exception("Unknown error fetching messages")))
-      }
-    }
   }
+
   /**
    * Sends a message to the Firestore database.
    *
@@ -69,15 +80,20 @@ class MessageFirestoreSource(private val db: FirebaseFirestore) : MessageReposit
    */
   override fun sendMessage(dataMessage: DataMessage, callback: (Result<Unit>) -> Unit) {
     val messageDocument = messageToDocument(dataMessage)
+    // Generate the chat path using the consistent `mergeUUIDs` order
+    val chatPath = mergeUUIDs(dataMessage.senderUUID, dataMessage.receiverUUID)
 
+    // Store the message in the correct chat subdivision
     db.collection(COLLECTION_PATH)
-        .document(dataMessage.uuid.toString())
+        .document(chatPath)
+	    .collection("messages")
+	    .document(dataMessage.uuid.toString())
         .set(messageDocument)
         .addOnCompleteListener { result ->
           if (result.isSuccessful) {
             callback(Result.success(Unit))
           } else {
-            callback(Result.failure(result.exception ?: Exception("Unknown error sending message")))
+            callback(Result.failure(result.exception ?: Exception("Error sending message")))
           }
         }
   }
@@ -85,58 +101,68 @@ class MessageFirestoreSource(private val db: FirebaseFirestore) : MessageReposit
    * Deletes a message from the Firestore database.
    *
    * @param messageUUID The UUID of the message to be deleted.
+   * @param user1UUID The UUID of the first user.
+   * @param user2UUID The UUID of the second user.
    * @param callback Callback to be invoked with the result of the operation. The result is a
    *   success if the message is deleted successfully, or an exception on failure.
+   * @param context The context for displaying Toast messages.
    */
   override fun deleteMessage(
       messageUUID: UUID,
-      callback: (Result<Unit>) -> Unit,
-      context: Context
+      user1UUID: UUID,
+      user2UUID: UUID,
+      callback: (Result<Unit>) -> Unit
   ) {
-    val fifteenMinutesInMillis = 15 * 60 * 1000
-    val currentTime = System.currentTimeMillis()
+    // Generate the chat path using the consistent `mergeUUIDs` order
+    val chatPath = mergeUUIDs(user1UUID, user2UUID)
 
-    db.collection(COLLECTION_PATH).document(messageUUID.toString()).get().addOnCompleteListener {
-        task ->
-      if (task.isSuccessful) {
-        val document = task.result
-        if (document != null && document.exists()) {
-          val existingMessage = documentToMessage(document).getOrNull()
-          if (existingMessage != null) {
-            if (currentTime - existingMessage.timestamp <= fifteenMinutesInMillis) {
-              db.collection(COLLECTION_PATH)
-                  .document(messageUUID.toString())
-                  .delete()
-                  .addOnCompleteListener { deleteTask ->
-                    if (deleteTask.isSuccessful) {
-                      callback(Result.success(Unit))
-                    } else {
-                      callback(
-                          Result.failure(
-                              deleteTask.exception ?: Exception("Unknown error deleting message")))
+    // Fetch the message to check the deletion time window
+    db.collection(COLLECTION_PATH)
+        .document(chatPath)
+        .collection("messages")
+        .document(messageUUID.toString())
+        .get()
+        .addOnCompleteListener { task ->
+          if (task.isSuccessful && task.result != null && task.result!!.exists()) {
+            val document = task.result!!
+            val existingMessage = documentToMessage(document).getOrNull()
+
+            if (existingMessage != null) {
+              val currentTime = System.currentTimeMillis()
+
+              // Check if the message is within the 15-minute deletion window
+              if (currentTime - existingMessage.timestamp <= fifteenMinutesInMillis) {
+                // Delete the message
+                db.collection(COLLECTION_PATH)
+                    .document(chatPath)
+                    .collection("messages")
+                    .document(messageUUID.toString())
+                    .delete()
+                    .addOnCompleteListener { deleteTask ->
+                      if (deleteTask.isSuccessful) {
+                        callback(Result.success(Unit))
+                      } else {
+                        callback(
+                            Result.failure(
+                                deleteTask.exception ?: Exception("Error deleting message")))
+                      }
                     }
-                  }
+              } else {
+                // Notify the user that the deletion window has passed
+                callback(
+                    Result.failure(
+                        Exception("Message can only be deleted within 15 minutes of being sent")))
+              }
             } else {
-              Toast.makeText(
-                      context,
-                      "Message can only be deleted within 15 minutes of being sent",
-                      Toast.LENGTH_LONG)
-                  .show()
-              callback(
-                  Result.failure(
-                      Exception("Message can only be deleted within 15 minutes of being sent")))
+              callback(Result.failure(Exception("Message not found")))
             }
           } else {
-            callback(Result.failure(Exception("Message not found")))
+            callback(
+                Result.failure(task.exception ?: Exception("Error fetching message for deletion")))
           }
-        } else {
-          callback(Result.failure(Exception("Message not found")))
         }
-      } else {
-        callback(Result.failure(task.exception ?: Exception("Unknown error fetching message")))
-      }
-    }
   }
+
   /**
    * Deletes all messages between two users from the Firestore database.
    *
@@ -150,31 +176,36 @@ class MessageFirestoreSource(private val db: FirebaseFirestore) : MessageReposit
       user2UUID: UUID,
       callback: (Result<Unit>) -> Unit
   ) {
+    // Generate the chat path using the consistent `mergeUUIDs` order
+    val chatPath = mergeUUIDs(user1UUID, user2UUID)
+
+    // Fetch all messages in the chat subdivision
     db.collection(COLLECTION_PATH)
-        .whereIn("senderUUID", listOf(user1UUID, user2UUID))
-        .whereIn("receiverUUID", listOf(user1UUID, user2UUID))
-        .whereNotEqualTo("senderUUID", "receiverUUID")
+        .document(chatPath)
+        .collection("messages")
         .get()
         .addOnCompleteListener { task ->
-          if (task.isSuccessful) {
-            val documents = task.result
-            if (documents != null && !documents.isEmpty) {
-              val batch = db.batch()
-              documents.documents.forEach { document -> batch.delete(document.reference) }
-              batch.commit().addOnCompleteListener { deleteTask ->
-                if (deleteTask.isSuccessful) {
-                  callback(Result.success(Unit))
-                } else {
-                  callback(
-                      Result.failure(
-                          deleteTask.exception ?: Exception("Unknown error deleting messages")))
-                }
+          if (task.isSuccessful && task.result != null) {
+            val batch = db.batch()
+            val documents = task.result!!.documents
+
+            // Add each document to the batch for deletion
+            for (document in documents) {
+              batch.delete(document.reference)
+            }
+
+            // Commit the batch
+            batch.commit().addOnCompleteListener { deleteTask ->
+              if (deleteTask.isSuccessful) {
+                callback(Result.success(Unit))
+              } else {
+                callback(
+                    Result.failure(deleteTask.exception ?: Exception("Error deleting messages")))
               }
-            } else {
-              callback(Result.success(Unit))
             }
           } else {
-            callback(Result.failure(task.exception ?: Exception("Unknown error fetching messages")))
+            callback(
+                Result.failure(task.exception ?: Exception("Error fetching messages for deletion")))
           }
         }
   }
@@ -182,62 +213,69 @@ class MessageFirestoreSource(private val db: FirebaseFirestore) : MessageReposit
    * Updates a message in the Firestore database.
    *
    * @param dataMessage The message to be updated.
+   * @param message The message to be updated.
+   * @param user1UUID The UUID of the first user.
+   * @param user2UUID The UUID of the second user.
    * @param callback Callback to be invoked with the result of the operation. The result is a
    *   success if the message is updated successfully, or an exception on failure.
    * @param context The context for displaying Toast messages.
    */
   override fun updateMessage(
       dataMessage: DataMessage,
-      callback: (Result<Unit>) -> Unit,
-      context: Context
+      user1UUID: UUID,
+      user2UUID: UUID,
+      callback: (Result<Unit>) -> Unit
   ) {
-    val fifteenMinutesInMillis = 15 * 60 * 1000
-    val currentTime = System.currentTimeMillis()
-
-    db.collection(COLLECTION_PATH)
-        .document(dataMessage.uuid.toString())
-        .get()
-        .addOnCompleteListener { task ->
-          if (task.isSuccessful) {
-            val document = task.result
-            if (document != null && document.exists()) {
-              val existingMessage = documentToMessage(document).getOrNull()
-              if (existingMessage != null) {
-                if (currentTime - existingMessage.timestamp <= fifteenMinutesInMillis) {
-                  val messageMap = messageToDocument(dataMessage)
-                  db.collection(COLLECTION_PATH)
-                      .document(dataMessage.uuid.toString())
-                      .update(messageMap)
-                      .addOnCompleteListener { updateTask ->
-                        if (updateTask.isSuccessful) {
-                          callback(Result.success(Unit))
-                        } else {
-                          callback(
-                              Result.failure(
-                                  updateTask.exception
-                                      ?: Exception("Unknown error updating message")))
-                        }
-                      }
-                } else {
-                  Toast.makeText(
-                          context,
-                          "Message can only be updated within 15 minutes of being sent",
-                          Toast.LENGTH_LONG)
-                      .show()
-                  callback(
-                      Result.failure(
-                          Exception("Message can only be updated within 15 minutes of being sent")))
-                }
-              } else {
-                callback(Result.failure(Exception("Message not found")))
-              }
-            } else {
-              callback(Result.failure(Exception("Message not found")))
-            }
-          } else {
-            callback(Result.failure(task.exception ?: Exception("Unknown error fetching message")))
-          }
-        }
+	// Generate the chat path using the consistent `mergeUUIDs` order
+	val chatPath = mergeUUIDs(user1UUID, user2UUID)
+	
+	db.collection(COLLECTION_PATH)
+	  .document(chatPath)
+	  .collection("messages")
+	  .document(dataMessage.uuid.toString())
+	  .get()
+	  .addOnCompleteListener { task ->
+		if (task.isSuccessful) {
+		  val document = task.result
+		  if (document != null && document.exists()) {
+			val existingMessage = documentToMessage(document).getOrNull()
+			if (existingMessage != null) {
+			  val currentTime = System.currentTimeMillis()
+			  if (currentTime - existingMessage.timestamp <= fifteenMinutesInMillis) {
+				val messageMap = messageToDocument(dataMessage)
+				db.collection(COLLECTION_PATH)
+				  .document(dataMessage.uuid.toString())
+				  .update(messageMap)
+				  .addOnCompleteListener { updateTask ->
+					if (updateTask.isSuccessful) {
+					  callback(Result.success(Unit))
+					} else {
+					  callback(
+						Result.failure(
+						  updateTask.exception
+							?: Exception("Unknown error updating message")
+						)
+					  )
+					}
+				  }
+			  } else {
+				callback(
+				  Result.failure(
+					Exception("Message can only be updated within 15 minutes of being sent")
+				  )
+				)
+			  }
+			} else {
+			  callback(Result.failure(Exception("Message not found")))
+			}
+		  } else {
+			callback(
+			  Result.failure(task.exception ?: Exception("Error fetching message for update"))
+			)
+			
+		  }
+		}
+	  }
   }
   /**
    * Adds a listener for real-time updates to messages between two users.
@@ -318,5 +356,20 @@ fun documentToMessage(document: DocumentSnapshot): Result<DataMessage> {
   } catch (e: Exception) {
     Log.e("MessageSource", "Error converting document to Message: ${e.message}")
     Result.failure(e)
+  }
+}
+
+/**
+ * Merges two UUIDs into a single string.
+ *
+ * @param uuid1 The first UUID.
+ * @param uuid2 The second UUID.
+ * @return A string containing both UUIDs.
+ */
+private fun mergeUUIDs(uuid1: UUID, uuid2: UUID): String {
+  return if (uuid1.toString() < uuid2.toString()) {
+    "${uuid1}_$uuid2"
+  } else {
+    "${uuid2}_$uuid1"
   }
 }

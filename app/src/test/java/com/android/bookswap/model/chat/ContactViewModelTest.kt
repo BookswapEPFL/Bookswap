@@ -17,22 +17,32 @@ class ContactViewModelTest {
   private lateinit var messageFirestoreSource: MessageFirestoreSource
   private lateinit var userFirestoreSource: UserFirestoreSource
 
-  // This method sets up the necessary mocks and prepares the test environment
   @Before
   fun setUp() {
     userVM = mockk()
     messageFirestoreSource = mockk()
     userFirestoreSource = mockk()
 
-    // Mocking the behavior of getUser() method in the userVM
+    // Mock the behavior of getUser() in userVM
     every { userVM.getUser() } returns user
 
-    // Mocking the repository calls for messages and user data
-    every { messageFirestoreSource.getMessages(any()) } answers
+    // Mock the behavior of getMessages in messageFirestoreSource
+    every { messageFirestoreSource.getMessages(any(), any(), any()) } answers
         {
-          val callback = it.invocation.args[0] as (Result<List<DataMessage>>) -> Unit
-          callback(Result.success(messagesDB))
+          val user1UUID = it.invocation.args[0] as UUID
+          val user2UUID = it.invocation.args[1] as UUID
+          val callback = it.invocation.args[2] as (Result<List<DataMessage>>) -> Unit
+
+          // Filter messages between the two users
+          val filteredMessages =
+              messagesDB.filter { message ->
+                (message.senderUUID == user1UUID && message.receiverUUID == user2UUID) ||
+                    (message.senderUUID == user2UUID && message.receiverUUID == user1UUID)
+              }
+          callback(Result.success(filteredMessages))
         }
+
+    // Mock the behavior of getUser in userFirestoreSource
     every { userFirestoreSource.getUser(uuid = any(), any()) } answers
         {
           val userUUID = it.invocation.args[0] as UUID
@@ -42,7 +52,6 @@ class ContactViewModelTest {
         }
   }
 
-  // This test verifies if the messageBoxMap is correctly updated after calling updateMessageBoxMap
   @Test
   fun `updateMessageBoxMap should update messageBoxMap`() {
     // Instantiate the ContactViewModel with mocked dependencies
@@ -51,14 +60,14 @@ class ContactViewModelTest {
     // Call the method to update the message box map
     contactViewModel.updateMessageBoxMap()
 
-    // Wait for the async operations to complete (not needed if we are using coroutines with proper
-    // Dispatchers)
-    Thread.sleep(1000) // Placeholder: You should ideally handle async operations better in tests
+    // Wait for the async operations to complete (or use proper coroutine testing tools if
+    // applicable)
+    Thread.sleep(1000) // Placeholder: Replace with proper handling for async tests
 
     // Print the current state of the messageBoxMap for debugging
     println(contactViewModel.messageBoxMap.value)
 
-    // Assertions to check if the message box map is updated with the correct messages
+    // Assertions to verify the message box map is updated with correct messages
     assert(contactViewModel.messageBoxMap.value[listOfUUIDs[1]]?.message == "Namaste")
     assert(contactViewModel.messageBoxMap.value[listOfUUIDs[2]]?.message == "Hola")
   }

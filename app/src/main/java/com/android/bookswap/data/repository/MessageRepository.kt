@@ -1,6 +1,5 @@
 package com.android.bookswap.data.repository
 
-import android.content.Context
 import com.android.bookswap.data.DataMessage
 import com.google.firebase.firestore.ListenerRegistration
 import java.util.UUID
@@ -21,9 +20,13 @@ interface MessageRepository {
   /**
    * Get all messages as a list
    *
+   * @param user1UUID uuid of the first user
+   * @param user2UUID uuid of the second user
    * @param callback callback function that receives list of messages if success
    */
   fun getMessages(
+      user1UUID: UUID,
+      user2UUID: UUID,
       callback: (Result<List<DataMessage>>) -> Unit,
   )
 
@@ -40,10 +43,17 @@ interface MessageRepository {
    * Delete a message from the repository
    *
    * @param messageUUID UUID of message to be deleted
+   * @param user1UUID uuid of the first user
+   * @param user2UUID uuid of the second user
    * @param callback callback function that receives Result.success() when operation succeed of
    *   Result.failure(exception) if error
    */
-  fun deleteMessage(messageUUID: UUID, callback: (Result<Unit>) -> Unit, context: Context)
+  fun deleteMessage(
+      messageUUID: UUID,
+      user1UUID: UUID,
+      user2UUID: UUID,
+      callback: (Result<Unit>) -> Unit,
+  )
 
   /**
    * Delete all messages of this chat from the repository
@@ -59,10 +69,17 @@ interface MessageRepository {
    * Update a message in the repository
    *
    * @param dataMessage message to be updated
+   * @param user1UUID uuid of the first user
+   * @param user2UUID uuid of the second user
    * @param callback callback function that receives Result.success() when operation succeed of
    *   Result.failure(exception) if error
    */
-  fun updateMessage(dataMessage: DataMessage, callback: (Result<Unit>) -> Unit, context: Context)
+  fun updateMessage(
+      dataMessage: DataMessage,
+      user1UUID: UUID,
+      user2UUID: UUID,
+      callback: (Result<Unit>) -> Unit
+  )
 
   /**
    * Add a listener to the repository to get messages in real-time

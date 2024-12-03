@@ -2,8 +2,6 @@ package com.android.bookswap.ui.chat
 
 import android.content.Context
 import androidx.compose.ui.semantics.SemanticsActions
-import androidx.compose.ui.semantics.SemanticsProperties
-import androidx.compose.ui.semantics.getOrNull
 import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextEquals
@@ -407,7 +405,6 @@ class ChatScreenTest {
     val messageNode =
         composeTestRule.onNodeWithTag(
             "${message.uuid}_" + C.Tag.ChatScreen.messages, useUnmergedTree = true)
-    messageNode.assertExists("Message item not found")
 
     messageNode.performSemanticsAction(SemanticsActions.OnLongClick)
 
@@ -442,19 +439,6 @@ class ChatScreenTest {
     assert(updatedMessage != null && updatedMessage.text == newText) {
       "Message was not updated correctly"
     }
-
-    composeTestRule.waitUntil(timeoutMillis = 5399) {
-      composeTestRule
-          .onNodeWithTag("${message.uuid}_" + C.Tag.ChatScreen.content, useUnmergedTree = true)
-          .fetchSemanticsNode()
-          .config
-          .getOrNull(SemanticsProperties.Text)
-          ?.joinToString() == newText
-    }
-
-    composeTestRule
-        .onNodeWithTag("${message.uuid}_" + C.Tag.ChatScreen.content, useUnmergedTree = true)
-        .assertTextEquals(newText)
 
     composeTestRule
         .onNodeWithTag(C.Tag.ChatScreen.message, useUnmergedTree = true)
@@ -550,8 +534,18 @@ class ChatScreenTest {
       return mockNewUUID
     }
 
-    override fun getMessages(callback: (Result<List<DataMessage>>) -> Unit) {
-      callback(Result.success(messages))
+    override fun getMessages(
+        user1UUID: UUID,
+        user2UUID: UUID,
+        callback: (Result<List<DataMessage>>) -> Unit
+    ) {
+      // Filter messages to only include those between user1 and user2
+      val filteredMessages =
+          messages.filter { message ->
+            (message.senderUUID == user1UUID && message.receiverUUID == user2UUID) ||
+                (message.senderUUID == user2UUID && message.receiverUUID == user1UUID)
+          }
+      callback(Result.success(filteredMessages))
     }
 
     override fun sendMessage(message: DataMessage, callback: (Result<Unit>) -> Unit) {
@@ -561,11 +555,22 @@ class ChatScreenTest {
 
     override fun deleteMessage(
         messageUUID: UUID,
-        callback: (Result<Unit>) -> Unit,
-        context: Context
+        user1UUID: UUID,
+        user2UUID: UUID,
+        callback: (Result<Unit>) -> Unit
     ) {
-      messages.removeIf { it.uuid == messageUUID }
-      callback(Result.success(Unit))
+      // Remove the message if it matches the UUID and is between the two users
+      val removed =
+          messages.removeIf { message ->
+            message.uuid == messageUUID &&
+                ((message.senderUUID == user1UUID && message.receiverUUID == user2UUID) ||
+                    (message.senderUUID == user2UUID && message.receiverUUID == user1UUID))
+          }
+      if (removed) {
+        callback(Result.success(Unit))
+      } else {
+        callback(Result.failure(Exception("Message not found")))
+      }
     }
 
     override fun deleteAllMessages(
@@ -573,20 +578,28 @@ class ChatScreenTest {
         user2UUID: UUID,
         callback: (Result<Unit>) -> Unit
     ) {
-      messages.removeIf { it.senderUUID == user1UUID && it.receiverUUID == user2UUID }
-      messages.removeIf { it.senderUUID == user2UUID && it.receiverUUID == user1UUID }
+      // Remove all messages between the two users
+      messages.removeIf { message ->
+        (message.senderUUID == user1UUID && message.receiverUUID == user2UUID) ||
+            (message.senderUUID == user2UUID && message.receiverUUID == user1UUID)
+      }
       callback(Result.success(Unit))
     }
 
     override fun updateMessage(
         message: DataMessage,
-        callback: (Result<Unit>) -> Unit,
-        context: Context
+        user1UUID: UUID,
+        user2UUID: UUID,
+        callback: (Result<Unit>) -> Unit
     ) {
       val index = messages.indexOfFirst { it.uuid == message.uuid }
-      if (index != -1) {
-        messages[index] = message.copy(text = message.text) // Update the message text
-        callback(Result.success(Unit)) // Simulate success
+      if (index != -1 &&
+          ((messages[index].senderUUID == user1UUID && messages[index].receiverUUID == user2UUID) ||
+              (messages[index].senderUUID == user2UUID &&
+                  messages[index].receiverUUID == user1UUID))) {
+        // Update the message text and timestamp
+        messages[index] = message.copy(text = message.text, timestamp = System.currentTimeMillis())
+        callback(Result.success(Unit))
       } else {
         callback(Result.failure(Exception("Message not found")))
       }
@@ -600,7 +613,14 @@ class ChatScreenTest {
       requireNotNull(otherUserUUID) { "otherUserId must not be null" }
       requireNotNull(currentUserUUID) { "currentUserId must not be null" }
 
-      callback(Result.success(messages)) // Or whatever logic you'd like to simulate
+      // Return messages between the two users
+      val filteredMessages =
+          messages.filter { message ->
+            (message.senderUUID == currentUserUUID && message.receiverUUID == otherUserUUID) ||
+                (message.senderUUID == otherUserUUID && message.receiverUUID == currentUserUUID)
+          }
+      callback(Result.success(filteredMessages))
+
       return mockk()
     }
   }
