@@ -29,6 +29,13 @@ import com.android.bookswap.ui.components.BookListComponent
 import com.android.bookswap.ui.theme.ColorVariable
 import java.util.UUID
 
+/** Constants * */
+private val PROFILE_PICTURE_SIZE = 90.dp
+private val PROFILE_PICTURE_BORDER_WIDTH = 3.dp
+private val ICON_SIZE = 80.dp
+private val PADDING = 16.dp
+private val ITEM_SPACING = 8.dp
+
 /**
  * Composable function to display the user profile screen.
  *
@@ -48,7 +55,7 @@ fun OthersUserProfileScreen(
     topAppBar: @Composable () -> Unit = {},
     bottomAppBar: @Composable () -> Unit = {}
 ) {
-  // var user = userVM.getUser()
+
   var user by remember { mutableStateOf(DataUser()) }
   var isLoading by remember { mutableStateOf(true) }
 
@@ -80,8 +87,6 @@ fun OthersUserProfileScreen(
   }
 
   Log.e("OtherUserProfileScreen", "BookListDataBook: ${bookListData.value}")
-  // bookListData.clear()
-  // bookListData.addAll(fetchedBooks)
 
   Scaffold(
       modifier = Modifier.testTag("OtherUserProfileScreen"),
@@ -98,14 +103,14 @@ fun OthersUserProfileScreen(
           Column(
               modifier =
                   Modifier.padding(padding).fillMaxSize().background(ColorVariable.BackGround),
-              verticalArrangement = Arrangement.spacedBy(8.dp),
+              verticalArrangement = Arrangement.spacedBy(ITEM_SPACING),
               horizontalAlignment = Alignment.CenterHorizontally) {
                 // Profile Picture
                 Box(
                     modifier =
-                        Modifier.padding(16.dp)
-                            .size(90.dp)
-                            .border(3.dp, ColorVariable.Accent, CircleShape)
+                        Modifier.padding(PADDING)
+                            .size(PROFILE_PICTURE_SIZE)
+                            .border(PROFILE_PICTURE_BORDER_WIDTH, ColorVariable.Accent, CircleShape)
                             .background(ColorVariable.AccentSecondary, CircleShape),
                     contentAlignment = Alignment.Center) {
                       if (user.profilePictureUrl.isNotEmpty()) {
@@ -115,7 +120,7 @@ fun OthersUserProfileScreen(
                         Icon(
                             imageVector = Icons.Default.AccountCircle,
                             contentDescription = null,
-                            modifier = Modifier.size(80.dp),
+                            modifier = Modifier.size(ICON_SIZE),
                             tint = ColorVariable.Accent)
                       }
                     }
@@ -135,7 +140,7 @@ fun OthersUserProfileScreen(
                 // Book List
                 if (isBooksLoading) {
                   Log.e("OtherUserProfileScreen", "Books are loading")
-                  CircularProgressIndicator(modifier = Modifier.padding(16.dp))
+                  CircularProgressIndicator(modifier = Modifier.padding(PADDING))
                 } else if (bookListData.value.isEmpty()) {
                   Log.e("OtherUserProfileScreen", "No books available")
                   Text("No books available", style = MaterialTheme.typography.bodyLarge)
@@ -145,7 +150,7 @@ fun OthersUserProfileScreen(
                       modifier =
                           Modifier.testTag("otherUserBookList")
                               .fillMaxWidth()
-                              .padding(16.dp), // background(Color.LightGray) // Debug background
+                              .padding(PADDING), // background(Color.LightGray) // Debug background
                       // .border(2.dp, Color.Red),    // Debug border,
                       bookList = bookListData.value)
                 }
@@ -153,6 +158,13 @@ fun OthersUserProfileScreen(
         }
       }
 }
+
+/** Constant * */
+private const val LABEL_WEIGHT = 0.5f
+private const val VALUE_WEIGHT = 2f
+private val BORDER_WIDTH = 1.dp
+private val PADDING_SMALL = 4.dp
+
 /**
  * A composable function to display a labeled text field.
  *
@@ -165,22 +177,20 @@ fun LabeledText(label: String, value: String) {
       modifier =
           Modifier.fillMaxWidth()
               .background(ColorVariable.Secondary, shape = MaterialTheme.shapes.small)
-              .border(1.dp, ColorVariable.Accent, shape = MaterialTheme.shapes.small)
-      // .padding(8.dp)
-      ) {
+              .border(BORDER_WIDTH, ColorVariable.Accent, shape = MaterialTheme.shapes.small)) {
         Row(
-            modifier = Modifier.fillMaxWidth().padding(4.dp),
+            modifier = Modifier.fillMaxWidth().padding(PADDING_SMALL),
             verticalAlignment = Alignment.CenterVertically) {
               Text(
                   text = label,
                   color = ColorVariable.Accent,
                   style = MaterialTheme.typography.labelLarge,
-                  modifier = Modifier.weight(0.5f))
+                  modifier = Modifier.weight(LABEL_WEIGHT))
               Text(
                   text = value,
                   color = ColorVariable.Accent,
                   style = MaterialTheme.typography.bodyLarge,
-                  modifier = Modifier.weight(2f))
+                  modifier = Modifier.weight(VALUE_WEIGHT))
             }
       }
 }

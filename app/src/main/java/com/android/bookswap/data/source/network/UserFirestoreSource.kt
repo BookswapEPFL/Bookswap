@@ -124,13 +124,6 @@ class UserFirestoreSource(private val db: FirebaseFirestore) : UsersRepository {
           (document.get("bookList") as List<String>).map { bookMap ->
             Log.d("TAG_BOOK_MAP", "bookMap: $bookMap")
             UUID.fromString(bookMap)
-            // val mostSigBits = bookMap["mostSignificantBits"]
-            // val leastSigBits = bookMap["leastSignificantBits"]
-            // if (mostSigBits != null && leastSigBits != null) {
-            // UUID(mostSigBits, leastSigBits)
-            // } else {
-            // null
-            // }
           }
       val contactList =
           try {
