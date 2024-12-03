@@ -37,7 +37,8 @@ class UserFirestoreSource(private val db: FirebaseFirestore) : UsersRepository {
    */
   override fun getUser(uuid: UUID, callback: (Result<DataUser>) -> Unit) {
 
-    db.collection(COLLECTION_NAME).whereEqualTo("UUID", uuid).get().addOnCompleteListener { task ->
+    db.collection(COLLECTION_NAME).whereEqualTo("userUUID", uuid).get().addOnCompleteListener { task
+      ->
       if (task.isSuccessful) {
         // Maps Firestore documents to DataUser objects or returns an empty list
         callback(
@@ -119,7 +120,6 @@ class UserFirestoreSource(private val db: FirebaseFirestore) : UsersRepository {
       val longitude = document.getDouble("longitude")!!
       val profilePicture = document.getString("profilePictureUrl")!!
       val googleUid = document.getString("googleUid")!!
-      Log.d("TAG_DOC2USR", "GUID: $googleUid")
       val bookList =
           (document.get("bookList") as List<Map<String, Long>>).map { bookMap ->
             val mostSigBits = bookMap["mostSignificantBits"]
@@ -130,6 +130,14 @@ class UserFirestoreSource(private val db: FirebaseFirestore) : UsersRepository {
               null
             }
           }
+      val contactList =
+          try {
+            (document.get("contactList") as? List<String>) ?: emptyList()
+          } catch (e: Exception) {
+            Log.e("TAG_CONTACT_LIST_ERROR", "Error parsing contactList: ${e.message}")
+            emptyList()
+          }
+
       if (bookList.any { it == null }) {
         throw IllegalArgumentException("Book list contains null UUIDs")
       }
@@ -146,7 +154,8 @@ class UserFirestoreSource(private val db: FirebaseFirestore) : UsersRepository {
               longitude,
               profilePicture,
               bookList.filterNotNull(),
-              googleUid))
+              googleUid,
+              contactList.filterNotNull()))
     } catch (e: Exception) {
       Log.e("FirestoreSource", "Error converting document to User: ${e.message}")
       Result.failure(e)
@@ -167,5 +176,63 @@ class UserFirestoreSource(private val db: FirebaseFirestore) : UsersRepository {
         result.exception?.let { e -> callback(Result.failure(e)) }
       }
     }
+  }
+
+  /**
+   * Adds a contact to the user's contact list in Firestore.
+   *
+   * @param userUUID UUID of the user whose contact list is being updated.
+   * @param contactUUID UUID of the contact to add.
+   * @param callback Callback for success or failure.
+   */
+  override fun addContact(userUUID: UUID, contactUUID: String, callback: (Result<Unit>) -> Unit) {
+    db.collection(COLLECTION_NAME)
+        .document(userUUID.toString())
+        .get()
+        .addOnSuccessListener { document ->
+          val currentContactList = (document.get("contactList") as? List<String>) ?: emptyList()
+          if (!currentContactList.contains(contactUUID)) {
+            val updatedContactList = currentContactList + contactUUID
+            db.collection(COLLECTION_NAME)
+                .document(userUUID.toString())
+                .update("contactList", updatedContactList)
+                .addOnSuccessListener { callback(Result.success(Unit)) }
+                .addOnFailureListener { e -> callback(Result.failure(e)) }
+          } else {
+            callback(Result.success(Unit)) // Already in the contact list
+          }
+        }
+        .addOnFailureListener { e -> callback(Result.failure(e)) }
+  }
+
+  /**
+   * Removes a contact from the user's contact list in Firestore.
+   *
+   * @param userUUID UUID of the user whose contact list is being updated.
+   * @param contactUUID UUID of the contact to remove.
+   * @param callback Callback for success or failure.
+   */
+  override fun removeContact(
+      userUUID: UUID,
+      contactUUID: String,
+      callback: (Result<Unit>) -> Unit
+  ) {
+    db.collection(COLLECTION_NAME)
+        .document(userUUID.toString())
+        .get()
+        .addOnSuccessListener { document ->
+          val currentContactList = (document.get("contactList") as? List<String>) ?: emptyList()
+          if (currentContactList.contains(contactUUID)) {
+            val updatedContactList = currentContactList - contactUUID
+            db.collection(COLLECTION_NAME)
+                .document(userUUID.toString())
+                .update("contactList", updatedContactList)
+                .addOnSuccessListener { callback(Result.success(Unit)) }
+                .addOnFailureListener { e -> callback(Result.failure(e)) }
+          } else {
+            callback(Result.success(Unit)) // Already not in the contact list
+          }
+        }
+        .addOnFailureListener { e -> callback(Result.failure(e)) }
   }
 }

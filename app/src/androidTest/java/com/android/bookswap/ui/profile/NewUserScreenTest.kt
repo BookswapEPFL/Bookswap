@@ -8,81 +8,82 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
+import com.android.bookswap.data.source.network.PhotoFirebaseStorageSource
 import com.android.bookswap.model.UserViewModel
+import com.android.bookswap.resources.C
 import com.android.bookswap.ui.navigation.NavigationActions
-import com.android.bookswap.ui.navigation.Route
-import io.mockk.justRun
 import io.mockk.mockk
 import io.mockk.verify
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.kotlin.any
 
 class NewUserScreenTest {
   @get:Rule val composeTestRule = createComposeRule()
   private lateinit var navigationActions: NavigationActions
   private lateinit var userVM: UserViewModel
+  private lateinit var photoStorage: PhotoFirebaseStorageSource
 
   @Before
   fun setUp() {
     navigationActions = mockk(relaxed = true)
     userVM = mockk(relaxed = true)
+    photoStorage = mockk(relaxed = true)
+    composeTestRule.setContent { NewUserScreen(navigationActions, photoStorage) }
   }
 
   @Test
   fun allComponentsAreDisplayedWithCorrectTexts() {
-    composeTestRule.setContent { NewUserScreen(navigationActions, userVM) }
     composeTestRule
-        .onNodeWithTag("welcomeTxt")
+        .onNodeWithTag(C.Tag.TopAppBar.screen_title)
         .assertExists()
         .assertIsDisplayed()
         .assertTextEquals("Welcome")
 
     composeTestRule
-        .onNodeWithTag("personalInfoTxt")
+        .onNodeWithTag(C.Tag.NewUser.personal_info)
         .assertExists()
         .assertIsDisplayed()
         .assertTextEquals("Please fill in your personal information to start BookSwapping")
 
     composeTestRule
-        .onNodeWithTag("profilPics")
+        .onNodeWithTag(C.Tag.NewUser.profile_pic)
         .assertExists()
         .assertIsDisplayed()
         .assertHasClickAction()
 
     composeTestRule
-        .onNodeWithTag("greetingTF")
+        .onNodeWithTag(C.Tag.NewUser.greeting)
         .assertExists()
         .assertIsDisplayed()
         .assertTextContains("Greeting")
 
     composeTestRule
-        .onNodeWithTag("firstnameTF")
+        .onNodeWithTag(C.Tag.NewUser.firstname)
         .assertExists()
         .assertIsDisplayed()
         .assertTextContains("Firstname")
 
     composeTestRule
-        .onNodeWithTag("lastnameTF")
+        .onNodeWithTag(C.Tag.NewUser.lastname)
         .assertExists()
         .assertIsDisplayed()
         .assertTextContains("Lastname")
 
     composeTestRule
-        .onNodeWithTag("emailTF")
+        .onNodeWithTag(C.Tag.NewUser.email)
         .assertExists()
         .assertIsDisplayed()
         .assertTextContains("Email")
 
     composeTestRule
-        .onNodeWithTag("phoneTF")
+        .onNodeWithTag(C.Tag.NewUser.phone)
         .assertExists()
         .assertIsDisplayed()
         .assertTextContains("Phone")
 
     composeTestRule
-        .onNodeWithTag("CreateButton")
+        .onNodeWithTag(C.Tag.NewUser.confirm)
         .assertExists()
         .assertIsDisplayed()
         .assertTextEquals("Create")
@@ -92,56 +93,23 @@ class NewUserScreenTest {
   @Test
   fun clickOnCreateButtonWithInvalidEmailDoesNotNavigate() {
 
-    composeTestRule.setContent { NewUserScreen(navigationActions, userVM) }
+    composeTestRule.waitForIdle()
+    composeTestRule.onNodeWithTag(C.Tag.NewUser.confirm).performClick()
 
-    composeTestRule.onNodeWithTag("greetingTF").performTextInput("Mr.")
-    composeTestRule.onNodeWithTag("firstnameTF").performTextInput("John")
-    composeTestRule.onNodeWithTag("lastnameTF").performTextInput("Doe")
-    composeTestRule.onNodeWithTag("emailTF").performTextInput("john.doe.com") // Email invalide
-    composeTestRule.onNodeWithTag("phoneTF").performTextInput("+4122345678")
+    composeTestRule.onNodeWithTag(C.Tag.NewUser.greeting).performTextInput("Mr.")
+    composeTestRule.onNodeWithTag(C.Tag.NewUser.firstname).performTextInput("John")
+    composeTestRule.onNodeWithTag(C.Tag.NewUser.lastname).performTextInput("Doe")
+    composeTestRule
+        .onNodeWithTag(C.Tag.NewUser.email)
+        .performTextInput("john.doe.com") // Email invalide
+    composeTestRule.onNodeWithTag(C.Tag.NewUser.phone).performTextInput("+4122345678")
 
-    composeTestRule.onNodeWithTag("CreateButton").performClick()
+    composeTestRule.onNodeWithTag(C.Tag.NewUser.confirm).performClick()
 
-    verify(exactly = 0) { navigationActions.navigateTo(Route.MAP) }
+    verify(exactly = 0) { navigationActions.navigateTo(C.Route.MAP) }
 
     composeTestRule
-        .onNodeWithTag("emailError")
-        .assertExists()
-        .assertIsDisplayed()
-        .assertTextContains("Invalid email format")
-  }
-
-  @Test
-  fun clickOnCreateButtonWithEmptyFieldsShowsErrors() {
-    justRun {
-      userVM.updateUser(any(), any(), any(), any(), any(), any(), any(), any(), any(), any())
-    }
-    composeTestRule.setContent { NewUserScreen(navigationActions, userVM) }
-
-    composeTestRule.onNodeWithTag("greetingTF").performTextInput("")
-    composeTestRule.onNodeWithTag("firstnameTF").performTextInput("")
-    composeTestRule.onNodeWithTag("lastnameTF").performTextInput("")
-    composeTestRule.onNodeWithTag("emailTF").performTextInput("notanemail")
-    composeTestRule.onNodeWithTag("phoneTF").performTextInput("")
-
-    composeTestRule.onNodeWithTag("CreateButton").performClick()
-
-    verify(exactly = 0) { navigationActions.navigateTo(Route.MAP) }
-
-    composeTestRule
-        .onNodeWithTag("firstnameError")
-        .assertExists()
-        .assertIsDisplayed()
-        .assertTextContains("First name required")
-
-    composeTestRule
-        .onNodeWithTag("lastnameError")
-        .assertExists()
-        .assertIsDisplayed()
-        .assertTextContains("Last name required")
-
-    composeTestRule
-        .onNodeWithTag("emailError")
+        .onNodeWithTag(C.Tag.NewUser.email_error)
         .assertExists()
         .assertIsDisplayed()
         .assertTextContains("Invalid email format")

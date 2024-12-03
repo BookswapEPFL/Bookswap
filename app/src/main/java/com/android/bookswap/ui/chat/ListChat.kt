@@ -13,39 +13,49 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
 import com.android.bookswap.data.MessageBox
+import com.android.bookswap.model.LocalAppConfig
+import com.android.bookswap.model.chat.ContactViewModel
+import com.android.bookswap.resources.C
 import com.android.bookswap.ui.navigation.NavigationActions
-import com.android.bookswap.ui.navigation.Screen
 import com.android.bookswap.ui.theme.ColorVariable
 
 /** This is the main screen for the chat feature. It displays the list of messages */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ListChatScreen(
-    placeHolderData: List<MessageBox> = emptyList(),
     navigationActions: NavigationActions,
     topAppBar: @Composable () -> Unit = {},
     bottomAppBar: @Composable () -> Unit = {},
+    contactViewModel: ContactViewModel = ContactViewModel(LocalAppConfig.current.userViewModel)
 ) {
+  LaunchedEffect(Unit) { contactViewModel.updateMessageBoxMap() }
+  val messageBoxMap by contactViewModel.messageBoxMap.collectAsState()
+  val messageList = messageBoxMap.values.toList()
   Scaffold(
-      modifier = Modifier.testTag("chat_listScreen"),
+      modifier = Modifier.testTag(C.Tag.chat_list_screen_container),
       topBar = topAppBar,
       content = { pv ->
         LazyColumn(
@@ -53,9 +63,9 @@ fun ListChatScreen(
             modifier =
                 Modifier.fillMaxSize()
                     .background(color = ColorVariable.BackGround)
-                    .testTag("chat_messageList")) {
+                    .testTag(C.Tag.ChatList.scrollable)) {
               item { MessageDivider() }
-              if (placeHolderData.isEmpty()) {
+              if (messageBoxMap.isEmpty()) {
                 item {
                   Text(
                       text = "No messages yet",
@@ -66,10 +76,11 @@ fun ListChatScreen(
                       textAlign = TextAlign.Center)
                 }
               } else {
-                items(placeHolderData.size) { message ->
-                  MessageBoxDisplay(placeHolderData[message]) {
+                items(messageList.size) { index ->
+                  val messageBox = messageList[index]
+                  MessageBoxDisplay(messageBox) {
                     navigationActions.navigateTo(
-                        Screen.CHAT, placeHolderData[message].contact.userUUID.toString())
+                        C.Screen.CHAT, messageBox.contact.userUUID.toString())
                   }
                   MessageDivider()
                 }
@@ -87,13 +98,27 @@ fun MessageBoxDisplay(message: MessageBox, onClick: () -> Unit = {}) {
           .height(55.dp)
           .background(color = ColorVariable.BackGround)
           .clickable(onClick = onClick)
-          .testTag("chat_messageBox"),
+          .testTag(C.Tag.ChatList.item),
   ) {
-    Icon(
-        imageVector = Icons.Filled.Person,
-        contentDescription = "Contact Icon",
-        modifier = Modifier.size(40.dp).align(Alignment.CenterVertically).fillMaxHeight(),
-    )
+    if (message.contact.profilePictureUrl.isNotEmpty()) {
+      // Show the profile picture of the contact or the default icon
+      AsyncImage(
+          model = message.contact.profilePictureUrl,
+          contentDescription = "Contact Icon",
+          modifier =
+              Modifier.size(40.dp)
+                  .align(Alignment.CenterVertically)
+                  .fillMaxHeight()
+                  .clip(CircleShape),
+          contentScale = ContentScale.Crop)
+    } else {
+      Icon(
+          imageVector = Icons.Filled.Person,
+          contentDescription = "Contact Icon empty",
+          modifier = Modifier.size(40.dp).align(Alignment.CenterVertically).fillMaxHeight(),
+      )
+    }
+
     Column(
         modifier = Modifier.weight(1f).padding(start = 8.dp, end = 8.dp, top = 4.dp),
         verticalArrangement = Arrangement.Center) {
@@ -105,21 +130,21 @@ fun MessageBoxDisplay(message: MessageBox, onClick: () -> Unit = {}) {
                     fontWeight = FontWeight.Medium,
                     fontSize = 18.sp,
                     color = ColorVariable.Accent,
-                    modifier = Modifier.testTag("chat_messageContactName"))
+                    modifier = Modifier.testTag(C.Tag.ChatList.contact))
                 Text(
-                    text = message.date,
+                    text = message.date.takeUnless { it.isNullOrEmpty() } ?: "",
                     fontSize = 14.sp,
                     color = ColorVariable.AccentSecondary,
-                    modifier = Modifier.testTag("chat_messageDate"))
+                    modifier = Modifier.testTag(C.Tag.ChatList.timestamp))
               }
 
           Text(
-              text = message.message,
+              text = message.message?.takeUnless { it.isEmpty() } ?: "No messages yet",
               fontSize = 14.sp,
               color = ColorVariable.AccentSecondary,
               maxLines = 1,
               overflow = TextOverflow.Ellipsis,
-              modifier = Modifier.testTag("chat_messageContent"))
+              modifier = Modifier.testTag(C.Tag.ChatList.message))
         }
   }
 }

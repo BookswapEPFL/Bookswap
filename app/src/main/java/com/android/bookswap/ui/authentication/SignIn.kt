@@ -1,7 +1,5 @@
 package com.android.bookswap.ui.authentication
 
-// import com.android.bookswap.ui.navigation.NavigationActions
-// import com.android.bookswap.ui.navigation.TopLevelDestinations
 import android.content.Intent
 import android.util.Log
 import android.widget.Toast
@@ -43,10 +41,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.bookswap.R
-import com.android.bookswap.model.UserViewModel
+import com.android.bookswap.model.LocalAppConfig
+import com.android.bookswap.resources.C
 import com.android.bookswap.ui.navigation.NavigationActions
-import com.android.bookswap.ui.navigation.Screen
-import com.android.bookswap.ui.navigation.TopLevelDestinations
 import com.android.bookswap.ui.theme.ColorVariable
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
@@ -65,17 +62,14 @@ import kotlinx.coroutines.tasks.await
  * @param userVM ViewModel for user-related operations.
  */
 @Composable
-fun SignInScreen(
-    navigationActions: NavigationActions,
-    userVM: UserViewModel
-) { // Add this when navigation is
-  // implemented
+fun SignInScreen(navigationActions: NavigationActions) {
   val context = LocalContext.current
+  val appConfig = LocalAppConfig.current
   var googleUid = ""
   // Check if user is already signed in
   LaunchedEffect(Unit) {
     if (Firebase.auth.currentUser != null) {
-      navigationActions.navigateTo(TopLevelDestinations.MAP)
+      navigationActions.navigateTo(C.Screen.MAP)
     }
   }
 
@@ -84,8 +78,8 @@ fun SignInScreen(
           onAuthComplete = { result ->
             val googleUserName = result.user?.displayName ?: ""
             googleUid = result.user?.uid ?: ""
-            userVM.getUserByGoogleUid(googleUid)
-            Log.d("SignInScreen", "isStored: ${userVM.isStored}")
+            appConfig.userViewModel.getUserByGoogleUid(googleUid)
+            Log.d("SignInScreen", "isStored: ${appConfig.userViewModel.isStored}")
             Log.d("SignInScreen", "User signed in: $googleUserName")
             Toast.makeText(context, "Welcome $googleUserName!", Toast.LENGTH_LONG).show()
           },
@@ -95,20 +89,20 @@ fun SignInScreen(
           })
   val token = stringResource(R.string.default_web_client_id)
 
-  val isStored by userVM.isStored.collectAsState()
+  val isStored by appConfig.userViewModel.isStored.collectAsState()
 
   LaunchedEffect(isStored) {
     when (isStored) {
-      true -> navigationActions.navigateTo(TopLevelDestinations.MAP)
+      true -> navigationActions.navigateTo(C.Screen.MAP)
       false -> {
-        navigationActions.navigateTo(Screen.NEW_USER)
+        navigationActions.navigateTo(C.Screen.NEW_USER)
       }
-      null -> {} // Attendre que `isStored` soit défini
+      null -> {}
     }
   }
 
   Scaffold(
-      modifier = Modifier.fillMaxSize().testTag("SignInScreen"),
+      modifier = Modifier.fillMaxSize().testTag(C.Tag.sign_in_screen_container),
       containerColor = ColorVariable.BackGround, // Set the background color
       content = { padding ->
         Column(
@@ -126,7 +120,7 @@ fun SignInScreen(
 
           // First part of the title:
           Text(
-              modifier = Modifier.testTag("login_loginTitle1"),
+              modifier = Modifier.testTag(C.Tag.TopAppBar.screen_title),
               text = "Welcome to",
               style =
                   TextStyle(
@@ -142,7 +136,7 @@ fun SignInScreen(
 
           // Second part of the logo:
           Text(
-              modifier = Modifier.testTag("login_loginTitle2"),
+              modifier = Modifier.testTag(C.Tag.SignIn.app_name),
               text = "BookSwap",
               style =
                   TextStyle(
@@ -190,7 +184,7 @@ fun GoogleSignInButton(onSignInClick: () -> Unit) {
       modifier =
           Modifier.padding(8.dp)
               .height(48.dp) // Adjust height as needed
-              .testTag("loginButton")) {
+              .testTag(C.Tag.SignIn.signIn)) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center,
