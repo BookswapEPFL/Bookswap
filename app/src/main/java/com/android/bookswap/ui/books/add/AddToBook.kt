@@ -175,10 +175,8 @@ fun AddToBookScreen(
                   labelText = "ISBN*",
                   value = isbn,
                   maxLength = MAXLENGTHISBN) {
-                    if (inputVerification.testIsbn(it)) {
-                      isbn = it
-                      Log.d("ISBN Input", "Updated ISBN: $isbn")
-                    }
+                    isbn = it
+                    Log.d("ISBN Input", "Updated ISBN: $isbn")
                   }
               FieldComponent(
                   modifier =
@@ -241,7 +239,10 @@ fun AddToBookScreen(
                   enabled = title.isNotBlank() && isbn.isNotBlank(),
                   onClick = {
                     // Check if title and ISBN are not blank (required fields)
-                    if (title.isNotBlank() && isbn.isNotBlank() && selectedGenre != null) {
+                    if (title.isNotBlank() &&
+                        isbn.isNotBlank() &&
+                        inputVerification.testIsbn(isbn) &&
+                        selectedGenre != null) {
                       // You can handle book object creation here (e.g., save the book)
                       val book =
                           createDataBook(
