@@ -1,10 +1,12 @@
 package com.android.bookswap.ui.components
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -24,9 +26,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
 import com.android.bookswap.data.DataBook
 import com.android.bookswap.resources.C
 import com.android.bookswap.ui.theme.ColorVariable
@@ -65,6 +69,7 @@ fun BookDisplayComponent(modifier: Modifier = Modifier, book: DataBook) {
               .padding(PADDING_HORIZONTAL_DP, PADDING_VERTICAL_DP),
       horizontalArrangement = Arrangement.Start,
       verticalAlignment = Alignment.CenterVertically) {
+        Log.d("BookDisplayComponent", "Displaying book: ${book.title} by ${book.author}")
         // Image Box
         Box(
             modifier =
@@ -73,65 +78,76 @@ fun BookDisplayComponent(modifier: Modifier = Modifier, book: DataBook) {
                     .testTag(C.Tag.BookDisplayComp.image),
             contentAlignment = Alignment.Center,
         ) {
-          // Image of the books, will be added at a later date
-          // We didn't discussed about how we will store the image or how we
-          // will
-          // encode them
-          Box(
-              modifier = Modifier.fillMaxSize().background(Color.Gray) // Placeholder for the image
-              )
-        }
-        Row(verticalAlignment = Alignment.CenterVertically) {
+          // Show the book picture of the contact or the default icon
+          val photoUrl = book.photo ?: ""
 
-          // Column for Title and Author text components
-          Column(
-              modifier =
-                  Modifier.weight(1f, true)
-                      .padding(horizontal = PADDING_HORIZONTAL_DP)
-                      .heightIn(max = IMAGE_HEIGHT_DP + PADDING_VERTICAL_DP * 2)
-                      .testTag(C.Tag.BookDisplayComp.middle_container)) {
-                Text(
-                    text = book.title,
-                    overflow = TextOverflow.Ellipsis,
-                    style = MaterialTheme.typography.titleLarge,
-                    color = ColorVariable.Accent,
-                    modifier =
-                        Modifier.weight(1f, true)
-                            // .padding(bottom = PADDING_VERTICAL_DP)
-                            .testTag(C.Tag.BookDisplayComp.title))
-                Text(
-                    text = book.author ?: "",
-                    overflow = TextOverflow.Ellipsis,
-                    color = ColorVariable.AccentSecondary,
-                    maxLines = 1,
-                    modifier = Modifier.testTag(C.Tag.BookDisplayComp.author))
-              }
-
-          // Column for rating and genres
-          Column(
-              modifier =
-                  Modifier.requiredWidth(STAR_SIZE_DP * MAX_RATING + PADDING_HORIZONTAL_DP * 2)
-                      .width(STAR_SIZE_DP * MAX_RATING + PADDING_HORIZONTAL_DP * 2)
-                      .testTag(C.Tag.BookDisplayComp.right_container),
-              horizontalAlignment = Alignment.CenterHorizontally) {
-                Row(
-                    modifier = Modifier.fillMaxWidth().testTag(C.Tag.BookDisplayComp.rating),
-                    horizontalArrangement = Arrangement.Center) {
-                      // leave all stars empty if no rating
-                      DisplayStarReview(book.rating ?: 0)
-                    }
-                // text for the tags of the book, will be added at a later date
-                // It isn't decided how we will handle the tag for the books
-                Text(
-                    text = book.genres.joinToString(separator = ", ") { it.Genre },
-                    modifier =
-                        Modifier.fillMaxWidth()
-                            .clipToBounds()
-                            .testTag(C.Tag.BookDisplayComp.genres),
-                    overflow = TextOverflow.Ellipsis,
-                    color = ColorVariable.AccentSecondary)
-              }
+          // If the photo URL is not empty, display the image:
+          if (photoUrl.isNotEmpty()) {
+            Log.d("BookDisplayComponent", "Photo URL: ${photoUrl}")
+            AsyncImage(
+                model = photoUrl,
+                contentDescription = "Book Picture",
+                modifier =
+                    Modifier
+                        .fillMaxSize(),
+                contentScale = ContentScale.Crop)
+          } else { // If the photo URL is empty, display the Gray Box
+            Box(
+                modifier =
+                    Modifier.fillMaxSize().background(Color.Gray)
+                )
+          }
         }
+
+        // Space between the image and text
+        Spacer(modifier = Modifier.width(PADDING_HORIZONTAL_DP * 2))
+
+        // Column for Title and Author text components
+        Column(
+            modifier =
+                Modifier.weight(1f, true)
+                    .padding(horizontal = PADDING_HORIZONTAL_DP)
+                    .heightIn(max = IMAGE_HEIGHT_DP + PADDING_VERTICAL_DP * 2)
+                    .testTag(C.Tag.BookDisplayComp.middle_container)) {
+              Text(
+                  text = book.title,
+                  overflow = TextOverflow.Ellipsis,
+                  style = MaterialTheme.typography.titleLarge,
+                  color = ColorVariable.Accent,
+                  modifier =
+                      Modifier.weight(1f, true)
+                          // .padding(bottom = PADDING_VERTICAL_DP)
+                          .testTag(C.Tag.BookDisplayComp.title))
+              Text(
+                  text = book.author ?: "",
+                  overflow = TextOverflow.Ellipsis,
+                  color = ColorVariable.AccentSecondary,
+                  maxLines = 1,
+                  modifier = Modifier.testTag(C.Tag.BookDisplayComp.author))
+            }
+
+        // Column for rating and genres
+        Column(
+            modifier =
+                Modifier.requiredWidth(STAR_SIZE_DP * MAX_RATING + PADDING_HORIZONTAL_DP * 2)
+                    .width(STAR_SIZE_DP * MAX_RATING + PADDING_HORIZONTAL_DP * 2)
+                    .testTag(C.Tag.BookDisplayComp.right_container),
+            horizontalAlignment = Alignment.CenterHorizontally) {
+              Row(
+                  modifier = Modifier.fillMaxWidth().testTag(C.Tag.BookDisplayComp.rating),
+                  horizontalArrangement = Arrangement.Center) {
+                    // leave all stars empty if no rating
+                    DisplayStarReview(book.rating ?: 0)
+                  }
+              // text for the tags of the book, will be added at a later date
+              // It isn't decided how we will handle the tag for the books
+              Text(
+                  text = book.genres.joinToString(separator = ", ") { it.Genre },
+                  modifier =
+                      Modifier.fillMaxWidth().clipToBounds().testTag(C.Tag.BookDisplayComp.genres),
+                  overflow = TextOverflow.Ellipsis,
+                  color = ColorVariable.AccentSecondary)
+            }
       }
 }
 /**
