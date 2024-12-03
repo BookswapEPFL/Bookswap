@@ -60,12 +60,12 @@ object DataConverter {
 	  Log.e(
 		"BookSwap_FirestoreDataConverter",
 		"DataConverter.parse_raw_long: Error converting \"$string\" to Long, the provided string cannot be parsed as a Long")
-	  null
+	  throw e
 	}
   }
   
   fun parse_raw_long_list(string: String): List<Long?> {
-	return string.split(", ").map{parse_raw_long(it)}
+	return string.removeSurrounding("[", "]").split(", ").map{parse_raw_long(it)}
   }
   
   fun convert_UUID(uuid: UUID): String {
