@@ -525,6 +525,14 @@ class ChatScreenTest {
     var mockNewUUID: UUID = UUID.randomUUID()
     var messages: MutableList<DataMessage> = mutableListOf()
     private var sendMessageResult: Result<Unit> = Result.success(Unit)
+    private val listeners: MutableList<(Result<List<DataMessage>>) -> Unit> = mutableListOf()
+
+    private val mockListenerRegistration: ListenerRegistration = mockk {
+      every { remove() } answers
+          {
+            listeners.clear() // Clear all listeners when remove is called
+          }
+    }
 
     override fun init(callback: (Result<Unit>) -> Unit) {
       callback(Result.success(Unit))
@@ -539,7 +547,6 @@ class ChatScreenTest {
         user2UUID: UUID,
         callback: (Result<List<DataMessage>>) -> Unit
     ) {
-      // Filter messages to only include those between user1 and user2
       val filteredMessages =
           messages.filter { message ->
             (message.senderUUID == user1UUID && message.receiverUUID == user2UUID) ||
@@ -550,6 +557,7 @@ class ChatScreenTest {
 
     override fun sendMessage(message: DataMessage, callback: (Result<Unit>) -> Unit) {
       messages.add(message)
+      notifyListeners()
       callback(sendMessageResult)
     }
 
@@ -559,7 +567,6 @@ class ChatScreenTest {
         user2UUID: UUID,
         callback: (Result<Unit>) -> Unit
     ) {
-      // Remove the message if it matches the UUID and is between the two users
       val removed =
           messages.removeIf { message ->
             message.uuid == messageUUID &&
@@ -567,6 +574,7 @@ class ChatScreenTest {
                     (message.senderUUID == user2UUID && message.receiverUUID == user1UUID))
           }
       if (removed) {
+        notifyListeners()
         callback(Result.success(Unit))
       } else {
         callback(Result.failure(Exception("Message not found")))
@@ -578,11 +586,11 @@ class ChatScreenTest {
         user2UUID: UUID,
         callback: (Result<Unit>) -> Unit
     ) {
-      // Remove all messages between the two users
       messages.removeIf { message ->
         (message.senderUUID == user1UUID && message.receiverUUID == user2UUID) ||
             (message.senderUUID == user2UUID && message.receiverUUID == user1UUID)
       }
+      notifyListeners()
       callback(Result.success(Unit))
     }
 
@@ -593,12 +601,9 @@ class ChatScreenTest {
         callback: (Result<Unit>) -> Unit
     ) {
       val index = messages.indexOfFirst { it.uuid == message.uuid }
-      if (index != -1 &&
-          ((messages[index].senderUUID == user1UUID && messages[index].receiverUUID == user2UUID) ||
-              (messages[index].senderUUID == user2UUID &&
-                  messages[index].receiverUUID == user1UUID))) {
-        // Update the message text and timestamp
+      if (index != -1) {
         messages[index] = message.copy(text = message.text, timestamp = System.currentTimeMillis())
+        notifyListeners()
         callback(Result.success(Unit))
       } else {
         callback(Result.failure(Exception("Message not found")))
@@ -610,18 +615,13 @@ class ChatScreenTest {
         currentUserUUID: UUID,
         callback: (Result<List<DataMessage>>) -> Unit
     ): ListenerRegistration {
-      requireNotNull(otherUserUUID) { "otherUserId must not be null" }
-      requireNotNull(currentUserUUID) { "currentUserId must not be null" }
+      listeners.add(callback)
+      callback(Result.success(messages)) // Initial callback with current messages
+      return mockListenerRegistration
+    }
 
-      // Return messages between the two users
-      val filteredMessages =
-          messages.filter { message ->
-            (message.senderUUID == currentUserUUID && message.receiverUUID == otherUserUUID) ||
-                (message.senderUUID == otherUserUUID && message.receiverUUID == currentUserUUID)
-          }
-      callback(Result.success(filteredMessages))
-
-      return mockk()
+    private fun notifyListeners() {
+      listeners.forEach { it(Result.success(messages)) }
     }
   }
 }

@@ -38,6 +38,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -77,7 +78,6 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import java.util.UUID
-import kotlinx.coroutines.delay
 
 /**
  * Composable function for the chat screen.
@@ -149,80 +149,79 @@ fun ChatScreen(
 
   photoReq.Init()
 
+  DisposableEffect(Unit) {
+    val listenerRegistration =
+        messageRepository.addMessagesListener(otherUser.userUUID, currentUser.userUUID) { result ->
+          result
+              .onSuccess { fetchedMessages ->
+                // Directly use the fetched messages as they belong to the specific chat
+                messages = fetchedMessages.sortedBy { it.timestamp }
+
+                // Ensure offline storage logic is applied
+                for (message in
+                    messageStorage.extractMessages(
+                        messages.toMutableList(), maxMessagesStoredOffline)) {
+                  messageStorage.addMessage(message)
+                }
+                messageStorage.setMessages() // Save the messages locally
+                Log.d("ChatScreen", "Updated messages via listener: $messages")
+              }
+              .onFailure { exception ->
+                // Fallback to locally stored messages
+                messages = messageStorage.getMessagesFromText()
+                Log.e("ChatScreen", "Failed to fetch messages via listener: ${exception.message}")
+              }
+        }
+
+    // Cleanup when the DisposableEffect leaves the composition
+    onDispose { listenerRegistration.remove() }
+  }
+
   LaunchedEffect(Unit) {
-    while (true) {
-      for (message in
-          messageStorage.extractMessages(messages.toMutableList(), maxMessagesStoredOffline)) {
-        messageStorage.addMessage(message)
-      }
-      messageStorage.setMessages()
-      messageRepository.getMessages(currentUser.userUUID, otherUser.userUUID) { result ->
+    if (messages.isNotEmpty()) {
+      // Add otherUser to currentUser's contacts
+      userSource.getUser(currentUser.userUUID) { result ->
         if (result.isSuccess) {
-          messages =
-              result
-                  .getOrThrow()
-                  .filter {
-                    (it.senderUUID == currentUser.userUUID &&
-                        it.receiverUUID == otherUser.userUUID) ||
-                        (it.senderUUID == otherUser.userUUID &&
-                            it.receiverUUID == currentUser.userUUID)
-                  }
-                  .sortedBy { it.timestamp }
-          Log.d("ChatScreen", "Fetched messages: $messages")
+          val updatedUser = result.getOrThrow()
+          if (!updatedUser.contactList.contains(otherUser.userUUID.toString())) {
+            userSource.addContact(currentUser.userUUID, otherUser.userUUID.toString()) {
+                contactResult ->
+              if (contactResult.isSuccess) {
+                Log.d(
+                    "ChatScreen",
+                    "Added ${otherUser.userUUID} to ${currentUser.userUUID}'s contacts")
+              } else {
+                Log.e(
+                    "ChatScreen",
+                    "Failed to add contact: ${contactResult.exceptionOrNull()?.message}")
+              }
+            }
+          }
         } else {
-          messages = messageStorage.getMessagesFromText()
-          Log.e("ChatScreen", "Failed to fetch messages: ${result.exceptionOrNull()?.message}")
+          Log.e("ChatScreen", "Failed to fetch current user: ${result.exceptionOrNull()?.message}")
         }
       }
-      delay(2000) // Delay for 2 seconds
 
-      // Check and add contacts for both users
-      if (messages.isNotEmpty()) {
-        // Add otherUser to currentUser's contacts
-        userSource.getUser(currentUser.userUUID) { result ->
-          if (result.isSuccess) {
-            val updatedUser = result.getOrThrow()
-            if (!updatedUser.contactList.contains(otherUser.userUUID.toString())) {
-              userSource.addContact(currentUser.userUUID, otherUser.userUUID.toString()) {
-                  contactResult ->
-                if (contactResult.isSuccess) {
-                  Log.d(
-                      "ChatScreen",
-                      "Added ${otherUser.userUUID} to ${currentUser.userUUID}'s contacts")
-                } else {
-                  Log.e(
-                      "ChatScreen",
-                      "Failed to add contact: ${contactResult.exceptionOrNull()?.message}")
-                }
+      // Add currentUser to otherUser's contacts
+      userSource.getUser(otherUser.userUUID) { result ->
+        if (result.isSuccess) {
+          val updatedOtherUser = result.getOrThrow()
+          if (!updatedOtherUser.contactList.contains(currentUser.userUUID.toString())) {
+            userSource.addContact(otherUser.userUUID, currentUser.userUUID.toString()) {
+                contactResult ->
+              if (contactResult.isSuccess) {
+                Log.d(
+                    "ChatScreen",
+                    "Added ${currentUser.userUUID} to ${otherUser.userUUID}'s contacts")
+              } else {
+                Log.e(
+                    "ChatScreen",
+                    "Failed to add contact: ${contactResult.exceptionOrNull()?.message}")
               }
             }
-          } else {
-            Log.e(
-                "ChatScreen", "Failed to fetch current user: ${result.exceptionOrNull()?.message}")
           }
-        }
-
-        // Add currentUser to otherUser's contacts
-        userSource.getUser(otherUser.userUUID) { result ->
-          if (result.isSuccess) {
-            val updatedOtherUser = result.getOrThrow()
-            if (!updatedOtherUser.contactList.contains(currentUser.userUUID.toString())) {
-              userSource.addContact(otherUser.userUUID, currentUser.userUUID.toString()) {
-                  contactResult ->
-                if (contactResult.isSuccess) {
-                  Log.d(
-                      "ChatScreen",
-                      "Added ${currentUser.userUUID} to ${otherUser.userUUID}'s contacts")
-                } else {
-                  Log.e(
-                      "ChatScreen",
-                      "Failed to add contact: ${contactResult.exceptionOrNull()?.message}")
-                }
-              }
-            }
-          } else {
-            Log.e("ChatScreen", "Failed to fetch other user: ${result.exceptionOrNull()?.message}")
-          }
+        } else {
+          Log.e("ChatScreen", "Failed to fetch other user: ${result.exceptionOrNull()?.message}")
         }
       }
     }
