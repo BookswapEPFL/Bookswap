@@ -156,7 +156,7 @@ fun ChatScreen(
         messageStorage.addMessage(message)
       }
       messageStorage.setMessages()
-      messageRepository.getMessages { result ->
+      messageRepository.getMessages(currentUser.userUUID, otherUser.userUUID) { result ->
         if (result.isSuccess) {
           messages =
               result
@@ -304,13 +304,19 @@ fun ChatScreen(
                       // Update the message
                       messageRepository.updateMessage(
                           selectedMessage!!.copy(text = newMessageText.text),
-                          { result: Result<Unit> ->
+                          currentUser.userUUID,
+                          otherUser.userUUID) { result: Result<Unit> ->
                             if (result.isSuccess) {
                               Log.d("ChatScreen", "Message updated successfully")
                               selectedMessage = null
                               newMessageText = TextFieldValue("")
                               updateActive = false
                             } else {
+                              Toast.makeText(
+                                      context,
+                                      "Message can only be updated within 15 minutes of being sent",
+                                      Toast.LENGTH_LONG)
+                                  .show()
                               Log.e(
                                   "ChatScreen",
                                   "Failed to update message: ${result.exceptionOrNull()?.message}")
@@ -318,8 +324,7 @@ fun ChatScreen(
                               newMessageText = TextFieldValue("")
                               updateActive = false
                             }
-                          },
-                          context)
+                          }
                     } else {
                       // Send a new message
                       val messageId = messageRepository.getNewUUID()
@@ -395,18 +400,21 @@ fun ChatScreen(
                           // Handle delete
                           selectedMessage?.let { message ->
                             messageRepository.deleteMessage(
-                                message.uuid,
-                                { result ->
+                                message.uuid, currentUser.userUUID, otherUser.userUUID) { result ->
                                   if (result.isSuccess) {
                                     Log.d("ChatScreen", "Message deleted successfully")
                                     selectedMessage = null
                                   } else {
+                                    Toast.makeText(
+                                            context,
+                                            "Message can only be deleted within 15 minutes of being sent",
+                                            Toast.LENGTH_LONG)
+                                        .show()
                                     Log.e(
                                         "ChatScreen",
                                         "Failed to delete message: ${result.exceptionOrNull()?.message}")
                                   }
-                                },
-                                context)
+                                }
                           }
                         },
                         modifier =
