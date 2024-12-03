@@ -2,9 +2,9 @@ package com.android.bookswap.model.chat
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
-import com.android.bookswap.data.DataMessage
 import com.android.bookswap.data.DataUser
 import com.android.bookswap.data.MessageBox
+import com.android.bookswap.data.MessageType
 import com.android.bookswap.data.repository.MessageRepository
 import com.android.bookswap.data.repository.UsersRepository
 import com.android.bookswap.data.source.network.MessageFirestoreSource
@@ -40,40 +40,46 @@ class ContactViewModel(
   }
   /** Updates the message box map with the latest messages for each contact */
   fun updateMessageBoxMap() {
-
     try {
+      val currentUserUUID = userVM.getUser().userUUID
 
-      var messages: List<DataMessage> = emptyList()
-      messageFirestoreSource.getMessages() { result ->
-        result.fold(
-            onSuccess = { messages = it },
-            onFailure = { error -> Log.e("ContactViewModel", "Error getting messages: $error") })
-      }
+      // Iterate through the contact list
+      userVM.getUser().contactList.forEach { contactUUIDString ->
+        val contactUUID = UUID.fromString(contactUUIDString)
 
-      userVM.getUser().contactList.forEach { contactUUID ->
-        userFirestoreSource.getUser(UUID.fromString(contactUUID)) { userResult ->
-          userResult.fold(
-              onSuccess = { contactUser ->
-                val filtered =
-                    messages
-                        .filter { message ->
-                          (message.senderUUID == userVM.getUser().userUUID &&
-                              message.receiverUUID == UUID.fromString(contactUUID)) ||
-                              (message.senderUUID == UUID.fromString(contactUUID) &&
-                                  message.receiverUUID == userVM.getUser().userUUID)
-                        }
-                        .sortedBy { it.timestamp }
+        // Fetch messages between the current user and each contact
+        messageFirestoreSource.getMessages(currentUserUUID, contactUUID) { result ->
+          result.fold(
+              onSuccess = { messagesForContact ->
+                // Exclude IMAGE type messages
+                val filteredMessages =
+                    messagesForContact.filter { it.messageType == MessageType.TEXT }
 
-                val lastMessageText = filtered.lastOrNull()?.text ?: ""
-                val lastMessageTimestamp = filtered.lastOrNull()?.timestamp.toString()
+                // Fetch user details for the contact
+                userFirestoreSource.getUser(contactUUID) { userResult ->
+                  userResult.fold(
+                      onSuccess = { contactUser ->
+                        // Extract the last message details
+                        val lastMessage = filteredMessages.lastOrNull()
+                        val lastMessageText = lastMessage?.text ?: ""
+                        val lastMessageTimestamp = lastMessage?.timestamp?.toString() ?: ""
 
-                _messageBoxMap.value =
-                    _messageBoxMap.value.toMutableMap().apply {
-                      this[UUID.fromString(contactUUID)] =
-                          MessageBox(contactUser, lastMessageText, lastMessageTimestamp)
-                    }
+                        // Update the message box map
+                        _messageBoxMap.value =
+                            _messageBoxMap.value.toMutableMap().apply {
+                              this[contactUUID] =
+                                  MessageBox(contactUser, lastMessageText, lastMessageTimestamp)
+                            }
+                      },
+                      onFailure = {
+                        Log.e(
+                            "ContactViewModel", "Error getting user for contact $contactUUID: $it")
+                      })
+                }
               },
-              onFailure = { Log.e("ContactViewModel", "Error getting user") })
+              onFailure = {
+                Log.e("ContactViewModel", "Error getting messages for contact $contactUUID: $it")
+              })
         }
       }
     } catch (e: Exception) {
