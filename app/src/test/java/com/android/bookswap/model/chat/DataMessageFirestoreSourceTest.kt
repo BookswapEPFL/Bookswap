@@ -1,6 +1,5 @@
 package com.android.bookswap.model.chat
 
-import android.content.Context
 import android.os.Looper
 import com.android.bookswap.data.DataMessage
 import com.android.bookswap.data.MessageType
@@ -24,6 +23,8 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.Shadows.shadowOf
 
+const val COLLECTION_PATH = "chats"
+
 @RunWith(RobolectricTestRunner::class)
 class DataMessageFirestoreSourceTest {
 
@@ -32,10 +33,11 @@ class DataMessageFirestoreSourceTest {
   private val mockDocumentReference: DocumentReference = mockk()
   private val mockDocumentSnapshot: DocumentSnapshot = mockk()
   private val mockQuerySnapshot: QuerySnapshot = mockk()
-  private val mockContext: Context = mockk()
 
   private lateinit var messageRepository: MessageFirestoreSource
   private lateinit var messageFirestoreSource: MessageFirestoreSource
+
+  private lateinit var chatPath: String
 
   private val testMessage =
       DataMessage(
@@ -48,13 +50,26 @@ class DataMessageFirestoreSourceTest {
 
   @Before
   fun setup() {
+    // Initialize MessageFirestoreSource
     messageFirestoreSource = MessageFirestoreSource(mockFirestore)
     messageRepository = MessageFirestoreSource(mockFirestore)
+
+    // Mock Firestore interactions
     every { mockFirestore.collection(any()) } returns mockCollectionReference
     every { mockCollectionReference.document(any()) } returns mockDocumentReference
     every { mockCollectionReference.get() } returns Tasks.forResult(mockQuerySnapshot)
 
-    // Arrange snapshot
+    // Generate consistent chat path using the test helper
+    chatPath = mergeUUIDsForTest(testMessage.senderUUID, testMessage.receiverUUID)
+
+    // Mock Firestore collections and documents for the generated path
+    every {
+      mockFirestore.collection(COLLECTION_PATH).document(chatPath).collection("messages")
+    } returns mockCollectionReference
+    every { mockCollectionReference.document(testMessage.uuid.toString()) } returns
+        mockDocumentReference
+
+    // Mock document snapshot to match the test data
     every { mockDocumentSnapshot.getString("uuid") } returns testMessage.uuid.toString()
     every { mockDocumentSnapshot.getString("text") } returns testMessage.text
     every { mockDocumentSnapshot.getString("senderUUID") } returns testMessage.senderUUID.toString()
@@ -63,6 +78,10 @@ class DataMessageFirestoreSourceTest {
     every { mockDocumentSnapshot.getLong("timestamp") } returns testMessage.timestamp
     every { mockDocumentSnapshot.getString("messageType") } returns testMessage.messageType.name
     every { mockDocumentSnapshot.exists() } returns true
+
+    // Mock query snapshot for empty and non-empty results
+    every { mockQuerySnapshot.documents } returns listOf(mockDocumentSnapshot)
+    every { mockQuerySnapshot.isEmpty } returns false
   }
 
   // Init Tests
@@ -74,9 +93,12 @@ class DataMessageFirestoreSourceTest {
   // GetMessages Tests
   @Test
   fun `getMessages returns messages onSuccess`() {
-    // Act
-    messageFirestoreSource.getMessages { result ->
-      // Assert
+    every {
+      mockFirestore.collection(COLLECTION_PATH).document(chatPath).collection("messages")
+    } returns mockCollectionReference
+    every { mockQuerySnapshot.documents } returns listOf(mockDocumentSnapshot)
+
+    messageFirestoreSource.getMessages(testMessage.senderUUID, testMessage.receiverUUID) { result ->
       assertTrue(result.isSuccess)
       val messages = result.getOrNull()
       assertEquals(1, messages?.size)
@@ -87,9 +109,12 @@ class DataMessageFirestoreSourceTest {
   @Test
   fun `getMessages returns Failure on fail`() {
     val exception = RuntimeException("Firestore error")
+    every {
+      mockFirestore.collection(COLLECTION_PATH).document(chatPath).collection("messages")
+    } returns mockCollectionReference
     every { mockCollectionReference.get() } returns Tasks.forException(exception)
 
-    messageFirestoreSource.getMessages { result ->
+    messageFirestoreSource.getMessages(testMessage.senderUUID, testMessage.receiverUUID) { result ->
       assert(result.isFailure)
       assert(result.exceptionOrNull() == exception)
     }
@@ -97,9 +122,12 @@ class DataMessageFirestoreSourceTest {
 
   @Test
   fun `getMessages returns emptyList on empty result`() {
+    every {
+      mockFirestore.collection(COLLECTION_PATH).document(chatPath).collection("messages")
+    } returns mockCollectionReference
     every { mockQuerySnapshot.documents } returns emptyList()
 
-    messageFirestoreSource.getMessages { result ->
+    messageFirestoreSource.getMessages(testMessage.senderUUID, testMessage.receiverUUID) { result ->
       assertTrue(result.isSuccess)
       val messages = result.getOrNull()
       assertTrue(messages?.isEmpty() == true)
@@ -117,11 +145,25 @@ class DataMessageFirestoreSourceTest {
             "receiverUUID" to testMessage.receiverUUID.toString(),
             "timestamp" to testMessage.timestamp,
             "messageType" to testMessage.messageType.name)
-    every { mockDocumentReference.set(messageMap) } returns Tasks.forResult(null)
+    every {
+      mockFirestore
+          .collection(COLLECTION_PATH)
+          .document(chatPath)
+          .collection("messages")
+          .document(testMessage.uuid.toString())
+          .set(messageMap)
+    } returns Tasks.forResult(null)
 
     messageFirestoreSource.sendMessage(testMessage) { result -> assert(result.isSuccess) }
 
-    verify { mockDocumentReference.set(messageMap) }
+    verify {
+      mockFirestore
+          .collection(COLLECTION_PATH)
+          .document(chatPath)
+          .collection("messages")
+          .document(testMessage.uuid.toString())
+          .set(messageMap)
+    }
   }
 
   @Test
@@ -135,141 +177,200 @@ class DataMessageFirestoreSourceTest {
             "receiverUUID" to testMessage.receiverUUID.toString(),
             "timestamp" to testMessage.timestamp,
             "messageType" to testMessage.messageType.name)
-    every { mockDocumentReference.set(messageMap) } returns Tasks.forException(exception)
 
+    // Mock Firestore behavior for the failure case
+    every {
+      mockFirestore
+          .collection(COLLECTION_PATH)
+          .document(chatPath)
+          .collection("messages")
+          .document(testMessage.uuid.toString())
+          .set(messageMap)
+    } returns Tasks.forException(exception)
+
+    // Execute sendMessage and verify the result
     messageFirestoreSource.sendMessage(testMessage) { result ->
       assert(result.isFailure)
       assertEquals(exception, result.exceptionOrNull())
+    }
+
+    // Verify Firestore interactions
+    verify {
+      mockFirestore
+          .collection(COLLECTION_PATH)
+          .document(chatPath)
+          .collection("messages")
+          .document(testMessage.uuid.toString())
+          .set(messageMap)
     }
   }
 
   // DeleteMessage Tests
   @Test
-  fun `deleteMessage deletesMessage on success`() {
+  fun `deleteMessage deletes message on success`() {
     val fifteenMinutesInMillis = 15 * 60 * 1000
     val timestamp = System.currentTimeMillis() - (fifteenMinutesInMillis - 1000)
 
-    every { mockDocumentReference.get() } returns Tasks.forResult(mockDocumentSnapshot)
-    every { mockDocumentSnapshot.exists() } returns true
+    every {
+      mockFirestore
+          .collection(COLLECTION_PATH)
+          .document(chatPath)
+          .collection("messages")
+          .document(testMessage.uuid.toString())
+          .get()
+    } returns Tasks.forResult(mockDocumentSnapshot)
     every { mockDocumentSnapshot.getLong("timestamp") } returns timestamp
-    every { mockDocumentReference.delete() } returns Tasks.forResult(null)
+    every {
+      mockFirestore
+          .collection(COLLECTION_PATH)
+          .document(chatPath)
+          .collection("messages")
+          .document(testMessage.uuid.toString())
+          .delete()
+    } returns Tasks.forResult(null)
 
     messageFirestoreSource.deleteMessage(
-        testMessage.uuid, { result -> assert(result.isSuccess) }, mockContext)
+        testMessage.uuid, testMessage.senderUUID, testMessage.receiverUUID) { result ->
+          assert(result.isSuccess)
+        }
 
     shadowOf(Looper.getMainLooper()).idle()
-
-    verify { mockDocumentReference.delete() }
+    verify {
+      mockFirestore
+          .collection(COLLECTION_PATH)
+          .document(chatPath)
+          .collection("messages")
+          .document(testMessage.uuid.toString())
+          .delete()
+    }
   }
 
   @Test
   fun `deleteMessage fails when message not found`() {
+    every {
+      mockFirestore
+          .collection(COLLECTION_PATH)
+          .document(chatPath)
+          .collection("messages")
+          .document(testMessage.uuid.toString())
+          .get()
+    } returns Tasks.forResult(mockDocumentSnapshot)
     every { mockDocumentSnapshot.exists() } returns false // Message does not exist
-    every { mockDocumentReference.get() } returns Tasks.forResult(mockDocumentSnapshot)
+
     messageFirestoreSource.deleteMessage(
-        testMessage.uuid,
-        { result ->
+        testMessage.uuid, testMessage.senderUUID, testMessage.receiverUUID) { result ->
           assert(result.isFailure)
           assert(result.exceptionOrNull()?.message == "Message not found")
-        },
-        mockContext)
+        }
   }
 
   @Test
   fun `deleteMessage fails when message too old`() {
-    val oldMessage =
-        testMessage.copy(
-            timestamp =
-                System.currentTimeMillis() -
-                    (15 * 60 * 1000 + 1000)) // Sent more than 15 minutes ago
+    val oldTimestamp =
+        System.currentTimeMillis() - (15 * 60 * 1000 + 1000) // Sent more than 15 minutes ago
 
-    every { mockDocumentReference.get() } returns Tasks.forResult(mockDocumentSnapshot)
-    every { mockDocumentSnapshot.getLong("timestamp") } returns oldMessage.timestamp
+    every {
+      mockFirestore
+          .collection(COLLECTION_PATH)
+          .document(chatPath)
+          .collection("messages")
+          .document(testMessage.uuid.toString())
+          .get()
+    } returns Tasks.forResult(mockDocumentSnapshot)
+    every { mockDocumentSnapshot.getLong("timestamp") } returns oldTimestamp
 
     messageFirestoreSource.deleteMessage(
-        oldMessage.uuid,
-        { result ->
+        testMessage.uuid, testMessage.senderUUID, testMessage.receiverUUID) { result ->
           assert(result.isFailure)
           assert(
               result.exceptionOrNull()?.message ==
                   "Message can only be deleted within 15 minutes of being sent")
-        },
-        mockContext)
+        }
   }
 
   @Test
-  fun `deleteMessage fails on firestore retrival error`() {
+  fun `deleteMessage fails on firestore retrieval error`() {
     val exception = RuntimeException("Firestore retrieval error")
-    every { mockDocumentReference.get() } returns Tasks.forException(exception)
+
+    every {
+      mockFirestore
+          .collection(COLLECTION_PATH)
+          .document(chatPath)
+          .collection("messages")
+          .document(testMessage.uuid.toString())
+          .get()
+    } returns Tasks.forException(exception)
 
     messageFirestoreSource.deleteMessage(
-        testMessage.uuid,
-        { result ->
+        testMessage.uuid, testMessage.senderUUID, testMessage.receiverUUID) { result ->
           assert(result.isFailure)
           assert(result.exceptionOrNull() == exception)
-        },
-        mockContext)
+        }
   }
 
   @Test
   fun `deleteMessage fails on firestore delete error`() {
+    val timestamp = System.currentTimeMillis() - (15 * 60 * 1000 - 1000) // Within 15 minutes
     val exception = RuntimeException("Firestore delete error")
-    val recentMessage =
-        testMessage.copy(
-            timestamp =
-                System.currentTimeMillis() - (15 * 60 * 1000 - 1000)) // Sent within 15 minutes
 
-    every { mockDocumentSnapshot.getLong("timestamp") } returns recentMessage.timestamp
-    every { mockDocumentReference.get() } returns Tasks.forResult(mockDocumentSnapshot)
-    every { mockDocumentReference.delete() } returns Tasks.forException(exception)
+    every {
+      mockFirestore
+          .collection(COLLECTION_PATH)
+          .document(chatPath)
+          .collection("messages")
+          .document(testMessage.uuid.toString())
+          .get()
+    } returns Tasks.forResult(mockDocumentSnapshot)
+    every { mockDocumentSnapshot.getLong("timestamp") } returns timestamp
+    every {
+      mockFirestore
+          .collection(COLLECTION_PATH)
+          .document(chatPath)
+          .collection("messages")
+          .document(testMessage.uuid.toString())
+          .delete()
+    } returns Tasks.forException(exception)
 
     messageFirestoreSource.deleteMessage(
-        recentMessage.uuid,
-        { result ->
+        testMessage.uuid, testMessage.senderUUID, testMessage.receiverUUID) { result ->
           assert(result.isFailure)
           assert(result.exceptionOrNull() == exception)
-        },
-        mockContext)
+        }
   }
 
   @Test
   fun `deleteMessage fails when conversion fails`() {
-    every { mockDocumentReference.get() } returns Tasks.forResult(mockDocumentSnapshot)
+    every {
+      mockFirestore
+          .collection(COLLECTION_PATH)
+          .document(chatPath)
+          .collection("messages")
+          .document(testMessage.uuid.toString())
+          .get()
+    } returns Tasks.forResult(mockDocumentSnapshot)
 
     every { mockDocumentSnapshot.getString("uuid") } returns
         null // Missing field causes conversion failure
 
     messageFirestoreSource.deleteMessage(
-        testMessage.uuid,
-        { result ->
+        testMessage.uuid, testMessage.senderUUID, testMessage.receiverUUID) { result ->
           assert(result.isFailure)
           assert(result.exceptionOrNull()?.message == "Message not found")
-        },
-        mockContext)
+        }
   }
 
   // DeleteAllMessages Tests
   @Test
-  fun `delete all messages deletes messages successfully`() {
+  fun `deleteAllMessages deletes messages successfully`() {
     val documents = listOf(mockDocumentSnapshot)
     val mockBatch: WriteBatch = mockk()
 
     every {
-      mockCollectionReference.whereIn(
-          "senderUUID", listOf(testMessage.senderUUID, testMessage.receiverUUID))
-    } returns mockCollectionReference
-
-    every {
-      mockCollectionReference.whereIn(
-          "receiverUUID", listOf(testMessage.senderUUID, testMessage.receiverUUID))
-    } returns mockCollectionReference
-
-    every { mockCollectionReference.whereNotEqualTo("senderUUID", "receiverUUID") } returns
-        mockCollectionReference
-    every { mockCollectionReference.get() } returns Tasks.forResult(mockQuerySnapshot)
+      mockFirestore.collection(COLLECTION_PATH).document(chatPath).collection("messages").get()
+    } returns Tasks.forResult(mockQuerySnapshot)
     every { mockQuerySnapshot.documents } returns documents
-    every { mockQuerySnapshot.isEmpty } returns false
     every { mockFirestore.batch() } returns mockBatch
+
     documents.forEach { every { mockBatch.delete(it.reference) } returns mockBatch }
     every { mockBatch.commit() } returns Tasks.forResult(null)
 
@@ -279,26 +380,14 @@ class DataMessageFirestoreSourceTest {
     }
 
     shadowOf(Looper.getMainLooper()).idle()
-
     verify { mockBatch.commit() }
   }
 
   @Test
-  fun `delete allMessages returns success when no messages to delete`() {
+  fun `deleteAllMessages returns success when no messages to delete`() {
     every {
-      mockCollectionReference.whereIn(
-          "senderUUID", listOf(testMessage.senderUUID, testMessage.receiverUUID))
-    } returns mockCollectionReference
-
-    every {
-      mockCollectionReference.whereIn(
-          "receiverUUID", listOf(testMessage.senderUUID, testMessage.receiverUUID))
-    } returns mockCollectionReference
-
-    every { mockCollectionReference.whereNotEqualTo("senderUUID", "receiverUUID") } returns
-        mockCollectionReference
-
-    every { mockCollectionReference.get() } returns Tasks.forResult(mockQuerySnapshot)
+      mockFirestore.collection(COLLECTION_PATH).document(chatPath).collection("messages").get()
+    } returns Tasks.forResult(mockQuerySnapshot)
     every { mockQuerySnapshot.documents } returns emptyList() // No messages found
 
     messageFirestoreSource.deleteAllMessages(testMessage.senderUUID, testMessage.receiverUUID) {
@@ -312,19 +401,8 @@ class DataMessageFirestoreSourceTest {
     val exception = RuntimeException("Firestore retrieval error")
 
     every {
-      mockCollectionReference.whereIn(
-          "senderUUID", listOf(testMessage.senderUUID, testMessage.receiverUUID))
-    } returns mockCollectionReference
-
-    every {
-      mockCollectionReference.whereIn(
-          "receiverUUID", listOf(testMessage.senderUUID, testMessage.receiverUUID))
-    } returns mockCollectionReference
-
-    every { mockCollectionReference.whereNotEqualTo("senderUUID", "receiverUUID") } returns
-        mockCollectionReference
-
-    every { mockCollectionReference.get() } returns Tasks.forException(exception)
+      mockFirestore.collection(COLLECTION_PATH).document(chatPath).collection("messages").get()
+    } returns Tasks.forException(exception)
 
     messageFirestoreSource.deleteAllMessages(testMessage.senderUUID, testMessage.receiverUUID) {
         result ->
@@ -336,22 +414,12 @@ class DataMessageFirestoreSourceTest {
   @Test
   fun `deleteAllMessages fails when batch commit error`() {
     val documents = listOf(mockDocumentSnapshot)
-    val exception = RuntimeException("Batch commit error")
     val mockBatch: WriteBatch = mockk()
+    val exception = RuntimeException("Batch commit error")
 
     every {
-      mockCollectionReference.whereIn(
-          "senderUUID", listOf(testMessage.senderUUID, testMessage.receiverUUID))
-    } returns mockCollectionReference
-
-    every {
-      mockCollectionReference.whereIn(
-          "receiverUUID", listOf(testMessage.senderUUID, testMessage.receiverUUID))
-    } returns mockCollectionReference
-
-    every { mockCollectionReference.whereNotEqualTo("senderUUID", "receiverUUID") } returns
-        mockCollectionReference
-    every { mockCollectionReference.get() } returns Tasks.forResult(mockQuerySnapshot)
+      mockFirestore.collection(COLLECTION_PATH).document(chatPath).collection("messages").get()
+    } returns Tasks.forResult(mockQuerySnapshot)
     every { mockQuerySnapshot.documents } returns documents
     every { mockFirestore.batch() } returns mockBatch
 
@@ -366,19 +434,24 @@ class DataMessageFirestoreSourceTest {
   }
 
   // UpdateMessage Tests
+
   @Test
   fun `updateMessage fails when message not found`() {
-    every { mockDocumentReference.get() } returns Tasks.forResult(mockDocumentSnapshot)
-
+    every {
+      mockFirestore
+          .collection(COLLECTION_PATH)
+          .document(chatPath)
+          .collection("messages")
+          .document(testMessage.uuid.toString())
+          .get()
+    } returns Tasks.forResult(mockDocumentSnapshot)
     every { mockDocumentSnapshot.exists() } returns false
 
     messageFirestoreSource.updateMessage(
-        testMessage,
-        { result ->
+        testMessage, testMessage.senderUUID, testMessage.receiverUUID) { result ->
           assert(result.isFailure)
           assert(result.exceptionOrNull()?.message == "Message not found")
-        },
-        mockContext)
+        }
   }
 
   @Test
@@ -386,68 +459,104 @@ class DataMessageFirestoreSourceTest {
     val oldMessage =
         testMessage.copy(
             timestamp =
-                System.currentTimeMillis() -
-                    (15 * 60 * 1000 + 1000)) // Sent more than 15 minutes ago
-    every { mockDocumentReference.get() } returns Tasks.forResult(mockDocumentSnapshot)
+                System.currentTimeMillis() - (15 * 60 * 1000 + 1000) // Older than 15 minutes
+            )
+
+    every {
+      mockFirestore
+          .collection(COLLECTION_PATH)
+          .document(chatPath)
+          .collection("messages")
+          .document(testMessage.uuid.toString())
+          .get()
+    } returns Tasks.forResult(mockDocumentSnapshot)
     every { mockDocumentSnapshot.getLong("timestamp") } returns oldMessage.timestamp
 
     messageFirestoreSource.updateMessage(
-        oldMessage,
-        { result ->
+        oldMessage, testMessage.senderUUID, testMessage.receiverUUID) { result ->
           assert(result.isFailure)
           assert(
               result.exceptionOrNull()?.message ==
                   "Message can only be updated within 15 minutes of being sent")
-        },
-        mockContext)
+        }
   }
 
   @Test
   fun `updateMessage fails on firestore retrieval error`() {
     val exception = RuntimeException("Firestore retrieval error")
-    every { mockDocumentReference.get() } returns Tasks.forException(exception)
+
+    every {
+      mockFirestore
+          .collection(COLLECTION_PATH)
+          .document(chatPath)
+          .collection("messages")
+          .document(testMessage.uuid.toString())
+          .get()
+    } returns Tasks.forException(exception)
 
     messageFirestoreSource.updateMessage(
-        testMessage,
-        { result ->
+        testMessage, testMessage.senderUUID, testMessage.receiverUUID) { result ->
           assert(result.isFailure)
           assert(result.exceptionOrNull() == exception)
-        },
-        mockContext)
+        }
   }
 
   @Test
   fun `updateMessage fails on firestore update error`() {
-    val exception = RuntimeException("Firestore update error")
     val recentMessage =
-        testMessage.copy(timestamp = System.currentTimeMillis() - (15 * 60 * 1000 - 1000))
-    val updatedText = "Updated text"
-    val messageMap = mapOf("text" to updatedText, "timestamp" to System.currentTimeMillis())
-    every { mockDocumentReference.get() } returns Tasks.forResult(mockDocumentSnapshot)
+        testMessage.copy(
+            timestamp = System.currentTimeMillis() - (15 * 60 * 1000 - 1000) // Within 15 minutes
+            )
+    val updatedFields =
+        mapOf(
+            "text" to recentMessage.text,
+            "timestamp" to System.currentTimeMillis(),
+            "messageType" to recentMessage.messageType.name)
+    val exception = RuntimeException("Firestore update error")
 
-    every { mockDocumentReference.update(messageMap) } returns Tasks.forException(exception)
+    every {
+      mockFirestore
+          .collection(COLLECTION_PATH)
+          .document(chatPath)
+          .collection("messages")
+          .document(testMessage.uuid.toString())
+          .get()
+    } returns Tasks.forResult(mockDocumentSnapshot)
+    every { mockDocumentSnapshot.getLong("timestamp") } returns recentMessage.timestamp
+    every {
+      mockFirestore
+          .collection(COLLECTION_PATH)
+          .document(chatPath)
+          .collection("messages")
+          .document(testMessage.uuid.toString())
+          .update(updatedFields)
+    } returns Tasks.forException(exception)
 
     messageFirestoreSource.updateMessage(
-        recentMessage.copy(text = updatedText),
-        { result ->
+        recentMessage, testMessage.senderUUID, testMessage.receiverUUID) { result ->
           assert(result.isFailure)
           assert(result.exceptionOrNull() == exception)
-        },
-        mockContext)
+        }
   }
 
   @Test
   fun `updateMessage fails when conversion fails`() {
-    every { mockDocumentSnapshot.getString("uuid") } returns null
-    every { mockDocumentReference.get() } returns Tasks.forResult(mockDocumentSnapshot)
+    every {
+      mockFirestore
+          .collection(COLLECTION_PATH)
+          .document(chatPath)
+          .collection("messages")
+          .document(testMessage.uuid.toString())
+          .get()
+    } returns Tasks.forResult(mockDocumentSnapshot)
+    every { mockDocumentSnapshot.getString("uuid") } returns
+        null // Missing field causes conversion failure
 
     messageFirestoreSource.updateMessage(
-        testMessage,
-        { result ->
+        testMessage, testMessage.senderUUID, testMessage.receiverUUID) { result ->
           assert(result.isFailure)
           assert(result.exceptionOrNull()?.message == "Message not found")
-        },
-        mockContext)
+        }
   }
 
   @Test
@@ -474,5 +583,13 @@ class DataMessageFirestoreSourceTest {
 
     assert(result.isFailure)
     assert(result.exceptionOrNull() is Exception)
+  }
+}
+
+private fun mergeUUIDsForTest(uuid1: UUID, uuid2: UUID): String {
+  return if (uuid1.toString() < uuid2.toString()) {
+    "${uuid1}_$uuid2"
+  } else {
+    "${uuid2}_$uuid1"
   }
 }
