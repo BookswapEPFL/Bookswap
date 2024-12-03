@@ -52,6 +52,7 @@ private object S {
   const val MAP = "map"
   const val USER_PROFILE = USER + PROFILE
   const val EDIT_PROFILE = A.EDIT + PROFILE
+  const val OTHERS_USER_PROFILE = "others" + USER_PROFILE
   const val SETTINGS = "settings"
   const val MAP_FILTER = MAP + "_filters"
 }
@@ -284,6 +285,7 @@ object C {
     const val NEW_BOOK = S.NEW_BOOK
     const val MAP = S.MAP
     const val USER_PROFILE = S.USER_PROFILE
+    const val OTHERS_USER_PROFILE = S.OTHERS_USER_PROFILE
   }
 
   // Every Screen route in the app
@@ -299,6 +301,7 @@ object C {
     const val ADD_BOOK_SCAN = S.NEW_BOOK + "_scan" + SCREEN
     const val ADD_BOOK_ISBN = S.NEW_BOOK + "_isbn" + SCREEN
     const val USER_PROFILE = S.USER_PROFILE + SCREEN
+    const val OTHERS_USER_PROFILE = S.USER_PROFILE + SCREEN
     const val BOOK_PROFILE = S.BOOK_PROFILE + SCREEN
     const val EDIT_BOOK = S.EDIT_BOOK + SCREEN
     const val SETTINGS = S.SETTINGS + SCREEN
