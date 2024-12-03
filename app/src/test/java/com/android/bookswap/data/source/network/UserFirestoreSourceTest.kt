@@ -47,7 +47,7 @@ class UserFirestoreSourceTest {
           "dummyPic.png")
 
   private val userUUID = UUID.randomUUID()
-  private val contactUUID = UUID.randomUUID().toString()
+  private val contactUUID = UUID.randomUUID()
 
   @Before
   fun setUp() {
