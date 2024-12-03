@@ -199,7 +199,7 @@ class BooksFirestoreSource(private val db: FirebaseFirestore) : BooksRepository 
    */
   fun bookToDocument(dataBook: DataBook): Map<String, Any?> {
     return mapOf(
-        "uuid" to dataBook.uuid.toString(),
+        "uuid" to DataConverter.convert_UUID(dataBook.uuid),
         "title" to dataBook.title,
         "author" to dataBook.author,
         "description" to dataBook.description,
@@ -208,7 +208,7 @@ class BooksFirestoreSource(private val db: FirebaseFirestore) : BooksRepository 
         "language" to dataBook.language.toString(),
         "isbn" to dataBook.isbn,
         "genres" to dataBook.genres.map { it.toString() },
-        "userId" to dataBook.userId.toString())
+        "userId" to DataConverter.convert_UUID(dataBook.userId))
   }
   /**
    * Maps a Firestore document to a DataBook object. If any required field is missing, returns null
@@ -219,17 +219,15 @@ class BooksFirestoreSource(private val db: FirebaseFirestore) : BooksRepository 
    */
   fun documentToBooks(document: DocumentSnapshot): DataBook? {
     return try {
-      // val mostSignificantBits = document.getString("uuid.mostSignificantBits") ?: return null
-      // val leastSignificantBits = document.getString("uuid.leastSignificantBits") ?: return null
-      val bookuuid = document.getString("uuid") ?: return null
+      val bookuuid = DataConverter.parse_raw_UUID(document.get("uuid").toString()) ?: return null
       val title = document.getString("title") ?: return null
       val author = document.getString("author")
       val description = document.getString("description")
-      val rating = document.getLong("rating")
+      val rating = DataConverter.parse_raw_long(document.get("rating").toString())
       val photo = document.getString("photo")
       val isbn = document.getString("isbn")
       val languageBook = BookLanguages.valueOf(document.getString("language") ?: return null)
-      val genres = document.get("genres") as? List<String> ?: emptyList()
+      val genres = document.get("genres").toString().split(", ")
       val bookGenres =
           genres.mapNotNull { genre ->
             try {
@@ -238,9 +236,9 @@ class BooksFirestoreSource(private val db: FirebaseFirestore) : BooksRepository 
               null
             }
           }
-      val userid = UUID.fromString(document.getString("userid")) ?: return null
+      val userid = DataConverter.parse_raw_UUID(document.get("userid").toString()) ?: return null
       DataBook(
-          UUID.fromString(bookuuid),
+          bookuuid,
           title,
           author,
           description,

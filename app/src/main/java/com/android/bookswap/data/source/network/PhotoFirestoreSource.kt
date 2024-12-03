@@ -131,9 +131,9 @@ class PhotoFirestoreSource(private val db: FirebaseFirestore) : PhotoRepository 
    */
   fun photoToDocument(dataPhoto: DataPhoto): Map<String, Any?> {
     return mapOf(
-        "uuid" to dataPhoto.uuid.toString(),
+        "uuid" to DataConverter.convert_UUID(dataPhoto.uuid),
         "url" to dataPhoto.url,
-        "timestamp" to dataPhoto.timestamp,
+        "timestamp" to DataConverter.convert_Long(dataPhoto.timestamp),
         "base64" to dataPhoto.base64)
   }
   /**
@@ -144,9 +144,10 @@ class PhotoFirestoreSource(private val db: FirebaseFirestore) : PhotoRepository 
    */
   fun documentToPhoto(document: DocumentSnapshot): DataPhoto? {
     return try {
-      val uuid = UUID.fromString(document.getString("uuid")) ?: return null
-      val url = document.getString("url") ?: ""
-      val timestamp = document.getLong("timestamp") ?: System.currentTimeMillis()
+      val uuid = DataConverter.parse_raw_UUID(document.get("uuid").toString()) ?: return null
+      val url = document.get("url").toString()
+      val timestamp =
+          DataConverter.parse_raw_long(document.get("timestamp").toString()) ?: return null
       val base64 = document.getString("base64") ?: return null
 
       DataPhoto(uuid = uuid, url = url, timestamp = timestamp, base64 = base64)

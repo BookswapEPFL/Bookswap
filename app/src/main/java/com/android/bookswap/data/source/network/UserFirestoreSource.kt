@@ -111,7 +111,7 @@ class UserFirestoreSource(private val db: FirebaseFirestore) : UsersRepository {
   fun documentToUser(document: DocumentSnapshot): Result<DataUser> {
 
     return try {
-      val userUUID = UUID.fromString(document.getString("userUUID")!!)
+      val userUUID = DataConverter.parse_raw_UUID(document.get("userUUID").toString())!!
       val greeting = document.getString("greeting")!!
       val firstname = document.getString("firstName")!!
       val lastname = document.getString("lastName")!!
@@ -121,12 +121,10 @@ class UserFirestoreSource(private val db: FirebaseFirestore) : UsersRepository {
       val longitude = document.getDouble("longitude")!!
       val profilePicture = document.getString("profilePictureUrl")!!
       val googleUid = document.getString("googleUid")!!
-      val bookList = (document.get("bookList") as List<String>).map { UUID.fromString(it) }
-      val contactList = (document.get("contactList") as List<String>).map { UUID.fromString(it) }
-
-      if (bookList.any { it == null }) {
-        throw IllegalArgumentException("Book list contains null UUIDs")
-      }
+      val bookList =
+          DataConverter.parse_raw_UUID_list(document.get("bookList").toString()).filterNotNull()
+      val contactList =
+          DataConverter.parse_raw_UUID_list(document.get("contactList").toString()).filterNotNull()
 
       Result.success(
           DataUser(
@@ -139,9 +137,9 @@ class UserFirestoreSource(private val db: FirebaseFirestore) : UsersRepository {
               latitude,
               longitude,
               profilePicture,
-              bookList.filterNotNull(),
+              bookList,
               googleUid,
-              contactList.filterNotNull()))
+              contactList))
     } catch (e: Exception) {
       Log.e("FirestoreSource", "Error converting document to User: ${e.message}")
       Result.failure(e)
@@ -157,7 +155,7 @@ class UserFirestoreSource(private val db: FirebaseFirestore) : UsersRepository {
    */
   fun userToDocument(dataUser: DataUser): Map<String, Any?> {
     return mapOf(
-        "userUUID" to dataUser.userUUID.toString(),
+        "userUUID" to DataConverter.convert_UUID(dataUser.userUUID),
         "greeting" to dataUser.greeting,
         "firstName" to dataUser.firstName,
         "lastName" to dataUser.lastName,
@@ -166,8 +164,8 @@ class UserFirestoreSource(private val db: FirebaseFirestore) : UsersRepository {
         "latitude" to dataUser.latitude,
         "longitude" to dataUser.longitude,
         "profilePictureUrl" to dataUser.profilePictureUrl,
-        "bookList" to dataUser.bookList.map { it.toString() },
-        "contactList" to dataUser.contactList.map { it.toString() },
+        "bookList" to DataConverter.convert_UUID_list(dataUser.bookList),
+        "contactList" to DataConverter.convert_UUID_list(dataUser.contactList),
         "googleUid" to dataUser.googleUid,
     )
   }

@@ -292,11 +292,11 @@ class MessageFirestoreSource(private val db: FirebaseFirestore) : MessageReposit
  */
 fun messageToDocument(dataMessage: DataMessage): Map<String, Any?> {
   return mapOf(
-      "uuid" to dataMessage.uuid.toString(),
+      "uuid" to DataConverter.convert_UUID(dataMessage.uuid),
       "text" to dataMessage.text,
-      "senderUUID" to dataMessage.senderUUID.toString(),
-      "receiverUUID" to dataMessage.receiverUUID.toString(),
-      "timestamp" to dataMessage.timestamp,
+      "senderUUID" to DataConverter.convert_UUID(dataMessage.senderUUID),
+      "receiverUUID" to DataConverter.convert_UUID(dataMessage.receiverUUID),
+      "timestamp" to DataConverter.convert_Long(dataMessage.timestamp),
       "messageType" to dataMessage.messageType.name)
 }
 /**
@@ -309,11 +309,11 @@ fun messageToDocument(dataMessage: DataMessage): Map<String, Any?> {
 fun documentToMessage(document: DocumentSnapshot): Result<DataMessage> {
   return try {
     val type = MessageType.valueOf(document.getString("messageType")!!)
-    val uuid = UUID.fromString(document.getString("uuid")!!)
+    val uuid = DataConverter.parse_raw_UUID(document.get("uuid").toString())!!
     val text = document.getString("text")!!
-    val senderUUID = UUID.fromString(document.getString("senderUUID")!!)
-    val receiverUUID = UUID.fromString(document.getString("receiverUUID")!!)
-    val timestamp = document.getLong("timestamp")!!
+    val senderUUID = DataConverter.parse_raw_UUID(document.get("senderUUID").toString())!!
+    val receiverUUID = DataConverter.parse_raw_UUID(document.get("receiverUUID").toString())!!
+    val timestamp = DataConverter.parse_raw_long(document.get("timestamp").toString())!!
     Result.success(DataMessage(type, uuid, text, senderUUID, receiverUUID, timestamp))
   } catch (e: Exception) {
     Log.e("MessageSource", "Error converting document to Message: ${e.message}")
