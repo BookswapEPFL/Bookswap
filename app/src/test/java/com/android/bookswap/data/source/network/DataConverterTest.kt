@@ -44,7 +44,7 @@ class DataConverterTest {
   fun convertUUIDToString() {
     val uuid = UUID.fromString(str_uuid + "0")
     val convrt_uuid = DataConverter.convert_UUID(uuid)
-    assertEquals("UUID $uuid not converted to ${str_uuid}0!", str_uuid+"0", convrt_uuid)
+    assertEquals("UUID $uuid not converted to ${str_uuid}0!", str_uuid + "0", convrt_uuid)
   }
 
   @Test
