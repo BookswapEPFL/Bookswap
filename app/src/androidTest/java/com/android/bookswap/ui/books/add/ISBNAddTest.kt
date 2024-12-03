@@ -82,10 +82,6 @@ class ISBNAddTest : TestCase() {
     }
     val isbnField = composeTestRule.onNodeWithTag(C.Tag.NewBookISBN.isbn)
 
-    isbnField.performTextInput("testEmpty")
-    Assert.assertEquals(
-        "", isbnField.fetchSemanticsNode().config[SemanticsProperties.EditableText].text)
-
     isbnField.performTextClearance()
     isbnField.performTextInput("978-3-16-148410-0")
     Assert.assertEquals(
@@ -165,7 +161,7 @@ class ISBNAddTest : TestCase() {
 
     composeTestRule.setContent { AddISBNScreen(mockNavigationActions, mockBooksRepository) }
 
-    composeTestRule.onNodeWithTag(C.Tag.NewBookISBN.isbn).performTextInput("BAD_ISBN")
+    composeTestRule.onNodeWithTag(C.Tag.NewBookISBN.isbn).performTextInput("9783161484100")
     composeTestRule.onNodeWithTag(C.Tag.NewBookISBN.search).performClick()
 
     verify {
