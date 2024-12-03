@@ -172,6 +172,7 @@ class MainActivity : ComponentActivity() {
             if (user2 != null) {
               ChatScreen(
                   messageRepository,
+                  userRepository,
                   userVM.getUser(),
                   user2,
                   navigationActions,

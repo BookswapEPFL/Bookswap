@@ -20,6 +20,7 @@ import com.android.bookswap.data.DataUser
 import com.android.bookswap.data.MessageType
 import com.android.bookswap.data.repository.MessageRepository
 import com.android.bookswap.data.repository.PhotoFirebaseStorageRepository
+import com.android.bookswap.data.source.network.UserFirestoreSource
 import com.android.bookswap.model.chat.OfflineMessageStorage
 import com.android.bookswap.resources.C
 import com.android.bookswap.ui.navigation.NavigationActions
@@ -43,6 +44,7 @@ class ChatScreenTest {
   private lateinit var mockMessageRepository: MessageRepository
   private lateinit var mockPhotoStorage: PhotoFirebaseStorageRepository
   private lateinit var mockMessageStorage: OfflineMessageStorage
+  private lateinit var mockUserRepository: UserFirestoreSource
   private val currentUserUUID = UUID.randomUUID()
   private val otherUserUUID = UUID.randomUUID()
   private lateinit var mockNavigationActions: NavigationActions
@@ -59,6 +61,7 @@ class ChatScreenTest {
     mockNavigationActions = mockk()
     mockMessageStorage = mockk()
     mockContext = mockk()
+    mockUserRepository = mockk()
 
     placeHolderData =
         List(6) {
@@ -87,6 +90,8 @@ class ChatScreenTest {
     every { mockMessageStorage.extractMessages(any(), any()) } returns placeHolderData
     every { mockMessageStorage.addMessage(any()) } just Runs
     every { mockMessageStorage.setMessages() } just Runs
+    every { mockUserRepository.getUser(any<String>(), any()) } just Runs
+    every { mockUserRepository.getUser(any<UUID>(), any()) } just Runs
   }
 
   private val palette =
@@ -110,6 +115,7 @@ class ChatScreenTest {
     composeTestRule.setContent {
       ChatScreen(
           mockMessageRepository,
+          mockUserRepository,
           currentUser,
           otherUser,
           mockNavigationActions,
@@ -129,6 +135,7 @@ class ChatScreenTest {
     composeTestRule.setContent {
       ChatScreen(
           mockMessageRepository,
+          mockUserRepository,
           currentUser,
           otherUser,
           mockNavigationActions,
@@ -174,6 +181,7 @@ class ChatScreenTest {
     composeTestRule.setContent {
       ChatScreen(
           mockMessageRepository,
+          mockUserRepository,
           currentUser,
           otherUser,
           mockNavigationActions,
@@ -197,6 +205,7 @@ class ChatScreenTest {
     composeTestRule.setContent {
       ChatScreen(
           mockMessageRepository,
+          mockUserRepository,
           currentUser,
           otherUser,
           mockNavigationActions,
@@ -212,6 +221,7 @@ class ChatScreenTest {
     composeTestRule.setContent {
       ChatScreen(
           mockMessageRepository,
+          mockUserRepository,
           currentUser,
           otherUser,
           mockNavigationActions,
@@ -232,6 +242,7 @@ class ChatScreenTest {
     composeTestRule.setContent {
       ChatScreen(
           mockMessageRepository,
+          mockUserRepository,
           currentUser,
           otherUser,
           mockNavigationActions,
@@ -258,6 +269,7 @@ class ChatScreenTest {
     composeTestRule.setContent {
       ChatScreen(
           mockMessageRepository,
+          mockUserRepository,
           currentUser,
           otherUser,
           mockNavigationActions,
@@ -281,6 +293,7 @@ class ChatScreenTest {
     composeTestRule.setContent {
       ChatScreen(
           mockMessageRepository,
+          mockUserRepository,
           currentUser,
           otherUser,
           mockNavigationActions,
@@ -330,6 +343,7 @@ class ChatScreenTest {
     composeTestRule.setContent {
       ChatScreen(
           mockMessageRepository,
+          mockUserRepository,
           currentUser,
           otherUser,
           mockNavigationActions,
@@ -378,6 +392,7 @@ class ChatScreenTest {
     composeTestRule.setContent {
       ChatScreen(
           mockMessageRepository,
+          mockUserRepository,
           currentUser,
           otherUser,
           mockNavigationActions,
@@ -454,6 +469,7 @@ class ChatScreenTest {
     composeTestRule.setContent {
       ChatScreen(
           mockMessageRepository,
+          mockUserRepository,
           currentUser,
           otherUser,
           mockNavigationActions,
@@ -499,6 +515,7 @@ class ChatScreenTest {
     composeTestRule.setContent {
       ChatScreen(
           mockMessageRepository,
+          mockUserRepository,
           currentUser,
           otherUser,
           mockNavigationActions,
