@@ -61,4 +61,22 @@ interface UsersRepository {
    *   Result.failure(exception) if error
    */
   fun deleteUser(uuid: UUID, callback: (Result<Unit>) -> Unit)
+
+  /**
+   * Function to add a contact to the user's contact list in the repository.
+   *
+   * @param userUUID UUID of the user whose contact list is being updated.
+   * @param contactUUID UUID of the contact to add.
+   * @param callback Callback for success or failure.
+   */
+  fun addContact(userUUID: UUID, contactUUID: String, callback: (Result<Unit>) -> Unit)
+
+  /**
+   * Function to remove a contact from the user's contact list in the repository.
+   *
+   * @param userUUID UUID of the user whose contact list is being updated.
+   * @param contactUUID UUID of the contact to remove.
+   * @param callback Callback for success or failure.
+   */
+  fun removeContact(userUUID: UUID, contactUUID: String, callback: (Result<Unit>) -> Unit)
 }

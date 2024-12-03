@@ -66,6 +66,7 @@ import com.android.bookswap.data.DataUser
 import com.android.bookswap.data.MessageType
 import com.android.bookswap.data.repository.MessageRepository
 import com.android.bookswap.data.repository.PhotoFirebaseStorageRepository
+import com.android.bookswap.data.repository.UsersRepository
 import com.android.bookswap.model.PhotoRequester
 import com.android.bookswap.model.chat.OfflineMessageStorage
 import com.android.bookswap.resources.C
@@ -92,6 +93,7 @@ import kotlinx.coroutines.delay
 @Composable
 fun ChatScreen(
     messageRepository: MessageRepository,
+    userSource: UsersRepository,
     currentUser: DataUser,
     otherUser: DataUser,
     navController: NavigationActions,
@@ -155,7 +157,7 @@ fun ChatScreen(
         messageStorage.addMessage(message)
       }
       messageStorage.setMessages()
-      messageRepository.getMessages { result ->
+      messageRepository.getMessages(currentUser.userUUID, otherUser.userUUID) { result ->
         if (result.isSuccess) {
           messages =
               result
@@ -174,6 +176,56 @@ fun ChatScreen(
         }
       }
       delay(2000) // Delay for 2 seconds
+
+      // Check and add contacts for both users
+      if (messages.isNotEmpty()) {
+        // Add otherUser to currentUser's contacts
+        userSource.getUser(currentUser.userUUID) { result ->
+          if (result.isSuccess) {
+            val updatedUser = result.getOrThrow()
+            if (!updatedUser.contactList.contains(otherUser.userUUID.toString())) {
+              userSource.addContact(currentUser.userUUID, otherUser.userUUID.toString()) {
+                  contactResult ->
+                if (contactResult.isSuccess) {
+                  Log.d(
+                      "ChatScreen",
+                      "Added ${otherUser.userUUID} to ${currentUser.userUUID}'s contacts")
+                } else {
+                  Log.e(
+                      "ChatScreen",
+                      "Failed to add contact: ${contactResult.exceptionOrNull()?.message}")
+                }
+              }
+            }
+          } else {
+            Log.e(
+                "ChatScreen", "Failed to fetch current user: ${result.exceptionOrNull()?.message}")
+          }
+        }
+
+        // Add currentUser to otherUser's contacts
+        userSource.getUser(otherUser.userUUID) { result ->
+          if (result.isSuccess) {
+            val updatedOtherUser = result.getOrThrow()
+            if (!updatedOtherUser.contactList.contains(currentUser.userUUID.toString())) {
+              userSource.addContact(otherUser.userUUID, currentUser.userUUID.toString()) {
+                  contactResult ->
+                if (contactResult.isSuccess) {
+                  Log.d(
+                      "ChatScreen",
+                      "Added ${currentUser.userUUID} to ${otherUser.userUUID}'s contacts")
+                } else {
+                  Log.e(
+                      "ChatScreen",
+                      "Failed to add contact: ${contactResult.exceptionOrNull()?.message}")
+                }
+              }
+            }
+          } else {
+            Log.e("ChatScreen", "Failed to fetch other user: ${result.exceptionOrNull()?.message}")
+          }
+        }
+      }
     }
   }
   Box(modifier = Modifier.fillMaxSize().background(ColorVariable.BackGround)) {
@@ -270,13 +322,19 @@ fun ChatScreen(
                       // Update the message
                       messageRepository.updateMessage(
                           selectedMessage!!.copy(text = newMessageText.text),
-                          { result: Result<Unit> ->
+                          currentUser.userUUID,
+                          otherUser.userUUID) { result: Result<Unit> ->
                             if (result.isSuccess) {
                               Log.d("ChatScreen", "Message updated successfully")
                               selectedMessage = null
                               newMessageText = TextFieldValue("")
                               updateActive = false
                             } else {
+                              Toast.makeText(
+                                      context,
+                                      "Message can only be updated within 15 minutes of being sent",
+                                      Toast.LENGTH_LONG)
+                                  .show()
                               Log.e(
                                   "ChatScreen",
                                   "Failed to update message: ${result.exceptionOrNull()?.message}")
@@ -284,8 +342,7 @@ fun ChatScreen(
                               newMessageText = TextFieldValue("")
                               updateActive = false
                             }
-                          },
-                          context)
+                          }
                     } else {
                       // Send a new message
                       val messageId = messageRepository.getNewUUID()
@@ -361,18 +418,21 @@ fun ChatScreen(
                           // Handle delete
                           selectedMessage?.let { message ->
                             messageRepository.deleteMessage(
-                                message.uuid,
-                                { result ->
+                                message.uuid, currentUser.userUUID, otherUser.userUUID) { result ->
                                   if (result.isSuccess) {
                                     Log.d("ChatScreen", "Message deleted successfully")
                                     selectedMessage = null
                                   } else {
+                                    Toast.makeText(
+                                            context,
+                                            "Message can only be deleted within 15 minutes of being sent",
+                                            Toast.LENGTH_LONG)
+                                        .show()
                                     Log.e(
                                         "ChatScreen",
                                         "Failed to delete message: ${result.exceptionOrNull()?.message}")
                                   }
-                                },
-                                context)
+                                }
                           }
                         },
                         modifier =

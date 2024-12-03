@@ -172,4 +172,62 @@ class UserFirestoreSource(private val db: FirebaseFirestore) : UsersRepository {
       }
     }
   }
+
+  /**
+   * Adds a contact to the user's contact list in Firestore.
+   *
+   * @param userUUID UUID of the user whose contact list is being updated.
+   * @param contactUUID UUID of the contact to add.
+   * @param callback Callback for success or failure.
+   */
+  override fun addContact(userUUID: UUID, contactUUID: String, callback: (Result<Unit>) -> Unit) {
+    db.collection(COLLECTION_NAME)
+        .document(userUUID.toString())
+        .get()
+        .addOnSuccessListener { document ->
+          val currentContactList = (document.get("contactList") as? List<String>) ?: emptyList()
+          if (!currentContactList.contains(contactUUID)) {
+            val updatedContactList = currentContactList + contactUUID
+            db.collection(COLLECTION_NAME)
+                .document(userUUID.toString())
+                .update("contactList", updatedContactList)
+                .addOnSuccessListener { callback(Result.success(Unit)) }
+                .addOnFailureListener { e -> callback(Result.failure(e)) }
+          } else {
+            callback(Result.success(Unit)) // Already in the contact list
+          }
+        }
+        .addOnFailureListener { e -> callback(Result.failure(e)) }
+  }
+
+  /**
+   * Removes a contact from the user's contact list in Firestore.
+   *
+   * @param userUUID UUID of the user whose contact list is being updated.
+   * @param contactUUID UUID of the contact to remove.
+   * @param callback Callback for success or failure.
+   */
+  override fun removeContact(
+      userUUID: UUID,
+      contactUUID: String,
+      callback: (Result<Unit>) -> Unit
+  ) {
+    db.collection(COLLECTION_NAME)
+        .document(userUUID.toString())
+        .get()
+        .addOnSuccessListener { document ->
+          val currentContactList = (document.get("contactList") as? List<String>) ?: emptyList()
+          if (currentContactList.contains(contactUUID)) {
+            val updatedContactList = currentContactList - contactUUID
+            db.collection(COLLECTION_NAME)
+                .document(userUUID.toString())
+                .update("contactList", updatedContactList)
+                .addOnSuccessListener { callback(Result.success(Unit)) }
+                .addOnFailureListener { e -> callback(Result.failure(e)) }
+          } else {
+            callback(Result.success(Unit)) // Already not in the contact list
+          }
+        }
+        .addOnFailureListener { e -> callback(Result.failure(e)) }
+  }
 }
