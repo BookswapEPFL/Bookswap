@@ -389,6 +389,12 @@ class ChatScreenTest {
     val message = placeHolderData.first()
     val newText = "Updated message text"
 
+    composeTestRule.waitUntil(timeoutMillis = 5000) {
+      composeTestRule
+          .onAllNodesWithTag("${message.uuid}_" + C.Tag.ChatScreen.messages, useUnmergedTree = true)
+          .fetchSemanticsNodes()
+          .isNotEmpty()
+    }
     val messageNode =
         composeTestRule.onNodeWithTag(
             "${message.uuid}_" + C.Tag.ChatScreen.messages, useUnmergedTree = true)
