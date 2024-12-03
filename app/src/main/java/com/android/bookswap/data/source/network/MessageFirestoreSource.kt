@@ -86,8 +86,8 @@ class MessageFirestoreSource(private val db: FirebaseFirestore) : MessageReposit
     // Store the message in the correct chat subdivision
     db.collection(COLLECTION_PATH)
         .document(chatPath)
-	    .collection("messages")
-	    .document(dataMessage.uuid.toString())
+        .collection("messages")
+        .document(dataMessage.uuid.toString())
         .set(messageDocument)
         .addOnCompleteListener { result ->
           if (result.isSuccessful) {
@@ -226,56 +226,50 @@ class MessageFirestoreSource(private val db: FirebaseFirestore) : MessageReposit
       user2UUID: UUID,
       callback: (Result<Unit>) -> Unit
   ) {
-	// Generate the chat path using the consistent `mergeUUIDs` order
-	val chatPath = mergeUUIDs(user1UUID, user2UUID)
-	
-	db.collection(COLLECTION_PATH)
-	  .document(chatPath)
-	  .collection("messages")
-	  .document(dataMessage.uuid.toString())
-	  .get()
-	  .addOnCompleteListener { task ->
-		if (task.isSuccessful) {
-		  val document = task.result
-		  if (document != null && document.exists()) {
-			val existingMessage = documentToMessage(document).getOrNull()
-			if (existingMessage != null) {
-			  val currentTime = System.currentTimeMillis()
-			  if (currentTime - existingMessage.timestamp <= fifteenMinutesInMillis) {
-				val messageMap = messageToDocument(dataMessage)
-				db.collection(COLLECTION_PATH)
-				  .document(dataMessage.uuid.toString())
-				  .update(messageMap)
-				  .addOnCompleteListener { updateTask ->
-					if (updateTask.isSuccessful) {
-					  callback(Result.success(Unit))
-					} else {
-					  callback(
-						Result.failure(
-						  updateTask.exception
-							?: Exception("Unknown error updating message")
-						)
-					  )
-					}
-				  }
-			  } else {
-				callback(
-				  Result.failure(
-					Exception("Message can only be updated within 15 minutes of being sent")
-				  )
-				)
-			  }
-			} else {
-			  callback(Result.failure(Exception("Message not found")))
-			}
-		  } else {
-			callback(
-			  Result.failure(task.exception ?: Exception("Error fetching message for update"))
-			)
-			
-		  }
-		}
-	  }
+    // Generate the chat path using the consistent `mergeUUIDs` order
+    val chatPath = mergeUUIDs(user1UUID, user2UUID)
+
+    db.collection(COLLECTION_PATH)
+        .document(chatPath)
+        .collection("messages")
+        .document(dataMessage.uuid.toString())
+        .get()
+        .addOnCompleteListener { task ->
+          if (task.isSuccessful) {
+            val document = task.result
+            if (document != null && document.exists()) {
+              val existingMessage = documentToMessage(document).getOrNull()
+              if (existingMessage != null) {
+                val currentTime = System.currentTimeMillis()
+                if (currentTime - existingMessage.timestamp <= fifteenMinutesInMillis) {
+                  val messageMap = messageToDocument(dataMessage)
+                  db.collection(COLLECTION_PATH)
+                      .document(dataMessage.uuid.toString())
+                      .update(messageMap)
+                      .addOnCompleteListener { updateTask ->
+                        if (updateTask.isSuccessful) {
+                          callback(Result.success(Unit))
+                        } else {
+                          callback(
+                              Result.failure(
+                                  updateTask.exception
+                                      ?: Exception("Unknown error updating message")))
+                        }
+                      }
+                } else {
+                  callback(
+                      Result.failure(
+                          Exception("Message can only be updated within 15 minutes of being sent")))
+                }
+              } else {
+                callback(Result.failure(Exception("Message not found")))
+              }
+            } else {
+              callback(
+                  Result.failure(task.exception ?: Exception("Error fetching message for update")))
+            }
+          }
+        }
   }
   /**
    * Adds a listener for real-time updates to messages between two users.

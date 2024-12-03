@@ -45,7 +45,7 @@ class ContactViewModel(
 
       // Iterate through the contact list
       userVM.getUser().contactList.forEach { contactUUID ->
-		
+
         // Fetch messages between the current user and each contact
         messageFirestoreSource.getMessages(currentUserUUID, contactUUID) { result ->
           result.fold(
@@ -62,7 +62,7 @@ class ContactViewModel(
                         val lastMessage = filteredMessages.lastOrNull()
                         val lastMessageText = lastMessage?.text ?: ""
                         val lastMessageTimestamp = lastMessage?.timestamp?.toString() ?: ""
-						
+
                         // Update the message box map
                         _messageBoxMap.value =
                             _messageBoxMap.value.toMutableMap().apply {
