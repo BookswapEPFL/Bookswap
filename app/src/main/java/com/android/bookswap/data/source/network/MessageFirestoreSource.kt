@@ -1,8 +1,6 @@
 package com.android.bookswap.data.source.network
 
-import android.content.Context
 import android.util.Log
-import android.widget.Toast
 import com.android.bookswap.data.DataMessage
 import com.android.bookswap.data.MessageType
 import com.android.bookswap.data.repository.MessageRepository
@@ -12,6 +10,7 @@ import com.google.firebase.firestore.ListenerRegistration
 import java.util.UUID
 
 const val COLLECTION_PATH = "chats"
+const val fifteenMinutesInMillis = 15 * 60 * 1000
 /**
  * Firestore source for managing messages.
  *
@@ -121,8 +120,7 @@ class MessageFirestoreSource(private val db: FirebaseFirestore) : MessageReposit
       messageUUID: UUID,
       user1UUID: UUID,
       user2UUID: UUID,
-      callback: (Result<Unit>) -> Unit,
-      context: Context
+      callback: (Result<Unit>) -> Unit
   ) {
     // Generate the chat path using the consistent `mergeUUIDs` order
     val chatPath = mergeUUIDs(user1UUID, user2UUID)
@@ -140,7 +138,6 @@ class MessageFirestoreSource(private val db: FirebaseFirestore) : MessageReposit
 
             if (existingMessage != null) {
               val currentTime = System.currentTimeMillis()
-              val fifteenMinutesInMillis = 15 * 60 * 1000
 
               // Check if the message is within the 15-minute deletion window
               if (currentTime - existingMessage.timestamp <= fifteenMinutesInMillis) {
@@ -161,11 +158,6 @@ class MessageFirestoreSource(private val db: FirebaseFirestore) : MessageReposit
                     }
               } else {
                 // Notify the user that the deletion window has passed
-                Toast.makeText(
-                        context,
-                        "Message can only be deleted within 15 minutes of being sent",
-                        Toast.LENGTH_LONG)
-                    .show()
                 callback(
                     Result.failure(
                         Exception("Message can only be deleted within 15 minutes of being sent")))
@@ -240,8 +232,7 @@ class MessageFirestoreSource(private val db: FirebaseFirestore) : MessageReposit
       message: DataMessage,
       user1UUID: UUID,
       user2UUID: UUID,
-      callback: (Result<Unit>) -> Unit,
-      context: Context
+      callback: (Result<Unit>) -> Unit
   ) {
     // Generate the chat path using the consistent `mergeUUIDs` order
     val chatPath = mergeUUIDs(user1UUID, user2UUID)
@@ -259,7 +250,6 @@ class MessageFirestoreSource(private val db: FirebaseFirestore) : MessageReposit
 
             if (existingMessage != null) {
               val currentTime = System.currentTimeMillis()
-              val fifteenMinutesInMillis = 15 * 60 * 1000
 
               // Check if the message is within the 15-minute update window
               if (currentTime - existingMessage.timestamp <= fifteenMinutesInMillis) {
@@ -287,11 +277,6 @@ class MessageFirestoreSource(private val db: FirebaseFirestore) : MessageReposit
                     }
               } else {
                 // Notify the user that the update window has passed
-                Toast.makeText(
-                        context,
-                        "Message can only be updated within 15 minutes of being sent",
-                        Toast.LENGTH_LONG)
-                    .show()
                 callback(
                     Result.failure(
                         Exception("Message can only be updated within 15 minutes of being sent")))

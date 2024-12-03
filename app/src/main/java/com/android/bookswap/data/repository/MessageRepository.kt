@@ -1,6 +1,5 @@
 package com.android.bookswap.data.repository
 
-import android.content.Context
 import com.android.bookswap.data.DataMessage
 import com.google.firebase.firestore.ListenerRegistration
 import java.util.UUID
@@ -48,14 +47,12 @@ interface MessageRepository {
    * @param user2UUID uuid of the second user
    * @param callback callback function that receives Result.success() when operation succeed of
    *   Result.failure(exception) if error
-   * @param context context of the application
    */
   fun deleteMessage(
       messageUUID: UUID,
       user1UUID: UUID,
       user2UUID: UUID,
       callback: (Result<Unit>) -> Unit,
-      context: Context
   )
 
   /**
@@ -76,14 +73,12 @@ interface MessageRepository {
    * @param user2UUID uuid of the second user
    * @param callback callback function that receives Result.success() when operation succeed of
    *   Result.failure(exception) if error
-   * @param context context of the application
    */
   fun updateMessage(
       message: DataMessage,
       user1UUID: UUID,
       user2UUID: UUID,
-      callback: (Result<Unit>) -> Unit,
-      context: Context
+      callback: (Result<Unit>) -> Unit
   )
 
   /**

@@ -1,6 +1,5 @@
 package com.android.bookswap.model.chat
 
-import android.content.Context
 import android.os.Looper
 import com.android.bookswap.data.DataMessage
 import com.android.bookswap.data.MessageType
@@ -34,7 +33,6 @@ class DataMessageFirestoreSourceTest {
   private val mockDocumentReference: DocumentReference = mockk()
   private val mockDocumentSnapshot: DocumentSnapshot = mockk()
   private val mockQuerySnapshot: QuerySnapshot = mockk()
-  private val mockContext: Context = mockk()
 
   private lateinit var messageRepository: MessageFirestoreSource
   private lateinit var messageFirestoreSource: MessageFirestoreSource
@@ -232,11 +230,9 @@ class DataMessageFirestoreSourceTest {
     } returns Tasks.forResult(null)
 
     messageFirestoreSource.deleteMessage(
-        testMessage.uuid,
-        testMessage.senderUUID,
-        testMessage.receiverUUID,
-        { result -> assert(result.isSuccess) },
-        mockContext)
+        testMessage.uuid, testMessage.senderUUID, testMessage.receiverUUID) { result ->
+          assert(result.isSuccess)
+        }
 
     shadowOf(Looper.getMainLooper()).idle()
     verify {
@@ -262,14 +258,10 @@ class DataMessageFirestoreSourceTest {
     every { mockDocumentSnapshot.exists() } returns false // Message does not exist
 
     messageFirestoreSource.deleteMessage(
-        testMessage.uuid,
-        testMessage.senderUUID,
-        testMessage.receiverUUID,
-        { result ->
+        testMessage.uuid, testMessage.senderUUID, testMessage.receiverUUID) { result ->
           assert(result.isFailure)
           assert(result.exceptionOrNull()?.message == "Message not found")
-        },
-        mockContext)
+        }
   }
 
   @Test
@@ -288,16 +280,12 @@ class DataMessageFirestoreSourceTest {
     every { mockDocumentSnapshot.getLong("timestamp") } returns oldTimestamp
 
     messageFirestoreSource.deleteMessage(
-        testMessage.uuid,
-        testMessage.senderUUID,
-        testMessage.receiverUUID,
-        { result ->
+        testMessage.uuid, testMessage.senderUUID, testMessage.receiverUUID) { result ->
           assert(result.isFailure)
           assert(
               result.exceptionOrNull()?.message ==
                   "Message can only be deleted within 15 minutes of being sent")
-        },
-        mockContext)
+        }
   }
 
   @Test
@@ -314,14 +302,10 @@ class DataMessageFirestoreSourceTest {
     } returns Tasks.forException(exception)
 
     messageFirestoreSource.deleteMessage(
-        testMessage.uuid,
-        testMessage.senderUUID,
-        testMessage.receiverUUID,
-        { result ->
+        testMessage.uuid, testMessage.senderUUID, testMessage.receiverUUID) { result ->
           assert(result.isFailure)
           assert(result.exceptionOrNull() == exception)
-        },
-        mockContext)
+        }
   }
 
   @Test
@@ -348,14 +332,10 @@ class DataMessageFirestoreSourceTest {
     } returns Tasks.forException(exception)
 
     messageFirestoreSource.deleteMessage(
-        testMessage.uuid,
-        testMessage.senderUUID,
-        testMessage.receiverUUID,
-        { result ->
+        testMessage.uuid, testMessage.senderUUID, testMessage.receiverUUID) { result ->
           assert(result.isFailure)
           assert(result.exceptionOrNull() == exception)
-        },
-        mockContext)
+        }
   }
 
   @Test
@@ -373,14 +353,10 @@ class DataMessageFirestoreSourceTest {
         null // Missing field causes conversion failure
 
     messageFirestoreSource.deleteMessage(
-        testMessage.uuid,
-        testMessage.senderUUID,
-        testMessage.receiverUUID,
-        { result ->
+        testMessage.uuid, testMessage.senderUUID, testMessage.receiverUUID) { result ->
           assert(result.isFailure)
           assert(result.exceptionOrNull()?.message == "Message not found")
-        },
-        mockContext)
+        }
   }
 
   // DeleteAllMessages Tests
@@ -472,14 +448,10 @@ class DataMessageFirestoreSourceTest {
     every { mockDocumentSnapshot.exists() } returns false
 
     messageFirestoreSource.updateMessage(
-        testMessage,
-        testMessage.senderUUID,
-        testMessage.receiverUUID,
-        { result ->
+        testMessage, testMessage.senderUUID, testMessage.receiverUUID) { result ->
           assert(result.isFailure)
           assert(result.exceptionOrNull()?.message == "Message not found")
-        },
-        mockContext)
+        }
   }
 
   @Test
@@ -501,16 +473,12 @@ class DataMessageFirestoreSourceTest {
     every { mockDocumentSnapshot.getLong("timestamp") } returns oldMessage.timestamp
 
     messageFirestoreSource.updateMessage(
-        oldMessage,
-        testMessage.senderUUID,
-        testMessage.receiverUUID,
-        { result ->
+        oldMessage, testMessage.senderUUID, testMessage.receiverUUID) { result ->
           assert(result.isFailure)
           assert(
               result.exceptionOrNull()?.message ==
                   "Message can only be updated within 15 minutes of being sent")
-        },
-        mockContext)
+        }
   }
 
   @Test
@@ -527,14 +495,10 @@ class DataMessageFirestoreSourceTest {
     } returns Tasks.forException(exception)
 
     messageFirestoreSource.updateMessage(
-        testMessage,
-        testMessage.senderUUID,
-        testMessage.receiverUUID,
-        { result ->
+        testMessage, testMessage.senderUUID, testMessage.receiverUUID) { result ->
           assert(result.isFailure)
           assert(result.exceptionOrNull() == exception)
-        },
-        mockContext)
+        }
   }
 
   @Test
@@ -569,14 +533,10 @@ class DataMessageFirestoreSourceTest {
     } returns Tasks.forException(exception)
 
     messageFirestoreSource.updateMessage(
-        recentMessage,
-        testMessage.senderUUID,
-        testMessage.receiverUUID,
-        { result ->
+        recentMessage, testMessage.senderUUID, testMessage.receiverUUID) { result ->
           assert(result.isFailure)
           assert(result.exceptionOrNull() == exception)
-        },
-        mockContext)
+        }
   }
 
   @Test
@@ -593,14 +553,10 @@ class DataMessageFirestoreSourceTest {
         null // Missing field causes conversion failure
 
     messageFirestoreSource.updateMessage(
-        testMessage,
-        testMessage.senderUUID,
-        testMessage.receiverUUID,
-        { result ->
+        testMessage, testMessage.senderUUID, testMessage.receiverUUID) { result ->
           assert(result.isFailure)
           assert(result.exceptionOrNull()?.message == "Message not found")
-        },
-        mockContext)
+        }
   }
 
   @Test

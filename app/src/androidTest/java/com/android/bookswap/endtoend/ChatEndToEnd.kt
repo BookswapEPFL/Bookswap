@@ -373,8 +373,7 @@ class ChatEndToEnd {
         messageUUID: UUID,
         user1UUID: UUID,
         user2UUID: UUID,
-        callback: (Result<Unit>) -> Unit,
-        context: Context
+        callback: (Result<Unit>) -> Unit
     ) {
       // Remove the message if it matches the UUID and is between the two users
       val removed =
@@ -407,8 +406,7 @@ class ChatEndToEnd {
         message: DataMessage,
         user1UUID: UUID,
         user2UUID: UUID,
-        callback: (Result<Unit>) -> Unit,
-        context: Context
+        callback: (Result<Unit>) -> Unit
     ) {
       val index = messages.indexOfFirst { it.uuid == message.uuid }
       if (index != -1 &&
