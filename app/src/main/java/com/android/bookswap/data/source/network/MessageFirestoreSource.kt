@@ -244,6 +244,8 @@ class MessageFirestoreSource(private val db: FirebaseFirestore) : MessageReposit
                 if (currentTime - existingMessage.timestamp <= fifteenMinutesInMillis) {
                   val messageMap = messageToDocument(dataMessage)
                   db.collection(COLLECTION_PATH)
+                      .document(chatPath)
+                      .collection("messages")
                       .document(dataMessage.uuid.toString())
                       .update(messageMap)
                       .addOnCompleteListener { updateTask ->
