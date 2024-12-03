@@ -57,7 +57,11 @@ fun UserProfile(
 ) {
   val context = LocalContext.current
   val appConfig = LocalAppConfig.current
-  var userData = appConfig.userViewModel.getUser()
+  var userData =
+      appConfig.userViewModel
+          .getUser()
+          .also { println(it.toString()) }
+          .also { android.util.Log.e("TAG_USER", it.toString()) }
   val addrStr by appConfig.userViewModel.getLocationPlace(context).collectAsState()
   val showEditPicture = remember { mutableStateOf(false) }
   var showEditProfile by remember { mutableStateOf(false) }

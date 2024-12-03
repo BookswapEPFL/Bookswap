@@ -33,12 +33,14 @@ import org.junit.runner.RunWith
 class UserProfileScreenTest : TestCase() {
 
   private lateinit var photoStorage: PhotoFirebaseStorageSource
+  private lateinit var userVM: UserViewModel
 
   @get:Rule val composeTestRule = createComposeRule()
 
   @Before
   fun setup() {
-    val userVM: UserViewModel = DefaultMockKs.mockKUserViewModel
+    android.util.Log.wtf("TAG_SETUP", "test setup")
+    userVM = DefaultMockKs.mockKUserViewModel
 
     photoStorage = mockk(relaxed = true)
 
