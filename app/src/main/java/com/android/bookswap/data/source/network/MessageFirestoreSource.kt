@@ -74,35 +74,26 @@ class MessageFirestoreSource(private val db: FirebaseFirestore) : MessageReposit
   /**
    * Sends a message to the Firestore database.
    *
-   * @param message The message to be sent.
+   * @param dataMessage The message to be sent.
    * @param callback Callback to be invoked with the result of the operation. The result is a
    *   success if the message is sent successfully, or an exception on failure.
    */
-  override fun sendMessage(message: DataMessage, callback: (Result<Unit>) -> Unit) {
+  override fun sendMessage(dataMessage: DataMessage, callback: (Result<Unit>) -> Unit) {
+    val messageDocument = messageToDocument(dataMessage)
     // Generate the chat path using the consistent `mergeUUIDs` order
-    val chatPath = mergeUUIDs(message.senderUUID, message.receiverUUID)
-
-    // Map the message to a Firestore-compatible structure
-    val messageMap =
-        mapOf(
-            "uuid" to message.uuid.toString(),
-            "text" to message.text,
-            "senderUUID" to message.senderUUID.toString(),
-            "receiverUUID" to message.receiverUUID.toString(),
-            "timestamp" to message.timestamp,
-            "messageType" to message.messageType.name)
+    val chatPath = mergeUUIDs(dataMessage.senderUUID, dataMessage.receiverUUID)
 
     // Store the message in the correct chat subdivision
     db.collection(COLLECTION_PATH)
         .document(chatPath)
         .collection("messages")
-        .document(message.uuid.toString())
-        .set(messageMap)
-        .addOnCompleteListener { task ->
-          if (task.isSuccessful) {
+        .document(dataMessage.uuid.toString())
+        .set(messageDocument)
+        .addOnCompleteListener { result ->
+          if (result.isSuccessful) {
             callback(Result.success(Unit))
           } else {
-            callback(Result.failure(task.exception ?: Exception("Error sending message")))
+            callback(Result.failure(result.exception ?: Exception("Error sending message")))
           }
         }
   }
@@ -221,6 +212,7 @@ class MessageFirestoreSource(private val db: FirebaseFirestore) : MessageReposit
   /**
    * Updates a message in the Firestore database.
    *
+   * @param dataMessage The message to be updated.
    * @param message The message to be updated.
    * @param user1UUID The UUID of the first user.
    * @param user2UUID The UUID of the second user.
@@ -229,7 +221,7 @@ class MessageFirestoreSource(private val db: FirebaseFirestore) : MessageReposit
    * @param context The context for displaying Toast messages.
    */
   override fun updateMessage(
-      message: DataMessage,
+      dataMessage: DataMessage,
       user1UUID: UUID,
       user2UUID: UUID,
       callback: (Result<Unit>) -> Unit
@@ -237,56 +229,47 @@ class MessageFirestoreSource(private val db: FirebaseFirestore) : MessageReposit
     // Generate the chat path using the consistent `mergeUUIDs` order
     val chatPath = mergeUUIDs(user1UUID, user2UUID)
 
-    // Fetch the existing message to validate it exists and check the update window
     db.collection(COLLECTION_PATH)
         .document(chatPath)
         .collection("messages")
-        .document(message.uuid.toString())
+        .document(dataMessage.uuid.toString())
         .get()
         .addOnCompleteListener { task ->
-          if (task.isSuccessful && task.result != null && task.result!!.exists()) {
-            val document = task.result!!
-            val existingMessage = documentToMessage(document).getOrNull()
-
-            if (existingMessage != null) {
-              val currentTime = System.currentTimeMillis()
-
-              // Check if the message is within the 15-minute update window
-              if (currentTime - existingMessage.timestamp <= fifteenMinutesInMillis) {
-                // Prepare the updated fields
-                val updatedFields =
-                    mapOf(
-                        "text" to message.text,
-                        "timestamp" to currentTime,
-                        "messageType" to message.messageType.name)
-
-                // Perform the update
-                db.collection(COLLECTION_PATH)
-                    .document(chatPath)
-                    .collection("messages")
-                    .document(message.uuid.toString())
-                    .update(updatedFields)
-                    .addOnCompleteListener { updateTask ->
-                      if (updateTask.isSuccessful) {
-                        callback(Result.success(Unit))
-                      } else {
-                        callback(
-                            Result.failure(
-                                updateTask.exception ?: Exception("Error updating message")))
+          if (task.isSuccessful) {
+            val document = task.result
+            if (document != null && document.exists()) {
+              val existingMessage = documentToMessage(document).getOrNull()
+              if (existingMessage != null) {
+                val currentTime = System.currentTimeMillis()
+                if (currentTime - existingMessage.timestamp <= fifteenMinutesInMillis) {
+                  val messageMap = messageToDocument(dataMessage)
+                  db.collection(COLLECTION_PATH)
+                      .document(chatPath)
+                      .collection("messages")
+                      .document(dataMessage.uuid.toString())
+                      .update(messageMap)
+                      .addOnCompleteListener { updateTask ->
+                        if (updateTask.isSuccessful) {
+                          callback(Result.success(Unit))
+                        } else {
+                          callback(
+                              Result.failure(
+                                  updateTask.exception
+                                      ?: Exception("Unknown error updating message")))
+                        }
                       }
-                    }
+                } else {
+                  callback(
+                      Result.failure(
+                          Exception("Message can only be updated within 15 minutes of being sent")))
+                }
               } else {
-                // Notify the user that the update window has passed
-                callback(
-                    Result.failure(
-                        Exception("Message can only be updated within 15 minutes of being sent")))
+                callback(Result.failure(Exception("Message not found")))
               }
             } else {
-              callback(Result.failure(Exception("Message not found")))
+              callback(
+                  Result.failure(task.exception ?: Exception("Error fetching message for update")))
             }
-          } else {
-            callback(
-                Result.failure(task.exception ?: Exception("Error fetching message for update")))
           }
         }
   }
@@ -330,6 +313,22 @@ class MessageFirestoreSource(private val db: FirebaseFirestore) : MessageReposit
   }
 }
 /**
+ * Maps a DataMessage object to a Firebase document-like Map
+ *
+ * @param dataMessage The object to convert into a Map
+ * @return Map<String,Any?> A Mapping of each of the DataMessage object fields to it's value,
+ *   properly formatted for storing
+ */
+fun messageToDocument(dataMessage: DataMessage): Map<String, Any?> {
+  return mapOf(
+      "uuid" to DataConverter.convert_UUID(dataMessage.uuid),
+      "text" to dataMessage.text,
+      "senderUUID" to DataConverter.convert_UUID(dataMessage.senderUUID),
+      "receiverUUID" to DataConverter.convert_UUID(dataMessage.receiverUUID),
+      "timestamp" to DataConverter.convert_Long(dataMessage.timestamp),
+      "messageType" to dataMessage.messageType.name)
+}
+/**
  * Converts a Firestore document to a DataMessage object.
  *
  * @param document The Firestore document to be converted.
@@ -339,11 +338,11 @@ class MessageFirestoreSource(private val db: FirebaseFirestore) : MessageReposit
 fun documentToMessage(document: DocumentSnapshot): Result<DataMessage> {
   return try {
     val type = MessageType.valueOf(document.getString("messageType")!!)
-    val uuid = UUID.fromString(document.getString("uuid")!!)
+    val uuid = DataConverter.parse_raw_UUID(document.get("uuid").toString())!!
     val text = document.getString("text")!!
-    val senderUUID = UUID.fromString(document.getString("senderUUID")!!)
-    val receiverUUID = UUID.fromString(document.getString("receiverUUID")!!)
-    val timestamp = document.getLong("timestamp")!!
+    val senderUUID = DataConverter.parse_raw_UUID(document.get("senderUUID").toString())!!
+    val receiverUUID = DataConverter.parse_raw_UUID(document.get("receiverUUID").toString())!!
+    val timestamp = DataConverter.parse_raw_long(document.get("timestamp").toString())!!
     Result.success(DataMessage(type, uuid, text, senderUUID, receiverUUID, timestamp))
   } catch (e: Exception) {
     Log.e("MessageSource", "Error converting document to Message: ${e.message}")

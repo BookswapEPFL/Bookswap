@@ -70,12 +70,8 @@ class ChatScreenViewModelTest {
 
     chatScreenViewModel.addContacts(mockUsersRepository, currentUser, otherUser)
 
-    verify {
-      mockUsersRepository.addContact(currentUser.userUUID, otherUser.userUUID.toString(), any())
-    }
-    verify {
-      mockUsersRepository.addContact(otherUser.userUUID, currentUser.userUUID.toString(), any())
-    }
+    verify { mockUsersRepository.addContact(currentUser.userUUID, otherUser.userUUID, any()) }
+    verify { mockUsersRepository.addContact(otherUser.userUUID, currentUser.userUUID, any()) }
   }
 
   @Test
@@ -93,7 +89,7 @@ class ChatScreenViewModelTest {
         }
 
     every {
-      mockUsersRepository.addContact(currentUser.userUUID, otherUser.userUUID.toString(), any())
+      mockUsersRepository.addContact(currentUser.userUUID, otherUser.userUUID, any())
     } answers
         {
           val callback = thirdArg<(Result<Unit>) -> Unit>()
@@ -101,7 +97,7 @@ class ChatScreenViewModelTest {
         }
 
     every {
-      mockUsersRepository.addContact(otherUser.userUUID, currentUser.userUUID.toString(), any())
+      mockUsersRepository.addContact(otherUser.userUUID, currentUser.userUUID, any())
     } answers
         {
           val callback = thirdArg<(Result<Unit>) -> Unit>()
@@ -110,11 +106,7 @@ class ChatScreenViewModelTest {
 
     chatScreenViewModel.addContacts(mockUsersRepository, currentUser, otherUser)
 
-    verify {
-      mockUsersRepository.addContact(currentUser.userUUID, otherUser.userUUID.toString(), any())
-    }
-    verify {
-      mockUsersRepository.addContact(otherUser.userUUID, currentUser.userUUID.toString(), any())
-    }
+    verify { mockUsersRepository.addContact(currentUser.userUUID, otherUser.userUUID, any()) }
+    verify { mockUsersRepository.addContact(otherUser.userUUID, currentUser.userUUID, any()) }
   }
 }

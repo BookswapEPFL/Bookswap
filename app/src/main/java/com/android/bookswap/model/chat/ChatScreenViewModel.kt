@@ -42,9 +42,8 @@ class ChatScreenViewModel {
     userSource.getUser(currentUser.userUUID) { result ->
       if (result.isSuccess) {
         val updatedUser = result.getOrThrow()
-        if (!updatedUser.contactList.contains(otherUser.userUUID.toString())) {
-          userSource.addContact(currentUser.userUUID, otherUser.userUUID.toString()) { contactResult
-            ->
+        if (!updatedUser.contactList.contains(otherUser.userUUID)) {
+          userSource.addContact(currentUser.userUUID, otherUser.userUUID) { contactResult ->
             if (contactResult.isSuccess) {
               Log.d(
                   "ChatScreen", "Added ${otherUser.userUUID} to ${currentUser.userUUID}'s contacts")
@@ -64,9 +63,8 @@ class ChatScreenViewModel {
     userSource.getUser(otherUser.userUUID) { result ->
       if (result.isSuccess) {
         val updatedOtherUser = result.getOrThrow()
-        if (!updatedOtherUser.contactList.contains(currentUser.userUUID.toString())) {
-          userSource.addContact(otherUser.userUUID, currentUser.userUUID.toString()) { contactResult
-            ->
+        if (!updatedOtherUser.contactList.contains(currentUser.userUUID)) {
+          userSource.addContact(otherUser.userUUID, currentUser.userUUID) { contactResult ->
             if (contactResult.isSuccess) {
               Log.d(
                   "ChatScreen", "Added ${currentUser.userUUID} to ${otherUser.userUUID}'s contacts")

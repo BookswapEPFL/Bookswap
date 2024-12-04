@@ -40,7 +40,6 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -119,7 +118,7 @@ fun ChatScreen(
                 result
                     .onSuccess { url ->
                       messageRepository.sendMessage(
-                          message =
+                          dataMessage =
                               DataMessage(
                                   messageType = MessageType.IMAGE,
                                   uuid = messageRepository.getNewUUID(),
@@ -157,12 +156,12 @@ fun ChatScreen(
               .onSuccess { fetchedMessages ->
                 // Directly use the fetched messages as they belong to the specific chat
                 messages = fetchedMessages.sortedBy { it.timestamp }
-                if (messages.isEmpty() && !empty){
-                    empty = true
-              }
+                if (messages.isEmpty() && !empty) {
+                  empty = true
+                }
                 if (messages.isNotEmpty() && empty) {
-                    empty = false
-                    chatScreenViewModel.addContacts(userSource, currentUser, otherUser)
+                  empty = false
+                  chatScreenViewModel.addContacts(userSource, currentUser, otherUser)
                 }
                 // Ensure offline storage logic is applied
                 for (message in
@@ -183,7 +182,6 @@ fun ChatScreen(
     // Cleanup when the DisposableEffect leaves the composition
     onDispose { listenerRegistration.remove() }
   }
-
 
   Box(modifier = Modifier.fillMaxSize().background(ColorVariable.BackGround)) {
     Column(modifier = Modifier.fillMaxSize()) {
@@ -314,7 +312,7 @@ fun ChatScreen(
                               timestamp = System.currentTimeMillis())
                       // Send the message
                       messageRepository.sendMessage(
-                          message = newMessage,
+                          dataMessage = newMessage,
                       ) { result ->
                         if (result.isSuccess) {
                           newMessageText = TextFieldValue("")

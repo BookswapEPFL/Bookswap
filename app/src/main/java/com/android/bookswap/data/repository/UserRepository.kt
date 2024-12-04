@@ -69,7 +69,7 @@ interface UsersRepository {
    * @param contactUUID UUID of the contact to add.
    * @param callback Callback for success or failure.
    */
-  fun addContact(userUUID: UUID, contactUUID: String, callback: (Result<Unit>) -> Unit)
+  fun addContact(userUUID: UUID, contactUUID: UUID, callback: (Result<Unit>) -> Unit)
 
   /**
    * Function to remove a contact from the user's contact list in the repository.
@@ -78,5 +78,5 @@ interface UsersRepository {
    * @param contactUUID UUID of the contact to remove.
    * @param callback Callback for success or failure.
    */
-  fun removeContact(userUUID: UUID, contactUUID: String, callback: (Result<Unit>) -> Unit)
+  fun removeContact(userUUID: UUID, contactUUID: UUID, callback: (Result<Unit>) -> Unit)
 }
