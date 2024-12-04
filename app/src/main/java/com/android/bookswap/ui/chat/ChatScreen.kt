@@ -104,6 +104,7 @@ fun ChatScreen(
   var newMessageText by remember { mutableStateOf(TextFieldValue("")) }
   var selectedMessage by remember { mutableStateOf<DataMessage?>(null) }
   var updateActive by remember { mutableStateOf(false) }
+  var empty by remember { mutableStateOf(false) }
   val maxMessagesStoredOffline = 10
   val padding8 = 8.dp
   val padding24 = 24.dp
@@ -156,8 +157,12 @@ fun ChatScreen(
               .onSuccess { fetchedMessages ->
                 // Directly use the fetched messages as they belong to the specific chat
                 messages = fetchedMessages.sortedBy { it.timestamp }
-                if (messages.isNotEmpty()) {
-                      chatScreenViewModel.addContacts(userSource, currentUser, otherUser)
+                if (messages.isEmpty() && !empty){
+                    empty = true
+              }
+                if (messages.isNotEmpty() && empty) {
+                    empty = false
+                    chatScreenViewModel.addContacts(userSource, currentUser, otherUser)
                 }
                 // Ensure offline storage logic is applied
                 for (message in
