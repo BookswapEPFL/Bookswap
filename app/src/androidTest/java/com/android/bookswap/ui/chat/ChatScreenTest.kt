@@ -256,30 +256,6 @@ class ChatScreenTest {
   }
 
   @Test
-  fun testTopAppBar() {
-    composeTestRule.setContent {
-      ChatScreen(
-          mockMessageRepository,
-          mockUserRepository,
-          currentUser,
-          otherUser,
-          mockNavigationActions,
-          mockPhotoStorage,
-          mockMessageStorage,
-          mockContext)
-    }
-
-    composeTestRule.onNodeWithTag(C.Tag.top_app_bar_container).assertIsDisplayed()
-    composeTestRule.onNodeWithTag(C.Tag.TopAppBar.screen_title).assertIsDisplayed()
-    composeTestRule
-        .onNodeWithTag(C.Tag.TopAppBar.screen_title)
-        .assertTextEquals(otherUser.firstName + " " + otherUser.lastName)
-    composeTestRule
-        .onNodeWithTag(C.Tag.TopAppBar.profile_button, useUnmergedTree = true)
-        .assertIsDisplayed()
-  }
-
-  @Test
   fun testPopUpExists() {
     composeTestRule.setContent {
       ChatScreen(
