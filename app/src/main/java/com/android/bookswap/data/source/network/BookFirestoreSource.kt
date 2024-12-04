@@ -212,44 +212,41 @@ class BooksFirestoreSource(private val db: FirebaseFirestore) : BooksRepository 
    */
   fun documentToBooks(document: DocumentSnapshot): DataBook? {
     return try {
-      // val mostSignificantBits = document.getString("uuid.mostSignificantBits") ?: return null
-      // val leastSignificantBits = document.getString("uuid.leastSignificantBits") ?: return null
-      val bookuuid = document.getString("uuid") ?: return null
+      val uuid = UUID.fromString(document.getString("uuid") ?: return null)
       val title = document.getString("title") ?: return null
       val author = document.getString("author")
       val description = document.getString("description")
-      val rating = document.getLong("rating")
+      val rating = document.getLong("rating")?.toInt()
       val photo = document.getString("photo")
+      val language = BookLanguages.valueOf(document.getString("language") ?: return null)
       val isbn = document.getString("isbn")
-      val languageBook = BookLanguages.valueOf(document.getString("language") ?: return null)
-      val genres = document.get("genres") as? List<String> ?: emptyList()
-
-      val archived = document.getBoolean("archived") ?: false
-      val exchange = document.getBoolean("exchange") ?: false
-      val bookGenres =
-          genres.mapNotNull { genre ->
+      val genres =
+          (document.get("genres", List::class.java) as? List<String>)?.mapNotNull {
             try {
-              BookGenres.valueOf(genre)
+              BookGenres.valueOf(it)
             } catch (e: IllegalArgumentException) {
               null
             }
-          }
-      val userid = UUID.fromString(document.getString("userid")) ?: return null
+          } ?: emptyList()
+      val userId = UUID.fromString(document.getString("userId") ?: return null)
+      val archived = document.getBoolean("archived") ?: false
+      val exchange = document.getBoolean("exchange") ?: false
+
       DataBook(
-          UUID.fromString(bookuuid),
-          title,
-          author,
-          description,
-          rating?.toInt(),
-          photo,
-          languageBook,
-          isbn,
-          bookGenres,
-          userid,
-          archived,
-          exchange)
+          uuid = uuid,
+          title = title,
+          author = author,
+          description = description,
+          rating = rating,
+          photo = photo,
+          language = language,
+          isbn = isbn,
+          genres = genres,
+          userId = userId,
+          archived = archived,
+          exchange = exchange)
     } catch (e: Exception) {
-      null // Return null in case of any exception during the conversion
+      null
     }
   }
   /**
