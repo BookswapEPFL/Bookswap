@@ -187,7 +187,7 @@ fun UserProfile(
               Column(Modifier.fillMaxHeight().fillMaxWidth(), Arrangement.spacedBy(8.dp)) {
                 // Full name text
                 Text(
-                    text = "${userData.greeting} ${userData.firstName} ${userData.lastName}",
+                    text = userData.printFullname(),
                     modifier = Modifier.testTag(C.Tag.UserProfile.fullname))
 
                 // Email text
