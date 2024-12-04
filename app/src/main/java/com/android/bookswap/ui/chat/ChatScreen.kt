@@ -26,6 +26,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Card
@@ -118,7 +119,7 @@ fun ChatScreen(
                 result
                     .onSuccess { url ->
                       messageRepository.sendMessage(
-                          message =
+                          dataMessage =
                               DataMessage(
                                   messageType = MessageType.IMAGE,
                                   uuid = messageRepository.getNewUUID(),
@@ -182,9 +183,8 @@ fun ChatScreen(
         userSource.getUser(currentUser.userUUID) { result ->
           if (result.isSuccess) {
             val updatedUser = result.getOrThrow()
-            if (!updatedUser.contactList.contains(otherUser.userUUID.toString())) {
-              userSource.addContact(currentUser.userUUID, otherUser.userUUID.toString()) {
-                  contactResult ->
+            if (!updatedUser.contactList.contains(otherUser.userUUID)) {
+              userSource.addContact(currentUser.userUUID, otherUser.userUUID) { contactResult ->
                 if (contactResult.isSuccess) {
                   Log.d(
                       "ChatScreen",
@@ -206,9 +206,8 @@ fun ChatScreen(
         userSource.getUser(otherUser.userUUID) { result ->
           if (result.isSuccess) {
             val updatedOtherUser = result.getOrThrow()
-            if (!updatedOtherUser.contactList.contains(currentUser.userUUID.toString())) {
-              userSource.addContact(otherUser.userUUID, currentUser.userUUID.toString()) {
-                  contactResult ->
+            if (!updatedOtherUser.contactList.contains(currentUser.userUUID)) {
+              userSource.addContact(otherUser.userUUID, currentUser.userUUID) { contactResult ->
                 if (contactResult.isSuccess) {
                   Log.d(
                       "ChatScreen",
@@ -242,16 +241,33 @@ fun ChatScreen(
           },
           navigationIcon = { BackButtonComponent(navController) },
           actions = {
-            IconButton(onClick = { /* Handle profile icon click */}) {
-              AsyncImage(
-                  model = otherUser.profilePictureUrl,
-                  contentDescription = "Profile Picture",
-                  contentScale = ContentScale.Crop,
-                  modifier =
-                      Modifier.testTag(C.Tag.TopAppBar.profile_button)
-                          .size(padding36)
-                          .clip(CircleShape))
-            }
+            IconButton(
+                onClick = {
+                  navController.navigateTo(
+                      screen = C.Screen.OTHERS_USER_PROFILE, UUID = otherUser.userUUID.toString())
+                }) {
+                  // * Handle profile icon click */}) {
+                  if (otherUser.profilePictureUrl.isNotEmpty()) {
+
+                    AsyncImage(
+                        model = otherUser.profilePictureUrl,
+                        contentDescription = "Profile Picture",
+                        contentScale = ContentScale.Crop,
+                        modifier =
+                            Modifier.testTag(C.Tag.TopAppBar.profile_button)
+                                .size(padding36)
+                                .clip(CircleShape))
+                  } else {
+                    Icon(
+                        imageVector = Icons.Filled.Person,
+                        contentDescription = "Contact Icon",
+                        modifier =
+                            Modifier.size(40.dp)
+                                .clip(CircleShape)
+                                .align(Alignment.CenterVertically),
+                    )
+                  }
+                }
           },
           colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
           modifier = Modifier.testTag(C.Tag.top_app_bar_container))
@@ -338,7 +354,7 @@ fun ChatScreen(
                               timestamp = System.currentTimeMillis())
                       // Send the message
                       messageRepository.sendMessage(
-                          message = newMessage,
+                          dataMessage = newMessage,
                       ) { result ->
                         if (result.isSuccess) {
                           newMessageText = TextFieldValue("")

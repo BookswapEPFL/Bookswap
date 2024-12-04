@@ -54,6 +54,7 @@ import com.android.bookswap.ui.navigation.BottomNavigationMenu
 import com.android.bookswap.ui.navigation.List_Navigation_Bar_Destinations
 import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.profile.NewUserScreen
+import com.android.bookswap.ui.profile.OthersUserProfileScreen
 import com.android.bookswap.ui.profile.UserProfile
 import com.android.bookswap.ui.theme.BookSwapAppTheme
 import com.android.bookswap.utils.ManifestUtils
@@ -271,6 +272,24 @@ class MainActivity : ComponentActivity() {
             }
           }
         }
+        navigation(
+            startDestination = C.Screen.OTHERS_USER_PROFILE, route = C.Route.OTHERS_USER_PROFILE) {
+              // OthersUserProfileScreen :
+              composable("${C.Screen.OTHERS_USER_PROFILE}/{userId}") { backStackEntry ->
+                val userId =
+                    backStackEntry.arguments?.getString("userId")?.let { UUID.fromString(it) }
+                Log.e("Main Launch OthersUserProfile", "userId: $userId")
+                if (userId != null) {
+                  OthersUserProfileScreen(
+                      userId = userId,
+                      booksRepository = bookRepository,
+                      topAppBar = { topAppBar("User Profile") },
+                      bottomAppBar = { bottomAppBar(this@navigation.route ?: "") })
+                } else {
+                  Log.e("Navigation", "Invalid userId passed to OthersUserProfileScreen")
+                }
+              }
+            }
       }
     }
   }

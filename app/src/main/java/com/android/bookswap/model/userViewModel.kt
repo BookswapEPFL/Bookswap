@@ -48,6 +48,7 @@ open class UserViewModel(
     if (!isLoaded || force) {
       fetchUser()
     }
+    Log.d("getUser", "Fetched user: $uuid")
     return dataUser
   }
 
@@ -76,7 +77,7 @@ open class UserViewModel(
       picURL: String = dataUser.profilePictureUrl,
       bookList: List<UUID> = dataUser.bookList,
       googleUid: String = dataUser.googleUid,
-      contactList: List<String> = dataUser.contactList
+      contactList: List<UUID> = dataUser.contactList
   ) {
     updateUser(
         DataUser(

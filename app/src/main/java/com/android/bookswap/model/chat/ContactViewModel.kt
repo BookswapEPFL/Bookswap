@@ -44,8 +44,7 @@ class ContactViewModel(
       val currentUserUUID = userVM.getUser().userUUID
 
       // Iterate through the contact list
-      userVM.getUser().contactList.forEach { contactUUIDString ->
-        val contactUUID = UUID.fromString(contactUUIDString)
+      userVM.getUser().contactList.forEach { contactUUID ->
 
         // Fetch messages between the current user and each contact
         messageFirestoreSource.getMessages(currentUserUUID, contactUUID) { result ->

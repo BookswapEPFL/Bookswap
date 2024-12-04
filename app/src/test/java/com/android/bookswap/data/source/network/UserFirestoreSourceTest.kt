@@ -47,13 +47,12 @@ class UserFirestoreSourceTest {
           "dummyPic.png")
 
   private val userUUID = UUID.randomUUID()
-  private val contactUUID = UUID.randomUUID().toString()
+  private val contactUUID = UUID.randomUUID()
 
   @Before
   fun setUp() {
 
     mockUsersRepository = mockk()
-    userFirestoreSource
 
     every { mockFirestore.collection(any()) } returns mockCollectionReference
     every { mockCollectionReference.document() } returns mockDocumentReference
@@ -61,12 +60,9 @@ class UserFirestoreSourceTest {
     every { mockCollectionReference.document(any()) } returns mockDocumentReference
 
     every { mockQuerySnapshot.documents } returns listOf(mockDocumentSnapshot)
-
+	
     every { mockDocumentSnapshot.id } returns testUser.userUUID.toString()
-    every { mockDocumentSnapshot.getLong("userUUID.mostSignificantBits") } returns
-        testUser.userUUID.mostSignificantBits
-    every { mockDocumentSnapshot.getLong("userUUID.leastSignificantBits") } returns
-        testUser.userUUID.leastSignificantBits
+    every { mockDocumentSnapshot.get("userUUID") } returns testUser.userUUID.toString()
     every { mockDocumentSnapshot.getString("greeting") } returns testUser.greeting
     every { mockDocumentSnapshot.getString("firstName") } returns testUser.firstName
 
@@ -77,7 +73,9 @@ class UserFirestoreSourceTest {
     every { mockDocumentSnapshot.getDouble("latitude") } returns testUser.latitude
     every { mockDocumentSnapshot.getDouble("longitude") } returns testUser.longitude
     every { mockDocumentSnapshot.getString("profilePictureUrl") } returns testUser.profilePictureUrl
-    every { mockDocumentSnapshot.get("bookList") } returns testUser.bookList
+    every { mockDocumentSnapshot.get("bookList") } returns testUser.bookList.map { it.toString() }
+    every { mockDocumentSnapshot.get("contactList") } returns
+        testUser.contactList.map { it.toString() }
     every { mockDocumentSnapshot.getString("googleUid") } returns testUser.googleUid
   }
 
@@ -121,7 +119,8 @@ class UserFirestoreSourceTest {
   @Test
   fun addUser() {
     // Arrange
-    every { mockDocumentReference.set(testUser) } returns Tasks.forResult(null)
+    every { mockDocumentReference.set(userFirestoreSource.userToDocument(testUser)) } returns
+        Tasks.forResult(null)
 
     // Act
     userFirestoreSource.addUser(testUser) { result ->
@@ -129,13 +128,14 @@ class UserFirestoreSourceTest {
     }
 
     // Verify Firestore collection was accessed
-    verify { mockDocumentReference.set(testUser) }
+    verify { mockDocumentReference.set(userFirestoreSource.userToDocument(testUser)) }
   }
 
   @Test
   fun updateUser() {
     // Arrange
-    every { mockDocumentReference.set(testUser) } returns Tasks.forResult(null)
+    every { mockDocumentReference.set(userFirestoreSource.userToDocument(testUser)) } returns
+        Tasks.forResult(null)
 
     // Act
     userFirestoreSource.updateUser(testUser) { result ->
@@ -143,7 +143,7 @@ class UserFirestoreSourceTest {
     }
 
     // Verify Firestore collection was accessed
-    verify { mockDocumentReference.set(testUser) }
+    verify { mockDocumentReference.set(userFirestoreSource.userToDocument(testUser)) }
   }
 
   @Test
@@ -166,7 +166,7 @@ class UserFirestoreSourceTest {
     val result = userFirestoreSource.documentToUser(mockDocumentSnapshot)
 
     // Assert
-    assert(result.getOrNull() != null)
+    result.onFailure { throw it }
     result.onSuccess { assert(it.printFullname() == testUser.printFullname()) }
   }
 
