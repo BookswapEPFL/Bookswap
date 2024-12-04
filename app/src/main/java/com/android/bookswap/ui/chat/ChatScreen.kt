@@ -26,6 +26,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Card
@@ -65,8 +66,11 @@ import com.android.bookswap.data.DataUser
 import com.android.bookswap.data.MessageType
 import com.android.bookswap.data.repository.MessageRepository
 import com.android.bookswap.data.repository.PhotoFirebaseStorageRepository
+import com.android.bookswap.data.repository.UsersRepository
 import com.android.bookswap.model.PhotoRequester
 import com.android.bookswap.model.chat.OfflineMessageStorage
+import com.android.bookswap.resources.C
+import com.android.bookswap.ui.MAXLENGTHMESSAGE
 import com.android.bookswap.ui.components.BackButtonComponent
 import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.theme.ColorVariable
@@ -89,6 +93,7 @@ import kotlinx.coroutines.delay
 @Composable
 fun ChatScreen(
     messageRepository: MessageRepository,
+    userSource: UsersRepository,
     currentUser: DataUser,
     otherUser: DataUser,
     navController: NavigationActions,
@@ -152,7 +157,7 @@ fun ChatScreen(
         messageStorage.addMessage(message)
       }
       messageStorage.setMessages()
-      messageRepository.getMessages { result ->
+      messageRepository.getMessages(currentUser.userUUID, otherUser.userUUID) { result ->
         if (result.isSuccess) {
           messages =
               result
@@ -171,6 +176,56 @@ fun ChatScreen(
         }
       }
       delay(2000) // Delay for 2 seconds
+
+      // Check and add contacts for both users
+      if (messages.isNotEmpty()) {
+        // Add otherUser to currentUser's contacts
+        userSource.getUser(currentUser.userUUID) { result ->
+          if (result.isSuccess) {
+            val updatedUser = result.getOrThrow()
+            if (!updatedUser.contactList.contains(otherUser.userUUID.toString())) {
+              userSource.addContact(currentUser.userUUID, otherUser.userUUID.toString()) {
+                  contactResult ->
+                if (contactResult.isSuccess) {
+                  Log.d(
+                      "ChatScreen",
+                      "Added ${otherUser.userUUID} to ${currentUser.userUUID}'s contacts")
+                } else {
+                  Log.e(
+                      "ChatScreen",
+                      "Failed to add contact: ${contactResult.exceptionOrNull()?.message}")
+                }
+              }
+            }
+          } else {
+            Log.e(
+                "ChatScreen", "Failed to fetch current user: ${result.exceptionOrNull()?.message}")
+          }
+        }
+
+        // Add currentUser to otherUser's contacts
+        userSource.getUser(otherUser.userUUID) { result ->
+          if (result.isSuccess) {
+            val updatedOtherUser = result.getOrThrow()
+            if (!updatedOtherUser.contactList.contains(currentUser.userUUID.toString())) {
+              userSource.addContact(otherUser.userUUID, currentUser.userUUID.toString()) {
+                  contactResult ->
+                if (contactResult.isSuccess) {
+                  Log.d(
+                      "ChatScreen",
+                      "Added ${currentUser.userUUID} to ${otherUser.userUUID}'s contacts")
+                } else {
+                  Log.e(
+                      "ChatScreen",
+                      "Failed to add contact: ${contactResult.exceptionOrNull()?.message}")
+                }
+              }
+            }
+          } else {
+            Log.e("ChatScreen", "Failed to fetch other user: ${result.exceptionOrNull()?.message}")
+          }
+        }
+      }
     }
   }
   Box(modifier = Modifier.fillMaxSize().background(ColorVariable.BackGround)) {
@@ -182,26 +237,46 @@ fun ChatScreen(
                 style = MaterialTheme.typography.titleMedium,
                 color = ColorVariable.Accent,
                 modifier =
-                    Modifier.testTag("chatName")
+                    Modifier.testTag(C.Tag.TopAppBar.screen_title)
                         .align(Alignment.CenterHorizontally)
                         .padding(start = padding24))
           },
           navigationIcon = { BackButtonComponent(navController) },
           actions = {
-            IconButton(onClick = { /* Handle profile icon click */}) {
-              AsyncImage(
-                  model = otherUser.profilePictureUrl,
-                  contentDescription = "Profile Picture",
-                  contentScale = ContentScale.Crop,
-                  modifier = Modifier.testTag("profileIcon").size(padding36).clip(CircleShape))
-            }
+            IconButton(
+                onClick = {
+                  navController.navigateTo(
+                      screen = C.Screen.OTHERS_USER_PROFILE, UUID = otherUser.userUUID.toString())
+                }) {
+                  // * Handle profile icon click */}) {
+                  if (otherUser.profilePictureUrl.isNotEmpty()) {
+
+                    AsyncImage(
+                        model = otherUser.profilePictureUrl,
+                        contentDescription = "Profile Picture",
+                        contentScale = ContentScale.Crop,
+                        modifier =
+                            Modifier.testTag(C.Tag.TopAppBar.profile_button)
+                                .size(padding36)
+                                .clip(CircleShape))
+                  } else {
+                    Icon(
+                        imageVector = Icons.Filled.Person,
+                        contentDescription = "Contact Icon",
+                        modifier =
+                            Modifier.size(40.dp)
+                                .clip(CircleShape)
+                                .align(Alignment.CenterVertically),
+                    )
+                  }
+                }
           },
           colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
-          modifier = Modifier.testTag("chatTopAppBar"))
+          modifier = Modifier.testTag(C.Tag.top_app_bar_container))
       Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.SpaceBetween) {
         // Message list
         LazyColumn(
-            modifier = Modifier.weight(1f).padding(padding8).testTag("column"),
+            modifier = Modifier.weight(1f).padding(padding8).testTag(C.Tag.ChatScreen.scrollable),
             verticalArrangement = Arrangement.Bottom) {
               items(messages) { message ->
                 MessageItem(
@@ -218,7 +293,7 @@ fun ChatScreen(
             verticalAlignment = Alignment.CenterVertically) {
               IconButton(
                   onClick = { photoReq.requestPhoto() },
-                  modifier = Modifier.testTag("photo_button")) {
+                  modifier = Modifier.testTag(C.Tag.ChatScreen.add_image)) {
                     Icon(
                         imageVector = Icons.Default.Add,
                         contentDescription = "Previous Image",
@@ -226,28 +301,40 @@ fun ChatScreen(
                   }
               BasicTextField(
                   value = newMessageText,
-                  onValueChange = { newMessageText = it },
+                  onValueChange = {
+                    if (it.text.length <= MAXLENGTHMESSAGE) {
+                      newMessageText = it
+                    }
+                  },
                   modifier =
                       Modifier.weight(1f)
                           .padding(padding8)
                           .background(ColorVariable.Secondary, MaterialTheme.shapes.small)
                           .border(1.dp, ColorVariable.Accent, MaterialTheme.shapes.small)
                           .padding(padding8)
-                          .testTag("message_input_field"),
+                          .testTag(C.Tag.ChatScreen.message),
               )
               Button(
                   onClick = {
-                    if (updateActive) {
+                    if (newMessageText.text.isEmpty()) {
+                      Toast.makeText(context, "Message cannot be empty", Toast.LENGTH_SHORT).show()
+                    } else if (updateActive) {
                       // Update the message
                       messageRepository.updateMessage(
                           selectedMessage!!.copy(text = newMessageText.text),
-                          { result: Result<Unit> ->
+                          currentUser.userUUID,
+                          otherUser.userUUID) { result: Result<Unit> ->
                             if (result.isSuccess) {
                               Log.d("ChatScreen", "Message updated successfully")
                               selectedMessage = null
                               newMessageText = TextFieldValue("")
                               updateActive = false
                             } else {
+                              Toast.makeText(
+                                      context,
+                                      "Message can only be updated within 15 minutes of being sent",
+                                      Toast.LENGTH_LONG)
+                                  .show()
                               Log.e(
                                   "ChatScreen",
                                   "Failed to update message: ${result.exceptionOrNull()?.message}")
@@ -255,8 +342,7 @@ fun ChatScreen(
                               newMessageText = TextFieldValue("")
                               updateActive = false
                             }
-                          },
-                          context)
+                          }
                     } else {
                       // Send a new message
                       val messageId = messageRepository.getNewUUID()
@@ -290,7 +376,9 @@ fun ChatScreen(
                           ColorVariable.Accent,
                           ColorVariable.Secondary,
                           ColorVariable.Accent),
-                  modifier = Modifier.padding(horizontal = padding8).testTag("send_button")) {
+                  modifier =
+                      Modifier.padding(horizontal = padding8)
+                          .testTag(C.Tag.ChatScreen.confirm_button)) {
                     Text(if (updateActive) "Update" else "Send")
                   }
             }
@@ -322,7 +410,7 @@ fun ChatScreen(
                             Modifier.background(
                                     ColorVariable.Primary, shape = RoundedCornerShape(50))
                                 .padding(padding8)
-                                .testTag("editButton")) {
+                                .testTag(C.Tag.ChatScreen.edit)) {
                           Text("Edit")
                         }
                     Button(
@@ -330,25 +418,28 @@ fun ChatScreen(
                           // Handle delete
                           selectedMessage?.let { message ->
                             messageRepository.deleteMessage(
-                                message.uuid,
-                                { result ->
+                                message.uuid, currentUser.userUUID, otherUser.userUUID) { result ->
                                   if (result.isSuccess) {
                                     Log.d("ChatScreen", "Message deleted successfully")
                                     selectedMessage = null
                                   } else {
+                                    Toast.makeText(
+                                            context,
+                                            "Message can only be deleted within 15 minutes of being sent",
+                                            Toast.LENGTH_LONG)
+                                        .show()
                                     Log.e(
                                         "ChatScreen",
                                         "Failed to delete message: ${result.exceptionOrNull()?.message}")
                                   }
-                                },
-                                context)
+                                }
                           }
                         },
                         modifier =
                             Modifier.background(
                                     ColorVariable.Primary, shape = RoundedCornerShape(50))
                                 .padding(padding8)
-                                .testTag("deleteButton")) {
+                                .testTag(C.Tag.ChatScreen.delete)) {
                           Text("Delete")
                         }
                   }
@@ -419,25 +510,30 @@ fun MessageItem(message: DataMessage, currentUserUUID: UUID, onLongPress: () -> 
                           if (message.messageType == MessageType.IMAGE) showPopup = true
                         },
                         onLongClick = { onLongPress() })
-                    .testTag("message_item ${message.uuid}")) {
+                    .testTag("${message.uuid}_" + C.Tag.ChatScreen.messages)) {
               Column(
                   modifier =
-                      Modifier.padding(16.dp).testTag("message_item_column ${message.uuid}")) {
+                      Modifier.padding(16.dp)
+                          .testTag("${message.uuid}_" + C.Tag.ChatScreen.container)) {
                     if (message.uuid != imageTestMessageUUID &&
                         message.messageType == MessageType.IMAGE) {
                       AsyncImage(
                           model = message.text,
                           contentDescription = "Message Image",
-                          modifier = Modifier.testTag("hobbit"))
+                          modifier =
+                              Modifier.testTag("${message.uuid}_" + C.Tag.ChatScreen.content))
                     } else if (message.uuid == imageTestMessageUUID) {
                       Image(
                           painter = painterResource(id = R.drawable.the_hobbit_cover),
                           contentDescription = "Hobbit",
-                          modifier = Modifier.size(100.dp).testTag("hobbit"))
+                          modifier =
+                              Modifier.size(100.dp)
+                                  .testTag("${message.uuid}_" + C.Tag.ChatScreen.content))
                     } else {
                       Text(
                           text = message.text,
-                          modifier = Modifier.testTag("message_text ${message.uuid}"),
+                          modifier =
+                              Modifier.testTag("${message.uuid}_" + C.Tag.ChatScreen.content),
                           color = ColorVariable.Accent)
                     }
                     Text(
@@ -446,7 +542,7 @@ fun MessageItem(message: DataMessage, currentUserUUID: UUID, onLongPress: () -> 
                         style = MaterialTheme.typography.bodySmall,
                         modifier =
                             Modifier.align(Alignment.End)
-                                .testTag("message_timestamp ${message.uuid}"))
+                                .testTag("${message.uuid}_" + C.Tag.ChatScreen.timestamp))
                   }
             }
       }
@@ -463,7 +559,7 @@ fun MessageItem(message: DataMessage, currentUserUUID: UUID, onLongPress: () -> 
           Box(
               modifier =
                   Modifier.fillMaxSize()
-                      .testTag("popupImage")
+                      .testTag(C.Tag.ChatScreen.pop_out)
                       .background(Color.Black.copy(alpha = 0.8f))
                       .clickable {
                         showPopup = false
@@ -499,8 +595,7 @@ fun MessageItem(message: DataMessage, currentUserUUID: UUID, onLongPress: () -> 
                                           scaleX = scale,
                                           scaleY = scale,
                                           translationX = offsetX,
-                                          translationY = offsetY)
-                                      .testTag("HobbitBig"))
+                                          translationY = offsetY))
                     }
               }
         }

@@ -7,6 +7,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import com.android.bookswap.resources.C
 import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.profile.ProfileIcon
 import com.android.bookswap.ui.theme.ColorVariable
@@ -26,8 +27,8 @@ fun TopAppBarComponent(
     title: String = navigationActions.currentRoute()
 ) {
   TopAppBar(
-      title = { Text(text = title, Modifier.testTag("TopAppBar_Title")) },
-      modifier = modifier.testTag("TopAppBar"),
+      title = { Text(text = title, Modifier.testTag(C.Tag.TopAppBar.screen_title)) },
+      modifier = modifier.testTag(C.Tag.top_app_bar_container),
       { BackButtonComponent(navActions = navigationActions) },
       { ProfileIcon(navigationActions = navigationActions) },
       TopAppBarDefaults.windowInsets,

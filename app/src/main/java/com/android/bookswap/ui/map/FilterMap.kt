@@ -37,6 +37,7 @@ import androidx.compose.ui.unit.sp
 import com.android.bookswap.data.BookGenres
 import com.android.bookswap.data.BookLanguages
 import com.android.bookswap.model.map.BookFilter
+import com.android.bookswap.resources.C
 import com.android.bookswap.ui.components.BackButtonComponent
 import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.theme.ColorVariable
@@ -75,7 +76,7 @@ fun FilterMapScreen(navigationActions: NavigationActions, bookFilter: BookFilter
                   text = "Filters", // Hard coded string that should be extracted to a strings.xml
                   modifier =
                       Modifier.fillMaxWidth(TOP_BAR_TITLE_WIDTH_RATIO)
-                          .testTag("filter_filterScreenTitle"),
+                          .testTag(C.Tag.TopAppBar.screen_title),
                   textAlign = TextAlign.Center,
                   style =
                       TextStyle(
@@ -128,7 +129,7 @@ fun FilterMapScreen(navigationActions: NavigationActions, bookFilter: BookFilter
                 modifier =
                     Modifier.width(BUTTON_WIDTH)
                         .height(BUTTON_HEIGHT)
-                        .testTag("filter_applyButton")) {
+                        .testTag(C.Tag.MapFilter.apply)) {
                   Text(
                       text = "Apply",
                       textAlign = TextAlign.Center,
@@ -194,7 +195,7 @@ fun ButtonBlock(
                       .border(
                           BORDER_WIDTH_BB, color = ColorVariable.Accent, shape = BUTTON_SHAPE_BB)
                       .height(BUTTON_HEIGHT_BB)
-                      .testTag("filter_buttonFilter_${text}"),
+                      .testTag(text + C.Tag.MapFilter.filter),
               colors =
                   ButtonDefaults.buttonColors(
                       containerColor =

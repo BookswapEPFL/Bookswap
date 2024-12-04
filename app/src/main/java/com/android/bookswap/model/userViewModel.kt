@@ -20,9 +20,9 @@ import kotlinx.coroutines.flow.StateFlow
  */
 open class UserViewModel(
     var uuid: UUID,
-    repository: UsersRepository = UserFirestoreSource(FirebaseFirestore.getInstance())
+    repository: UsersRepository = UserFirestoreSource(FirebaseFirestore.getInstance()),
+    private var dataUser: DataUser = DataUser(uuid) // Allows easier testing
 ) : ViewModel() {
-  private var dataUser = DataUser(uuid)
   private var isLoaded = false
   private val _isStored = MutableStateFlow<Boolean?>(null)
   val isStored: StateFlow<Boolean?> = _isStored
@@ -32,6 +32,7 @@ open class UserViewModel(
     if (!isLoaded || force) {
       fetchUser()
     }
+    Log.d("getUser", "Fetched user: $uuid")
     return dataUser
   }
 
@@ -59,11 +60,12 @@ open class UserViewModel(
       longitude: Double = dataUser.longitude,
       picURL: String = dataUser.profilePictureUrl,
       bookList: List<UUID> = dataUser.bookList,
-      googleUid: String = dataUser.googleUid
+      googleUid: String = dataUser.googleUid,
+      contactList: List<String> = dataUser.contactList
   ) {
     updateUser(
         DataUser(
-            uuid,
+            dataUser.userUUID,
             greeting,
             firstName,
             lastName,
@@ -73,7 +75,8 @@ open class UserViewModel(
             longitude,
             picURL,
             bookList,
-            googleUid))
+            googleUid,
+            contactList))
   }
   /**
    * Update the user data with the given DataUser object.
@@ -97,9 +100,6 @@ open class UserViewModel(
         dataUser = it
         isLoaded = true
         _isStored.value = true
-        Log.e(
-            "UserViewModel",
-            "User found {${dataUser.firstName}}{${dataUser.lastName}}{${dataUser.userUUID}}")
       }
       // If the user is not found, set isLoaded to false
       result.onFailure {

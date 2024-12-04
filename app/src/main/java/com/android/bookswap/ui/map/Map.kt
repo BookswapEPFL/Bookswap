@@ -1,5 +1,6 @@
 package com.android.bookswap.ui.map
 
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -34,6 +35,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.SemanticsPropertyKey
 import androidx.compose.ui.semantics.SemanticsPropertyReceiver
@@ -42,14 +44,15 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.bookswap.data.DataBook
+import com.android.bookswap.model.isNetworkAvailable
 import com.android.bookswap.model.map.BookFilter
 import com.android.bookswap.model.map.BookManagerViewModel
 import com.android.bookswap.model.map.DefaultGeolocation
 import com.android.bookswap.model.map.IGeolocation
+import com.android.bookswap.resources.C
 import com.android.bookswap.ui.components.BookListComponent
 import com.android.bookswap.ui.navigation.BOTTOM_NAV_HEIGHT
 import com.android.bookswap.ui.navigation.NavigationActions
-import com.android.bookswap.ui.navigation.Screen
 import com.android.bookswap.ui.theme.ColorVariable
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
@@ -89,13 +92,20 @@ fun MapScreen(
   val cameraPositionState = rememberCameraPositionState()
   // Get the user's current location
   val latitude = geolocation.latitude.collectAsState()
+  val context = LocalContext.current
+  var isOnline = remember { isNetworkAvailable(context) }
   val longitude = geolocation.longitude.collectAsState()
   // Start location and books updates
   LaunchedEffect(Unit) {
-    bookManagerViewModel.startUpdatingBooks()
+    if (isOnline) {
+      bookManagerViewModel.startUpdatingBooks()
+    } else {
+      Toast.makeText(context, "Please connect to Internet to actualise", Toast.LENGTH_SHORT).show()
+    }
     geolocation.startLocationUpdates()
     cameraPositionState.position =
         CameraPosition.fromLatLngZoom(LatLng(latitude.value, longitude.value), INIT_ZOOM)
+    isOnline = isNetworkAvailable(context)
   }
   // Stop location and books updates when the screen is disposed
   DisposableEffect(Unit) {
@@ -144,7 +154,7 @@ fun MapScreen(
   }
 
   Scaffold(
-      modifier = Modifier.testTag("mapScreen"),
+      modifier = Modifier.testTag(C.Tag.map_screen_container),
       topBar = topAppBar,
       bottomBar = bottomAppBar,
       content = { pd ->
@@ -154,11 +164,13 @@ fun MapScreen(
               GoogleMap(
                   onMapClick = { mutableStateSelectedUser = NO_USER_SELECTED },
                   modifier =
-                      Modifier.fillMaxSize().testTag("mapGoogleMap").semantics {
+                      Modifier.fillMaxSize().testTag(C.Tag.Map.google_map).semantics {
                         cameraPosition = cameraPositionState
                       },
                   cameraPositionState = cameraPositionState,
-                  uiSettings = MapUiSettings(zoomControlsEnabled = false),
+                  uiSettings =
+                      MapUiSettings(myLocationButtonEnabled = true, zoomControlsEnabled = false),
+                  properties = MapProperties(isMyLocationEnabled = true),
               ) {
                 // Marker for user's current location
                 if (!latitude.value.isNaN() && !longitude.value.isNaN()) {
@@ -183,11 +195,19 @@ fun MapScreen(
                             coroutineScope.launch {
                               computePositionOfMarker(cameraPositionState, markerState.position)
                             }
+                            // Navigate to the user profile
+                            navigationActions.navigateTo(
+                                screen = C.Screen.USER_PROFILE,
+                                UUID =
+                                    item.userUUID
+                                        .toString() // Assuming `item` has a unique UUID field
+                                // called `id`
+                                )
                             false
                           })
                     }
               }
-              FilterButton { navigationActions.navigateTo(Screen.FILTER) }
+              FilterButton { navigationActions.navigateTo(C.Screen.MAP_FILTER) }
 
               // Custom info window linked to the marker
               markerScreenPosition?.let { screenPos ->
@@ -246,41 +266,42 @@ private fun CustomInfoWindow(modifier: Modifier = Modifier, userBooks: List<Data
                           CARD_CORNER_RADIUS.dp,
                           CARD_CORNER_RADIUS.dp))
               .heightIn(max = CARD_HEIGHT_DP.dp)
-              .testTag("mapBoxMarker")
+              .testTag(C.Tag.Map.Marker.info_window_container)
               .background(Color.Transparent),
       colors = CardDefaults.cardColors(containerColor = ColorVariable.Secondary),
       shape =
           RoundedCornerShape(
               0.dp, CARD_CORNER_RADIUS.dp, CARD_CORNER_RADIUS.dp, CARD_CORNER_RADIUS.dp)) {
         Spacer(modifier.height(CARD_CORNER_RADIUS.dp))
-        LazyColumn(modifier = Modifier.fillMaxWidth().testTag("mapBoxMarkerList")) {
-          itemsIndexed(userBooks) { index, book ->
-            Column(
-                modifier =
-                    Modifier.padding(horizontal = PADDING_HORIZONTAL_DP.dp)
-                        .testTag("mapBoxMarkerListBox")) {
-                  Text(
-                      text = book.title,
-                      color = ColorVariable.Accent,
-                      fontSize = PRIMARY_TEXT_FONT_SP.sp,
-                      modifier = Modifier.testTag("mapBoxMarkerListBoxTitle"))
-                  Spacer(modifier = Modifier.height(PADDING_VERTICAL_DP.dp))
-                  Text(
-                      text = book.author ?: "",
-                      color = ColorVariable.AccentSecondary,
-                      fontSize = SECONDARY_TEXT_FONT_SP.sp,
-                      modifier = Modifier.testTag("mapBoxMarkerListBoxAuthor"))
-                }
-            if (index < userBooks.size - 1)
-                HorizontalDivider(
+        LazyColumn(
+            modifier = Modifier.fillMaxWidth().testTag(C.Tag.Map.Marker.info_window_scrollable)) {
+              itemsIndexed(userBooks) { index, book ->
+                Column(
                     modifier =
-                        Modifier.fillMaxWidth()
-                            .height(PADDING_VERTICAL_DP.dp)
-                            .testTag("mapBoxMarkerListDivider"),
-                    thickness = DIVIDER_THICKNESS_DP.dp,
-                    color = ColorVariable.Accent)
-          }
-        }
+                        Modifier.padding(horizontal = PADDING_HORIZONTAL_DP.dp)
+                            .testTag(C.Tag.Map.Marker.info_window_book_container)) {
+                      Text(
+                          text = book.title,
+                          color = ColorVariable.Accent,
+                          fontSize = PRIMARY_TEXT_FONT_SP.sp,
+                          modifier = Modifier.testTag(C.Tag.Map.Marker.book_title))
+                      Spacer(modifier = Modifier.height(PADDING_VERTICAL_DP.dp))
+                      Text(
+                          text = book.author ?: "",
+                          color = ColorVariable.AccentSecondary,
+                          fontSize = SECONDARY_TEXT_FONT_SP.sp,
+                          modifier = Modifier.testTag(C.Tag.Map.Marker.book_author))
+                    }
+                if (index < userBooks.size - 1)
+                    HorizontalDivider(
+                        modifier =
+                            Modifier.fillMaxWidth()
+                                .height(PADDING_VERTICAL_DP.dp)
+                                .testTag(C.Tag.Map.Marker.info_window_divider),
+                        thickness = DIVIDER_THICKNESS_DP.dp,
+                        color = ColorVariable.Accent)
+              }
+            }
         Spacer(modifier.height(PADDING_VERTICAL_DP.dp))
       }
 }
@@ -346,8 +367,8 @@ private fun DraggableMenu(listAllBooks: List<DataBook>) {
                       RoundedCornerShape(
                           topStart = HEIGHT_RETRACTED_DRAGGABLE_MENU_DP.dp,
                           topEnd = HEIGHT_RETRACTED_DRAGGABLE_MENU_DP.dp))
-              .testTag("mapDraggableMenu")) {
-        Column(modifier = Modifier.fillMaxWidth().testTag("mapDraggableMenuStructure")) {
+              .testTag(C.Tag.Map.bottom_drawer_container)) {
+        Column(modifier = Modifier.fillMaxWidth().testTag(C.Tag.Map.bottom_drawer_layout)) {
           // draggable handle
           Spacer(modifier = Modifier.height(HANDLE_HEIGHT_DP.dp))
           Box(
@@ -358,10 +379,10 @@ private fun DraggableMenu(listAllBooks: List<DataBook>) {
                       .background(
                           color = ColorVariable.AccentSecondary,
                           shape = RoundedCornerShape(HANDLE_CORNER_RADIUS_DP.dp))
-                      .testTag("mapDraggableMenuHandle"))
+                      .testTag(C.Tag.Map.bottom_drawer_handle))
           Spacer(modifier = Modifier.height(SPACER_HEIGHT_DP.dp))
           HorizontalDivider(
-              modifier = Modifier.fillMaxWidth().testTag("mapDraggableMenuHandleDivider"),
+              modifier = Modifier.fillMaxWidth().testTag(C.Tag.Map.bottom_drawer_handle_divider),
               thickness = DIVIDER_THICKNESS_DP.dp,
               color = ColorVariable.Accent)
           BookListComponent(Modifier, listAllBooks)

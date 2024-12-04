@@ -1,5 +1,6 @@
 package com.android.bookswap.ui.components
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -28,6 +29,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.android.bookswap.data.DataBook
+import com.android.bookswap.resources.C
 import com.android.bookswap.ui.theme.ColorVariable
 
 /** Padding values for horizontal and vertical padding in dp. */
@@ -64,12 +66,13 @@ fun BookDisplayComponent(modifier: Modifier = Modifier, book: DataBook) {
               .padding(PADDING_HORIZONTAL_DP, PADDING_VERTICAL_DP),
       horizontalArrangement = Arrangement.Start,
       verticalAlignment = Alignment.CenterVertically) {
+        Log.i("BookDisplayComponent", "Displaying book: ${book.title} by ${book.author}")
         // Image Box
         Box(
             modifier =
                 Modifier.height(IMAGE_HEIGHT_DP)
                     .width(IMAGE_WIDTH_DP)
-                    .testTag("mapDraggableMenuBookBoxImage"),
+                    .testTag(C.Tag.BookDisplayComp.image),
             contentAlignment = Alignment.Center,
         ) {
           // Image of the books, will be added at a later date
@@ -88,7 +91,7 @@ fun BookDisplayComponent(modifier: Modifier = Modifier, book: DataBook) {
                   Modifier.weight(1f, true)
                       .padding(horizontal = PADDING_HORIZONTAL_DP)
                       .heightIn(max = IMAGE_HEIGHT_DP + PADDING_VERTICAL_DP * 2)
-                      .testTag("mapDraggableMenuBookBoxMiddle")) {
+                      .testTag(C.Tag.BookDisplayComp.middle_container)) {
                 Text(
                     text = book.title,
                     overflow = TextOverflow.Ellipsis,
@@ -97,13 +100,13 @@ fun BookDisplayComponent(modifier: Modifier = Modifier, book: DataBook) {
                     modifier =
                         Modifier.weight(1f, true)
                             // .padding(bottom = PADDING_VERTICAL_DP)
-                            .testTag("mapDraggableMenuBookBoxTitle"))
+                            .testTag(C.Tag.BookDisplayComp.title))
                 Text(
                     text = book.author ?: "",
                     overflow = TextOverflow.Ellipsis,
                     color = ColorVariable.AccentSecondary,
                     maxLines = 1,
-                    modifier = Modifier.testTag("mapDraggableMenuBookBoxAuthor"))
+                    modifier = Modifier.testTag(C.Tag.BookDisplayComp.author))
               }
 
           // Column for rating and genres
@@ -111,10 +114,10 @@ fun BookDisplayComponent(modifier: Modifier = Modifier, book: DataBook) {
               modifier =
                   Modifier.requiredWidth(STAR_SIZE_DP * MAX_RATING + PADDING_HORIZONTAL_DP * 2)
                       .width(STAR_SIZE_DP * MAX_RATING + PADDING_HORIZONTAL_DP * 2)
-                      .testTag("mapDraggableMenuBookRight"),
+                      .testTag(C.Tag.BookDisplayComp.right_container),
               horizontalAlignment = Alignment.CenterHorizontally) {
                 Row(
-                    modifier = Modifier.fillMaxWidth().testTag("mapDraggableMenuBookBoxRating"),
+                    modifier = Modifier.fillMaxWidth().testTag(C.Tag.BookDisplayComp.rating),
                     horizontalArrangement = Arrangement.Center) {
                       // leave all stars empty if no rating
                       DisplayStarReview(book.rating ?: 0)
@@ -126,7 +129,7 @@ fun BookDisplayComponent(modifier: Modifier = Modifier, book: DataBook) {
                     modifier =
                         Modifier.fillMaxWidth()
                             .clipToBounds()
-                            .testTag("mapDraggableMenuBookBoxTag"),
+                            .testTag(C.Tag.BookDisplayComp.genres),
                     overflow = TextOverflow.Ellipsis,
                     color = ColorVariable.AccentSecondary)
               }
@@ -144,7 +147,7 @@ fun BookDisplayComponent(modifier: Modifier = Modifier, book: DataBook) {
 @Composable
 private fun DisplayStarReview(rating: Int) {
   for (i in 1..rating) {
-    Box(modifier = Modifier.width(STAR_SIZE_DP).testTag("mapDraggableMenuBookBoxStar")) {
+    Box(modifier = Modifier.width(STAR_SIZE_DP).testTag(C.Tag.BookDisplayComp.filled_star)) {
       Icon(
           imageVector = Icons.Filled.Star,
           contentDescription = "Star Icon",
@@ -157,7 +160,7 @@ private fun DisplayStarReview(rating: Int) {
   }
   for (i in rating + 1..MAX_RATING) {
     // Hollow star
-    Box(modifier = Modifier.width(STAR_SIZE_DP).testTag("mapDraggableMenuBookBoxEmptyStar")) {
+    Box(modifier = Modifier.width(STAR_SIZE_DP).testTag(C.Tag.BookDisplayComp.hollow_star)) {
       Icon(
           imageVector = Icons.TwoTone.Star,
           contentDescription = "Star Icon",

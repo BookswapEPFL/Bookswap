@@ -2,6 +2,7 @@ package com.android.bookswap.data.source.network
 
 import android.util.Log
 import com.android.bookswap.data.DataUser
+import com.android.bookswap.data.repository.UsersRepository
 import com.google.android.gms.tasks.Tasks
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
@@ -14,6 +15,7 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import java.util.UUID
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -28,6 +30,7 @@ class UserFirestoreSourceTest {
   private val mockDocumentSnapshot: DocumentSnapshot = mockk()
   private val mockQuerySnapshot: QuerySnapshot = mockk()
   private val mockQuery: Query = mockk()
+  private lateinit var mockUsersRepository: UsersRepository
 
   private val userFirestoreSource: UserFirestoreSource = UserFirestoreSource(mockFirestore)
 
@@ -43,9 +46,13 @@ class UserFirestoreSourceTest {
           0.0,
           "dummyPic.png")
 
+  private val userUUID = UUID.randomUUID()
+  private val contactUUID = UUID.randomUUID().toString()
+
   @Before
   fun setUp() {
 
+    mockUsersRepository = mockk()
     userFirestoreSource
 
     every { mockFirestore.collection(any()) } returns mockCollectionReference
@@ -93,7 +100,7 @@ class UserFirestoreSourceTest {
   @Test
   fun getUser() {
     // Arrange
-    every { mockCollectionReference.whereEqualTo("UUID", any()) } returns mockQuery
+    every { mockCollectionReference.whereEqualTo("userUUID", any()) } returns mockQuery
     every { mockQuery.get() } returns Tasks.forResult(mockQuerySnapshot)
 
     // Act
@@ -107,7 +114,7 @@ class UserFirestoreSourceTest {
     }
 
     // Verify Firestore collection was accessed
-    verify { mockCollectionReference.whereEqualTo("UUID", any()) }
+    verify { mockCollectionReference.whereEqualTo("userUUID", any()) }
   }
 
   @Test
@@ -172,5 +179,69 @@ class UserFirestoreSourceTest {
     // Assert
     assert(result.getOrNull() == null)
     result.onFailure { Log.d("UserFirestoreSourceTest", "failure with message: ${it.message}") }
+  }
+
+  @Test
+  fun `addContact succeeds`() {
+    every { mockUsersRepository.addContact(userUUID, contactUUID, any()) } answers
+        {
+          val callback = it.invocation.args[2] as (Result<Unit>) -> Unit
+          callback(Result.success(Unit)) // Simulate success
+        }
+
+    var result: Result<Unit>? = null
+    mockUsersRepository.addContact(userUUID, contactUUID) { result = it }
+
+    assertTrue(result!!.isSuccess)
+    verify { mockUsersRepository.addContact(userUUID, contactUUID, any()) }
+  }
+
+  @Test
+  fun `addContact fails`() {
+    val exception = RuntimeException("Failed to add contact")
+    every { mockUsersRepository.addContact(userUUID, contactUUID, any()) } answers
+        {
+          val callback = it.invocation.args[2] as (Result<Unit>) -> Unit
+          callback(Result.failure(exception)) // Simulate failure
+        }
+
+    var result: Result<Unit>? = null
+    mockUsersRepository.addContact(userUUID, contactUUID) { result = it }
+
+    assertTrue(result!!.isFailure)
+    assertTrue(result!!.exceptionOrNull() == exception)
+    verify { mockUsersRepository.addContact(userUUID, contactUUID, any()) }
+  }
+
+  @Test
+  fun `removeContact succeeds`() {
+    every { mockUsersRepository.removeContact(userUUID, contactUUID, any()) } answers
+        {
+          val callback = it.invocation.args[2] as (Result<Unit>) -> Unit
+          callback(Result.success(Unit)) // Simulate success
+        }
+
+    var result: Result<Unit>? = null
+    mockUsersRepository.removeContact(userUUID, contactUUID) { result = it }
+
+    assertTrue(result!!.isSuccess)
+    verify { mockUsersRepository.removeContact(userUUID, contactUUID, any()) }
+  }
+
+  @Test
+  fun `removeContact fails`() {
+    val exception = RuntimeException("Failed to remove contact")
+    every { mockUsersRepository.removeContact(userUUID, contactUUID, any()) } answers
+        {
+          val callback = it.invocation.args[2] as (Result<Unit>) -> Unit
+          callback(Result.failure(exception)) // Simulate failure
+        }
+
+    var result: Result<Unit>? = null
+    mockUsersRepository.removeContact(userUUID, contactUUID) { result = it }
+
+    assertTrue(result!!.isFailure)
+    assertTrue(result!!.exceptionOrNull() == exception)
+    verify { mockUsersRepository.removeContact(userUUID, contactUUID, any()) }
   }
 }

@@ -1,5 +1,6 @@
 package com.android.bookswap.ui.books
 
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.hasTestTag
@@ -12,8 +13,13 @@ import com.android.bookswap.data.BookGenres
 import com.android.bookswap.data.BookLanguages
 import com.android.bookswap.data.DataBook
 import com.android.bookswap.data.repository.BooksRepository
+import com.android.bookswap.model.AppConfig
+import com.android.bookswap.model.LocalAppConfig
+import com.android.bookswap.model.UserViewModel
+import com.android.bookswap.resources.C
 import com.android.bookswap.ui.navigation.NavigationActions
 import io.mockk.coEvery
+import io.mockk.every
 import io.mockk.mockk
 import java.util.UUID
 import org.junit.Before
@@ -26,21 +32,26 @@ class BookProfileScreenTest {
   private lateinit var mockNavController: NavigationActions
   private lateinit var mockBookRepo: BooksRepository
   private val testBookId = UUID.randomUUID()
-  private val currentUserId = UUID.randomUUID()
+  private val mockUserViewModel: UserViewModel = mockk()
+  private lateinit var testBook: DataBook
 
-  private val testBook =
-      DataBook(
-          uuid = testBookId,
-          title = "Historia de España",
-          author = "Jose Ignacio Pastor Iglesias",
-          description =
-              "Recuento de la historia de España desde los primeros pobladores hasta la actualidad.",
-          rating = 9,
-          photo = null,
-          language = BookLanguages.SPANISH,
-          isbn = "978-84-09025-23-5",
-          genres = listOf(BookGenres.HISTORICAL, BookGenres.NONFICTION, BookGenres.BIOGRAPHY),
-          userId = currentUserId)
+  @Before
+  fun setup() {
+    val userUUID = UUID.randomUUID()
+    every { mockUserViewModel.uuid } returns userUUID
+    testBook =
+        DataBook(
+            testBookId,
+            "Historia de España",
+            "Jose Ignacio Pastor Iglesias",
+            "Recuento de la historia de España desde los primeros pobladores hasta la actualidad.",
+            9,
+            null,
+            BookLanguages.SPANISH,
+            "978-84-09025-23-5",
+            listOf(BookGenres.HISTORICAL, BookGenres.NONFICTION, BookGenres.BIOGRAPHY),
+            mockUserViewModel.uuid)
+  }
 
   @Before
   fun setUp() {
@@ -60,29 +71,28 @@ class BookProfileScreenTest {
     composeTestRule.setContent {
       val navController = rememberNavController()
       val navigationActions = NavigationActions(navController)
-      BookProfileScreen(
-          bookId = testBookId,
-          booksRepository = mockBookRepo,
-          navController = navigationActions,
-          currentUserId = currentUserId)
+      CompositionLocalProvider(
+          LocalAppConfig provides AppConfig(userViewModel = mockUserViewModel)) {
+            BookProfileScreen(testBookId, mockBookRepo, navigationActions)
+          }
     }
 
-    composeTestRule.onNodeWithTag("bookTitle").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("bookAuthor").assertIsDisplayed()
+    composeTestRule.onNodeWithTag(C.Tag.BookProfile.title).assertIsDisplayed()
+    composeTestRule.onNodeWithTag(C.Tag.BookProfile.author).assertIsDisplayed()
     composeTestRule
-        .onNodeWithTag("bookProfileScroll")
-        .performScrollToNode(hasTestTag("bookProfileEditionPlace"))
-    composeTestRule.onNodeWithTag("bookProfileLanguage").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("bookProfileGenresTitle").assertIsDisplayed()
+        .onNodeWithTag(C.Tag.BookProfile.scrollable)
+        .performScrollToNode(hasTestTag(C.Tag.BookProfile.location))
+    composeTestRule.onNodeWithTag(C.Tag.BookProfile.language).assertIsDisplayed()
+    composeTestRule.onNodeWithTag(C.Tag.BookProfile.genres).assertIsDisplayed()
     testBook.genres.forEach { genre ->
-      composeTestRule.onNodeWithTag("bookProfileGenre${genre.Genre}").assertIsDisplayed()
+      composeTestRule.onNodeWithTag(genre.Genre + C.Tag.BookProfile.genre).assertIsDisplayed()
     }
-    composeTestRule.onNodeWithTag("bookProfileISBN").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("bookProfileDate").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("bookProfileVolume").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("bookProfileIssue").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("bookProfileEditorial").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("bookProfileEditionPlace").assertIsDisplayed()
+    composeTestRule.onNodeWithTag(C.Tag.BookProfile.isbn).assertIsDisplayed()
+    composeTestRule.onNodeWithTag(C.Tag.BookProfile.date).assertIsDisplayed()
+    composeTestRule.onNodeWithTag(C.Tag.BookProfile.volume).assertIsDisplayed()
+    composeTestRule.onNodeWithTag(C.Tag.BookProfile.issue).assertIsDisplayed()
+    composeTestRule.onNodeWithTag(C.Tag.BookProfile.editorial).assertIsDisplayed()
+    composeTestRule.onNodeWithTag(C.Tag.BookProfile.location).assertIsDisplayed()
   }
 
   @Test
@@ -90,15 +100,14 @@ class BookProfileScreenTest {
     composeTestRule.setContent {
       val navController = rememberNavController()
       val navigationActions = NavigationActions(navController)
-      BookProfileScreen(
-          bookId = testBookId,
-          booksRepository = mockBookRepo,
-          navController = navigationActions,
-          currentUserId = currentUserId)
+      CompositionLocalProvider(
+          LocalAppConfig provides AppConfig(userViewModel = mockUserViewModel)) {
+            BookProfileScreen(testBookId, mockBookRepo, navigationActions)
+          }
     }
 
-    composeTestRule.onNodeWithTag("bookProfileImageLeft").assertHasClickAction()
-    composeTestRule.onNodeWithTag("bookProfileImageRight").assertHasClickAction()
+    composeTestRule.onNodeWithTag(C.Tag.BookProfile.previous_image).assertHasClickAction()
+    composeTestRule.onNodeWithTag(C.Tag.BookProfile.next_image).assertHasClickAction()
   }
 
   @Test
@@ -106,20 +115,19 @@ class BookProfileScreenTest {
     composeTestRule.setContent {
       val navController = rememberNavController()
       val navigationActions = NavigationActions(navController)
-      BookProfileScreen(
-          bookId = testBookId,
-          booksRepository = mockBookRepo,
-          navController = navigationActions,
-          currentUserId = currentUserId)
+      CompositionLocalProvider(
+          LocalAppConfig provides AppConfig(userViewModel = mockUserViewModel)) {
+            BookProfileScreen(testBookId, mockBookRepo, navigationActions)
+          }
     }
 
     // Verify the first picture is displayed
-    composeTestRule.onNodeWithTag("bookProfileImage Isabel La Catolica").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("0_" + C.Tag.BookProfile.image).assertIsDisplayed()
 
     // Perform a click action on the icon
-    composeTestRule.onNodeWithTag("bookProfileImageRight").performClick()
+    composeTestRule.onNodeWithTag(C.Tag.BookProfile.next_image).performClick()
 
     // Verify the next picture is displayed
-    composeTestRule.onNodeWithTag("bookProfileImage Felipe II").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("1_" + C.Tag.BookProfile.image).assertIsDisplayed()
   }
 }

@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -28,25 +27,29 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.android.bookswap.data.repository.BooksRepository
 import com.android.bookswap.data.source.api.GoogleBookDataSource
+import com.android.bookswap.model.InputVerification
+import com.android.bookswap.model.LocalAppConfig
+import com.android.bookswap.resources.C
+import com.android.bookswap.ui.MAXLENGTHISBN
 import com.android.bookswap.ui.components.ButtonComponent
 import com.android.bookswap.ui.components.FieldComponent
 import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.navigation.TopLevelDestinations
 import com.android.bookswap.ui.theme.ColorVariable
-import java.util.UUID
 
 /** This is the main screen for the chat feature. It displays the list of messages */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddISBNScreen(
     navigationActions: NavigationActions,
     booksRepository: BooksRepository,
     topAppBar: @Composable () -> Unit = {},
-    bottomAppBar: @Composable () -> Unit = {},
-    userId: UUID
+    bottomAppBar: @Composable () -> Unit = {}
 ) {
   val context = LocalContext.current
+  val inputVerification = InputVerification()
+  val appConfig = LocalAppConfig.current
   Scaffold(
+      modifier = Modifier.testTag(C.Tag.new_book_isbn_screen_container),
       topBar = topAppBar,
       bottomBar = bottomAppBar,
       content = { pv ->
@@ -60,36 +63,53 @@ fun AddISBNScreen(
                   horizontalAlignment = Alignment.CenterHorizontally,
                   verticalArrangement = Arrangement.spacedBy(45.dp)) {
                     FieldComponent(
-                        modifier = Modifier.testTag("isbn_field"),
+                        modifier = Modifier.testTag(C.Tag.NewBookISBN.isbn),
                         labelText = "ISBN*",
-                        value = isbn) {
-                          if (it.all { c -> c.isDigit() } && it.length <= 13) {
-                            isbn = it
-                            Log.d("ISBN Input", "Updated ISBN: $isbn")
-                          }
+                        value = isbn,
+                        maxLength = MAXLENGTHISBN) {
+                          isbn = it
+                          Log.d("ISBN Input", "Updated ISBN: $isbn")
                         }
                     ButtonComponent(
-                        modifier = Modifier.testTag("isbn_searchButton"),
+                        modifier = Modifier.testTag(C.Tag.NewBookISBN.search),
                         onClick = {
-                          GoogleBookDataSource(context).getBookFromISBN(isbn, userId) { result ->
-                            if (result.isFailure) {
-                              Toast.makeText(context, "Search unsuccessful", Toast.LENGTH_LONG)
-                                  .show()
-                              Log.e("AddBook", result.exceptionOrNull().toString())
-                            } else {
-                              booksRepository.addBook(
-                                  result.getOrThrow(),
-                                  callback = { res ->
-                                    if (res.isSuccess) {
-                                      navigationActions.navigateTo(TopLevelDestinations.NEW_BOOK)
-                                    } else {
-                                      val error = res.exceptionOrNull()!!
-                                      Log.e("AddBook", res.toString())
-                                      Toast.makeText(context, error.message, Toast.LENGTH_LONG)
-                                          .show()
-                                    }
-                                  })
-                            }
+                          if (inputVerification.testIsbn(isbn)) {
+                            GoogleBookDataSource(context).getBookFromISBN(
+                                isbn, appConfig.userViewModel.uuid) { result ->
+                                  if (result.isFailure) {
+                                    Toast.makeText(
+                                            context, "Search unsuccessful", Toast.LENGTH_LONG)
+                                        .show()
+                                    Log.e("AddBook", result.exceptionOrNull().toString())
+                                  } else {
+                                    booksRepository.addBook(
+                                        result.getOrThrow(),
+                                        callback = { res ->
+                                          if (res.isSuccess) {
+                                            val newBookList =
+                                                appConfig.userViewModel.getUser().bookList +
+                                                    result.getOrNull()?.uuid!!
+                                            appConfig.userViewModel.updateUser(
+                                                bookList = newBookList)
+                                            Toast.makeText(
+                                                    context,
+                                                    "${result.getOrNull()?.title} added",
+                                                    Toast.LENGTH_LONG)
+                                                .show()
+                                            navigationActions.navigateTo(
+                                                TopLevelDestinations.NEW_BOOK)
+                                          } else {
+                                            val error = res.exceptionOrNull()!!
+                                            Log.e("AddBook", res.toString())
+                                            Toast.makeText(
+                                                    context, error.message, Toast.LENGTH_LONG)
+                                                .show()
+                                          }
+                                        })
+                                  }
+                                }
+                          } else {
+                            Toast.makeText(context, "Invalid ISBN", Toast.LENGTH_LONG).show()
                           }
                         }) {
                           Row(verticalAlignment = Alignment.CenterVertically) {

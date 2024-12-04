@@ -16,6 +16,11 @@ import com.android.bookswap.data.DataBook
 import com.android.bookswap.model.edit.EditBookViewModel
 import com.android.bookswap.ui.components.ButtonComponent
 import com.android.bookswap.ui.components.EntriesListBookComponent
+import com.android.bookswap.data.repository.BooksRepository
+import com.android.bookswap.resources.C
+import com.android.bookswap.ui.books.add.createDataBook
+import com.android.bookswap.ui.navigation.NavigationActions
+import com.android.bookswap.ui.theme.ColorVariable
 
 /** Constants * */
 private const val WIDTH_BUTTON = 0.45f
@@ -44,6 +49,12 @@ fun EditBookScreen(
   val language = remember { mutableStateOf<BookLanguages?>(null) }
   val genres = remember { mutableStateOf(book.genres) }
   val isbn = remember { mutableStateOf(book.isbn ?: "") }
+
+  val maxLengthTitle = 50
+  val maxLengthAuthor = 50
+  val maxLengthDescription = 10000
+  val maxLengthRating = 1
+  val maxLengthPhoto = 50
 
   val context = LocalContext.current
 

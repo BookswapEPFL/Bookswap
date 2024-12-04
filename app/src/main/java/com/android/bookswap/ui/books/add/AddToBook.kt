@@ -14,6 +14,17 @@ import androidx.compose.ui.platform.testTag
 import com.android.bookswap.data.BookGenres
 import com.android.bookswap.data.BookLanguages
 import com.android.bookswap.model.add.AddToBookViewModel
+import com.android.bookswap.data.DataBook
+import com.android.bookswap.data.repository.BooksRepository
+import com.android.bookswap.model.InputVerification
+import com.android.bookswap.model.LocalAppConfig
+import com.android.bookswap.resources.C
+import com.android.bookswap.ui.MAXLENGTHAUTHOR
+import com.android.bookswap.ui.MAXLENGTHDESCRIPTION
+import com.android.bookswap.ui.MAXLENGTHISBN
+import com.android.bookswap.ui.MAXLENGTHPHOTO
+import com.android.bookswap.ui.MAXLENGTHRATING
+import com.android.bookswap.ui.MAXLENGTHTITLE
 import com.android.bookswap.ui.components.ButtonComponent
 import com.android.bookswap.ui.components.EntriesListBookComponent
 
@@ -41,10 +52,13 @@ fun AddToBookScreen(
   val language = remember { mutableStateOf<BookLanguages?>(null) }
   val genres = remember { mutableStateOf<List<BookGenres>>(emptyList()) } // Genre selection state
   val context = LocalContext.current
+  val inputVerification = InputVerification()
+
+  val appConfig = LocalAppConfig.current
 
   // Scaffold to provide basic UI structure with a top app bar
   Scaffold(
-      modifier = Modifier.testTag("addBookScreen"),
+      modifier = Modifier.testTag(C.Tag.new_book_manual_screen_container),
       topBar = topAppBar,
       bottomBar = bottomAppBar,
       content = { paddingValues ->

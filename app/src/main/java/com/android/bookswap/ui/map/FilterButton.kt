@@ -14,6 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
+import com.android.bookswap.resources.C
 import com.android.bookswap.ui.theme.ColorVariable
 
 // Constants
@@ -32,7 +33,7 @@ fun FilterButton(onClick: () -> Unit) {
     IconButton(
         onClick = onClick,
         modifier =
-            Modifier.testTag("filterButton")
+            Modifier.testTag(C.Tag.Map.filter_button)
                 .background(
                     color = ColorVariable.BackGround,
                     shape = RoundedCornerShape(size = BUTTON_CORNER_RADIUS_DP)) // Use constant
