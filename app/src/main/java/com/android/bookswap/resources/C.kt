@@ -64,7 +64,7 @@ object C {
     const val sign_in_screen_container = S.AUTH + UI_T.SCREEN_CONTAINER
     const val new_user_screen_container = S.NEW_USER + UI_T.SCREEN_CONTAINER
     const val user_profile_screen_container = S.USER_PROFILE + UI_T.SCREEN_CONTAINER
-	const val other_user_profile_screen_container = S.OTHERS_USER_PROFILE + UI_T.SCREEN_CONTAINER
+    const val other_user_profile_screen_container = S.OTHERS_USER_PROFILE + UI_T.SCREEN_CONTAINER
     const val edit_profile_screen_container = S.EDIT_PROFILE + UI_T.SCREEN_CONTAINER
     const val map_screen_container = S.MAP + UI_T.SCREEN_CONTAINER
     const val map_filters_screen_container = S.MAP_FILTER + UI_T.SCREEN_CONTAINER
@@ -93,12 +93,12 @@ object C {
       const val nav_icon = "_nav" + UI_T.ICON
       const val nav_item = "_nav" + UI_T.ICON_BUTTON
     }
-	
-	// LabeledText composable specific tags (OtherUserProfile.kt)
-	object LabeledText {
-	  const val label = UI_T.LABEL
-	  const val  text = UI_T.TEXT
-	}
+
+    // LabeledText composable specific tags (OtherUserProfile.kt)
+    object LabeledText {
+      const val label = UI_T.LABEL
+      const val text = UI_T.TEXT
+    }
 
     // BookListComponent specific tags (BookListComponent.kt)
     object BookListComp {
@@ -132,13 +132,13 @@ object C {
       const val take_photo = A.NEW + UI_T.IMAGE + UI_T.BUTTON
       const val profileImageBox = "profile_image_box" + UI_T.CONTAINER
     }
-	
-	object OtherUserProfile {
-	  const val fullname = "fullname"
-	  const val email = "email"
-	  const val phone = "phoneNumber"
-	  const val address = "address"
-	}
+
+    object OtherUserProfile {
+      const val fullname = "fullname"
+      const val email = "email"
+      const val phone = "phoneNumber"
+      const val address = "address"
+    }
 
     // Edit User Profile Screen specific tags (EditProfile.kt)
     object EditProfile {

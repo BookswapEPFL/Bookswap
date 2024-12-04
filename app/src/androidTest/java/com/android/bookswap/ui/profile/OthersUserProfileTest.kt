@@ -4,7 +4,6 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.onNodeWithText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.android.bookswap.data.BookGenres
 import com.android.bookswap.data.BookLanguages
@@ -37,8 +36,8 @@ class OthersUserProfileTest : TestCase() {
   private val testUserId = UUID.randomUUID()
   private val testUser =
       DataUser(
-		  userUUID = testUserId,
-		  greeting = "Mr.",
+          userUUID = testUserId,
+          greeting = "Mr.",
           firstName = "John",
           lastName = "Doe",
           email = "john.doe@example.com",
@@ -103,17 +102,41 @@ class OthersUserProfileTest : TestCase() {
     }
 
     // Verify user details
-    composeTestRule.onNodeWithTag(C.Tag.OtherUserProfile.fullname + C.Tag.LabeledText.label).assertIsDisplayed().assertTextEquals("Name:")
-    composeTestRule.onNodeWithTag(C.Tag.OtherUserProfile.fullname + C.Tag.LabeledText.text).assertIsDisplayed().assertTextEquals("John Doe")
+    composeTestRule
+        .onNodeWithTag(C.Tag.OtherUserProfile.fullname + C.Tag.LabeledText.label)
+        .assertIsDisplayed()
+        .assertTextEquals("Name:")
+    composeTestRule
+        .onNodeWithTag(C.Tag.OtherUserProfile.fullname + C.Tag.LabeledText.text)
+        .assertIsDisplayed()
+        .assertTextEquals("John Doe")
 
-    composeTestRule.onNodeWithTag(C.Tag.OtherUserProfile.email + C.Tag.LabeledText.label).assertIsDisplayed().assertTextEquals("Email:")
-    composeTestRule.onNodeWithTag(C.Tag.OtherUserProfile.email + C.Tag.LabeledText.text).assertIsDisplayed().assertTextEquals("john.doe@example.com")
+    composeTestRule
+        .onNodeWithTag(C.Tag.OtherUserProfile.email + C.Tag.LabeledText.label)
+        .assertIsDisplayed()
+        .assertTextEquals("Email:")
+    composeTestRule
+        .onNodeWithTag(C.Tag.OtherUserProfile.email + C.Tag.LabeledText.text)
+        .assertIsDisplayed()
+        .assertTextEquals("john.doe@example.com")
 
-    composeTestRule.onNodeWithTag(C.Tag.OtherUserProfile.phone + C.Tag.LabeledText.label).assertIsDisplayed().assertTextEquals("Phone:")
-    composeTestRule.onNodeWithTag(C.Tag.OtherUserProfile.phone + C.Tag.LabeledText.text).assertIsDisplayed().assertTextEquals("1234567890")
+    composeTestRule
+        .onNodeWithTag(C.Tag.OtherUserProfile.phone + C.Tag.LabeledText.label)
+        .assertIsDisplayed()
+        .assertTextEquals("Phone:")
+    composeTestRule
+        .onNodeWithTag(C.Tag.OtherUserProfile.phone + C.Tag.LabeledText.text)
+        .assertIsDisplayed()
+        .assertTextEquals("1234567890")
 
-    composeTestRule.onNodeWithTag(C.Tag.OtherUserProfile.address + C.Tag.LabeledText.label).assertIsDisplayed().assertTextEquals("Address:")
-    composeTestRule.onNodeWithTag(C.Tag.OtherUserProfile.address + C.Tag.LabeledText.text).assertIsDisplayed().assertTextEquals("45.0, 50.0")
+    composeTestRule
+        .onNodeWithTag(C.Tag.OtherUserProfile.address + C.Tag.LabeledText.label)
+        .assertIsDisplayed()
+        .assertTextEquals("Address:")
+    composeTestRule
+        .onNodeWithTag(C.Tag.OtherUserProfile.address + C.Tag.LabeledText.text)
+        .assertIsDisplayed()
+        .assertTextEquals("45.0, 50.0")
   }
 
   @Test
@@ -128,9 +151,21 @@ class OthersUserProfileTest : TestCase() {
 
     // Verify book list is displayed
     composeTestRule.onNodeWithTag(C.Tag.BookListComp.book_list_container).assertIsDisplayed()
-    composeTestRule.onNodeWithTag(C.Tag.BookDisplayComp.title).assertIsDisplayed().assertTextEquals("Book 1")
-    composeTestRule.onNodeWithTag(C.Tag.BookDisplayComp.title).assertIsDisplayed().assertTextEquals("Book 2")
-    composeTestRule.onNodeWithTag(C.Tag.BookDisplayComp.author).assertIsDisplayed().assertTextEquals("Author 1")
-    composeTestRule.onNodeWithTag(C.Tag.BookDisplayComp.author).assertIsDisplayed().assertTextEquals("Author 2")
+    composeTestRule
+        .onNodeWithTag(C.Tag.BookDisplayComp.title)
+        .assertIsDisplayed()
+        .assertTextEquals("Book 1")
+    composeTestRule
+        .onNodeWithTag(C.Tag.BookDisplayComp.title)
+        .assertIsDisplayed()
+        .assertTextEquals("Book 2")
+    composeTestRule
+        .onNodeWithTag(C.Tag.BookDisplayComp.author)
+        .assertIsDisplayed()
+        .assertTextEquals("Author 1")
+    composeTestRule
+        .onNodeWithTag(C.Tag.BookDisplayComp.author)
+        .assertIsDisplayed()
+        .assertTextEquals("Author 2")
   }
 }

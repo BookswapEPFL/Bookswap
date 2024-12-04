@@ -127,16 +127,26 @@ fun OthersUserProfileScreen(
                     }
 
                 // Full Name:
-                LabeledText(testTag = C.Tag.OtherUserProfile.fullname, label = "Name:", value = "${user.greeting} ${user.firstName} ${user.lastName}")
+                LabeledText(
+                    testTag = C.Tag.OtherUserProfile.fullname,
+                    label = "Name:",
+                    value = "${user.greeting} ${user.firstName} ${user.lastName}")
 
                 // Email:
-                LabeledText(testTag = C.Tag.OtherUserProfile.email, label = "Email:", value = user.email)
+                LabeledText(
+                    testTag = C.Tag.OtherUserProfile.email, label = "Email:", value = user.email)
 
                 // Phone Number:
-                LabeledText(testTag = C.Tag.OtherUserProfile.phone, label = "Phone:", value = user.phoneNumber)
+                LabeledText(
+                    testTag = C.Tag.OtherUserProfile.phone,
+                    label = "Phone:",
+                    value = user.phoneNumber)
 
                 // Address:
-                LabeledText(testTag = C.Tag.OtherUserProfile.address, label = "Address:", value = "${user.latitude}, ${user.longitude}")
+                LabeledText(
+                    testTag = C.Tag.OtherUserProfile.address,
+                    label = "Address:",
+                    value = "${user.latitude}, ${user.longitude}")
 
                 // Book List
                 if (isBooksLoading) {
@@ -182,12 +192,14 @@ fun LabeledText(testTag: String = "LabeledText", label: String, value: String) {
                   text = label,
                   color = ColorVariable.Accent,
                   style = MaterialTheme.typography.labelLarge,
-                  modifier = Modifier.weight(LABEL_WEIGHT).testTag(testTag + C.Tag.LabeledText.label))
+                  modifier =
+                      Modifier.weight(LABEL_WEIGHT).testTag(testTag + C.Tag.LabeledText.label))
               Text(
                   text = value,
                   color = ColorVariable.Accent,
                   style = MaterialTheme.typography.bodyLarge,
-                  modifier = Modifier.weight(VALUE_WEIGHT).testTag(testTag + C.Tag.LabeledText.text))
+                  modifier =
+                      Modifier.weight(VALUE_WEIGHT).testTag(testTag + C.Tag.LabeledText.text))
             }
       }
 }
