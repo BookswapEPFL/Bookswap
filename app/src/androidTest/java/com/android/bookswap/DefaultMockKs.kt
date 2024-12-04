@@ -17,6 +17,8 @@ object DefaultMockKs {
   private val mockKUserLoc = LatLng(0.0, 0.0)
   private val mockKUserUID = UUID.fromString("00000000-0000-4000-C000-000000000000")
   private val mockKBookUID = UUID.fromString("00000000-0000-4000-C000-100000000000")
+  private val mockContactUID1 = UUID.fromString("00000000-0000-4000-C000-000000000010")
+  private val mockContactUID2 = UUID.fromString("00000000-0000-4000-C000-000000000020")
   val mockKUserRepository: UsersRepository = mockk()
   val mockKStandardUser =
       DataUser(
@@ -31,7 +33,7 @@ object DefaultMockKs {
           "dummyPic.png",
           listOf(mockKBookUID),
           "googleUID",
-          listOf("contact1", "contact2"))
+          listOf(mockContactUID1, mockContactUID2))
   val mockKUserViewModel: UserViewModel =
       spyk<UserViewModel>(
           UserViewModel(mockKUserUID, mockKUserRepository),
