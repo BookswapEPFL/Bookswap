@@ -32,6 +32,7 @@ open class UserViewModel(
     if (!isLoaded || force) {
       fetchUser()
     }
+    Log.d("getUser", "Fetched user: $uuid")
     return dataUser
   }
 

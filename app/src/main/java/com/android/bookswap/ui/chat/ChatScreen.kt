@@ -26,6 +26,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Card
@@ -242,16 +243,33 @@ fun ChatScreen(
           },
           navigationIcon = { BackButtonComponent(navController) },
           actions = {
-            IconButton(onClick = { /* Handle profile icon click */}) {
-              AsyncImage(
-                  model = otherUser.profilePictureUrl,
-                  contentDescription = "Profile Picture",
-                  contentScale = ContentScale.Crop,
-                  modifier =
-                      Modifier.testTag(C.Tag.TopAppBar.profile_button)
-                          .size(padding36)
-                          .clip(CircleShape))
-            }
+            IconButton(
+                onClick = {
+                  navController.navigateTo(
+                      screen = C.Screen.OTHERS_USER_PROFILE, UUID = otherUser.userUUID.toString())
+                }) {
+                  // * Handle profile icon click */}) {
+                  if (otherUser.profilePictureUrl.isNotEmpty()) {
+
+                    AsyncImage(
+                        model = otherUser.profilePictureUrl,
+                        contentDescription = "Profile Picture",
+                        contentScale = ContentScale.Crop,
+                        modifier =
+                            Modifier.testTag(C.Tag.TopAppBar.profile_button)
+                                .size(padding36)
+                                .clip(CircleShape))
+                  } else {
+                    Icon(
+                        imageVector = Icons.Filled.Person,
+                        contentDescription = "Contact Icon",
+                        modifier =
+                            Modifier.size(40.dp)
+                                .clip(CircleShape)
+                                .align(Alignment.CenterVertically),
+                    )
+                  }
+                }
           },
           colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
           modifier = Modifier.testTag(C.Tag.top_app_bar_container))
