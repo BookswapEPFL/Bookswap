@@ -60,7 +60,7 @@ class UserFirestoreSourceTest {
     every { mockCollectionReference.document(any()) } returns mockDocumentReference
 
     every { mockQuerySnapshot.documents } returns listOf(mockDocumentSnapshot)
-	
+
     every { mockDocumentSnapshot.id } returns testUser.userUUID.toString()
     every { mockDocumentSnapshot.get("userUUID") } returns testUser.userUUID.toString()
     every { mockDocumentSnapshot.getString("greeting") } returns testUser.greeting
