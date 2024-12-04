@@ -262,4 +262,24 @@ class BooksFirestoreSource(private val db: FirebaseFirestore) : BooksRepository 
       }
     }
   }
+  /**
+   * Maps a DataBook object to a Firebase document-like Map
+   *
+   * @param dataBook The object to convert into a Map
+   * @return Map<String,Any?> A Mapping of each of the DataBook object fields to it's value,
+   *   properly formatted for storing
+   */
+  fun bookToDocument(dataBook: DataBook): Map<String, Any?> {
+    return mapOf(
+        "uuid" to DataConverter.convert_UUID(dataBook.uuid),
+        "title" to dataBook.title,
+        "author" to dataBook.author,
+        "description" to dataBook.description,
+        "rating" to dataBook.rating,
+        "photo" to dataBook.photo,
+        "language" to dataBook.language.toString(),
+        "isbn" to dataBook.isbn,
+        "genres" to dataBook.genres.map { it.toString() },
+        "userId" to DataConverter.convert_UUID(dataBook.userId))
+  }
 }

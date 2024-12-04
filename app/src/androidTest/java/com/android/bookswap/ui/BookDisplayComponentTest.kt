@@ -31,7 +31,9 @@ class BookDisplayComponentTest {
             language = BookLanguages.SPANISH,
             isbn = "978-84-09025-23-5",
             genres = listOf(BookGenres.HISTORICAL, BookGenres.NONFICTION, BookGenres.BIOGRAPHY),
-            userId = UUID.randomUUID())
+            userId = UUID.randomUUID(),
+            false,
+            false)
 
     composeTestRule.setContent { BookDisplayComponent(book = testBook) }
 
@@ -59,7 +61,9 @@ class BookDisplayComponentTest {
             language = BookLanguages.SPANISH,
             isbn = "978-84-09025-23-5",
             genres = listOf(BookGenres.HISTORICAL, BookGenres.NONFICTION, BookGenres.BIOGRAPHY),
-            userId = UUID.randomUUID())
+            userId = UUID.randomUUID(),
+            false,
+            false)
 
     composeTestRule.setContent { BookDisplayComponent(book = testBook) }
 
