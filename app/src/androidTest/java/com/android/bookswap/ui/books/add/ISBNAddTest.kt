@@ -39,43 +39,42 @@ class ISBNAddTest : TestCase() {
   private lateinit var toastMock: Toast
   private lateinit var mockUserVM: UserViewModel
 
-
   @Before
   fun init() {
-      mockkStatic(Toast::class)
-      toastMock = mockk<Toast>()
-      every { toastMock.show() } returns Unit
-      every { Toast.makeText(any(), any<String>(), any()) } returns toastMock
+    mockkStatic(Toast::class)
+    toastMock = mockk<Toast>()
+    every { toastMock.show() } returns Unit
+    every { Toast.makeText(any(), any<String>(), any()) } returns toastMock
 
-      mockUserVM = mockk(relaxed = true)
-      every { mockUserVM.getUser() } returns
-              DataUser(
-                  UUID.randomUUID(),
-                  "Hello",
-                  "John",
-                  "Doe",
-                  "eleanorroosevelt@myownpersonaldomain.com",
-                  "+1234567890",
-                  0.0,
-                  0.0,
-                  "https://www.example.com/profile.jpg",
-                  listOf(UUID.randomUUID()),
-                  "googleUID",
-                  listOf("contact1", "contact2"))
+    mockUserVM = mockk(relaxed = true)
+    every { mockUserVM.getUser() } returns
+        DataUser(
+            UUID.randomUUID(),
+            "Hello",
+            "John",
+            "Doe",
+            "eleanorroosevelt@myownpersonaldomain.com",
+            "+1234567890",
+            0.0,
+            0.0,
+            "https://www.example.com/profile.jpg",
+            listOf(UUID.randomUUID()),
+            "googleUID",
+            listOf("contact1", "contact2"))
 
-      mockkConstructor(DataUser::class)
+    mockkConstructor(DataUser::class)
 
-      every { anyConstructed<DataUser>().greeting } returns "Hello"
-      every { anyConstructed<DataUser>().firstName } returns "John"
-      every { anyConstructed<DataUser>().lastName } returns "Doe"
-      every { anyConstructed<DataUser>().email } returns "john.doe@example.com"
-      every { anyConstructed<DataUser>().phoneNumber } returns "+1234567890"
-      every { anyConstructed<DataUser>().latitude } returns 0.0
-      every { anyConstructed<DataUser>().longitude } returns 0.0
-      every { anyConstructed<DataUser>().profilePictureUrl } returns "mockPicUrl.png"
-      every { anyConstructed<DataUser>().bookList } returns emptyList()
-      every { anyConstructed<DataUser>().googleUid } returns "mockGoogleUid"
-      every { anyConstructed<DataUser>().contactList } returns emptyList()
+    every { anyConstructed<DataUser>().greeting } returns "Hello"
+    every { anyConstructed<DataUser>().firstName } returns "John"
+    every { anyConstructed<DataUser>().lastName } returns "Doe"
+    every { anyConstructed<DataUser>().email } returns "john.doe@example.com"
+    every { anyConstructed<DataUser>().phoneNumber } returns "+1234567890"
+    every { anyConstructed<DataUser>().latitude } returns 0.0
+    every { anyConstructed<DataUser>().longitude } returns 0.0
+    every { anyConstructed<DataUser>().profilePictureUrl } returns "mockPicUrl.png"
+    every { anyConstructed<DataUser>().bookList } returns emptyList()
+    every { anyConstructed<DataUser>().googleUid } returns "mockGoogleUid"
+    every { anyConstructed<DataUser>().contactList } returns emptyList()
   }
 
   @Test

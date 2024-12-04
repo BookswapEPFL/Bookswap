@@ -83,83 +83,85 @@ class BookProfileScreenTest {
     composeTestRule.onNodeWithTag(C.Tag.BookProfile.location).assertIsDisplayed()
   }
 
-    @Test
-    fun iconsAreClickable() {
-        composeTestRule.setContent {
-            val navController = rememberNavController()
-            val navigationActions = NavigationActions(navController)
-            BookProfileScreen(testBookId, mockBookRepo, navigationActions, currentUserId = currentUserId)
-        }
-
-        // Ensure visibility of the previous image button
-        composeTestRule.onNodeWithTag(C.Tag.BookProfile.scrollable)
-            .performScrollToNode(hasTestTag(C.Tag.BookProfile.previous_image))
-
-        // Wait until the button is available
-        composeTestRule.waitUntil(timeoutMillis = 5000) {
-            try {
-                composeTestRule.onNodeWithTag(C.Tag.BookProfile.previous_image).fetchSemanticsNode()
-                true
-            } catch (e: Exception) {
-                false
-            }
-        }
-
-        // Assert the previous image button is clickable
-        composeTestRule.onNodeWithTag(C.Tag.BookProfile.previous_image).assertHasClickAction()
-
-        // Ensure visibility of the next image button
-        composeTestRule.onNodeWithTag(C.Tag.BookProfile.scrollable)
-            .performScrollToNode(hasTestTag(C.Tag.BookProfile.next_image))
-
-        // Wait until the button is available
-        composeTestRule.waitUntil(timeoutMillis = 5000) {
-            try {
-                composeTestRule.onNodeWithTag(C.Tag.BookProfile.next_image).fetchSemanticsNode()
-                true
-            } catch (e: Exception) {
-                false
-            }
-        }
-
-        // Assert the next image button is clickable
-        composeTestRule.onNodeWithTag(C.Tag.BookProfile.next_image).assertHasClickAction()
+  @Test
+  fun iconsAreClickable() {
+    composeTestRule.setContent {
+      val navController = rememberNavController()
+      val navigationActions = NavigationActions(navController)
+      BookProfileScreen(testBookId, mockBookRepo, navigationActions, currentUserId = currentUserId)
     }
 
-    @Test
-    fun pictureChangesOnIconClick() {
-        composeTestRule.setContent {
-            val navController = rememberNavController()
-            val navigationActions = NavigationActions(navController)
-            BookProfileScreen(
-                bookId = testBookId,
-                booksRepository = mockBookRepo,
-                navController = navigationActions,
-                currentUserId = currentUserId
-            )
-        }
+    // Ensure visibility of the previous image button
+    composeTestRule
+        .onNodeWithTag(C.Tag.BookProfile.scrollable)
+        .performScrollToNode(hasTestTag(C.Tag.BookProfile.previous_image))
 
-        // Ensure the button is visible
-        composeTestRule.onNodeWithTag(C.Tag.BookProfile.scrollable)
-            .performScrollToNode(hasTestTag(C.Tag.BookProfile.next_image))
-
-        // Wait until the node is available
-        composeTestRule.waitUntil(timeoutMillis = 5000) {
-            try {
-                composeTestRule.onNodeWithTag(C.Tag.BookProfile.next_image).fetchSemanticsNode()
-                true
-            } catch (e: Exception) {
-                false
-            }
-        }
-
-        // Verify the first picture is displayed
-        composeTestRule.onNodeWithTag("0_" + C.Tag.BookProfile.image).assertIsDisplayed()
-
-        // Perform a click action on the next image button
-        composeTestRule.onNodeWithTag(C.Tag.BookProfile.next_image).performClick()
-
-        // Verify the next picture is displayed
-        composeTestRule.onNodeWithTag("1_" + C.Tag.BookProfile.image).assertIsDisplayed()
+    // Wait until the button is available
+    composeTestRule.waitUntil(timeoutMillis = 5000) {
+      try {
+        composeTestRule.onNodeWithTag(C.Tag.BookProfile.previous_image).fetchSemanticsNode()
+        true
+      } catch (e: Exception) {
+        false
+      }
     }
+
+    // Assert the previous image button is clickable
+    composeTestRule.onNodeWithTag(C.Tag.BookProfile.previous_image).assertHasClickAction()
+
+    // Ensure visibility of the next image button
+    composeTestRule
+        .onNodeWithTag(C.Tag.BookProfile.scrollable)
+        .performScrollToNode(hasTestTag(C.Tag.BookProfile.next_image))
+
+    // Wait until the button is available
+    composeTestRule.waitUntil(timeoutMillis = 5000) {
+      try {
+        composeTestRule.onNodeWithTag(C.Tag.BookProfile.next_image).fetchSemanticsNode()
+        true
+      } catch (e: Exception) {
+        false
+      }
+    }
+
+    // Assert the next image button is clickable
+    composeTestRule.onNodeWithTag(C.Tag.BookProfile.next_image).assertHasClickAction()
+  }
+
+  @Test
+  fun pictureChangesOnIconClick() {
+    composeTestRule.setContent {
+      val navController = rememberNavController()
+      val navigationActions = NavigationActions(navController)
+      BookProfileScreen(
+          bookId = testBookId,
+          booksRepository = mockBookRepo,
+          navController = navigationActions,
+          currentUserId = currentUserId)
+    }
+
+    // Ensure the button is visible
+    composeTestRule
+        .onNodeWithTag(C.Tag.BookProfile.scrollable)
+        .performScrollToNode(hasTestTag(C.Tag.BookProfile.next_image))
+
+    // Wait until the node is available
+    composeTestRule.waitUntil(timeoutMillis = 5000) {
+      try {
+        composeTestRule.onNodeWithTag(C.Tag.BookProfile.next_image).fetchSemanticsNode()
+        true
+      } catch (e: Exception) {
+        false
+      }
+    }
+
+    // Verify the first picture is displayed
+    composeTestRule.onNodeWithTag("0_" + C.Tag.BookProfile.image).assertIsDisplayed()
+
+    // Perform a click action on the next image button
+    composeTestRule.onNodeWithTag(C.Tag.BookProfile.next_image).performClick()
+
+    // Verify the next picture is displayed
+    composeTestRule.onNodeWithTag("1_" + C.Tag.BookProfile.image).assertIsDisplayed()
+  }
 }
