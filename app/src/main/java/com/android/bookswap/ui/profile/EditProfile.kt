@@ -17,6 +17,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.android.bookswap.data.DataUser
 import com.android.bookswap.model.InputVerification
+import com.android.bookswap.model.LocalAppConfig
 import com.android.bookswap.resources.C
 import com.android.bookswap.ui.MAXLENGTHEMAIL
 import com.android.bookswap.ui.MAXLENGTHFIRSTNAME
@@ -34,8 +35,9 @@ import com.android.bookswap.ui.theme.BookSwapAppTheme
  * @param dataUser The DataUser object containing the user's current profile information.
  */
 @Composable
-fun EditProfileDialog(onDismiss: () -> Unit, onSave: (DataUser) -> Unit, dataUser: DataUser) {
-
+fun EditProfileDialog(onDismiss: () -> Unit, onSave: (DataUser) -> Unit) {
+  val appConfig = LocalAppConfig.current
+  val dataUser = appConfig.userViewModel.getUser()
   val _email = remember { mutableStateOf<String>(dataUser.email) }
   val _phone = remember { mutableStateOf<String>(dataUser.phoneNumber) }
   val _greeting = remember { mutableStateOf<String>(dataUser.greeting) }

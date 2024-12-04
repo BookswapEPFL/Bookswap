@@ -5,6 +5,7 @@ import androidx.compose.material.icons.filled.MailOutline
 import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.AddCircle
 import androidx.compose.material.icons.outlined.Place
+import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.NavOptionsBuilder
@@ -75,14 +76,6 @@ class NavigationActionsTest {
   }
 
   @Test
-  fun goBackCallPopBackStack() {
-    every { navHostController.popBackStack() } returns true
-    navigationActions.goBack()
-
-    verify { navHostController.popBackStack() }
-  }
-
-  @Test
   fun topLevelDestinationsHaveCorrectIcon() {
     assertThat(TopLevelDestinations.CHAT.icon, `is`(Icons.Filled.MailOutline))
     assertThat(TopLevelDestinations.MAP.icon, `is`(Icons.Outlined.Place))
@@ -99,5 +92,17 @@ class NavigationActionsTest {
                 TopLevelDestinations.CHAT,
                 TopLevelDestinations.NEW_BOOK,
                 TopLevelDestinations.MAP)))
+  }
+
+  @Test
+  fun `go back when previous route is AUTH does nothing`() {
+    val mockPreviousBackStackEntry: NavBackStackEntry? = mockk()
+    every { mockPreviousBackStackEntry?.destination?.route } returns C.Route.AUTH
+
+    every { navHostController.previousBackStackEntry } returns mockPreviousBackStackEntry
+
+    navigationActions.goBack()
+
+    verify(exactly = 0) { navHostController.popBackStack() }
   }
 }
