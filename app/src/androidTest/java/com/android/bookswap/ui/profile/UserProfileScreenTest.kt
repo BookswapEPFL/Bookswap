@@ -2,6 +2,7 @@ package com.android.bookswap.ui.profile
 
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
@@ -57,8 +58,20 @@ class UserProfileScreenTest : TestCase() {
 
   @Test
   fun testDisplay() {
-    run(testName = "assertContent") {
+    val str =
+        "${composeTestRule.onNodeWithTag(C.Tag.UserProfile.fullname).fetchSemanticsNode().config}"
+    android.util.Log.d("TAG_USER_PROFILE_TEST", str)
+    run("assertContent") {
       step("Start User Profile Screen") {
+        try {
+          composeTestRule
+              .onNodeWithTag(C.Tag.UserProfile.fullname)
+              .assertExists()
+              .assertTextEquals("M. John Doe")
+        } catch (e: Error) {
+          assert(str.contains("Joe")).also { throw e }
+        }
+
         ComposeScreen.onComposeScreen<UserProfileScreen>(composeTestRule) {
           titleTxt { assertIsDisplayed() }
           fullNameTxt {
