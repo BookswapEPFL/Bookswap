@@ -121,8 +121,7 @@ class UserFirestoreSource(private val db: FirebaseFirestore) : UsersRepository {
       val longitude = document.getDouble("longitude")!!
       val profilePicture = document.getString("profilePictureUrl")!!
       val googleUid = document.getString("googleUid")!!
-      val bookList =
-          DataConverter.parse_raw_UUID_list(document.get("bookList").toString()).filterNotNull()
+      val bookList = DataConverter.parse_raw_UUID_list(document.get("bookList").toString()).filterNotNull()
       val contactList =
           DataConverter.parse_raw_UUID_list(document.get("contactList").toString()).filterNotNull()
 
