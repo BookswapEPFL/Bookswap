@@ -58,6 +58,10 @@ class UserProfileScreenTest : TestCase() {
 
   @Test
   fun testDisplay() {
+    composeTestRule
+        .onNodeWithTag(C.Tag.UserProfile.fullname)
+        .assertExists()
+        .assertTextEquals("M. John Doe")
     val str =
         "${composeTestRule.onNodeWithTag(C.Tag.UserProfile.fullname).fetchSemanticsNode().config}"
     android.util.Log.d("TAG_USER_PROFILE_TEST", str)
@@ -76,7 +80,7 @@ class UserProfileScreenTest : TestCase() {
           titleTxt { assertIsDisplayed() }
           fullNameTxt {
             assertIsDisplayed()
-            assertTextEquals("M. John Doe")
+            // assertTextEquals("M. John Doe")
           }
           emailTxt {
             assertIsDisplayed()
@@ -109,12 +113,16 @@ class UserProfileScreenTest : TestCase() {
 
   @Test
   fun testEdit() {
-    run(testName = "assertEditAction") {
+    composeTestRule
+        .onNodeWithTag(C.Tag.UserProfile.fullname)
+        .assertExists()
+        .assertTextEquals("M. John Doe")
+    run("assertEditAction") {
       ComposeScreen.onComposeScreen<UserProfileScreen>(composeTestRule) {
         step("Start User Profile Screen") {
           fullNameTxt {
             assertIsDisplayed()
-            assertTextEquals("M. John Doe")
+            // assertTextEquals("M. John Doe")
           }
           emailTxt {
             assertIsDisplayed()
