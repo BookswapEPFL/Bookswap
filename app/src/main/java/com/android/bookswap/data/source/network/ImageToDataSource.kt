@@ -1,6 +1,8 @@
 package com.android.bookswap.data.source.network
 
+import android.util.Log
 import com.android.bookswap.data.source.api.ApiService
+import org.json.JSONException
 import org.json.JSONObject
 
 /**
@@ -25,11 +27,11 @@ class ImageToDataSource(private val apiService: ApiService) {
   ) {
     // Complete the prompt by appending the image URL
     val fullPrompt = "$PROMPT $imageUrl"
-
     // Send the request to ChatGPTApiService
     apiService.sendChatRequest(
         userMessages = listOf(fullPrompt),
         onSuccess = { responseContent ->
+          Log.i("ImageToDataSource", "Response: $responseContent")
           try {
             // Parse the JSON response into a Map
             val parsedData = parseResponse(responseContent)
@@ -48,21 +50,35 @@ class ImageToDataSource(private val apiService: ApiService) {
    * @return A map with keys: "title", "author", "description", "language", and "isbn"
    */
   private fun parseResponse(response: String): Map<String, String> {
-    val jsonObject = JSONObject(response)
+    // Remove any leading/trailing whitespace and potential triple backticks or other formatting
+    // characters
+    val cleanResponse = response.trim().removePrefix("```json").removeSuffix("```")
 
-    // Extract the fields as specified
-    val title = jsonObject.optString("title", UNDEFINED_ATTRIBUTE)
-    val author = jsonObject.optString("author", UNDEFINED_ATTRIBUTE)
-    val description = jsonObject.optString("description", UNDEFINED_ATTRIBUTE)
-    val language = jsonObject.optString("language", UNDEFINED_ATTRIBUTE)
-    val isbn = jsonObject.optString("isbn", UNDEFINED_ATTRIBUTE)
+    return try {
+      val jsonObject = JSONObject(cleanResponse)
 
-    return mapOf(
-        "title" to title,
-        "author" to author,
-        "description" to description,
-        "language" to language,
-        "isbn" to isbn)
+      // Extract the fields as specified
+      val title = jsonObject.optString("title", UNDEFINED_ATTRIBUTE)
+      val author = jsonObject.optString("author", UNDEFINED_ATTRIBUTE)
+      val description = jsonObject.optString("description", UNDEFINED_ATTRIBUTE)
+      val language = jsonObject.optString("language", UNDEFINED_ATTRIBUTE)
+      val isbn = jsonObject.optString("isbn", UNDEFINED_ATTRIBUTE)
+
+      mapOf(
+          "title" to title,
+          "author" to author,
+          "description" to description,
+          "language" to language,
+          "isbn" to isbn)
+    } catch (e: JSONException) {
+      Log.e("ImageToDataSource", "JSON Parsing error: ${e.localizedMessage}")
+      mapOf(
+          "title" to UNDEFINED_ATTRIBUTE,
+          "author" to UNDEFINED_ATTRIBUTE,
+          "description" to UNDEFINED_ATTRIBUTE,
+          "language" to UNDEFINED_ATTRIBUTE,
+          "isbn" to UNDEFINED_ATTRIBUTE)
+    }
   }
 
   companion object {

@@ -1,5 +1,6 @@
 package com.android.bookswap.ui.components
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -65,6 +66,7 @@ fun BookDisplayComponent(modifier: Modifier = Modifier, book: DataBook) {
               .padding(PADDING_HORIZONTAL_DP, PADDING_VERTICAL_DP),
       horizontalArrangement = Arrangement.Start,
       verticalAlignment = Alignment.CenterVertically) {
+        Log.i("BookDisplayComponent", "Displaying book: ${book.title} by ${book.author}")
         // Image Box
         Box(
             modifier =
