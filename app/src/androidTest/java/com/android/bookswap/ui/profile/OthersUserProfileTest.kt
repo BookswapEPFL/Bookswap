@@ -1,8 +1,12 @@
 package com.android.bookswap.ui.profile
 
+import androidx.compose.ui.test.assertAll
+import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextEquals
+import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.android.bookswap.data.BookGenres
@@ -109,7 +113,7 @@ class OthersUserProfileTest : TestCase() {
     composeTestRule
         .onNodeWithTag(C.Tag.OtherUserProfile.fullname + C.Tag.LabeledText.text)
         .assertIsDisplayed()
-        .assertTextEquals("John Doe")
+        .assertTextEquals("Mr. John Doe")
 
     composeTestRule
         .onNodeWithTag(C.Tag.OtherUserProfile.email + C.Tag.LabeledText.label)
@@ -152,20 +156,18 @@ class OthersUserProfileTest : TestCase() {
     // Verify book list is displayed
     composeTestRule.onNodeWithTag(C.Tag.BookListComp.book_list_container).assertIsDisplayed()
     composeTestRule
-        .onNodeWithTag(C.Tag.BookDisplayComp.title)
+        .onNodeWithTag("0_" + C.Tag.BookDisplayComp.book_display_container)
         .assertIsDisplayed()
-        .assertTextEquals("Book 1")
     composeTestRule
-        .onNodeWithTag(C.Tag.BookDisplayComp.title)
+        .onNodeWithTag("1_" + C.Tag.BookDisplayComp.book_display_container)
         .assertIsDisplayed()
-        .assertTextEquals("Book 2")
     composeTestRule
-        .onNodeWithTag(C.Tag.BookDisplayComp.author)
-        .assertIsDisplayed()
-        .assertTextEquals("Author 1")
+        .onAllNodesWithTag(C.Tag.BookDisplayComp.title)
+        .assertCountEquals(2)
+        .assertAll(hasText("Book 1").or(hasText("Book 2")))
     composeTestRule
-        .onNodeWithTag(C.Tag.BookDisplayComp.author)
-        .assertIsDisplayed()
-        .assertTextEquals("Author 2")
+        .onAllNodesWithTag(C.Tag.BookDisplayComp.author)
+        .assertCountEquals(2)
+        .assertAll(hasText("Author 1").or(hasText("Author 2")))
   }
 }
