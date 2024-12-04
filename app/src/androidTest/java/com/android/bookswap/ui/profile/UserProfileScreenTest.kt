@@ -1,5 +1,6 @@
 package com.android.bookswap.ui.profile
 
+import android.content.Context
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.assertTextEquals
@@ -58,32 +59,25 @@ class UserProfileScreenTest : TestCase() {
 
   @Test
   fun testDisplay() {
-    composeTestRule
-        .onNodeWithTag(C.Tag.UserProfile.fullname)
-        .assertExists()
-        .assertTextEquals(userVM.getUser().printFullname())
-    val str =
-        "${composeTestRule.onNodeWithTag(C.Tag.UserProfile.fullname).fetchSemanticsNode().config}"
-    android.util.Log.d("TAG_USER_PROFILE_TEST", str)
     run("assertContent") {
       step("Start User Profile Screen") {
         ComposeScreen.onComposeScreen<UserProfileScreen>(composeTestRule) {
           titleTxt { assertIsDisplayed() }
           fullNameTxt {
             assertIsDisplayed()
-            // assertTextEquals("M. John Doe")
+            assertTextEquals(userVM.getUser().printFullname())
           }
           emailTxt {
             assertIsDisplayed()
-            assertTextEquals("John.Doe@example.com")
+            assertTextEquals(userVM.getUser().email)
           }
           phoneNumberTxt {
             assertIsDisplayed()
-            assertTextEquals("+41223456789")
+            assertTextEquals(userVM.getUser().phoneNumber)
           }
           addressTxt {
             assertIsDisplayed()
-            assertTextEquals("address")
+            assertTextEquals(userVM.getLocationPlace(mockk<Context>()).value)
           }
           editProfileBtn {
             assertIsDisplayed()
@@ -104,28 +98,24 @@ class UserProfileScreenTest : TestCase() {
 
   @Test
   fun testEdit() {
-    composeTestRule
-        .onNodeWithTag(C.Tag.UserProfile.fullname)
-        .assertExists()
-        .assertTextEquals(userVM.getUser().printFullname())
     run("assertEditAction") {
       ComposeScreen.onComposeScreen<UserProfileScreen>(composeTestRule) {
         step("Start User Profile Screen") {
           fullNameTxt {
             assertIsDisplayed()
-            // assertTextEquals("M. John Doe")
+            assertTextEquals(userVM.getUser().printFullname())
           }
           emailTxt {
             assertIsDisplayed()
-            assertTextEquals("John.Doe@example.com")
+            assertTextEquals(userVM.getUser().email)
           }
           phoneNumberTxt {
             assertIsDisplayed()
-            assertTextEquals("+41223456789")
+            assertTextEquals(userVM.getUser().phoneNumber)
           }
           addressTxt {
             assertIsDisplayed()
-            assertTextEquals("address")
+            assertTextEquals(userVM.getLocationPlace(mockk<Context>()).value)
           }
           editProfileBtn {
             assertIsDisplayed()
