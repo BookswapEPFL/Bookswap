@@ -29,7 +29,7 @@ class NewUserScreenTest {
     navigationActions = mockk(relaxed = true)
     userVM = mockk(relaxed = true)
     photoStorage = mockk(relaxed = true)
-    composeTestRule.setContent { NewUserScreen(navigationActions, userVM, photoStorage) }
+    composeTestRule.setContent { NewUserScreen(navigationActions, photoStorage) }
   }
 
   @Test

@@ -54,6 +54,7 @@ import com.android.bookswap.ui.navigation.BottomNavigationMenu
 import com.android.bookswap.ui.navigation.List_Navigation_Bar_Destinations
 import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.profile.NewUserScreen
+import com.android.bookswap.ui.profile.OthersUserProfileScreen
 import com.android.bookswap.ui.profile.UserProfile
 import com.android.bookswap.ui.theme.BookSwapAppTheme
 import com.google.firebase.Firebase
@@ -73,7 +74,6 @@ class MainActivity : ComponentActivity() {
 
   @Composable
   fun BookSwapApp() {
-
     // Initialize a Firebase Firestore database instance
     val db = FirebaseFirestore.getInstance()
     val storage = FirebaseStorage.getInstance()
@@ -155,8 +155,8 @@ class MainActivity : ComponentActivity() {
     CompositionLocalProvider(LocalAppConfig provides AppConfig(userViewModel = userVM)) {
       NavHost(navController = navController, startDestination = startDestination) {
         navigation(startDestination = C.Screen.AUTH, route = C.Route.AUTH) {
-          composable(C.Screen.AUTH) { SignInScreen(navigationActions, userVM) }
-          composable(C.Screen.NEW_USER) { NewUserScreen(navigationActions, userVM, photoStorage) }
+          composable(C.Screen.AUTH) { SignInScreen(navigationActions) }
+          composable(C.Screen.NEW_USER) { NewUserScreen(navigationActions, photoStorage) }
         }
         navigation(startDestination = C.Screen.CHAT_LIST, route = C.Route.CHAT_LIST) {
           composable(C.Screen.CHAT_LIST) {
@@ -172,6 +172,7 @@ class MainActivity : ComponentActivity() {
             if (user2 != null) {
               ChatScreen(
                   messageRepository,
+                  userRepository,
                   userVM.getUser(),
                   user2,
                   navigationActions,
@@ -184,8 +185,7 @@ class MainActivity : ComponentActivity() {
                   topAppBar = { topAppBar("Add a Book") },
                   bottomAppBar = { bottomAppBar(this@navigation.route ?: "") },
                   photoFirebaseStorageRepository = photoStorage,
-                  booksRepository = bookRepository,
-                  userUUID = userVM.uuid)
+                  booksRepository = bookRepository)
             }
           }
         }
@@ -207,13 +207,11 @@ class MainActivity : ComponentActivity() {
                 topAppBar = { topAppBar("Add a Book") },
                 bottomAppBar = { bottomAppBar(this@navigation.route ?: "") },
                 photoFirebaseStorageRepository = photoStorage,
-                booksRepository = bookRepository,
-                userUUID = userVM.uuid)
+                booksRepository = bookRepository)
           }
           composable(C.Screen.ADD_BOOK_MANUALLY) {
             AddToBookScreen(
                 bookRepository,
-                userVM,
                 topAppBar = { topAppBar("Add your Book") },
                 bottomAppBar = { bottomAppBar(this@navigation.route ?: "") })
           }
@@ -221,23 +219,22 @@ class MainActivity : ComponentActivity() {
             AddISBNScreen(
                 navigationActions,
                 bookRepository,
-                userVM,
                 topAppBar = { topAppBar(null) },
                 bottomAppBar = { bottomAppBar(this@navigation.route ?: "") },
             )
           }
         }
         navigation(startDestination = C.Screen.USER_PROFILE, route = C.Route.USER_PROFILE) {
-          composable(C.Screen.USER_PROFILE) { UserProfile(userVM, photoStorage) }
+          composable(C.Screen.USER_PROFILE) { UserProfile(photoStorage) }
           composable(C.Screen.BOOK_PROFILE) { backStackEntry ->
             val bookId = backStackEntry.arguments?.getString("bookId")?.let { UUID.fromString(it) }
+
             if (bookId != null) {
               BookProfileScreen(
                   bookId = bookId, // Default for testing
                   booksRepository = BooksFirestoreSource(FirebaseFirestore.getInstance()),
                   navController = NavigationActions(navController),
-                  currentUserId = UUID.randomUUID() // Pass the actual logged-in user ID
-                  )
+              )
             } else {
               Log.e("Navigation", "Invalid bookId passed to BookProfileScreen")
             }
@@ -261,6 +258,24 @@ class MainActivity : ComponentActivity() {
             }
           }
         }
+        navigation(
+            startDestination = C.Screen.OTHERS_USER_PROFILE, route = C.Route.OTHERS_USER_PROFILE) {
+              // OthersUserProfileScreen :
+              composable("${C.Screen.OTHERS_USER_PROFILE}/{userId}") { backStackEntry ->
+                val userId =
+                    backStackEntry.arguments?.getString("userId")?.let { UUID.fromString(it) }
+                Log.e("Main Launch OthersUserProfile", "userId: $userId")
+                if (userId != null) {
+                  OthersUserProfileScreen(
+                      userId = userId,
+                      booksRepository = bookRepository,
+                      topAppBar = { topAppBar("User Profile") },
+                      bottomAppBar = { bottomAppBar(this@navigation.route ?: "") })
+                } else {
+                  Log.e("Navigation", "Invalid userId passed to OthersUserProfileScreen")
+                }
+              }
+            }
       }
     }
   }

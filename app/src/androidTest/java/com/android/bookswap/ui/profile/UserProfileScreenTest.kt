@@ -1,5 +1,6 @@
 package com.android.bookswap.ui.profile
 
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -8,6 +9,8 @@ import androidx.navigation.compose.rememberNavController
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.android.bookswap.data.DataUser
 import com.android.bookswap.data.source.network.PhotoFirebaseStorageSource
+import com.android.bookswap.model.AppConfig
+import com.android.bookswap.model.LocalAppConfig
 import com.android.bookswap.model.UserViewModel
 import com.android.bookswap.resources.C
 import com.android.bookswap.screen.UserProfileScreen
@@ -57,10 +60,11 @@ class UserProfileScreenTest : TestCase() {
     composeTestRule.setContent {
       val navController = rememberNavController()
       val navigationActions = NavigationActions(navController)
-      UserProfile(
-          userVM = userVM,
-          photoStorage = photoStorage,
-          { TopAppBarComponent(Modifier, navigationActions, "Messages") })
+      CompositionLocalProvider(LocalAppConfig provides AppConfig(userViewModel = userVM)) {
+        UserProfile(
+            photoStorage = photoStorage,
+            { TopAppBarComponent(Modifier, navigationActions, "Messages") })
+      }
     }
   }
 
