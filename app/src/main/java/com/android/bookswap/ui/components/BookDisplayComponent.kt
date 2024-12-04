@@ -88,16 +88,14 @@ fun BookDisplayComponent(modifier: Modifier = Modifier, book: DataBook) {
             AsyncImage(
                 model = photoUrl,
                 contentDescription = "Book Picture",
-                modifier = Modifier
-                    .fillMaxSize()
-                    .testTag(C.Tag.BookDisplayComp.image_picture),
+                modifier = Modifier.fillMaxSize().testTag(C.Tag.BookDisplayComp.image_picture),
                 contentScale = ContentScale.Crop)
           } else { // If the photo URL is empty, display the Gray Box
-            Box(modifier = Modifier
-                .fillMaxSize()
-                .background(Color.Gray)
-                .testTag(C.Tag.BookDisplayComp.image_gray_box)
-            )
+            Box(
+                modifier =
+                    Modifier.fillMaxSize()
+                        .background(Color.Gray)
+                        .testTag(C.Tag.BookDisplayComp.image_gray_box))
           }
         }
 
