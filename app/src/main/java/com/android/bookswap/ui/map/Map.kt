@@ -197,7 +197,7 @@ fun MapScreen(
                             }
                             // Navigate to the user profile
                             navigationActions.navigateTo(
-                                screen = C.Screen.USER_PROFILE,
+                                screen = C.Screen.OTHERS_USER_PROFILE,
                                 UUID =
                                     item.userUUID
                                         .toString() // Assuming `item` has a unique UUID field

@@ -195,8 +195,10 @@ class BooksFirestoreSource(private val db: FirebaseFirestore) : BooksRepository 
    *   success, or an exception on failure.
    */
   override fun updateBook(dataBook: DataBook, callback: (Result<Unit>) -> Unit) {
+    val bookDocument = bookToDocument(dataBook) // Transform to Map<String, Any?>
     performFirestoreOperation(
-        db.collection(collectionBooks).document(dataBook.uuid.toString()).set(dataBook), callback)
+        db.collection(collectionBooks).document(dataBook.uuid.toString()).set(bookDocument),
+        callback)
   }
   /**
    * Deletes a book from the Firestore database.
@@ -418,5 +420,27 @@ class BooksFirestoreSource(private val db: FirebaseFirestore) : BooksRepository 
     book.archived = false
     book.userId = user_uuid
     addBook(book, callback)
+  }
+  /**
+   * Maps a DataBook object to a Firebase document-like Map
+   *
+   * @param dataBook The object to convert into a Map
+   * @return Map<String,Any?> A Mapping of each of the DataBook object fields to it's value,
+   *   properly formatted for storing
+   */
+  fun bookToDocument(dataBook: DataBook): Map<String, Any?> {
+    return mapOf(
+        "uuid" to dataBook.uuid.toString(),
+        "title" to dataBook.title,
+        "author" to dataBook.author,
+        "description" to dataBook.description,
+        "rating" to dataBook.rating,
+        "photo" to dataBook.photo,
+        "language" to dataBook.language.toString(),
+        "isbn" to dataBook.isbn,
+        "genres" to dataBook.genres.map { it.toString() },
+        "userId" to dataBook.userId.toString(),
+        "archived" to dataBook.archived,
+        "exchange" to dataBook.exchange)
   }
 }

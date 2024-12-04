@@ -33,11 +33,11 @@ interface MessageRepository {
   /**
    * Add a message to the repository
    *
-   * @param message message to be added
+   * @param dataMessage message to be added
    * @param callback callback function that receives Result.success() when operation succeed of
    *   Result.failure(exception) if error
    */
-  fun sendMessage(message: DataMessage, callback: (Result<Unit>) -> Unit)
+  fun sendMessage(dataMessage: DataMessage, callback: (Result<Unit>) -> Unit)
 
   /**
    * Delete a message from the repository
@@ -68,14 +68,14 @@ interface MessageRepository {
   /**
    * Update a message in the repository
    *
-   * @param message message to be updated
+   * @param dataMessage message to be updated
    * @param user1UUID uuid of the first user
    * @param user2UUID uuid of the second user
    * @param callback callback function that receives Result.success() when operation succeed of
    *   Result.failure(exception) if error
    */
   fun updateMessage(
-      message: DataMessage,
+      dataMessage: DataMessage,
       user1UUID: UUID,
       user2UUID: UUID,
       callback: (Result<Unit>) -> Unit

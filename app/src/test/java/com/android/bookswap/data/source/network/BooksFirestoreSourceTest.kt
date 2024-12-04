@@ -53,13 +53,13 @@ class BooksFirestoreSourceTest {
     every { mockDocumentSnapshot.getString("title") }.returns(testBook.title)
     every { mockDocumentSnapshot.getString("author") }.returns(testBook.author)
     every { mockDocumentSnapshot.getString("description") }.returns(testBook.description)
-    every { mockDocumentSnapshot.getLong("rating") }.returns(testBook.rating?.toLong())
+    every { mockDocumentSnapshot.get("rating") }.returns(testBook.rating?.toLong())
     every { mockDocumentSnapshot.getString("photo") }.returns(testBook.photo)
     every { mockDocumentSnapshot.getString("language") }.returns(testBook.language.name)
     every { mockDocumentSnapshot.getString("isbn") }.returns(testBook.isbn)
     every { mockDocumentSnapshot.get("genres") }.returns(emptyList<String>())
-    every { mockDocumentSnapshot.getString("uuid") }.returns(testBook.uuid.toString())
-    every { mockDocumentSnapshot.getString("userid") }.returns(testBook.userId.toString())
+    every { mockDocumentSnapshot.get("uuid") }.returns(testBook.uuid.toString())
+    every { mockDocumentSnapshot.get("userid") }.returns(testBook.userId.toString())
 
     every { mockDocumentReference.set(any<Map<String, Any>>()) }.returns(Tasks.forResult(null))
     every { mockDocumentReference.delete() }.returns(Tasks.forResult(null))
@@ -116,13 +116,30 @@ class BooksFirestoreSourceTest {
     val bookSource = BooksFirestoreSource(mockFirestore)
 
     // Arrange
-    every { mockDocumentReference.set(testBook) }.returns(Tasks.forResult(null))
+    val testBook =
+        DataBook(
+            uuid = UUID.fromString("f9fb0016-1714-46bb-823b-24dd32e09e19"),
+            title = "Test Book",
+            author = "Test Author",
+            description = "Test Description",
+            rating = 5,
+            photo = "http://example.com/photo.jpg",
+            language = BookLanguages.ENGLISH,
+            isbn = "1234567890",
+            genres = emptyList(),
+            userId = UUID.fromString("142e9f53-697c-4bfd-b4cf-af6a0761d67a"),
+            archived = false,
+            exchange = false)
+
+    val bookDocument = bookSource.bookToDocument(testBook)
+
+    every { mockDocumentReference.set(bookDocument) } returns Tasks.forResult(null)
 
     // Act
     bookSource.updateBook(testBook) { result -> assertTrue(result.isSuccess) }
 
     // Verify Firestore update operation
-    verify { mockDocumentReference.set(testBook) }
+    verify { mockDocumentReference.set(bookDocument) }
   }
 
   @Test

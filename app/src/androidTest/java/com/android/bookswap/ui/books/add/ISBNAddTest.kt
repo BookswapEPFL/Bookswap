@@ -69,7 +69,7 @@ class ISBNAddTest : TestCase() {
             "https://www.example.com/profile.jpg",
             listOf(UUID.randomUUID()),
             "googleUID",
-            listOf("contact1", "contact2"))
+            List(2, { UUID.randomUUID() }))
 
     val mockUserRepository: UsersRepository = mockk()
 
