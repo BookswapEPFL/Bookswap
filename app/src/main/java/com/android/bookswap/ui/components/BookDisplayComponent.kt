@@ -70,6 +70,7 @@ fun BookDisplayComponent(modifier: Modifier = Modifier, book: DataBook) {
       horizontalArrangement = Arrangement.Start,
       verticalAlignment = Alignment.CenterVertically) {
         Log.i("BookDisplayComponent", "Displaying book: ${book.title} by ${book.author}")
+
         // Image Box
         Box(
             modifier =
@@ -87,15 +88,16 @@ fun BookDisplayComponent(modifier: Modifier = Modifier, book: DataBook) {
             AsyncImage(
                 model = photoUrl,
                 contentDescription = "Book Picture",
-                modifier =
-                    Modifier
-                        .fillMaxSize(),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .testTag(C.Tag.BookDisplayComp.image_picture),
                 contentScale = ContentScale.Crop)
           } else { // If the photo URL is empty, display the Gray Box
-            Box(
-                modifier =
-                    Modifier.fillMaxSize().background(Color.Gray)
-                )
+            Box(modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Gray)
+                .testTag(C.Tag.BookDisplayComp.image_gray_box)
+            )
           }
         }
 
