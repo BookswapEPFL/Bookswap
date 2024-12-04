@@ -111,6 +111,8 @@ object C {
     object BookDisplayComp {
       const val book_display_container = BOOK + UI_T.CONTAINER
       const val image = BOOK + UI_T.IMAGE
+      const val image_picture = BOOK + "_image_picture" + UI_T.IMAGE
+      const val image_gray_box = BOOK + "_image_gray_box" + UI_T.IMAGE
       const val middle_container = BOOK + "_middle" + UI_T.CONTAINER
       const val right_container = BOOK + "_right" + UI_T.CONTAINER
       const val title = BOOK + "_title" + UI_T.TEXT
