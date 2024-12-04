@@ -155,7 +155,9 @@ fun ChatScreen(
               .onSuccess { fetchedMessages ->
                 // Directly use the fetched messages as they belong to the specific chat
                 messages = fetchedMessages.sortedBy { it.timestamp }
-
+                if (messages.isNotEmpty()) {
+                      chatScreenViewModel.addContacts(userSource, currentUser, otherUser)
+                }
                 // Ensure offline storage logic is applied
                 for (message in
                     messageStorage.extractMessages(
@@ -176,14 +178,7 @@ fun ChatScreen(
     onDispose { listenerRegistration.remove() }
   }
 
-  LaunchedEffect(Unit) {
-    while (true) {
-      if (messages.isNotEmpty()) {
-        chatScreenViewModel.addContacts(userSource, currentUser, otherUser)
-        break
-      }
-    }
-  }
+
   Box(modifier = Modifier.fillMaxSize().background(ColorVariable.BackGround)) {
     Column(modifier = Modifier.fillMaxSize()) {
       TopAppBar(
