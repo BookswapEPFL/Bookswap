@@ -62,7 +62,7 @@ class BookProfileScreenTest {
     composeTestRule.setContent {
       val navController = rememberNavController()
       val navigationActions = NavigationActions(navController)
-      BookProfileScreen(testBookId, mockBookRepo, navigationActions, currentUserId = currentUserId)
+      BookProfileScreen(testBookId, mockBookRepo, navigationActions)
     }
 
     composeTestRule.onNodeWithTag(C.Tag.BookProfile.title).assertIsDisplayed()
@@ -88,7 +88,7 @@ class BookProfileScreenTest {
     composeTestRule.setContent {
       val navController = rememberNavController()
       val navigationActions = NavigationActions(navController)
-      BookProfileScreen(testBookId, mockBookRepo, navigationActions, currentUserId = currentUserId)
+      BookProfileScreen(testBookId, mockBookRepo, navigationActions)
     }
 
     // Ensure visibility of the previous image button
@@ -137,7 +137,7 @@ class BookProfileScreenTest {
           bookId = testBookId,
           booksRepository = mockBookRepo,
           navController = navigationActions,
-          currentUserId = currentUserId)
+      )
     }
 
     // Ensure the button is visible
