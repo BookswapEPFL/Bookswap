@@ -110,9 +110,9 @@ class PhotoFirestoreSource(private val db: FirebaseFirestore) : PhotoRepository 
    */
   override fun addPhoto(dataPhoto: DataPhoto, callback: (Result<Unit>) -> Unit) {
     Log.d("PhotoFirestoreRepository", "Attempting to add photo with UUID: ${dataPhoto.uuid}")
-
+    val photoDocument = photoToDocument(dataPhoto)
     performFirestoreOperation(
-        db.collection(PHOTO_COLLECTION_PATH).document(dataPhoto.uuid.toString()).set(dataPhoto),
+        db.collection(PHOTO_COLLECTION_PATH).document(dataPhoto.uuid.toString()).set(photoDocument),
         {
           Log.d("PhotoFirestoreRepository", "Photo added successfully with UUID: ${dataPhoto.uuid}")
           callback(Result.success(Unit))
@@ -122,7 +122,20 @@ class PhotoFirestoreSource(private val db: FirebaseFirestore) : PhotoRepository 
           callback(Result.failure(e))
         })
   }
-
+  /**
+   * Maps a DataPhoto object to a Firebase document-like Map
+   *
+   * @param dataPhoto The object to convert into a Map
+   * @return Map<String,Any?> A Mapping of each of the DataPhoto object fields to it's value,
+   *   properly formatted for storing
+   */
+  fun photoToDocument(dataPhoto: DataPhoto): Map<String, Any?> {
+    return mapOf(
+        "uuid" to DataConverter.convert_UUID(dataPhoto.uuid),
+        "url" to dataPhoto.url,
+        "timestamp" to DataConverter.convert_Long(dataPhoto.timestamp),
+        "base64" to dataPhoto.base64)
+  }
   /**
    * Converts a Firestore document to a DataPhoto object.
    *
@@ -131,9 +144,10 @@ class PhotoFirestoreSource(private val db: FirebaseFirestore) : PhotoRepository 
    */
   fun documentToPhoto(document: DocumentSnapshot): DataPhoto? {
     return try {
-      val uuid = UUID.fromString(document.getString("uuid")) ?: return null
-      val url = document.getString("url") ?: ""
-      val timestamp = document.getLong("timestamp") ?: System.currentTimeMillis()
+      val uuid = DataConverter.parse_raw_UUID(document.get("uuid").toString()) ?: return null
+      val url = document.get("url").toString()
+      val timestamp =
+          DataConverter.parse_raw_long(document.get("timestamp").toString()) ?: return null
       val base64 = document.getString("base64") ?: return null
 
       DataPhoto(uuid = uuid, url = url, timestamp = timestamp, base64 = base64)

@@ -3,6 +3,7 @@ package com.android.bookswap.model.chat
 import android.os.Looper
 import com.android.bookswap.data.DataMessage
 import com.android.bookswap.data.MessageType
+import com.android.bookswap.data.source.network.DataConverter
 import com.android.bookswap.data.source.network.MessageFirestoreSource
 import com.android.bookswap.data.source.network.documentToMessage
 import com.google.android.gms.tasks.Tasks
@@ -70,12 +71,11 @@ class DataMessageFirestoreSourceTest {
         mockDocumentReference
 
     // Mock document snapshot to match the test data
-    every { mockDocumentSnapshot.getString("uuid") } returns testMessage.uuid.toString()
+    every { mockDocumentSnapshot.get("uuid") } returns testMessage.uuid.toString()
     every { mockDocumentSnapshot.getString("text") } returns testMessage.text
-    every { mockDocumentSnapshot.getString("senderUUID") } returns testMessage.senderUUID.toString()
-    every { mockDocumentSnapshot.getString("receiverUUID") } returns
-        testMessage.receiverUUID.toString()
-    every { mockDocumentSnapshot.getLong("timestamp") } returns testMessage.timestamp
+    every { mockDocumentSnapshot.get("senderUUID") } returns testMessage.senderUUID.toString()
+    every { mockDocumentSnapshot.get("receiverUUID") } returns testMessage.receiverUUID.toString()
+    every { mockDocumentSnapshot.get("timestamp") } returns testMessage.timestamp.toString()
     every { mockDocumentSnapshot.getString("messageType") } returns testMessage.messageType.name
     every { mockDocumentSnapshot.exists() } returns true
 
@@ -139,11 +139,11 @@ class DataMessageFirestoreSourceTest {
   fun `sendMessage calls firestore set on success`() {
     val messageMap =
         mapOf(
-            "uuid" to testMessage.uuid.toString(),
+            "uuid" to DataConverter.convert_UUID(testMessage.uuid),
             "text" to testMessage.text,
-            "senderUUID" to testMessage.senderUUID.toString(),
-            "receiverUUID" to testMessage.receiverUUID.toString(),
-            "timestamp" to testMessage.timestamp,
+            "senderUUID" to DataConverter.convert_UUID(testMessage.senderUUID),
+            "receiverUUID" to DataConverter.convert_UUID(testMessage.receiverUUID),
+            "timestamp" to DataConverter.convert_Long(testMessage.timestamp),
             "messageType" to testMessage.messageType.name)
     every {
       mockFirestore
@@ -171,11 +171,11 @@ class DataMessageFirestoreSourceTest {
     val exception = RuntimeException("Firestore error")
     val messageMap =
         mapOf(
-            "uuid" to testMessage.uuid.toString(),
+            "uuid" to DataConverter.convert_UUID(testMessage.uuid),
             "text" to testMessage.text,
-            "senderUUID" to testMessage.senderUUID.toString(),
-            "receiverUUID" to testMessage.receiverUUID.toString(),
-            "timestamp" to testMessage.timestamp,
+            "senderUUID" to DataConverter.convert_UUID(testMessage.senderUUID),
+            "receiverUUID" to DataConverter.convert_UUID(testMessage.receiverUUID),
+            "timestamp" to DataConverter.convert_Long(testMessage.timestamp),
             "messageType" to testMessage.messageType.name)
 
     // Mock Firestore behavior for the failure case
@@ -219,7 +219,7 @@ class DataMessageFirestoreSourceTest {
           .document(testMessage.uuid.toString())
           .get()
     } returns Tasks.forResult(mockDocumentSnapshot)
-    every { mockDocumentSnapshot.getLong("timestamp") } returns timestamp
+    every { mockDocumentSnapshot.get("timestamp") } returns timestamp.toString()
     every {
       mockFirestore
           .collection(COLLECTION_PATH)
