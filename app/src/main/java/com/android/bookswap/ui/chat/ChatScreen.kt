@@ -119,7 +119,7 @@ fun ChatScreen(
                 result
                     .onSuccess { url ->
                       messageRepository.sendMessage(
-                          message =
+                          dataMessage =
                               DataMessage(
                                   messageType = MessageType.IMAGE,
                                   uuid = messageRepository.getNewUUID(),
@@ -183,9 +183,8 @@ fun ChatScreen(
         userSource.getUser(currentUser.userUUID) { result ->
           if (result.isSuccess) {
             val updatedUser = result.getOrThrow()
-            if (!updatedUser.contactList.contains(otherUser.userUUID.toString())) {
-              userSource.addContact(currentUser.userUUID, otherUser.userUUID.toString()) {
-                  contactResult ->
+            if (!updatedUser.contactList.contains(otherUser.userUUID)) {
+              userSource.addContact(currentUser.userUUID, otherUser.userUUID) { contactResult ->
                 if (contactResult.isSuccess) {
                   Log.d(
                       "ChatScreen",
@@ -207,9 +206,8 @@ fun ChatScreen(
         userSource.getUser(otherUser.userUUID) { result ->
           if (result.isSuccess) {
             val updatedOtherUser = result.getOrThrow()
-            if (!updatedOtherUser.contactList.contains(currentUser.userUUID.toString())) {
-              userSource.addContact(otherUser.userUUID, currentUser.userUUID.toString()) {
-                  contactResult ->
+            if (!updatedOtherUser.contactList.contains(currentUser.userUUID)) {
+              userSource.addContact(otherUser.userUUID, currentUser.userUUID) { contactResult ->
                 if (contactResult.isSuccess) {
                   Log.d(
                       "ChatScreen",
@@ -356,7 +354,7 @@ fun ChatScreen(
                               timestamp = System.currentTimeMillis())
                       // Send the message
                       messageRepository.sendMessage(
-                          message = newMessage,
+                          dataMessage = newMessage,
                       ) { result ->
                         if (result.isSuccess) {
                           newMessageText = TextFieldValue("")
