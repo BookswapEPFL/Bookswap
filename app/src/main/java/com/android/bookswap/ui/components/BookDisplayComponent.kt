@@ -48,6 +48,18 @@ val MAX_RATING = 5
 
 /** Size of the star icon in dp. */
 val STAR_SIZE_DP = 26.dp
+
+/** Maximum number of lines for the author text. */
+const val MAX_LINE = 1
+
+/** Weight for the title text in the column layout. */
+const val TITLE_WEIGHT = 1f
+
+/** Weight for the author and text column layout. */
+const val COLUMN_WEIGHT = 1f
+
+/** Default rating value. */
+const val DEFAULT_RATING_VALUE = 0
 /**
  * Composable function to display a book's information.
  *
@@ -84,7 +96,7 @@ fun BookDisplayComponent(modifier: Modifier = Modifier, book: DataBook) {
 
           // If the photo URL is not empty, display the image:
           if (photoUrl.isNotEmpty()) {
-            Log.d("BookDisplayComponent", "Photo URL: ${photoUrl}")
+            Log.i("BookDisplayComponent", "Photo URL: ${photoUrl}")
             AsyncImage(
                 model = photoUrl,
                 contentDescription = "Book Picture",
@@ -105,7 +117,7 @@ fun BookDisplayComponent(modifier: Modifier = Modifier, book: DataBook) {
         // Column for Title and Author text components
         Column(
             modifier =
-                Modifier.weight(1f, true)
+                Modifier.weight(COLUMN_WEIGHT, true)
                     .padding(horizontal = PADDING_HORIZONTAL_DP)
                     .heightIn(max = IMAGE_HEIGHT_DP + PADDING_VERTICAL_DP * 2)
                     .testTag(C.Tag.BookDisplayComp.middle_container)) {
@@ -115,14 +127,14 @@ fun BookDisplayComponent(modifier: Modifier = Modifier, book: DataBook) {
                   style = MaterialTheme.typography.titleLarge,
                   color = ColorVariable.Accent,
                   modifier =
-                      Modifier.weight(1f, true)
+                      Modifier.weight(TITLE_WEIGHT, true)
                           // .padding(bottom = PADDING_VERTICAL_DP)
                           .testTag(C.Tag.BookDisplayComp.title))
               Text(
                   text = book.author ?: "",
                   overflow = TextOverflow.Ellipsis,
                   color = ColorVariable.AccentSecondary,
-                  maxLines = 1,
+                  maxLines = MAX_LINE,
                   modifier = Modifier.testTag(C.Tag.BookDisplayComp.author))
             }
 
@@ -137,7 +149,7 @@ fun BookDisplayComponent(modifier: Modifier = Modifier, book: DataBook) {
                   modifier = Modifier.fillMaxWidth().testTag(C.Tag.BookDisplayComp.rating),
                   horizontalArrangement = Arrangement.Center) {
                     // leave all stars empty if no rating
-                    DisplayStarReview(book.rating ?: 0)
+                    DisplayStarReview(book.rating ?: DEFAULT_RATING_VALUE)
                   }
               // text for the tags of the book, will be added at a later date
               // It isn't decided how we will handle the tag for the books
@@ -150,6 +162,21 @@ fun BookDisplayComponent(modifier: Modifier = Modifier, book: DataBook) {
             }
       }
 }
+
+/** Constants */
+
+/** Star Alpha tint */
+const val STAR_TINT_ALPHA = 1f
+
+/** Star Alpha tint */
+const val STAR_TINT_RED_FACTOR = 0.75f
+
+/** Star Green Factor */
+const val STAR_TINT_GREEN_FACTOR = 0.75f
+
+/** Star Blue Factor */
+const val STAR_TINT_BLUE_FACTOR = 0.75f
+
 /**
  * Displays a star rating for a book.
  *
@@ -167,7 +194,11 @@ private fun DisplayStarReview(rating: Int) {
           contentDescription = "Star Icon",
           tint =
               MaterialTheme.colorScheme.outline.let {
-                it.copy(1f, it.red * 0.75f, it.green * 0.75f, it.blue * 0.75f)
+                it.copy(
+                    STAR_TINT_ALPHA,
+                    it.red * STAR_TINT_RED_FACTOR,
+                    it.green * STAR_TINT_GREEN_FACTOR,
+                    it.blue * STAR_TINT_BLUE_FACTOR)
               },
           modifier = Modifier.size(STAR_SIZE_DP))
     }
