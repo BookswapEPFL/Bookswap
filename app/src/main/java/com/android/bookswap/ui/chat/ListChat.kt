@@ -16,7 +16,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
@@ -38,19 +37,19 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.android.bookswap.data.MessageBox
+import com.android.bookswap.model.LocalAppConfig
 import com.android.bookswap.model.chat.ContactViewModel
 import com.android.bookswap.resources.C
 import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.theme.ColorVariable
 
 /** This is the main screen for the chat feature. It displays the list of messages */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ListChatScreen(
     navigationActions: NavigationActions,
     topAppBar: @Composable () -> Unit = {},
     bottomAppBar: @Composable () -> Unit = {},
-    contactViewModel: ContactViewModel = ContactViewModel()
+    contactViewModel: ContactViewModel = ContactViewModel(LocalAppConfig.current.userViewModel)
 ) {
   LaunchedEffect(Unit) { contactViewModel.updateMessageBoxMap() }
   val messageBoxMap by contactViewModel.messageBoxMap.collectAsState()
@@ -140,7 +139,7 @@ fun MessageBoxDisplay(message: MessageBox, onClick: () -> Unit = {}) {
               }
 
           Text(
-              text = message.message?.takeUnless { it.isNullOrEmpty() } ?: "No messages yet",
+              text = message.message?.takeUnless { it.isEmpty() } ?: "No messages yet",
               fontSize = 14.sp,
               color = ColorVariable.AccentSecondary,
               maxLines = 1,
