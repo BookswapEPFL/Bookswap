@@ -7,6 +7,8 @@ import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -172,20 +174,12 @@ fun UserProfile(
       topBar = topAppBar,
       bottomBar = bottomAppBar) {
         Column(modifier = Modifier.padding(it).fillMaxSize()) {
-          // */
-          // Column layout to stack input fields vertically with spacing
-          /*Row(
-              modifier = Modifier.padding(it).consumeWindowInsets(it).fillMaxWidth(),
-              horizontalArrangement = Arrangement.spacedBy(5f.dp)
-          ) {*/
-          // Column(modifier = Modifier.fillMaxWidth(0.25f)) {
           Box {
             IconButton(
                 onClick = { showEditPicture.value = true },
                 modifier =
                     Modifier.size(90.dp)
                         .clip(CircleShape)
-                        // .fillMaxWidth(0.25f)
                         .testTag(C.Tag.UserProfile.profileImage)) {
                   Box(
                       modifier =
@@ -224,8 +218,6 @@ fun UserProfile(
                       }
                 }
           }
-          // }
-          // Column(Modifier.fillMaxHeight().fillMaxWidth(), Arrangement.spacedBy(8.dp)) {
           // Full name text
           Text(
               text = "${userData.greeting} ${userData.firstName} ${userData.lastName}",
@@ -246,9 +238,6 @@ fun UserProfile(
           ButtonComponent({ showEditProfile = true }, Modifier.testTag(C.Tag.UserProfile.edit)) {
             Text("Edit Profile")
           }
-          // }
-          // }
-          // Spacer(modifier = Modifier.weight(1f))
 
           // Book List
           if (isBooksLoading) {
@@ -263,8 +252,7 @@ fun UserProfile(
                 modifier =
                     Modifier.testTag("otherUserBookList")
                         .fillMaxWidth()
-                        .padding(PADDING), // background(Color.LightGray) // Debug background
-                // .border(2.dp, Color.Red),    // Debug border,
+                        .padding(PADDING),
                 bookList = bookListData.value,
                 onBookClick = { bookId ->
                     navigationActions.navigateTo("${C.Screen.BOOK_PROFILE}/$bookId")
