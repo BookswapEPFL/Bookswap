@@ -46,14 +46,8 @@ object DefaultMockKs {
     every { uvm.latlng } returns mockKUserLoc
     every { uvm setProperty "lat" value any<Double>() } just runs
     every { uvm setProperty "lon" value any<Double>() } just runs
-    every { uvm.getUser(any()) } returns
-        mockKStandardUser
-            .also { println("user returned") }
-            .also { android.util.Log.wtf("TAG_WTF", "user returned") }
-    every { uvm.getUser() } returns
-        mockKStandardUser
-            .also { println("user returned") }
-            .also { android.util.Log.wtf("TAG_WTF", "user returned") }
+    every { uvm.getUser(any()) } returns mockKStandardUser
+    every { uvm.getUser() } returns mockKStandardUser
     every { uvm.uuid } returns mockKStandardUser.userUUID
     every { uvm.getLocationPlace(any()) } returns MutableStateFlow("address").asStateFlow()
     every { uvm.updateUser(any<DataUser>()) } just runs
