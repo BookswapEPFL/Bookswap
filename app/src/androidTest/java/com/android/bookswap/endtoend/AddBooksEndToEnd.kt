@@ -1,11 +1,15 @@
 package com.android.bookswap.endtoend
 
 import android.content.Context
+import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
+import androidx.compose.ui.test.performScrollToNode
 import androidx.compose.ui.test.performTextInput
 import com.android.bookswap.MainActivity
 import com.android.bookswap.data.BookLanguages
@@ -15,6 +19,7 @@ import com.android.bookswap.data.repository.MessageRepository
 import com.android.bookswap.data.repository.UsersRepository
 import com.android.bookswap.data.source.api.GoogleBookDataSource
 import com.android.bookswap.data.source.network.PhotoFirebaseStorageSource
+import com.android.bookswap.model.add.AddToBookViewModel
 import com.android.bookswap.model.chat.OfflineMessageStorage
 import com.android.bookswap.resources.C
 import io.mockk.every
@@ -63,7 +68,7 @@ class AddBooksEndToEnd {
             "A classic novel set in the Jazz Age.",
             5,
             "https://example.com/greatgatsby.jpg",
-            BookLanguages.ENGLISH,
+            BookLanguages.FRENCH,
             "9780743273565",
             emptyList(),
             testUUID)
@@ -112,33 +117,47 @@ class AddBooksEndToEnd {
     composeTestRule.onNodeWithTag("Manually" + C.Tag.NewBookChoice.btnWIcon.button).performClick()
     composeTestRule.onNodeWithTag(C.Tag.new_book_manual_screen_container).assertExists()
 
-    composeTestRule.onNodeWithTag(C.Tag.NewBookManually.title).performTextInput("Test Book Title")
-    composeTestRule.onNodeWithTag(C.Tag.NewBookManually.author).performTextInput("Author Name")
+      composeTestRule.onNodeWithTag(C.Tag.BookEntryComp.genre_field).performClick()
+      composeTestRule.onNode(hasText("Fiction")).performClick()
+      composeTestRule.onNodeWithTag(C.Tag.BookEntryComp.genre_field).performClick()
+
+      composeTestRule.onNodeWithTag(C.Tag.BookEntryComp.title_field).performClick()
+
+      composeTestRule.onNodeWithTag(C.Tag.BookEntryComp.title_field).performTextInput("Test Book Title")
+    composeTestRule.onNodeWithTag(C.Tag.BookEntryComp.author_field).performTextInput("Author Name")
     composeTestRule
-        .onNodeWithTag(C.Tag.NewBookManually.synopsis)
+        .onNodeWithTag(C.Tag.BookEntryComp.description_field)
         .performTextInput("This is a test description for the book.")
-    composeTestRule.onNodeWithTag(C.Tag.NewBookManually.rating).performTextInput("5")
-    composeTestRule.onNodeWithTag(C.Tag.NewBookManually.isbn).performTextInput("9780743273565")
-    composeTestRule.onNodeWithTag(C.Tag.NewBookManually.photo).performTextInput("photo_url_test")
+    composeTestRule.onNodeWithTag(C.Tag.BookEntryComp.rating_field).performTextInput("5")
+    composeTestRule.onNodeWithTag(C.Tag.BookEntryComp.isbn_field).performTextInput("9780743273565")
+    composeTestRule.onNodeWithTag(C.Tag.BookEntryComp.photo_field).performTextInput("photo_url_test")
+      composeTestRule.onNodeWithTag(C.Tag.BookEntryComp.photo_field).performClick()
 
-    composeTestRule.onNodeWithTag(C.Tag.NewBookManually.genres).performClick()
-    composeTestRule.onNode(hasText("Fiction")).performClick()
 
-    composeTestRule.onNodeWithTag(C.Tag.NewBookManually.language).performClick()
-    composeTestRule.onNodeWithText("English").performClick()
 
-    composeTestRule.onNodeWithTag(C.Tag.NewBookManually.save).performClick()
+    composeTestRule.onNodeWithTag(C.Tag.BookEntryComp.scrollable).performScrollToNode(hasTestTag(C.Tag.BookEntryComp.language_field))
+
+
+
+    composeTestRule.onNodeWithTag(C.Tag.BookEntryComp.language_field).performClick()
+    composeTestRule.onNodeWithTag(C.Tag.BookEntryComp.language_menu + "_French").performClick()
+      composeTestRule.onNodeWithTag(C.Tag.BookEntryComp.language_field).performClick()
+
+    composeTestRule.onNodeWithTag(C.Tag.BookEntryComp.action_buttons).performClick()
+
+
+    mockkConstructor(AddToBookViewModel::class)
 
     verify {
       mockBookRepository.addBook(
           match { book ->
-            book.title == "The Great Gatsby" &&
-                book.author == "F. Scott Fitzgerald" &&
-                book.description == "A classic novel set in the Jazz Age." &&
+            book.title == "Test Book Title" &&
+                book.author == "Author Name" &&
+                book.description == "This is a test description for the book." &&
                 book.rating == 5 &&
                 book.isbn == "9780743273565" &&
-                book.photo == "https://example.com/greatgatsby.jpg" &&
-                book.language == BookLanguages.ENGLISH
+                book.photo == "photo_url_test" &&
+                book.language == BookLanguages.FRENCH
           },
           any())
     }

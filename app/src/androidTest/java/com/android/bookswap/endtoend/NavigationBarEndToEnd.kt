@@ -7,14 +7,18 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.test.rule.GrantPermissionRule
 import com.android.bookswap.MainActivity
+import com.android.bookswap.data.DataUser
 import com.android.bookswap.data.repository.BooksRepository
 import com.android.bookswap.data.repository.UsersRepository
 import com.android.bookswap.data.source.network.MessageFirestoreSource
 import com.android.bookswap.data.source.network.PhotoFirebaseStorageSource
+import com.android.bookswap.model.UserViewModel
 import com.android.bookswap.model.chat.ContactViewModel
 import com.android.bookswap.model.chat.OfflineMessageStorage
 import com.android.bookswap.resources.C
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.core.UserData
+import io.mockk.awaits
 import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
@@ -46,7 +50,8 @@ class NavigationBarEndToEnd {
     mockMessageStorage = mockk()
     mockContext = mockk()
     every { mockBookRepository.getBook(any()) } just runs
-    mockUserRepository = mockk()
+    mockUserRepository = mockk(relaxed = true)
+
     every { mockUserRepository.getUsers(any()) } just runs
 
     mockkConstructor(ContactViewModel::class)
