@@ -186,13 +186,12 @@ class BooksFirestoreSource(private val db: FirebaseFirestore) : BooksRepository 
    * Deletes a book from the Firestore database.
    *
    * @param uuid The UUID of the book to be deleted.
-   * @param dataBook The DataBook object containing the book details.
    * @param callback Callback to be invoked with the result of the operation. The result is Unit on
    *   success, or an exception on failure.
    */
-  override fun deleteBooks(uuid: UUID, dataBook: DataBook, callback: (Result<Unit>) -> Unit) {
+  override fun deleteBooks(uuid: UUID, callback: (Result<Unit>) -> Unit) {
     performFirestoreOperation(
-        db.collection(collectionBooks).document(dataBook.uuid.toString()).delete(), callback)
+        db.collection(collectionBooks).document(uuid.toString()).delete(), callback)
   }
   /**
    * Maps a Firestore document to a DataBook object. If any required field is missing, returns null

@@ -46,7 +46,8 @@ class NavigationBarEndToEnd {
     mockMessageStorage = mockk()
     mockContext = mockk()
     every { mockBookRepository.getBook(any()) } just runs
-    mockUserRepository = mockk()
+    mockUserRepository = mockk(relaxed = true)
+
     every { mockUserRepository.getUsers(any()) } just runs
 
     mockkConstructor(ContactViewModel::class)

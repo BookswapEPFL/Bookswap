@@ -31,8 +31,10 @@ import com.android.bookswap.data.source.network.UserFirestoreSource
 import com.android.bookswap.model.AppConfig
 import com.android.bookswap.model.LocalAppConfig
 import com.android.bookswap.model.UserViewModel
+import com.android.bookswap.model.add.AddToBookViewModel
 import com.android.bookswap.model.chat.ContactViewModel
 import com.android.bookswap.model.chat.OfflineMessageStorage
+import com.android.bookswap.model.edit.EditBookViewModel
 import com.android.bookswap.model.map.BookFilter
 import com.android.bookswap.model.map.BookManagerViewModel
 import com.android.bookswap.model.map.DefaultGeolocation
@@ -135,6 +137,8 @@ class MainActivity : ComponentActivity() {
     val bookFilter = BookFilter()
     val bookManagerViewModel =
         BookManagerViewModel(geolocation, bookRepository, userRepository, bookFilter)
+    val addBookViewModel = AddToBookViewModel(bookRepository, userVM)
+    val editBookViewModel = EditBookViewModel(bookRepository, navigationActions, userVM)
 
     val topAppBar =
         @Composable { s: String? ->
@@ -154,10 +158,12 @@ class MainActivity : ComponentActivity() {
     // CompositionLocalProvider provides LocalAppConfig to every child
     CompositionLocalProvider(LocalAppConfig provides AppConfig(userViewModel = userVM)) {
       NavHost(navController = navController, startDestination = startDestination) {
+        // ================Route Auth======================================
         navigation(startDestination = C.Screen.AUTH, route = C.Route.AUTH) {
           composable(C.Screen.AUTH) { SignInScreen(navigationActions) }
           composable(C.Screen.NEW_USER) { NewUserScreen(navigationActions, photoStorage) }
         }
+        // ==============Route Chat =======================================
         navigation(startDestination = C.Screen.CHAT_LIST, route = C.Route.CHAT_LIST) {
           composable(C.Screen.CHAT_LIST) {
             ListChatScreen(
@@ -189,6 +195,7 @@ class MainActivity : ComponentActivity() {
             }
           }
         }
+        // ===================Route Map====================================
         navigation(startDestination = C.Screen.MAP, route = C.Route.MAP) {
           composable(C.Screen.MAP) {
             MapScreen(
@@ -200,6 +207,7 @@ class MainActivity : ComponentActivity() {
           }
           composable(C.Screen.MAP_FILTER) { FilterMapScreen(navigationActions, bookFilter) }
         }
+        // ================Route New Book =================================
         navigation(startDestination = C.Screen.NEW_BOOK, route = C.Route.NEW_BOOK) {
           composable(C.Screen.NEW_BOOK) {
             BookAdditionChoiceScreen(
@@ -211,10 +219,11 @@ class MainActivity : ComponentActivity() {
           }
           composable(C.Screen.ADD_BOOK_MANUALLY) {
             AddToBookScreen(
-                bookRepository,
+                viewModel = addBookViewModel,
                 topAppBar = { topAppBar("Add your Book") },
                 bottomAppBar = { bottomAppBar(this@navigation.route ?: "") })
           }
+
           composable(C.Screen.ADD_BOOK_ISBN) {
             AddISBNScreen(
                 navigationActions,
@@ -228,7 +237,6 @@ class MainActivity : ComponentActivity() {
           composable(C.Screen.USER_PROFILE) { UserProfile(photoStorage) }
           composable(C.Screen.BOOK_PROFILE) { backStackEntry ->
             val bookId = backStackEntry.arguments?.getString("bookId")?.let { UUID.fromString(it) }
-
             if (bookId != null) {
               BookProfileScreen(
                   bookId = bookId, // Default for testing
@@ -250,8 +258,9 @@ class MainActivity : ComponentActivity() {
                   OnSucess = { fetchedbook -> book = fetchedbook },
                   onFailure = { Log.e("EditScreen", "Error while loading the book") })
               EditBookScreen(
-                  booksRepository = bookRepository,
-                  navigationActions = NavigationActions(navController),
+                  viewModel = editBookViewModel,
+                  topAppBar = { topAppBar("Edit Book") },
+                  bottomAppBar = { bottomAppBar(this@navigation.route ?: "") },
                   book = book!!)
             } else {
               Log.e("Navigation", "Invalid bookId passed to EditBookScreen")
