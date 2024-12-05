@@ -40,7 +40,9 @@ class UserBookViewModelTest {
             language = BookLanguages.ENGLISH,
             isbn = "1234567890",
             genres = listOf(BookGenres.FICTION),
-            userId = UUID.randomUUID())
+            userId = UUID.randomUUID(),
+            false,
+            false)
     val dataBook2 =
         DataBook(
             uuid = bookId2,
@@ -52,7 +54,9 @@ class UserBookViewModelTest {
             language = BookLanguages.SPANISH,
             isbn = "0987654321",
             genres = listOf(BookGenres.NONFICTION),
-            userId = UUID.randomUUID())
+            userId = UUID.randomUUID(),
+            false,
+            false)
 
     coEvery { booksRepository.getBook(eq(bookId1), any(), any()) } answers
         {
@@ -91,7 +95,9 @@ class UserBookViewModelTest {
                       language = BookLanguages.ENGLISH,
                       isbn = "1234567890",
                       genres = listOf(BookGenres.FICTION),
-                      userId = UUID.randomUUID()))
+                      userId = UUID.randomUUID(),
+                      false,
+                      false))
         }
 
     coEvery { booksRepository.getBook(eq(bookId2), any(), any()) } answers
