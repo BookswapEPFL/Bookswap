@@ -57,6 +57,8 @@ import com.android.bookswap.ui.profile.NewUserScreen
 import com.android.bookswap.ui.profile.OthersUserProfileScreen
 import com.android.bookswap.ui.profile.UserProfile
 import com.android.bookswap.ui.theme.BookSwapAppTheme
+import com.android.bookswap.utils.ManifestUtils
+import com.google.android.libraries.places.api.Places
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -90,6 +92,10 @@ class MainActivity : ComponentActivity() {
 
     // Initialize the geolocation
     val geolocation = Geolocation(this)
+    val apiKey = ManifestUtils.getApiKeyFromManifest(this)
+    if (!Places.isInitialized() && apiKey != null) {
+      Places.initialize(applicationContext, apiKey)
+    }
     BookSwapAppTheme {
       // A surface container using the 'background' color from the theme
       Surface(
@@ -99,6 +105,7 @@ class MainActivity : ComponentActivity() {
                 messageRepository = messageRepository,
                 bookRepository = bookRepository,
                 userRepository = userDataSource,
+                startDestination = C.Route.AUTH,
                 photoStorage = photoStorage,
                 messageStorage = messageStorage,
                 geolocation = geolocation,
@@ -226,7 +233,13 @@ class MainActivity : ComponentActivity() {
           }
         }
         navigation(startDestination = C.Screen.USER_PROFILE, route = C.Route.USER_PROFILE) {
-          composable(C.Screen.USER_PROFILE) { UserProfile(photoStorage) }
+          composable(C.Screen.USER_PROFILE) {
+            UserProfile(
+                photoStorage,
+                topAppBar = { topAppBar("Your Profile") },
+                bottomAppBar = { bottomAppBar(this@navigation.route ?: "") },
+            )
+          }
           composable(C.Screen.BOOK_PROFILE) { backStackEntry ->
             val bookId = backStackEntry.arguments?.getString("bookId")?.let { UUID.fromString(it) }
 
