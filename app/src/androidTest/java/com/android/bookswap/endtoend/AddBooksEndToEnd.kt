@@ -71,7 +71,9 @@ class AddBooksEndToEnd {
             BookLanguages.FRENCH,
             "9780743273565",
             emptyList(),
-            testUUID)
+            testUUID,
+            false,
+            false)
 
     mockkConstructor(GoogleBookDataSource::class)
     every {

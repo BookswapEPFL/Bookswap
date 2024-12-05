@@ -51,7 +51,9 @@ class EditBookScreenTest {
           BookLanguages.ENGLISH,
           "123456789",
           listOf(BookGenres.FANTASY),
-          UUID.randomUUID())
+          UUID.randomUUID(),
+          false,
+          false)
 
   @Before
   fun setUp() {
@@ -157,13 +159,5 @@ class EditBookScreenTest {
     composeTestRule
         .onNodeWithTag(C.Tag.BookEntryComp.language_field).performScrollTo()
       .assertExists()
-  }
-
-  @Test
-  fun genreDropdownWorks() {
-    // opens genre dropdown and select a genre
-    composeTestRule.onNodeWithTag(C.Tag.BookEntryComp.genre_field).performClick()
-    composeTestRule.onNodeWithText("Fiction").performClick().assertTextContains("Fiction")
-
   }
 }

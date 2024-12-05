@@ -69,7 +69,7 @@ class ISBNAddTest : TestCase() {
             "https://www.example.com/profile.jpg",
             listOf(UUID.randomUUID()),
             "googleUID",
-            listOf("contact1", "contact2"))
+            List(2, { UUID.randomUUID() }))
 
     val mockUserRepository: UsersRepository = mockk()
 
@@ -130,7 +130,9 @@ class ISBNAddTest : TestCase() {
             photo = null,
             language = BookLanguages.OTHER,
             isbn = "9780435123437",
-            userId = mockUserVM.uuid)
+            userId = mockUserVM.uuid,
+            archived = false,
+            exchange = false)
 
     // Mock call to repository
     val mockBooksRepository: BooksRepository = mockk()
@@ -215,7 +217,9 @@ class ISBNAddTest : TestCase() {
             BookLanguages.OTHER,
             bookISBN,
             emptyList(),
-            userUUID)
+            userUUID,
+            archived = false,
+            exchange = false)
 
     // Mock call to api
     mockkConstructor(GoogleBookDataSource::class)

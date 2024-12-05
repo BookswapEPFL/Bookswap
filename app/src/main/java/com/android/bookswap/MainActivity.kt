@@ -76,7 +76,6 @@ class MainActivity : ComponentActivity() {
 
   @Composable
   fun BookSwapApp() {
-
     // Initialize a Firebase Firestore database instance
     val db = FirebaseFirestore.getInstance()
     val storage = FirebaseStorage.getInstance()
@@ -125,7 +124,7 @@ class MainActivity : ComponentActivity() {
     val navigationActions = NavigationActions(navController)
 
     // user part
-    Firebase.auth.signOut() // Uncomment this line to test the sign in screen
+    // Firebase.auth.signOut() // Uncomment this line to test the sign in screen
     val currentUser = Firebase.auth.currentUser
     val userVM = UserViewModel(UUID.randomUUID(), userRepository)
 
