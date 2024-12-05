@@ -46,6 +46,7 @@ json = "20240303"
 firebaseMessagingKtx = "24.0.2" #Json parsing
 mapsCompose = "4.3.3"
 mapsComposeUtils = "4.3.0"
+places = "4.1.0"
 
 byteBuddy= "1.15.4"
 firebaseStorageKtx = "21.0.1"
@@ -108,6 +109,7 @@ firebase-messaging-ktx = { group = "com.google.firebase", name = "firebase-messa
 
 maps-compose = { module = "com.google.maps.android:maps-compose", version.ref = "mapsCompose" }
 maps-compose-utils = { module = "com.google.maps.android:maps-compose-utils", version.ref = "mapsComposeUtils" }
+maps-places = { module = "com.google.android.libraries.places:places", version.ref = "places" }
 firebase-storage-ktx = { group = "com.google.firebase", name = "firebase-storage-ktx", version.ref = "firebaseStorageKtx" }
 
 
