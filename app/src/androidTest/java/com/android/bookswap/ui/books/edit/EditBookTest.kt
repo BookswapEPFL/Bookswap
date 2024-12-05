@@ -8,8 +8,6 @@ import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.onNodeWithText
-import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performScrollToNode
 import com.android.bookswap.data.BookGenres
@@ -58,19 +56,19 @@ class EditBookScreenTest {
   @Before
   fun setUp() {
     val topAppBar =
-      @Composable { s: String? ->
-        TopAppBarComponent(
-          modifier = Modifier,
-          navigationActions = navigationActions,
-          title = s ?: navigationActions.currentRoute())
-      }
+        @Composable { s: String? ->
+          TopAppBarComponent(
+              modifier = Modifier,
+              navigationActions = navigationActions,
+              title = s ?: navigationActions.currentRoute())
+        }
     val bottomAppBar =
-      @Composable { s: String? ->
-        BottomNavigationMenu(
-          onTabSelect = { destination -> navigationActions.navigateTo(destination) },
-          tabList = List_Navigation_Bar_Destinations,
-          selectedItem = s ?: "")
-      }
+        @Composable { s: String? ->
+          BottomNavigationMenu(
+              onTabSelect = { destination -> navigationActions.navigateTo(destination) },
+              tabList = List_Navigation_Bar_Destinations,
+              selectedItem = s ?: "")
+        }
     MockKAnnotations.init(this)
     every { mockViewModel.deleteBooks(any(), any()) } just runs
     every {
@@ -79,7 +77,10 @@ class EditBookScreenTest {
     } just runs
 
     every { navigationActions.currentRoute() } returns "EDIT_BOOK"
-    composeTestRule.setContent { EditBookScreen(mockViewModel, sampleBook,topAppBar = { topAppBar("Edit your Book") }, bottomAppBar = {}) }
+    composeTestRule.setContent {
+      EditBookScreen(
+          mockViewModel, sampleBook, topAppBar = { topAppBar("Edit your Book") }, bottomAppBar = {})
+    }
   }
 
   @Test
@@ -101,7 +102,8 @@ class EditBookScreenTest {
   @Test
   fun displayEditSaveValueComponent() {
     composeTestRule
-        .onNodeWithTag(C.Tag.BookEntryComp.scrollable).performScrollToNode(hasTestTag(C.Tag.BookEntryComp.action_buttons))
+        .onNodeWithTag(C.Tag.BookEntryComp.scrollable)
+        .performScrollToNode(hasTestTag(C.Tag.BookEntryComp.action_buttons))
 
     composeTestRule.onNodeWithTag(C.Tag.BookEntryComp.action_buttons).assertIsDisplayed()
     composeTestRule.onNodeWithTag(C.Tag.BookEntryComp.action_buttons).assertTextEquals("Save")
@@ -110,7 +112,8 @@ class EditBookScreenTest {
   @Test
   fun displayEditDeleteValueComponent() {
     composeTestRule
-        .onNodeWithTag(C.Tag.BookEntryComp.scrollable).performScrollToNode(hasTestTag(C.Tag.BookEntryComp.cancel_button))
+        .onNodeWithTag(C.Tag.BookEntryComp.scrollable)
+        .performScrollToNode(hasTestTag(C.Tag.BookEntryComp.cancel_button))
 
     composeTestRule.onNodeWithTag(C.Tag.BookEntryComp.cancel_button).assertIsDisplayed()
     composeTestRule.onNodeWithTag(C.Tag.BookEntryComp.cancel_button).assertTextEquals("Delete")
@@ -150,14 +153,21 @@ class EditBookScreenTest {
   @Test
   fun inputsHaveInitialValue() {
 
-    composeTestRule.onNodeWithTag(C.Tag.BookEntryComp.title_field).assertTextContains(sampleBook.title)
-    composeTestRule.onNodeWithTag(C.Tag.BookEntryComp.author_field).assertTextContains(sampleBook.author ?: "")
+    composeTestRule
+        .onNodeWithTag(C.Tag.BookEntryComp.title_field)
+        .assertTextContains(sampleBook.title)
+    composeTestRule
+        .onNodeWithTag(C.Tag.BookEntryComp.author_field)
+        .assertTextContains(sampleBook.author ?: "")
     composeTestRule
         .onNodeWithTag(C.Tag.BookEntryComp.description_field)
         .assertTextContains(sampleBook.description ?: "")
-    composeTestRule.onNodeWithTag(C.Tag.BookEntryComp.photo_field).assertTextContains(sampleBook.photo ?: "")
     composeTestRule
-        .onNodeWithTag(C.Tag.BookEntryComp.language_field).performScrollTo()
-      .assertExists()
+        .onNodeWithTag(C.Tag.BookEntryComp.photo_field)
+        .assertTextContains(sampleBook.photo ?: "")
+    composeTestRule
+        .onNodeWithTag(C.Tag.BookEntryComp.language_field)
+        .performScrollTo()
+        .assertExists()
   }
 }

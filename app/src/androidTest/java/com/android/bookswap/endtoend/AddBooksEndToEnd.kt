@@ -5,10 +5,7 @@ import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.onNodeWithText
-import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.performClick
-import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performScrollToNode
 import androidx.compose.ui.test.performTextInput
 import com.android.bookswap.MainActivity
@@ -119,34 +116,35 @@ class AddBooksEndToEnd {
     composeTestRule.onNodeWithTag("Manually" + C.Tag.NewBookChoice.btnWIcon.button).performClick()
     composeTestRule.onNodeWithTag(C.Tag.new_book_manual_screen_container).assertExists()
 
-      composeTestRule.onNodeWithTag(C.Tag.BookEntryComp.genre_field).performClick()
-      composeTestRule.onNode(hasText("Fiction")).performClick()
-      composeTestRule.onNodeWithTag(C.Tag.BookEntryComp.genre_field).performClick()
+    composeTestRule.onNodeWithTag(C.Tag.BookEntryComp.genre_field).performClick()
+    composeTestRule.onNode(hasText("Fiction")).performClick()
+    composeTestRule.onNodeWithTag(C.Tag.BookEntryComp.genre_field).performClick()
 
-      composeTestRule.onNodeWithTag(C.Tag.BookEntryComp.title_field).performClick()
+    composeTestRule.onNodeWithTag(C.Tag.BookEntryComp.title_field).performClick()
 
-      composeTestRule.onNodeWithTag(C.Tag.BookEntryComp.title_field).performTextInput("Test Book Title")
+    composeTestRule
+        .onNodeWithTag(C.Tag.BookEntryComp.title_field)
+        .performTextInput("Test Book Title")
     composeTestRule.onNodeWithTag(C.Tag.BookEntryComp.author_field).performTextInput("Author Name")
     composeTestRule
         .onNodeWithTag(C.Tag.BookEntryComp.description_field)
         .performTextInput("This is a test description for the book.")
     composeTestRule.onNodeWithTag(C.Tag.BookEntryComp.rating_field).performTextInput("5")
     composeTestRule.onNodeWithTag(C.Tag.BookEntryComp.isbn_field).performTextInput("9780743273565")
-    composeTestRule.onNodeWithTag(C.Tag.BookEntryComp.photo_field).performTextInput("photo_url_test")
-      composeTestRule.onNodeWithTag(C.Tag.BookEntryComp.photo_field).performClick()
+    composeTestRule
+        .onNodeWithTag(C.Tag.BookEntryComp.photo_field)
+        .performTextInput("photo_url_test")
+    composeTestRule.onNodeWithTag(C.Tag.BookEntryComp.photo_field).performClick()
 
-
-
-    composeTestRule.onNodeWithTag(C.Tag.BookEntryComp.scrollable).performScrollToNode(hasTestTag(C.Tag.BookEntryComp.language_field))
-
-
+    composeTestRule
+        .onNodeWithTag(C.Tag.BookEntryComp.scrollable)
+        .performScrollToNode(hasTestTag(C.Tag.BookEntryComp.language_field))
 
     composeTestRule.onNodeWithTag(C.Tag.BookEntryComp.language_field).performClick()
     composeTestRule.onNodeWithTag(C.Tag.BookEntryComp.language_menu + "_French").performClick()
-      composeTestRule.onNodeWithTag(C.Tag.BookEntryComp.language_field).performClick()
+    composeTestRule.onNodeWithTag(C.Tag.BookEntryComp.language_field).performClick()
 
     composeTestRule.onNodeWithTag(C.Tag.BookEntryComp.action_buttons).performClick()
-
 
     mockkConstructor(AddToBookViewModel::class)
 

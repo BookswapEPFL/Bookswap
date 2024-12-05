@@ -3,7 +3,6 @@ package com.android.bookswap.ui.books.add
 import android.widget.Toast
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsEnabled
-import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -53,22 +52,22 @@ class AddToBookTest {
     composeTestRule.setContent { AddToBookScreen(mockViewModel) }
     // Fill in the required fields (Title and Author and language)
     composeTestRule.onNodeWithTag(C.Tag.BookEntryComp.title_field).performTextInput("My Book Title")
-    composeTestRule
-        .onNodeWithTag(C.Tag.BookEntryComp.author_field)
-        .performTextInput("Kaaris")
+    composeTestRule.onNodeWithTag(C.Tag.BookEntryComp.author_field).performTextInput("Kaaris")
 
-    composeTestRule.onNodeWithTag(C.Tag.BookEntryComp.scrollable).performScrollToNode(hasTestTag(C.Tag.BookEntryComp.language_field))
+    composeTestRule
+        .onNodeWithTag(C.Tag.BookEntryComp.scrollable)
+        .performScrollToNode(hasTestTag(C.Tag.BookEntryComp.language_field))
     // Simulate a click to open the language dropdown menu
     composeTestRule.onNodeWithTag(C.Tag.BookEntryComp.language_field).performClick()
     // Select a language
     composeTestRule.onNodeWithText("English").performClick()
-    //close the dropdown
+    // close the dropdown
     composeTestRule.onNodeWithTag(C.Tag.BookEntryComp.language_field).performClick()
 
-
-
     // Verify that the Save button is now enabled
-    composeTestRule.onNodeWithTag(C.Tag.BookEntryComp.scrollable).performScrollToNode(hasTestTag(C.Tag.BookEntryComp.language_field))
+    composeTestRule
+        .onNodeWithTag(C.Tag.BookEntryComp.scrollable)
+        .performScrollToNode(hasTestTag(C.Tag.BookEntryComp.language_field))
     composeTestRule.onNodeWithTag(C.Tag.BookEntryComp.action_buttons).performClick()
     composeTestRule.onNodeWithTag(C.Tag.BookEntryComp.action_buttons).assertIsEnabled()
   }
@@ -92,9 +91,7 @@ class AddToBookTest {
 
     // Verify that dropdown menu items are displayed
     composeTestRule.onNodeWithTag(C.Tag.BookEntryComp.genre_menu + "_Fiction").assertIsDisplayed()
-    composeTestRule
-        .onNodeWithTag(C.Tag.BookEntryComp.genre_menu + "_Fantasy")
-        .assertIsDisplayed()
+    composeTestRule.onNodeWithTag(C.Tag.BookEntryComp.genre_menu + "_Fantasy").assertIsDisplayed()
   }
 
   @Test
@@ -115,7 +112,9 @@ class AddToBookTest {
   fun testLanguageDropdownOpensAndCloses() {
     composeTestRule.setContent { AddToBookScreen(mockViewModel) }
 
-    composeTestRule.onNodeWithTag(C.Tag.BookEntryComp.scrollable).performScrollToNode(hasTestTag(C.Tag.BookEntryComp.language_field))
+    composeTestRule
+        .onNodeWithTag(C.Tag.BookEntryComp.scrollable)
+        .performScrollToNode(hasTestTag(C.Tag.BookEntryComp.language_field))
     // Simulate a click to open the language dropdown menu
     composeTestRule.onNodeWithTag(C.Tag.BookEntryComp.language_field).performClick()
 
@@ -125,9 +124,7 @@ class AddToBookTest {
 
     // Select a language
     composeTestRule.onNodeWithText("English").performClick()
-    //close the dropdown
+    // close the dropdown
     composeTestRule.onNodeWithTag(C.Tag.BookEntryComp.language_field).performClick()
-
-
   }
 }

@@ -55,7 +55,11 @@ fun EntriesListBookComponent(
 
   LazyColumn(
       modifier =
-          Modifier.background(BackGround).fillMaxWidth().fillMaxHeight().padding(paddingValues).testTag(C.Tag.BookEntryComp.scrollable),
+          Modifier.background(BackGround)
+              .fillMaxWidth()
+              .fillMaxHeight()
+              .padding(paddingValues)
+              .testTag(C.Tag.BookEntryComp.scrollable),
       verticalArrangement = Arrangement.spacedBy(8.dp)) {
         // Title Input Field
         item {
@@ -201,14 +205,20 @@ fun EntriesListBookComponent(
                     onValueChange = {},
                     readOnly = true,
                     label = { Text(text = "Language*") },
-                    modifier = Modifier.menuAnchor().fillMaxWidth().testTag(C.Tag.BookEntryComp.language_menu))
+                    modifier =
+                        Modifier.menuAnchor()
+                            .fillMaxWidth()
+                            .testTag(C.Tag.BookEntryComp.language_menu))
                 ExposedDropdownMenu(
                     expanded = expandedLanguage,
                     onDismissRequest = { expandedLanguage = false },
                     modifier = Modifier.fillMaxWidth()) {
                       BookLanguages.values().forEach { language ->
                         DropdownMenuItem(
-                            modifier = Modifier.testTag(C.Tag.BookEntryComp.language_menu + "_${language.languageCode}"),
+                            modifier =
+                                Modifier.testTag(
+                                    C.Tag.BookEntryComp.language_menu +
+                                        "_${language.languageCode}"),
                             text = { Text(text = language.languageCode) },
                             onClick = {
                               selectedLanguage.value = language

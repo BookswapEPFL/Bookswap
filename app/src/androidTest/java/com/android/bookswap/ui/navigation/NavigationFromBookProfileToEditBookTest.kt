@@ -3,7 +3,6 @@ package com.android.bookswap.ui.navigation
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextContains
-import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -124,8 +123,9 @@ class NavigationFromBookProfileToEditBookTest {
 
     // Verify book information on EditBookScreen
     composeTestRule.onNodeWithTag(C.Tag.BookEntryComp.title_field).assertIsDisplayed()
-    composeTestRule.onNodeWithTag(C.Tag.BookEntryComp.title_field).assertTextContains(testBook.title)
-
+    composeTestRule
+        .onNodeWithTag(C.Tag.BookEntryComp.title_field)
+        .assertTextContains(testBook.title)
 
     // Edit book title and save
     composeTestRule.onNodeWithTag(C.Tag.BookEntryComp.title_field).performTextInput("Updated Title")
