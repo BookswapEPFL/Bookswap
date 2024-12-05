@@ -81,7 +81,9 @@ class GoogleBookDataSource(context: Context) {
               item.getJSONObjectOrNull("imageLinks")?.getStringOrNull("thumbnail"),
               language ?: BookLanguages.OTHER,
               isbn = identifier,
-              userId = userId))
+              userId = userId,
+              archived = false,
+              exchange = false))
     } catch (exception: Exception) {
       return Result.failure(exception)
     }

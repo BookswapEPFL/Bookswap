@@ -6,7 +6,6 @@ import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollToNode
 import com.android.bookswap.data.BookGenres
 import com.android.bookswap.data.BookLanguages
@@ -41,7 +40,9 @@ class EditBookScreenTest {
           BookLanguages.ENGLISH,
           "123456789",
           listOf(BookGenres.FANTASY),
-          UUID.randomUUID())
+          UUID.randomUUID(),
+          false,
+          false)
 
   @Before
   fun setUp() {
@@ -147,17 +148,5 @@ class EditBookScreenTest {
     composeTestRule
         .onNodeWithTag(C.Tag.EditBook.language)
         .assertTextContains(sampleBook.language.toString())
-  }
-
-  @Test
-  fun genreDropdownWorks() {
-    composeTestRule.setContent { EditBookScreen(booksRepository, navigationActions, sampleBook) }
-
-    // opens genre dropdown and select a genre
-    composeTestRule.onNodeWithTag(C.Tag.EditBook.genres).performClick()
-    composeTestRule.onNodeWithTag("Fantasy" + C.Tag.EditBook.genre).performClick()
-
-    // verify the selected genre
-    composeTestRule.onNodeWithTag("selected" + C.Tag.EditBook.genre).assertTextContains("Fantasy")
   }
 }

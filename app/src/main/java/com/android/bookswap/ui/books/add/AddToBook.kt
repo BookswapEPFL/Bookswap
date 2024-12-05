@@ -402,5 +402,7 @@ fun createDataBook(
       language = languages,
       isbn = isbn,
       genres = genres,
-      userId = userId)
+      userId = userId,
+      archived = false,
+      exchange = false)
 }

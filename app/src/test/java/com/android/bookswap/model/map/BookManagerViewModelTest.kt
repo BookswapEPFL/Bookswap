@@ -42,7 +42,9 @@ class BookManagerViewModelTest {
           language = BookLanguages.ENGLISH,
           isbn = "123-456-789",
           genres = listOf(BookGenres.FICTION, BookGenres.HORROR),
-          userId = UUID.randomUUID())
+          userId = UUID.randomUUID(),
+          archived = false,
+          exchange = false)
 
   private val book2 =
       DataBook(
@@ -55,7 +57,9 @@ class BookManagerViewModelTest {
           language = BookLanguages.GERMAN,
           isbn = "234-567-890",
           genres = listOf(BookGenres.FICTION),
-          userId = UUID.randomUUID())
+          userId = UUID.randomUUID(),
+          archived = false,
+          exchange = false)
 
   private val book3 =
       DataBook(
@@ -68,7 +72,9 @@ class BookManagerViewModelTest {
           language = BookLanguages.GERMAN,
           isbn = "234-567-890",
           genres = listOf(BookGenres.NONFICTION, BookGenres.HORROR),
-          userId = UUID.randomUUID())
+          userId = UUID.randomUUID(),
+          archived = false,
+          exchange = false)
 
   private val books = listOf(book3, book1, book2)
 
