@@ -287,29 +287,24 @@ class MessageFirestoreSource(private val db: FirebaseFirestore) : MessageReposit
       currentUserUUID: UUID,
       callback: (Result<List<DataMessage>>) -> Unit
   ): ListenerRegistration {
-    return db.collection("messages")
-        .whereIn("senderId", listOf(currentUserUUID, otherUserUUID))
-        .whereIn("receiverId", listOf(currentUserUUID, otherUserUUID))
-        .whereNotEqualTo("senderId", "receiverId")
+    val chatPath = mergeUUIDs(currentUserUUID, otherUserUUID)
+
+    // Attach listener to the specific chat's "messages" subcollection
+    return db.collection(COLLECTION_PATH)
+        .document(chatPath)
+        .collection("messages")
         .addSnapshotListener { snapshot, e ->
           if (e != null) {
             callback(Result.failure(e))
             return@addSnapshotListener
           }
 
-          if (snapshot != null && !snapshot.isEmpty) {
+          if (snapshot != null) {
             val messages =
                 snapshot.documents
-                    .mapNotNull { document ->
-                      try {
-                        document.toObject(DataMessage::class.java)
-                      } catch (ex: Exception) {
-                        Log.e(
-                            "MessageSource", "Error converting document to Message: ${ex.message}")
-                        null
-                      }
-                    }
+                    .mapNotNull { document -> documentToMessage(document).getOrNull() }
                     .sortedBy { it.timestamp } // Sort messages by timestamp
+
             callback(Result.success(messages))
           } else {
             callback(Result.success(emptyList()))
