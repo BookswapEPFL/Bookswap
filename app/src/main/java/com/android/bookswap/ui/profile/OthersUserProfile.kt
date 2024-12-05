@@ -92,7 +92,7 @@ fun OthersUserProfileScreen(
   Log.e("OtherUserProfileScreen", "BookListDataBook: ${bookListData.value}")
 
   Scaffold(
-      modifier = Modifier.testTag("OtherUserProfileScreen"),
+      modifier = Modifier.testTag(C.Tag.other_user_profile_screen_container),
       topBar = topAppBar,
       bottomBar = bottomAppBar) { padding ->
         if (isLoading) {
@@ -129,30 +129,36 @@ fun OthersUserProfileScreen(
                     }
 
                 // Full Name:
-                LabeledText(label = "Name:", value = "${user.firstName} ${user.lastName}")
+                LabeledText(
+                    testTag = C.Tag.OtherUserProfile.fullname,
+                    label = "Name:",
+                    value = "${user.greeting} ${user.firstName} ${user.lastName}")
 
                 // Email:
-                LabeledText(label = "Email:", value = user.email)
+                LabeledText(
+                    testTag = C.Tag.OtherUserProfile.email, label = "Email:", value = user.email)
 
                 // Phone Number:
-                LabeledText(label = "Phone:", value = user.phoneNumber)
+                LabeledText(
+                    testTag = C.Tag.OtherUserProfile.phone,
+                    label = "Phone:",
+                    value = user.phoneNumber)
 
                 // Address:
-                LabeledText(label = "Address:", value = "${user.latitude}, ${user.longitude}")
+                LabeledText(
+                    testTag = C.Tag.OtherUserProfile.address,
+                    label = "Address:",
+                    value = "${user.latitude}, ${user.longitude}")
 
                 // Book List
                 if (isBooksLoading) {
                   Log.e("OtherUserProfileScreen", "Books are loading")
                   CircularProgressIndicator(modifier = Modifier.padding(PADDING))
-                } else if (bookListData.value.isEmpty()) {
-                  Log.e("OtherUserProfileScreen", "No books available")
-                  Text("No books available", style = MaterialTheme.typography.bodyLarge)
                 } else {
                   Log.e("OtherUserProfileScreen", "Displaying book list")
                   BookListComponent(
                       modifier =
-                          Modifier.testTag("otherUserBookList")
-                              .fillMaxWidth()
+                          Modifier.fillMaxWidth()
                               .padding(PADDING), // background(Color.LightGray) // Debug background
                       // .border(2.dp, Color.Red),    // Debug border,
                       bookList = bookListData.value,
@@ -178,7 +184,7 @@ private val PADDING_SMALL = 4.dp
  * @param value The value of the field.
  */
 @Composable
-fun LabeledText(label: String, value: String) {
+fun LabeledText(testTag: String = "LabeledText", label: String, value: String) {
   Box(
       modifier =
           Modifier.fillMaxWidth()
@@ -191,12 +197,14 @@ fun LabeledText(label: String, value: String) {
                   text = label,
                   color = ColorVariable.Accent,
                   style = MaterialTheme.typography.labelLarge,
-                  modifier = Modifier.weight(LABEL_WEIGHT))
+                  modifier =
+                      Modifier.weight(LABEL_WEIGHT).testTag(testTag + C.Tag.LabeledText.label))
               Text(
                   text = value,
                   color = ColorVariable.Accent,
                   style = MaterialTheme.typography.bodyLarge,
-                  modifier = Modifier.weight(VALUE_WEIGHT))
+                  modifier =
+                      Modifier.weight(VALUE_WEIGHT).testTag(testTag + C.Tag.LabeledText.text))
             }
       }
 }

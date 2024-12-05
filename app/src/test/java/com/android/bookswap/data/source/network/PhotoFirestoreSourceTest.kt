@@ -54,9 +54,9 @@ class PhotoFirestoreSourceTest {
 
     // Arrange snapshot
     every { mockDocumentReference.get() } returns Tasks.forResult(mockDocumentSnapshot)
-    every { mockDocumentSnapshot.getString("uuid") } returns testPhoto.uuid.toString()
-    every { mockDocumentSnapshot.getString("url") } returns testPhoto.url
-    every { mockDocumentSnapshot.getLong("timestamp") } returns testPhoto.timestamp
+    every { mockDocumentSnapshot.get("uuid") } returns testPhoto.uuid.toString()
+    every { mockDocumentSnapshot.get("url") } returns testPhoto.url.toString()
+    every { mockDocumentSnapshot.get("timestamp") } returns testPhoto.timestamp
     every { mockDocumentSnapshot.getString("base64") } returns testPhoto.base64
   }
 
@@ -84,7 +84,8 @@ class PhotoFirestoreSourceTest {
   @Test
   fun `addPhoto call set and success`() {
     // Arrange
-    every { mockDocumentReference.set(testPhoto) } returns Tasks.forResult(null)
+    every { mockDocumentReference.set(photoFirestoreSource.photoToDocument(testPhoto)) } returns
+        Tasks.forResult(null)
 
     // Act
     photoFirestoreSource.addPhoto(
@@ -94,7 +95,7 @@ class PhotoFirestoreSourceTest {
           assert(result.isSuccess)
         })
     // Verify Firestore set operation
-    verify { mockDocumentReference.set(testPhoto) }
+    verify { mockDocumentReference.set(photoFirestoreSource.photoToDocument(testPhoto)) }
   }
 
   @Test

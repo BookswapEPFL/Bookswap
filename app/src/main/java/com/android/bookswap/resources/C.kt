@@ -52,7 +52,7 @@ private object S {
   const val MAP = "map"
   const val USER_PROFILE = USER + PROFILE
   const val EDIT_PROFILE = A.EDIT + PROFILE
-  const val OTHERS_USER_PROFILE = "others" + USER_PROFILE
+  const val OTHERS_USER_PROFILE = "others_" + USER_PROFILE
   const val SETTINGS = "settings"
   const val MAP_FILTER = MAP + "_filters"
 }
@@ -64,6 +64,7 @@ object C {
     const val sign_in_screen_container = S.AUTH + UI_T.SCREEN_CONTAINER
     const val new_user_screen_container = S.NEW_USER + UI_T.SCREEN_CONTAINER
     const val user_profile_screen_container = S.USER_PROFILE + UI_T.SCREEN_CONTAINER
+    const val other_user_profile_screen_container = S.OTHERS_USER_PROFILE + UI_T.SCREEN_CONTAINER
     const val edit_profile_screen_container = S.EDIT_PROFILE + UI_T.SCREEN_CONTAINER
     const val map_screen_container = S.MAP + UI_T.SCREEN_CONTAINER
     const val map_filters_screen_container = S.MAP_FILTER + UI_T.SCREEN_CONTAINER
@@ -93,6 +94,12 @@ object C {
       const val nav_item = "_nav" + UI_T.ICON_BUTTON
     }
 
+    // LabeledText composable specific tags (OtherUserProfile.kt)
+    object LabeledText {
+      const val label = UI_T.LABEL
+      const val text = UI_T.TEXT
+    }
+
     // BookListComponent specific tags (BookListComponent.kt)
     object BookListComp {
       const val book_list_container = BOOK + LIST + UI_T.SCROLLABLE_CONTAINER
@@ -104,6 +111,8 @@ object C {
     object BookDisplayComp {
       const val book_display_container = BOOK + UI_T.CONTAINER
       const val image = BOOK + UI_T.IMAGE
+      const val image_picture = BOOK + "_image_picture" + UI_T.IMAGE
+      const val image_gray_box = BOOK + "_image_gray_box" + UI_T.IMAGE
       const val middle_container = BOOK + "_middle" + UI_T.CONTAINER
       const val right_container = BOOK + "_right" + UI_T.CONTAINER
       const val title = BOOK + "_title" + UI_T.TEXT
@@ -122,8 +131,15 @@ object C {
       const val address = "address" + UI_T.TEXT
       const val edit = S.EDIT_PROFILE + UI_T.BUTTON
       const val profileImage = "profile" + UI_T.IMAGE
-      const val take_photo = A.NEW + UI_T.BUTTON + UI_T.IMAGE
+      const val take_photo = A.NEW + UI_T.IMAGE + UI_T.BUTTON
       const val profileImageBox = "profile_image_box" + UI_T.CONTAINER
+    }
+
+    object OtherUserProfile {
+      const val fullname = "fullname"
+      const val email = "email"
+      const val phone = "phoneNumber"
+      const val address = "address"
     }
 
     // Edit User Profile Screen specific tags (EditProfile.kt)
@@ -301,7 +317,7 @@ object C {
     const val ADD_BOOK_SCAN = S.NEW_BOOK + "_scan" + SCREEN
     const val ADD_BOOK_ISBN = S.NEW_BOOK + "_isbn" + SCREEN
     const val USER_PROFILE = S.USER_PROFILE + SCREEN
-    const val OTHERS_USER_PROFILE = S.USER_PROFILE + SCREEN
+    const val OTHERS_USER_PROFILE = S.OTHERS_USER_PROFILE + SCREEN
     const val BOOK_PROFILE = S.BOOK_PROFILE + SCREEN
     const val EDIT_BOOK = S.EDIT_BOOK + SCREEN
     const val SETTINGS = S.SETTINGS + SCREEN
