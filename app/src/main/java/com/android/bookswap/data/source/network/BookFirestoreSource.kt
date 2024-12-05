@@ -163,18 +163,7 @@ class BooksFirestoreSource(private val db: FirebaseFirestore) : BooksRepository 
     Log.d("BooksFirestoreRepository", "Attempting to add book: ${dataBook.title}")
 
     // Attempt to add book to Firestore
-    val bookMap =
-        mapOf(
-            "uuid" to dataBook.uuid.toString(),
-            "title" to dataBook.title,
-            "author" to dataBook.author,
-            "description" to dataBook.description,
-            "rating" to dataBook.rating,
-            "photo" to dataBook.photo,
-            "language" to dataBook.language.toString(),
-            "isbn" to dataBook.isbn,
-            "genres" to dataBook.genres.map { it.toString() },
-            "userId" to dataBook.userId.toString())
+    val bookMap = bookToDocument(dataBook)
 
     performFirestoreOperation(
         db.collection(collectionBooks).document(dataBook.uuid.toString()).set(bookMap)) { result ->
