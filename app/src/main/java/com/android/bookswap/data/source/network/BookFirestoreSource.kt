@@ -97,7 +97,10 @@ class BooksFirestoreSource(private val db: FirebaseFirestore) : BooksRepository 
                     null // Skip if genre is not valid in the BookGenres enum
                   }
                 }
+            var archived = document.getBoolean("archived") ?: false
+            var exchange = document.getBoolean("exchange") ?: false
 
+            val userId = UUID.fromString(document.getString("userId"))
             // Create the DataBook object
             val dataBook =
                 DataBook(
@@ -112,7 +115,9 @@ class BooksFirestoreSource(private val db: FirebaseFirestore) : BooksRepository 
                             ?: BookLanguages.ENGLISH, // Default or adjust based on requirements
                     isbn = document.getString("isbn"),
                     genres = bookGenres,
-                    userId = UUID.fromString(document.getString("userId")))
+                    userId = userId,
+                    archived = archived,
+                    exchange = exchange)
             OnSucess(dataBook)
           } catch (e: Exception) {
             Log.e("BooksFirestoreRepository", "Error parsing book document: ${e.message}", e)
@@ -151,10 +156,10 @@ class BooksFirestoreSource(private val db: FirebaseFirestore) : BooksRepository 
     Log.d("BooksFirestoreRepository", "Attempting to add book: ${dataBook.title}")
 
     // Attempt to add book to Firestore
-    val bookDocument = bookToDocument(dataBook)
+    val bookMap = bookToDocument(dataBook)
+
     performFirestoreOperation(
-        db.collection(collectionBooks).document(dataBook.uuid.toString()).set(bookDocument)) {
-            result ->
+        db.collection(collectionBooks).document(dataBook.uuid.toString()).set(bookMap)) { result ->
           if (result.isSuccess)
               Log.d("BooksFirestoreRepository", "Book added successfully: ${dataBook.title}")
           else {
@@ -172,7 +177,7 @@ class BooksFirestoreSource(private val db: FirebaseFirestore) : BooksRepository 
    *   success, or an exception on failure.
    */
   override fun updateBook(dataBook: DataBook, callback: (Result<Unit>) -> Unit) {
-    val bookDocument = bookToDocument(dataBook)
+    val bookDocument = bookToDocument(dataBook) // Transform to Map<String, Any?>
     performFirestoreOperation(
         db.collection(collectionBooks).document(dataBook.uuid.toString()).set(bookDocument),
         callback)
@@ -189,27 +194,6 @@ class BooksFirestoreSource(private val db: FirebaseFirestore) : BooksRepository 
     performFirestoreOperation(
         db.collection(collectionBooks).document(dataBook.uuid.toString()).delete(), callback)
   }
-
-  /**
-   * Maps a DataBook object to a Firebase document-like Map
-   *
-   * @param dataBook The object to convert into a Map
-   * @return Map<String,Any?> A Mapping of each of the DataBook object fields to it's value,
-   *   properly formatted for storing
-   */
-  fun bookToDocument(dataBook: DataBook): Map<String, Any?> {
-    return mapOf(
-        "uuid" to DataConverter.convert_UUID(dataBook.uuid),
-        "title" to dataBook.title,
-        "author" to dataBook.author,
-        "description" to dataBook.description,
-        "rating" to dataBook.rating,
-        "photo" to dataBook.photo,
-        "language" to dataBook.language.toString(),
-        "isbn" to dataBook.isbn,
-        "genres" to dataBook.genres.map { it.toString() },
-        "userId" to DataConverter.convert_UUID(dataBook.userId))
-  }
   /**
    * Maps a Firestore document to a DataBook object. If any required field is missing, returns null
    * to avoid incomplete objects.
@@ -219,37 +203,41 @@ class BooksFirestoreSource(private val db: FirebaseFirestore) : BooksRepository 
    */
   fun documentToBooks(document: DocumentSnapshot): DataBook? {
     return try {
-      val bookuuid = DataConverter.parse_raw_UUID(document.get("uuid").toString()) ?: return null
+      val uuid = UUID.fromString(document.getString("uuid") ?: return null)
       val title = document.getString("title") ?: return null
       val author = document.getString("author")
       val description = document.getString("description")
-      val rating = DataConverter.parse_raw_long(document.get("rating").toString())
+      val rating = document.getLong("rating")?.toInt()
       val photo = document.getString("photo")
+      val language = BookLanguages.valueOf(document.getString("language") ?: return null)
       val isbn = document.getString("isbn")
-      val languageBook = BookLanguages.valueOf(document.getString("language") ?: return null)
-      val genres = document.get("genres").toString().split(", ")
-      val bookGenres =
-          genres.mapNotNull { genre ->
+      val genres =
+          (document.get("genres", List::class.java) as? List<String>)?.mapNotNull {
             try {
-              BookGenres.valueOf(genre)
+              BookGenres.valueOf(it)
             } catch (e: IllegalArgumentException) {
               null
             }
-          }
-      val userid = DataConverter.parse_raw_UUID(document.get("userid").toString()) ?: return null
+          } ?: emptyList()
+      val userId = UUID.fromString(document.getString("userId") ?: return null)
+      val archived = document.getBoolean("archived") ?: false
+      val exchange = document.getBoolean("exchange") ?: false
+
       DataBook(
-          bookuuid,
-          title,
-          author,
-          description,
-          rating?.toInt(),
-          photo,
-          languageBook,
-          isbn,
-          bookGenres,
-          userid)
+          uuid = uuid,
+          title = title,
+          author = author,
+          description = description,
+          rating = rating,
+          photo = photo,
+          language = language,
+          isbn = isbn,
+          genres = genres,
+          userId = userId,
+          archived = archived,
+          exchange = exchange)
     } catch (e: Exception) {
-      null // Return null in case of any exception during the conversion
+      null
     }
   }
   /**
@@ -264,5 +252,27 @@ class BooksFirestoreSource(private val db: FirebaseFirestore) : BooksRepository 
         result.exception?.let { e -> callback(Result.failure(e)) }
       }
     }
+  }
+  /**
+   * Maps a DataBook object to a Firebase document-like Map
+   *
+   * @param dataBook The object to convert into a Map
+   * @return Map<String,Any?> A Mapping of each of the DataBook object fields to it's value,
+   *   properly formatted for storing
+   */
+  fun bookToDocument(dataBook: DataBook): Map<String, Any?> {
+    return mapOf(
+        "uuid" to dataBook.uuid.toString(),
+        "title" to dataBook.title,
+        "author" to dataBook.author,
+        "description" to dataBook.description,
+        "rating" to dataBook.rating,
+        "photo" to dataBook.photo,
+        "language" to dataBook.language.toString(),
+        "isbn" to dataBook.isbn,
+        "genres" to dataBook.genres.map { it.toString() },
+        "userId" to dataBook.userId.toString(),
+        "archived" to dataBook.archived,
+        "exchange" to dataBook.exchange)
   }
 }

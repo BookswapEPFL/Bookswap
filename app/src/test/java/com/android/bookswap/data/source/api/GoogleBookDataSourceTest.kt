@@ -92,7 +92,9 @@ class GoogleBookDataSourceTest {
             photo = "image2",
             language = BookLanguages.ENGLISH,
             isbn = "9780435123437",
-            userId = UUID.randomUUID())
+            userId = UUID.randomUUID(),
+            archived = false,
+            exchange = false)
 
     assertBookEquals(
         dataBook, mockGoogleBookDataSource.parseISBNResponse(jsonBook, dataBook.userId).getOrNull())
@@ -213,7 +215,9 @@ class GoogleBookDataSourceTest {
             photo = null,
             language = BookLanguages.OTHER,
             isbn = "9780435123437",
-            userId = UUID.randomUUID())
+            userId = UUID.randomUUID(),
+            archived = false,
+            exchange = false)
 
     assertBookEquals(
         dataBook,
