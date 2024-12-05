@@ -14,10 +14,13 @@ import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.Priority
 import kotlinx.coroutines.flow.MutableStateFlow
 
 const val REQUEST_LOCATION_PERMISSION = 1
 const val BACKGROUND_LOCATION_PERMISSION_REQUEST_CODE = 2
+const val LOCATION_REFRESH_DELAY = 500L
+const val MIN_UPDATE_DISTANCE_METERS = 20F
 
 /**
  * Geolocation class manages the geolocation functionality and handles the required permissions for
@@ -39,11 +42,9 @@ class Geolocation(private val activity: Activity) : IGeolocation {
 
   /** Location request settings */
   private val locationRequest: LocationRequest =
-      LocationRequest.create().apply {
-        interval = 10000 // Update interval in milliseconds
-        fastestInterval = 5000 // Fastest update interval in milliseconds
-        priority = LocationRequest.PRIORITY_HIGH_ACCURACY
-      }
+      LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, LOCATION_REFRESH_DELAY)
+          .setMinUpdateDistanceMeters(MIN_UPDATE_DISTANCE_METERS)
+          .build()
   /**
    * Callback for location updates.
    *
@@ -53,7 +54,7 @@ class Geolocation(private val activity: Activity) : IGeolocation {
   private val locationCallback =
       object : LocationCallback() {
         override fun onLocationResult(p0: LocationResult) {
-          p0.lastLocation.let { location ->
+          p0.lastLocation?.let { location ->
             // Handle the updated location here
             latitude.value = location.latitude
             longitude.value = location.longitude
@@ -101,6 +102,10 @@ class Geolocation(private val activity: Activity) : IGeolocation {
           requestBackgroundPermissions()
         }
         // can run without ACCESS_BACKGROUND_LOCATION but it is better if we have the permission
+        fusedLocationClient.lastLocation.addOnSuccessListener {
+          latitude.compareAndSet(Double.NaN, it.latitude)
+          longitude.compareAndSet(Double.NaN, it.longitude)
+        }
         fusedLocationClient.requestLocationUpdates(
             locationRequest, locationCallback, Looper.getMainLooper())
         isRunning.value = true
