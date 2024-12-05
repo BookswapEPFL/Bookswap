@@ -78,7 +78,7 @@ fun UserProfile(
   LaunchedEffect(userData.bookList) {
     val userBookList = userData.bookList
     for (book in userBookList) {
-      Log.e("UserProfileScreen", "BookListUUID: $userBookList")
+      Log.i("UserProfileScreen", "BookListUUID: $userBookList")
     }
 
     isBooksLoading = true
@@ -90,7 +90,7 @@ fun UserProfile(
       isBooksLoading = false
     }
 
-    Log.e("UserProfileScreen", "DataBookList: $bookListData.value")
+    Log.i("UserProfileScreen", "DataBookList: $bookListData.value")
   }
 
   // Create a PhotoRequester instance
@@ -241,13 +241,13 @@ fun UserProfile(
 
           // Book List
           if (isBooksLoading) {
-            Log.e("UserProfileScreen", "Books are loading")
+            Log.i("UserProfileScreen", "Books are loading")
             CircularProgressIndicator(modifier = Modifier.padding(PADDING))
           } else if (bookListData.value.isEmpty()) {
             Log.e("UserProfileScreen", "No books available")
             Text("No books available", style = MaterialTheme.typography.bodyLarge)
           } else {
-            Log.e("UserProfileScreen", "Displaying book list")
+            Log.i("UserProfileScreen", "Displaying book list")
             BookListComponent(
                 modifier = Modifier.fillMaxWidth().padding(PADDING),
                 bookList = bookListData.value,
