@@ -78,17 +78,19 @@ fun UserProfile(
   LaunchedEffect(userData.bookList) {
     val userBookList = userData.bookList
     for (book in userBookList) {
-      Log.e("OtherUserProfileScreen", "BookListUUID: $userBookList")
+      Log.e("UserProfileScreen", "BookListUUID: $userBookList")
     }
 
     isBooksLoading = true
     try {
       bookListData.value = userBookViewModel.getBooks(userData.bookList)
     } catch (exception: Exception) {
-      Log.e("OtherUserProfileScreen", "Error fetching books: $exception")
+      Log.e("UserProfileScreen", "Error fetching books: $exception")
     } finally {
       isBooksLoading = false
     }
+
+    Log.e("UserProfileScreen", "DataBookList: $bookListData.value")
   }
 
   // Create a PhotoRequester instance
@@ -239,15 +241,15 @@ fun UserProfile(
 
           // Book List
           if (isBooksLoading) {
-            Log.e("OtherUserProfileScreen", "Books are loading")
+            Log.e("UserProfileScreen", "Books are loading")
             CircularProgressIndicator(modifier = Modifier.padding(PADDING))
           } else if (bookListData.value.isEmpty()) {
-            Log.e("OtherUserProfileScreen", "No books available")
+            Log.e("UserProfileScreen", "No books available")
             Text("No books available", style = MaterialTheme.typography.bodyLarge)
           } else {
-            Log.e("OtherUserProfileScreen", "Displaying book list")
+            Log.e("UserProfileScreen", "Displaying book list")
             BookListComponent(
-                modifier = Modifier.testTag("otherUserBookList").fillMaxWidth().padding(PADDING),
+                modifier = Modifier.fillMaxWidth().padding(PADDING),
                 bookList = bookListData.value,
                 onBookClick = { bookId ->
                   navigationActions.navigateTo("${C.Screen.BOOK_PROFILE}/$bookId")

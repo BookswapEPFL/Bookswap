@@ -8,9 +8,11 @@ import androidx.compose.ui.test.performClick
 import androidx.navigation.compose.rememberNavController
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.android.bookswap.data.DataUser
+import com.android.bookswap.data.repository.BooksRepository
 import com.android.bookswap.data.source.network.PhotoFirebaseStorageSource
 import com.android.bookswap.model.AppConfig
 import com.android.bookswap.model.LocalAppConfig
+import com.android.bookswap.model.UserBookViewModel
 import com.android.bookswap.model.UserViewModel
 import com.android.bookswap.resources.C
 import com.android.bookswap.screen.UserProfileScreen
@@ -35,19 +37,22 @@ import org.junit.runner.RunWith
 class UserProfileScreenTest : TestCase() {
 
   private lateinit var photoStorage: PhotoFirebaseStorageSource
+  private lateinit var mockUserBookViewModel: UserBookViewModel
+  private lateinit var mockBooksRepository: BooksRepository
+  private lateinit var mockNavigationActions: NavigationActions
 
   @get:Rule val composeTestRule = createComposeRule()
   private val standardUser =
-      DataUser(
-          UUID.randomUUID(),
-          "M.",
-          "John",
-          "Doe",
-          "John.Doe@example.com",
-          "+41223456789",
-          0.0,
-          0.0,
-          "dummyPic.png")
+    DataUser(
+      UUID.randomUUID(),
+      "M.",
+      "John",
+      "Doe",
+      "John.Doe@example.com",
+      "+41223456789",
+      0.0,
+      0.0,
+      "dummyPic.png")
 
   @Before
   fun setup() {
@@ -56,14 +61,21 @@ class UserProfileScreenTest : TestCase() {
     every { userVM.uuid } returns standardUser.userUUID
 
     photoStorage = mockk(relaxed = true)
+    mockBooksRepository = mockk()
+    mockNavigationActions = mockk()
+    photoStorage = mockk(relaxed = true)
+    mockUserBookViewModel = mockk(relaxed = true)
 
     composeTestRule.setContent {
       val navController = rememberNavController()
       val navigationActions = NavigationActions(navController)
       CompositionLocalProvider(LocalAppConfig provides AppConfig(userViewModel = userVM)) {
         UserProfile(
-            photoStorage = photoStorage,
-            { TopAppBarComponent(Modifier, navigationActions, "Messages") })
+          photoStorage = photoStorage,
+          booksRepository = mockBooksRepository,
+          userBookViewModel = mockUserBookViewModel,
+          navigationActions = mockNavigationActions,
+          { TopAppBarComponent(Modifier, navigationActions, "Messages") })
       }
     }
   }
