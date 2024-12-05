@@ -149,31 +149,4 @@ class EditBookScreenTest {
         .onNodeWithTag(C.Tag.EditBook.language)
         .assertTextContains(sampleBook.language.toString())
   }
-  /*
-  @Test
-  fun genreDropdownWorks() {
-    composeTestRule.setContent {
-      EditBookScreen(booksRepository, navigationActions, sampleBook)
-    }
-
-    // Step 1: Open the dropdown menu
-    composeTestRule.onNodeWithTag(C.Tag.EditBook.genres).performClick()
-
-    // Step 2: Wait until the dropdown is expanded and the Fantasy item is visible
-    composeTestRule.waitUntil(timeoutMillis = 5000) {
-      try {
-        composeTestRule.onNodeWithTag("Fantasy" + C.Tag.EditBook.genre).fetchSemanticsNode()
-        true
-      } catch (e: Exception) {
-        false
-      }
-    }
-
-    // Step 3: Select the genre
-    composeTestRule.onNodeWithTag("Fantasy" + C.Tag.EditBook.genre).performClick()
-
-    // Step 4: Verify the selected genre is displayed
-    composeTestRule.onNodeWithTag(C.Tag.EditBook.genres).assertTextContains("Fantasy")
-  }
-   */
 }
