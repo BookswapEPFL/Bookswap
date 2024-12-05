@@ -14,13 +14,9 @@ import androidx.compose.ui.platform.testTag
 import com.android.bookswap.data.BookLanguages
 import com.android.bookswap.data.DataBook
 import com.android.bookswap.model.edit.EditBookViewModel
+import com.android.bookswap.resources.C
 import com.android.bookswap.ui.components.ButtonComponent
 import com.android.bookswap.ui.components.EntriesListBookComponent
-import com.android.bookswap.data.repository.BooksRepository
-import com.android.bookswap.resources.C
-import com.android.bookswap.ui.books.add.createDataBook
-import com.android.bookswap.ui.navigation.NavigationActions
-import com.android.bookswap.ui.theme.ColorVariable
 
 /** Constants * */
 private const val WIDTH_BUTTON = 0.45f
@@ -50,16 +46,10 @@ fun EditBookScreen(
   val genres = remember { mutableStateOf(book.genres) }
   val isbn = remember { mutableStateOf(book.isbn ?: "") }
 
-  val maxLengthTitle = 50
-  val maxLengthAuthor = 50
-  val maxLengthDescription = 10000
-  val maxLengthRating = 1
-  val maxLengthPhoto = 50
-
   val context = LocalContext.current
 
   Scaffold(
-      modifier = Modifier.testTag("edit_book_screen"),
+      modifier = Modifier.testTag(C.Tag.edit_book_screen_container),
       topBar = topAppBar,
       bottomBar = bottomAppBar,
       content = { paddingValues ->
@@ -76,7 +66,9 @@ fun EditBookScreen(
             buttons = { modifier ->
               Row(modifier.fillMaxWidth()) {
                 ButtonComponent(
-                    modifier = Modifier.testTag("save_button").fillMaxWidth(WIDTH_BUTTON),
+                    modifier =
+                        Modifier.testTag(C.Tag.BookEntryComp.action_buttons)
+                            .fillMaxWidth(WIDTH_BUTTON),
                     enabled =
                         title.value.isNotBlank() &&
                             author.value.isNotBlank() &&
@@ -98,7 +90,7 @@ fun EditBookScreen(
                     }
                 Spacer(modifier = Modifier.fillMaxWidth(SPACE_BETWEEN_BUTTON))
                 ButtonComponent(
-                    modifier = Modifier.testTag("delete_button").fillMaxWidth(),
+                    modifier = Modifier.testTag(C.Tag.BookEntryComp.cancel_button).fillMaxWidth(),
                     onClick = { viewModel.deleteBooks(context, book.uuid) }) {
                       Text("Delete")
                     }

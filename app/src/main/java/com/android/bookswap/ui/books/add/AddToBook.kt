@@ -13,18 +13,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import com.android.bookswap.data.BookGenres
 import com.android.bookswap.data.BookLanguages
-import com.android.bookswap.model.add.AddToBookViewModel
-import com.android.bookswap.data.DataBook
-import com.android.bookswap.data.repository.BooksRepository
-import com.android.bookswap.model.InputVerification
 import com.android.bookswap.model.LocalAppConfig
+import com.android.bookswap.model.add.AddToBookViewModel
 import com.android.bookswap.resources.C
-import com.android.bookswap.ui.MAXLENGTHAUTHOR
-import com.android.bookswap.ui.MAXLENGTHDESCRIPTION
-import com.android.bookswap.ui.MAXLENGTHISBN
-import com.android.bookswap.ui.MAXLENGTHPHOTO
-import com.android.bookswap.ui.MAXLENGTHRATING
-import com.android.bookswap.ui.MAXLENGTHTITLE
 import com.android.bookswap.ui.components.ButtonComponent
 import com.android.bookswap.ui.components.EntriesListBookComponent
 
@@ -52,7 +43,6 @@ fun AddToBookScreen(
   val language = remember { mutableStateOf<BookLanguages?>(null) }
   val genres = remember { mutableStateOf<List<BookGenres>>(emptyList()) } // Genre selection state
   val context = LocalContext.current
-  val inputVerification = InputVerification()
 
   val appConfig = LocalAppConfig.current
 
@@ -75,7 +65,7 @@ fun AddToBookScreen(
             buttons = { modifier ->
               Row(modifier.fillMaxWidth(0.5f)) {
                 ButtonComponent(
-                    modifier = Modifier.testTag("save_button"),
+                    modifier = Modifier.testTag(C.Tag.BookEntryComp.action_buttons).fillMaxWidth(),
                     enabled =
                         title.value.isNotBlank() &&
                             author.value.isNotBlank() &&

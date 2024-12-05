@@ -8,14 +8,17 @@ import com.android.bookswap.data.BookGenres
 import com.android.bookswap.data.BookLanguages
 import com.android.bookswap.data.DataBook
 import com.android.bookswap.data.repository.BooksRepository
+import com.android.bookswap.model.UserViewModel
 import com.android.bookswap.ui.navigation.NavigationActions
 import java.util.UUID
 
 class EditBookViewModel(
     private val booksRepository: BooksRepository,
     private val navigation: NavigationActions,
-    private val userID: UUID
+    private val userVM: UserViewModel
 ) : ViewModel() {
+
+  private val userID = userVM.getUser().userUUID
   /**
    * Creates a DataBook instance after validating the input parameters.
    *
