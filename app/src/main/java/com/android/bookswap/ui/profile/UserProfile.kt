@@ -7,8 +7,6 @@ import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -249,13 +247,10 @@ fun UserProfile(
           } else {
             Log.e("OtherUserProfileScreen", "Displaying book list")
             BookListComponent(
-                modifier =
-                    Modifier.testTag("otherUserBookList")
-                        .fillMaxWidth()
-                        .padding(PADDING),
+                modifier = Modifier.testTag("otherUserBookList").fillMaxWidth().padding(PADDING),
                 bookList = bookListData.value,
                 onBookClick = { bookId ->
-                    navigationActions.navigateTo("${C.Screen.BOOK_PROFILE}/$bookId")
+                  navigationActions.navigateTo("${C.Screen.BOOK_PROFILE}/$bookId")
                 })
           }
         }

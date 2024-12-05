@@ -163,7 +163,7 @@ fun OthersUserProfileScreen(
                       // .border(2.dp, Color.Red),    // Debug border,
                       bookList = bookListData.value,
                       onBookClick = { bookId ->
-                          navigationActions.navigateTo("${C.Screen.BOOK_PROFILE}/$bookId")
+                        navigationActions.navigateTo("${C.Screen.BOOK_PROFILE}/$bookId")
                       })
                 }
               }

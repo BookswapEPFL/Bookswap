@@ -385,9 +385,11 @@ private fun DraggableMenu(listAllBooks: List<DataBook>, navigationActions: Navig
               modifier = Modifier.fillMaxWidth().testTag(C.Tag.Map.bottom_drawer_handle_divider),
               thickness = DIVIDER_THICKNESS_DP.dp,
               color = ColorVariable.Accent)
-          BookListComponent(Modifier, listAllBooks,
+          BookListComponent(
+              Modifier,
+              listAllBooks,
               onBookClick = { bookId ->
-                  navigationActions.navigateTo("${C.Screen.BOOK_PROFILE}/$bookId")
+                navigationActions.navigateTo("${C.Screen.BOOK_PROFILE}/$bookId")
               })
         }
       }

@@ -51,9 +51,10 @@ fun BookListComponent(
     } else {
       itemsIndexed(bookList) { i, book ->
         BookDisplayComponent(
-            modifier = Modifier
-                .testTag("${i}_" + C.Tag.BookDisplayComp.book_display_container)
-                .clickable { onBookClick(book.uuid) }, // Pass book's ID to the click handler
+            modifier =
+                Modifier.testTag("${i}_" + C.Tag.BookDisplayComp.book_display_container).clickable {
+                  onBookClick(book.uuid)
+                }, // Pass book's ID to the click handler
             book = book)
         if (i < bookList.size - 1) {
           HorizontalDivider(

@@ -226,10 +226,11 @@ class MainActivity : ComponentActivity() {
         }
         navigation(startDestination = C.Screen.USER_PROFILE, route = C.Route.USER_PROFILE) {
           composable(C.Screen.USER_PROFILE) {
-              UserProfile(
-                  photoStorage = photoStorage,
-                  booksRepository = bookRepository,
-                  navigationActions = navigationActions) }
+            UserProfile(
+                photoStorage = photoStorage,
+                booksRepository = bookRepository,
+                navigationActions = navigationActions)
+          }
           composable("${C.Screen.BOOK_PROFILE}/{bookId}") { backStackEntry ->
             val bookId = backStackEntry.arguments?.getString("bookId")?.let { UUID.fromString(it) }
 
