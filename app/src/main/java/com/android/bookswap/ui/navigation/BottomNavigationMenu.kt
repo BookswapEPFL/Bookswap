@@ -2,13 +2,12 @@ package com.android.bookswap.ui.navigation
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.BottomNavigation
-import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material3.Icon
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.android.bookswap.resources.C
@@ -28,28 +27,25 @@ fun BottomNavigationMenu(
     tabList: List<TopLevelDestination>,
     selectedItem: String
 ) {
-  BottomNavigation(
+  NavigationBar(
       modifier =
           Modifier.fillMaxWidth()
               .height(BOTTOM_NAV_HEIGHT)
               .testTag(C.Tag.bottom_navigation_menu_container),
-      backgroundColor = ColorVariable.Primary, // Color of the bottom navigation bar
-      content = {
+      containerColor = ColorVariable.Primary) {
         tabList.forEach { tab ->
-          BottomNavigationItem(
+          NavigationBarItem(
+              selected = tab.route == selectedItem,
+              onClick = { onTabSelect(tab) },
               icon = {
-                // Display the icon for each tab
                 Icon(
                     tab.icon,
                     contentDescription = tab.route + C.Tag.BottomNavMenu.nav_icon,
                     tint = ColorVariable.BackGround)
               },
-              selected = tab.route == selectedItem,
-              onClick = { onTabSelect(tab) },
-              modifier =
-                  Modifier.clip(RoundedCornerShape(ROUNDED_CORNER_SIZE))
-                      .testTag(tab.route + C.Tag.BottomNavMenu.nav_item))
+              colors =
+                  NavigationBarItemDefaults.colors(
+                      indicatorColor = ColorVariable.Secondary.copy(0.4f)))
         }
-      },
-  )
+      }
 }
