@@ -5,7 +5,9 @@ import android.widget.Toast
 import com.android.bookswap.data.BookGenres
 import com.android.bookswap.data.BookLanguages
 import com.android.bookswap.data.DataBook
+import com.android.bookswap.data.DataUser
 import com.android.bookswap.data.repository.BooksRepository
+import com.android.bookswap.model.UserViewModel
 import com.android.bookswap.model.edit.EditBookViewModel
 import com.android.bookswap.ui.navigation.NavigationActions
 import io.mockk.*
@@ -19,6 +21,9 @@ class EditBookViewModelTest {
   private lateinit var navigation: NavigationActions
   private lateinit var context: Context
   private lateinit var viewModel: EditBookViewModel
+  private lateinit var mockUserViewModel: UserViewModel
+
+  private val user = DataUser(UUID.randomUUID())
 
   private val book =
       DataBook(
@@ -31,14 +36,17 @@ class EditBookViewModelTest {
           language = BookLanguages.ENGLISH,
           isbn = "123456789",
           genres = listOf(BookGenres.FICTION),
-          userId = UUID(2, 2))
+          userId = user.userUUID)
 
   @Before
   fun setup() {
+    mockUserViewModel = mockk(relaxed = true)
     booksRepository = mockk()
     navigation = mockk()
     context = mockk()
-    viewModel = EditBookViewModel(booksRepository, navigation, book.userId)
+    viewModel = EditBookViewModel(booksRepository, navigation, mockUserViewModel)
+
+    every { mockUserViewModel.getUser() } returns user
 
     // Mock Toast.makeText
     mockkStatic(Toast::class)
@@ -67,7 +75,22 @@ class EditBookViewModelTest {
         book.isbn!!,
         book.genres)
 
-    verify { booksRepository.updateBook(eq(book), any()) }
+    verify {
+      booksRepository.updateBook(
+          match { updatedBook ->
+            updatedBook.uuid == book.uuid &&
+                updatedBook.title == book.title &&
+                updatedBook.author == book.author &&
+                updatedBook.description == book.description &&
+                updatedBook.rating == book.rating &&
+                updatedBook.photo == book.photo &&
+                updatedBook.language == book.language &&
+                updatedBook.isbn == book.isbn &&
+                updatedBook.genres == book.genres
+          },
+          any())
+    }
+
     verify { navigation.goBack() }
   }
 
@@ -90,7 +113,22 @@ class EditBookViewModelTest {
         book.isbn!!,
         book.genres)
 
-    verify { booksRepository.updateBook(eq(book), any()) }
+    verify {
+      booksRepository.updateBook(
+          match { updatedBook ->
+            updatedBook.uuid == book.uuid &&
+                updatedBook.title == book.title &&
+                updatedBook.author == book.author &&
+                updatedBook.description == book.description &&
+                updatedBook.rating == book.rating &&
+                updatedBook.photo == book.photo &&
+                updatedBook.language == book.language &&
+                updatedBook.isbn == book.isbn &&
+                updatedBook.genres == book.genres
+          },
+          any())
+    }
+
     verify(exactly = 0) { navigation.goBack() }
   }
 

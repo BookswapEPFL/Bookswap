@@ -6,6 +6,7 @@ import com.android.bookswap.data.BookGenres
 import com.android.bookswap.data.BookLanguages
 import com.android.bookswap.data.DataBook
 import com.android.bookswap.data.repository.BooksRepository
+import com.android.bookswap.model.UserViewModel
 import com.android.bookswap.model.add.AddToBookViewModel
 import io.mockk.*
 import java.util.*
@@ -17,6 +18,7 @@ class AddToBookViewModelTest {
   private lateinit var booksRepository: BooksRepository
   private lateinit var context: Context
   private lateinit var viewModel: AddToBookViewModel
+  private lateinit var mockUserViewModel: UserViewModel
 
   private val book =
       DataBook(
@@ -35,7 +37,8 @@ class AddToBookViewModelTest {
   fun setup() {
     booksRepository = mockk()
     context = mockk()
-    viewModel = AddToBookViewModel(booksRepository, book.userId)
+    mockUserViewModel = mockk(relaxed = true)
+    viewModel = AddToBookViewModel(booksRepository, mockUserViewModel)
 
     // Mock Toast.makeText
     mockkStatic(Toast::class)
@@ -64,6 +67,20 @@ class AddToBookViewModelTest {
         book.isbn!!,
         book.genres)
 
-    verify { booksRepository.addBook(eq(book), any()) }
+    verify {
+      booksRepository.addBook(
+          match { updatedBook ->
+            updatedBook.uuid == book.uuid &&
+                updatedBook.title == book.title &&
+                updatedBook.author == book.author &&
+                updatedBook.description == book.description &&
+                updatedBook.rating == book.rating &&
+                updatedBook.photo == book.photo &&
+                updatedBook.language == book.language &&
+                updatedBook.isbn == book.isbn &&
+                updatedBook.genres == book.genres
+          },
+          any())
+    }
   }
 }
