@@ -53,7 +53,9 @@ class AddToBookViewModel(
             language = language,
             isbn = isbn,
             genres = genres,
-            userID)
+            userID,
+            archived = false,
+            exchange = false)
     Log.d("AddToBookScreen", "Adding book: $book")
     booksRepository.addBook(
         book,

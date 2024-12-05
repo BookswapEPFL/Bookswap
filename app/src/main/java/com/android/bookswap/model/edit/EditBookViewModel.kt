@@ -56,7 +56,8 @@ class EditBookViewModel(
             language = language,
             isbn = isbn,
             genres = genres,
-            userID)
+            userID,
+        )
     Log.d("EditBookViewModel", "Editing book: $book")
     booksRepository.updateBook(
         book,

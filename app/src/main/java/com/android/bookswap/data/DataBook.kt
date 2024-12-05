@@ -29,8 +29,8 @@ data class DataBook(
     val isbn: String?,
     val genres: List<BookGenres> = emptyList(),
     var userId: UUID,
-    var archived: Boolean,
-    var exchange: Boolean
+    var archived: Boolean = false,
+    var exchange: Boolean = false
 )
 
 /** All supported book language type */
