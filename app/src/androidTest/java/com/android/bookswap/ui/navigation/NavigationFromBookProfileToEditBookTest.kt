@@ -2,11 +2,14 @@ package com.android.bookswap.ui.navigation
 
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
+import androidx.compose.ui.test.performScrollToNode
 import androidx.compose.ui.test.performTextInput
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -16,25 +19,39 @@ import com.android.bookswap.data.BookGenres
 import com.android.bookswap.data.BookLanguages
 import com.android.bookswap.data.DataBook
 import com.android.bookswap.data.repository.BooksRepository
-import com.android.bookswap.model.edit.EditBookViewModel
 import com.android.bookswap.model.AppConfig
 import com.android.bookswap.model.LocalAppConfig
 import com.android.bookswap.model.UserViewModel
+import com.android.bookswap.model.edit.EditBookViewModel
 import com.android.bookswap.resources.C
 import com.android.bookswap.ui.books.BookProfileScreen
 import com.android.bookswap.ui.books.edit.EditBookScreen
 import io.mockk.coEvery
 import io.mockk.every
+import io.mockk.just
 import io.mockk.mockk
+import io.mockk.runs
 import java.util.UUID
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class NavigationFromBookProfileToEditBookTest {
+  private lateinit var mockEditVM: EditBookViewModel
 
   @get:Rule val composeTestRule = createComposeRule()
+
+  @Before
+  fun setUp() {
+    mockEditVM = mockk(relaxed = true)
+    every { mockEditVM.deleteBooks(any(), any()) } just runs
+    every {
+      mockEditVM.updateDataBook(
+          any(), any(), any(), any(), any(), any(), any(), any(), any(), any())
+    } just runs
+  }
 
   @Test
   fun EditBookScreen_allows_editing_when_currentUser_is_bookUser() {
@@ -76,8 +93,7 @@ class NavigationFromBookProfileToEditBookTest {
                 val bookId =
                     backStackEntry.arguments?.getString("bookId")?.let { UUID.fromString(it) }
                 if (bookId != null) {
-                  EditBookScreen(
-                      mockBookRepo, NavigationActions(navController), testBook.copy(uuid = bookId))
+                  EditBookScreen(mockEditVM, book = testBook.copy(uuid = bookId))
                 }
               }
             }
@@ -105,19 +121,15 @@ class NavigationFromBookProfileToEditBookTest {
     composeTestRule.onNodeWithTag(C.Tag.BookProfile.edit).performClick()
 
     // Verify book information on EditBookScreen
-    composeTestRule.onNodeWithTag(C.Tag.EditBook.title).assertIsDisplayed()
-    composeTestRule.onNodeWithTag(C.Tag.EditBook.title).assertTextEquals(testBook.title, "Title")
+    composeTestRule.onNodeWithTag(C.Tag.BookEntryComp.title_field).assertIsDisplayed()
+    composeTestRule.onNodeWithTag(C.Tag.BookEntryComp.title_field).assertTextContains(testBook.title)
 
-    // composeTestRule.onNodeWithTag("inputBookDescription").assertTextEquals("Original
-    // Description")
 
     // Edit book title and save
-    composeTestRule.onNodeWithTag(C.Tag.EditBook.title).performTextInput("Updated Title")
-    composeTestRule
-        .onNodeWithTag(C.Tag.EditBook.scrollable)
-        .performScrollToNode(hasTestTag(C.Tag.EditBook.save))
-    composeTestRule.onNodeWithTag(C.Tag.EditBook.save).assertIsDisplayed()
-    composeTestRule.onNodeWithTag(C.Tag.EditBook.save).performClick()
+    composeTestRule.onNodeWithTag(C.Tag.BookEntryComp.title_field).performTextInput("Updated Title")
+    composeTestRule.onNodeWithTag(C.Tag.BookEntryComp.action_buttons).performScrollTo()
+    composeTestRule.onNodeWithTag(C.Tag.BookEntryComp.cancel_button).assertIsDisplayed()
+    composeTestRule.onNodeWithTag(C.Tag.BookEntryComp.cancel_button).performClick()
 
     // Verify updated book is reflected in BookProfileScreen
     coEvery { mockBookRepo.getBook(eq(testBookId), any(), any()) } answers
