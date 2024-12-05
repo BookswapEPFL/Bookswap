@@ -1,7 +1,6 @@
 package com.android.bookswap.ui.profile
 
 import androidx.compose.ui.test.assertAll
-import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.hasText
@@ -38,7 +37,6 @@ class OthersUserProfileTest : TestCase() {
   private lateinit var mockUserBookViewModel: UserBookViewModel
   private lateinit var mockBooksRepository: BooksRepository
   private lateinit var mockNavigationActions: NavigationActions
-
 
   private val testUserId = UUID.randomUUID()
   private val testUser =
@@ -92,8 +90,7 @@ class OthersUserProfileTest : TestCase() {
     mockOthersUserViewModel = mockk(relaxed = true)
     mockUserBookViewModel = mockk(relaxed = true)
 
-
-      // Mock the user data fetching
+    // Mock the user data fetching
     every { mockOthersUserViewModel.getUserByUUID(testUserId, any()) } answers
         {
           val callback = secondArg<(DataUser?) -> Unit>()
@@ -112,8 +109,7 @@ class OthersUserProfileTest : TestCase() {
           otherUserVM = mockOthersUserViewModel,
           booksRepository = mockBooksRepository,
           userBookViewModel = mockUserBookViewModel,
-          navigationActions = mockNavigationActions
-          )
+          navigationActions = mockNavigationActions)
     }
 
     // Verify user details
@@ -162,8 +158,7 @@ class OthersUserProfileTest : TestCase() {
           otherUserVM = mockOthersUserViewModel,
           booksRepository = mockBooksRepository,
           userBookViewModel = mockUserBookViewModel,
-          navigationActions = mockNavigationActions
-          )
+          navigationActions = mockNavigationActions)
     }
 
     // Verify book list is displayed
@@ -176,11 +171,9 @@ class OthersUserProfileTest : TestCase() {
         .assertIsDisplayed()
     composeTestRule
         .onAllNodesWithTag(C.Tag.BookDisplayComp.title)
-        //.assertCountEquals(2)
         .assertAll(hasText("Book 1").or(hasText("Book 2")))
     composeTestRule
         .onAllNodesWithTag(C.Tag.BookDisplayComp.author)
-        //.assertCountEquals(2)
         .assertAll(hasText("Author 1").or(hasText("Author 2")))
   }
 }

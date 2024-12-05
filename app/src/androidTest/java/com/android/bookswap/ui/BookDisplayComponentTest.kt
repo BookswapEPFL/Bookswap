@@ -17,8 +17,8 @@ import io.mockk.verify
 import java.util.UUID
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.Mockito.mock
-//import org.mockito.kotlin.verify
+
+// import org.mockito.kotlin.verify
 
 @ExperimentalCoilApi
 class BookDisplayComponentTest {
@@ -84,43 +84,43 @@ class BookDisplayComponentTest {
     composeTestRule.onNodeWithTag(C.Tag.BookDisplayComp.image_picture).assertDoesNotExist()
   }
 
-    @Test
-    fun bookListComponent_navigatesToBookProfileOnClick() {
-        // Arrange
-        val navigationActions = mockk<NavigationActions>(relaxed = true) // Relaxed mock for automatic behavior
-        val bookId = UUID.randomUUID()
-        val testBook =
-            listOf(
-                DataBook(
-                    uuid = bookId, // Ensure this matches the book being tested
-                    title = "Test Book",
-                    author = "Test Author",
-                    description = "Recuento de la historia de España desde los primeros pobladores hasta la actualidad.",
-                    rating = 3,
-                    photo = null, // No photo URL
-                    language = BookLanguages.SPANISH,
-                    isbn = "978-84-09025-23-5",
-                    genres = listOf(BookGenres.HISTORICAL, BookGenres.NONFICTION, BookGenres.BIOGRAPHY),
-                    userId = UUID.randomUUID(),
-                    false,
-                    false
-                )
-            )
+  @Test
+  fun bookListComponent_navigatesToBookProfileOnClick() {
+    // Arrange
+    val navigationActions =
+        mockk<NavigationActions>(relaxed = true) // Relaxed mock for automatic behavior
+    val bookId = UUID.randomUUID()
+    val testBook =
+        listOf(
+            DataBook(
+                uuid = bookId, // Ensure this matches the book being tested
+                title = "Test Book",
+                author = "Test Author",
+                description =
+                    "Recuento de la historia de España desde los primeros pobladores hasta la actualidad.",
+                rating = 3,
+                photo = null, // No photo URL
+                language = BookLanguages.SPANISH,
+                isbn = "978-84-09025-23-5",
+                genres = listOf(BookGenres.HISTORICAL, BookGenres.NONFICTION, BookGenres.BIOGRAPHY),
+                userId = UUID.randomUUID(),
+                false,
+                false))
 
-        composeTestRule.setContent {
-            BookListComponent(
-                bookList = testBook,
-                onBookClick = { clickedBookId ->
-                    navigationActions.navigateTo("${C.Screen.BOOK_PROFILE}/$clickedBookId")
-                }
-            )
-        }
-
-        // Act
-        composeTestRule.onNodeWithTag("0_" + C.Tag.BookDisplayComp.book_display_container)
-            .performClick()
-
-        // Assert
-        verify { navigationActions.navigateTo("${C.Screen.BOOK_PROFILE}/$bookId") }
+    composeTestRule.setContent {
+      BookListComponent(
+          bookList = testBook,
+          onBookClick = { clickedBookId ->
+            navigationActions.navigateTo("${C.Screen.BOOK_PROFILE}/$clickedBookId")
+          })
     }
+
+    // Act
+    composeTestRule
+        .onNodeWithTag("0_" + C.Tag.BookDisplayComp.book_display_container)
+        .performClick()
+
+    // Assert
+    verify { navigationActions.navigateTo("${C.Screen.BOOK_PROFILE}/$bookId") }
+  }
 }

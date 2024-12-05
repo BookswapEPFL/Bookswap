@@ -43,16 +43,16 @@ class UserProfileScreenTest : TestCase() {
 
   @get:Rule val composeTestRule = createComposeRule()
   private val standardUser =
-    DataUser(
-      UUID.randomUUID(),
-      "M.",
-      "John",
-      "Doe",
-      "John.Doe@example.com",
-      "+41223456789",
-      0.0,
-      0.0,
-      "dummyPic.png")
+      DataUser(
+          UUID.randomUUID(),
+          "M.",
+          "John",
+          "Doe",
+          "John.Doe@example.com",
+          "+41223456789",
+          0.0,
+          0.0,
+          "dummyPic.png")
 
   @Before
   fun setup() {
@@ -71,11 +71,11 @@ class UserProfileScreenTest : TestCase() {
       val navigationActions = NavigationActions(navController)
       CompositionLocalProvider(LocalAppConfig provides AppConfig(userViewModel = userVM)) {
         UserProfile(
-          photoStorage = photoStorage,
-          booksRepository = mockBooksRepository,
-          userBookViewModel = mockUserBookViewModel,
-          navigationActions = mockNavigationActions,
-          { TopAppBarComponent(Modifier, navigationActions, "Messages") })
+            photoStorage = photoStorage,
+            booksRepository = mockBooksRepository,
+            userBookViewModel = mockUserBookViewModel,
+            navigationActions = mockNavigationActions,
+            { TopAppBarComponent(Modifier, navigationActions, "Messages") })
       }
     }
   }
