@@ -69,14 +69,12 @@ fun BookAdditionChoiceScreen(
             // Display error message in a toast.
             result.getOrThrow().asAndroidBitmap(),
             appConfig.userViewModel.uuid,
-        ) {
-            error, uuid ->
-            Toast.makeText(
-                context, context.resources.getString(error.message), Toast.LENGTH_SHORT)
-                .show()
-            if(error == BookFromChatGPT.Companion.ErrorType.NONE ) {
-                navController.navigateTo(C.Screen.EDIT_BOOK, uuid!!.toString())
-            }
+        ) { error, uuid ->
+          Toast.makeText(context, context.resources.getString(error.message), Toast.LENGTH_SHORT)
+              .show()
+          if (error == BookFromChatGPT.Companion.ErrorType.NONE) {
+            navController.navigateTo(C.Screen.EDIT_BOOK, uuid!!.toString())
+          }
         }
       }
   photoRequester.Init()
@@ -110,9 +108,10 @@ fun BookAdditionChoiceScreen(
                   text = "From Photo",
                   leftIcon = null,
                   leftIconPainter = painterResource(id = R.drawable.photoicon),
-                  onClick = { //photoRequester.requestPhoto()
-                      navController.navigateTo(C.Screen.EDIT_BOOK, "6e15d9af-ed34-4b28-9b64-5cdc69c25c76")
-                       },
+                  onClick = { // photoRequester.requestPhoto()
+                    navController.navigateTo(
+                        C.Screen.EDIT_BOOK, "6e15d9af-ed34-4b28-9b64-5cdc69c25c76")
+                  },
                   buttonWidth = buttonWidth,
               )
             }

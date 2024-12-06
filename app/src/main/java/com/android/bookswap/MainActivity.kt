@@ -239,12 +239,12 @@ class MainActivity : ComponentActivity() {
             }
           }
           composable("${C.Screen.EDIT_BOOK}/{bookUUID}") { backStackEntry ->
-            val bookUUID = backStackEntry.arguments?.getString("bookUUID")?.let { UUID.fromString(it) }
-              EditBookScreen(
-                  booksRepository = bookRepository,
-                  navigationActions = NavigationActions(navController),
-                  bookUUID = bookUUID!!
-              )
+            val bookUUID =
+                backStackEntry.arguments?.getString("bookUUID")?.let { UUID.fromString(it) }
+            EditBookScreen(
+                booksRepository = bookRepository,
+                navigationActions = NavigationActions(navController),
+                bookUUID = bookUUID!!)
           }
         }
         navigation(

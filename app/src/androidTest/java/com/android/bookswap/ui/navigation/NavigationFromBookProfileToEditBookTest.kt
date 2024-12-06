@@ -78,8 +78,7 @@ class NavigationFromBookProfileToEditBookTest {
                 val bookUUID =
                     backStackEntry.arguments?.getString("bookUUID")?.let { UUID.fromString(it) }
                 if (bookUUID != null) {
-                  EditBookScreen(
-                      mockBookRepo, NavigationActions(navController), bookUUID)
+                  EditBookScreen(mockBookRepo, NavigationActions(navController), bookUUID)
                 }
               }
             }

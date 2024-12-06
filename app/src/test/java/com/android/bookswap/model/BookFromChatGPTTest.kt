@@ -52,9 +52,12 @@ class BookFromChatGPTTest {
     every { anyConstructed<GoogleBookDataSource>().getBookFromISBN(testISBN, any(), any()) } answers
         {
           val dataBook: DataBook = mockk()
-            every { dataBook.copy(any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any()) } returns dataBook
+          every {
+            dataBook.copy(
+                any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any())
+          } returns dataBook
           every { dataBook.uuid } returns UUID.randomUUID()
-            thirdArg<(Result<DataBook>) -> Unit>()(Result.success(dataBook))
+          thirdArg<(Result<DataBook>) -> Unit>()(Result.success(dataBook))
         }
 
     every { booksRepository.addBook(any(), any()) } answers
@@ -150,6 +153,8 @@ class BookFromChatGPTTest {
     val callback = mockk<(BookFromChatGPT.Companion.ErrorType, UUID?) -> Unit>(relaxed = true)
     bookFromChatGPT.addBookFromImage(bitmap, uuid, callback)
 
-    verify(exactly = 1, timeout = 500) { callback.invoke(BookFromChatGPT.Companion.ErrorType.NONE, any()) }
+    verify(exactly = 1, timeout = 500) {
+      callback.invoke(BookFromChatGPT.Companion.ErrorType.NONE, any())
+    }
   }
 }
