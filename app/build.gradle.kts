@@ -189,6 +189,7 @@ dependencies {
     implementation(libs.play.services.maps)
     implementation(libs.maps.compose)
     implementation(libs.maps.compose.utils)
+    implementation(libs.maps.places)
 
     // ------------- Jetpack Compose ------------------
     implementation("androidx.compose.material:material:1.7.1")

@@ -21,6 +21,7 @@ import io.github.kakaocup.compose.node.element.ComposeScreen
 import io.mockk.every
 import io.mockk.mockk
 import java.util.UUID
+import kotlinx.coroutines.flow.MutableStateFlow
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -54,6 +55,7 @@ class UserProfileScreenTest : TestCase() {
     val userVM: UserViewModel = mockk()
     every { userVM.getUser(any()) } returns standardUser
     every { userVM.uuid } returns standardUser.userUUID
+    every { userVM.addressStr } returns MutableStateFlow("address")
 
     photoStorage = mockk(relaxed = true)
 
@@ -88,7 +90,7 @@ class UserProfileScreenTest : TestCase() {
           }
           addressTxt {
             assertIsDisplayed()
-            assertTextEquals("0.0, 0.0")
+            assertTextEquals("address")
           }
           editProfileBtn {
             assertIsDisplayed()
@@ -126,7 +128,7 @@ class UserProfileScreenTest : TestCase() {
           }
           addressTxt {
             assertIsDisplayed()
-            assertTextEquals("0.0, 0.0")
+            assertTextEquals("address")
           }
           editProfileBtn {
             assertIsDisplayed()

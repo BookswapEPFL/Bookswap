@@ -44,6 +44,7 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.bookswap.data.DataBook
+import com.android.bookswap.model.LocalAppConfig
 import com.android.bookswap.model.isNetworkAvailable
 import com.android.bookswap.model.map.BookFilter
 import com.android.bookswap.model.map.BookManagerViewModel
@@ -89,12 +90,18 @@ fun MapScreen(
     topAppBar: @Composable () -> Unit = {},
     bottomAppBar: @Composable () -> Unit = {},
 ) {
-  val cameraPositionState = rememberCameraPositionState()
+  val appConfig = LocalAppConfig.current
+  val userVM = appConfig.userViewModel
+  val cameraPositionState = rememberCameraPositionState {
+    this.position =
+        CameraPosition.fromLatLngZoom(
+            userVM.getUser().let { LatLng(it.latitude, it.longitude) }, INIT_ZOOM)
+  }
   // Get the user's current location
   val latitude = geolocation.latitude.collectAsState()
+  val longitude = geolocation.longitude.collectAsState()
   val context = LocalContext.current
   var isOnline = remember { isNetworkAvailable(context) }
-  val longitude = geolocation.longitude.collectAsState()
   // Start location and books updates
   LaunchedEffect(Unit) {
     if (isOnline) {
@@ -110,12 +117,13 @@ fun MapScreen(
   // Stop location and books updates when the screen is disposed
   DisposableEffect(Unit) {
     onDispose {
+      userVM.updateAddress(latitude.value, longitude.value, context)
       geolocation.stopLocationUpdates()
       bookManagerViewModel.stopUpdatingBooks()
     }
   }
 
-  var mutableStateSelectedUser by remember { mutableStateOf(selectedUser) }
+  var mutableStateSelectedUser by remember { mutableIntStateOf(selectedUser) }
   var markerScreenPosition by remember { mutableStateOf<Offset?>(null) }
 
   val filteredBooks = bookManagerViewModel.filteredBooks.collectAsState()
@@ -163,6 +171,11 @@ fun MapScreen(
                 top = pd.calculateTopPadding(), bottom = pd.calculateBottomPadding())) {
               GoogleMap(
                   onMapClick = { mutableStateSelectedUser = NO_USER_SELECTED },
+                  onMapLoaded = {
+                    cameraPositionState.position =
+                        CameraPosition.fromLatLngZoom(
+                            LatLng(latitude.value, longitude.value), INIT_ZOOM)
+                  },
                   modifier =
                       Modifier.fillMaxSize().testTag(C.Tag.Map.google_map).semantics {
                         cameraPosition = cameraPositionState

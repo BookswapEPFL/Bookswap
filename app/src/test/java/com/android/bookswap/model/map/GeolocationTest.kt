@@ -60,11 +60,17 @@ class GeolocationTest {
     } returns PackageManager.PERMISSION_GRANTED
 
     every {
-      mockFusedLocationClient.requestLocationUpdates(any(), any(), Looper.getMainLooper())
+      mockFusedLocationClient.requestLocationUpdates(
+          any(), any<LocationCallback>(), Looper.getMainLooper())
     } returns Tasks.forResult(null)
+    every { mockFusedLocationClient.lastLocation } returns Tasks.forResult(null)
+
     geolocation.startLocationUpdates()
 
-    verify { mockFusedLocationClient.requestLocationUpdates(any(), any(), Looper.getMainLooper()) }
+    verify {
+      mockFusedLocationClient.requestLocationUpdates(
+          any(), any<LocationCallback>(), Looper.getMainLooper())
+    }
     assertEquals(true, geolocation.isRunning.value)
   }
 
@@ -111,8 +117,10 @@ class GeolocationTest {
 
     every { ActivityCompat.requestPermissions(any(), any(), any()) } just Runs
     every {
-      mockFusedLocationClient.requestLocationUpdates(any(), any(), Looper.getMainLooper())
+      mockFusedLocationClient.requestLocationUpdates(
+          any(), any<LocationCallback>(), Looper.getMainLooper())
     } returns Tasks.forResult(null)
+    every { mockFusedLocationClient.lastLocation } returns Tasks.forResult(null)
 
     geolocation.startLocationUpdates()
 
@@ -163,10 +171,12 @@ class GeolocationTest {
   @Test
   fun `stopLocationUpdates should remove location updates`() {
     every {
-      mockFusedLocationClient.requestLocationUpdates(any(), any(), Looper.getMainLooper())
+      mockFusedLocationClient.requestLocationUpdates(
+          any(), any<LocationCallback>(), Looper.getMainLooper())
     } returns Tasks.forResult(null)
     every { mockFusedLocationClient.removeLocationUpdates(any<LocationCallback>()) } returns
         Tasks.forResult(null)
+    every { mockFusedLocationClient.lastLocation } returns Tasks.forResult(null)
     every {
       mockActivity.checkPermission(Manifest.permission.ACCESS_BACKGROUND_LOCATION, any(), any())
     } returns PackageManager.PERMISSION_GRANTED
@@ -205,6 +215,7 @@ class GeolocationTest {
       mockFusedLocationClient.requestLocationUpdates(
           any<LocationRequest>(), capture(locationCallbackSlot), any<Looper>())
     } returns mockk()
+    every { mockFusedLocationClient.lastLocation } returns Tasks.forResult(null)
 
     geolocation.startLocationUpdates()
 
