@@ -28,7 +28,7 @@ class BookFromChatGPT(
       imageToData.analyzeImage(
           urlResult.getOrThrow(),
           onSuccess = { map ->
-            // Get isbn from result
+            // Get isbn from result and removes the '-' characters
             val isbn = map["isbn"]?.replace("-", "")
             if (isbn == null || isbn == ImageToDataSource.UNDEFINED_ATTRIBUTE) {
               callback(ErrorType.CHATGPT_ANALYZER_ERROR, null)
@@ -42,6 +42,7 @@ class BookFromChatGPT(
                 return@getBookFromISBN
               }
 
+              // Add photo url to dataBook
               val dataBook = dataBookResult.getOrThrow().copy(photo = urlResult.getOrThrow())
 
               // Add book

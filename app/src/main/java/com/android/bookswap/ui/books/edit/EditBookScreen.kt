@@ -74,15 +74,18 @@ fun EditBookScreen(
 
   var bookMutable by remember { mutableStateOf<DataBook?>(null) }
 
+  // Request book when screen load
   LaunchedEffect(Unit) {
     booksRepository.getBook(
         uuid = bookUUID,
         OnSucess = { resultBook -> bookMutable = resultBook },
         onFailure = { Log.e("EditScreen", "Error while loading the book") })
   }
+
   when (bookMutable) {
-    null -> CircularProgressIndicator()
+    null -> CircularProgressIndicator() // If the book has not loaded, show circular loading
     else -> {
+      // Get book when book has been successfully been requested
       val book = bookMutable!!
       var title by remember { mutableStateOf(book.title) }
       var author by remember { mutableStateOf(book.author ?: "") }
