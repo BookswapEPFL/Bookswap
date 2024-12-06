@@ -7,10 +7,12 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.test.rule.GrantPermissionRule
 import com.android.bookswap.MainActivity
+import com.android.bookswap.data.DataUser
 import com.android.bookswap.data.repository.BooksRepository
 import com.android.bookswap.data.repository.UsersRepository
 import com.android.bookswap.data.source.network.MessageFirestoreSource
 import com.android.bookswap.data.source.network.PhotoFirebaseStorageSource
+import com.android.bookswap.model.UserViewModel
 import com.android.bookswap.model.chat.ContactViewModel
 import com.android.bookswap.model.chat.OfflineMessageStorage
 import com.android.bookswap.resources.C
@@ -23,6 +25,7 @@ import io.mockk.runs
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import java.util.UUID
 
 class NavigationBarEndToEnd {
   @get:Rule val composeTestRule = createComposeRule()
@@ -38,19 +41,39 @@ class NavigationBarEndToEnd {
   private lateinit var mockPhotoStorage: PhotoFirebaseStorageSource
   private lateinit var mockMessageStorage: OfflineMessageStorage
   private lateinit var mockContext: Context
+  private lateinit var userVM: UserViewModel
+  
+  private val standardUser =
+	DataUser(
+	  UUID.randomUUID(),
+	  "M.",
+	  "John",
+	  "Doe",
+	  "John.Doe@example.com",
+	  "+41223456789",
+	  0.0,
+	  0.0,
+	  "dummyPic.png")
 
   @Before
   fun setUp() {
     mockPhotoStorage = mockk()
-    mockBookRepository = mockk()
     mockMessageStorage = mockk()
     mockContext = mockk()
+	
+	mockBookRepository = mockk()
     every { mockBookRepository.getBook(any()) } just runs
+	
     mockUserRepository = mockk()
     every { mockUserRepository.getUsers(any()) } just runs
 
     mockkConstructor(ContactViewModel::class)
     every { anyConstructed<ContactViewModel>().updateMessageBoxMap() } just runs
+	
+	userVM = mockk(relaxed = true)
+	every { userVM.getUser(any()) } returns standardUser
+	every { userVM.uuid } returns standardUser.userUUID
+	every { userVM.updateAddress(any<Double>(), any<Double>(), any<Context>()) } just runs
 
     composeTestRule.setContent {
       val db: FirebaseFirestore = mockk(relaxed = true)
