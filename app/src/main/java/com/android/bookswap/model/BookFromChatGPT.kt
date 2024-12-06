@@ -42,8 +42,10 @@ class BookFromChatGPT(
                 return@getBookFromISBN
               }
 
+              val dataBook = dataBookResult.getOrThrow().copy(photo = urlResult.getOrThrow())
+
               // Add book
-              booksRepository.addBook(dataBookResult.getOrThrow()) { bookResult ->
+              booksRepository.addBook(dataBook) { bookResult ->
                 if (bookResult.isFailure) {
                   callback(ErrorType.BOOK_ADD_ERROR, null)
                 } else {
