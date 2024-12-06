@@ -46,7 +46,6 @@ import com.android.bookswap.ui.theme.ColorVariable
  * @param bottomAppBar A composable function to display the bottom app bar.
  * @param photoFirebaseStorageRepository a repository allowing to upload photo as url
  * @param booksRepository book where to add the book
- * @param userUUID to which user add the book
  */
 @Composable
 fun BookAdditionChoiceScreen(
@@ -111,7 +110,9 @@ fun BookAdditionChoiceScreen(
                   text = "From Photo",
                   leftIcon = null,
                   leftIconPainter = painterResource(id = R.drawable.photoicon),
-                  onClick = { photoRequester.requestPhoto() },
+                  onClick = { //photoRequester.requestPhoto()
+                      navController.navigateTo(C.Screen.EDIT_BOOK, "6e15d9af-ed34-4b28-9b64-5cdc69c25c76")
+                       },
                   buttonWidth = buttonWidth,
               )
             }
