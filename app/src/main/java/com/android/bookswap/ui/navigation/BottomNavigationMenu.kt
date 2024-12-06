@@ -35,6 +35,7 @@ fun BottomNavigationMenu(
       containerColor = ColorVariable.Primary) {
         tabList.forEach { tab ->
           NavigationBarItem(
+              modifier = Modifier.testTag(tab.route + C.Tag.BottomNavMenu.nav_item),
               selected = tab.route == selectedItem,
               onClick = { onTabSelect(tab) },
               icon = {
