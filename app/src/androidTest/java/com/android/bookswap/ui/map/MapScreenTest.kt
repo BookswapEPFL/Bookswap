@@ -1,6 +1,8 @@
 package com.android.bookswap.ui.map
 
 import android.Manifest
+import android.content.Context
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.semantics.getOrNull
 import androidx.compose.ui.test.assertCountEquals
@@ -20,6 +22,10 @@ import com.android.bookswap.data.BookLanguages
 import com.android.bookswap.data.DataBook
 import com.android.bookswap.data.DataUser
 import com.android.bookswap.data.UserBooksWithLocation
+import com.android.bookswap.data.repository.UsersRepository
+import com.android.bookswap.model.AppConfig
+import com.android.bookswap.model.LocalAppConfig
+import com.android.bookswap.model.UserViewModel
 import com.android.bookswap.model.map.BookManagerViewModel
 import com.android.bookswap.model.map.DefaultGeolocation
 import com.android.bookswap.resources.C
@@ -99,6 +105,21 @@ class MapScreenTest {
           Manifest.permission.ACCESS_BACKGROUND_LOCATION)
 
   private val mockBookManagerViewModel: BookManagerViewModel = mockk()
+  private lateinit var userVM: UserViewModel
+
+  private lateinit var mockUserRepository: UsersRepository
+
+  private val standardUser =
+      DataUser(
+          UUID.randomUUID(),
+          "M.",
+          "John",
+          "Doe",
+          "John.Doe@example.com",
+          "+41223456789",
+          0.0,
+          0.0,
+          "dummyPic.png")
 
   @Before
   fun setup() {
@@ -108,14 +129,24 @@ class MapScreenTest {
         MutableStateFlow(userBooksWithLocationList)
     every { mockBookManagerViewModel.startUpdatingBooks() } just runs
     every { mockBookManagerViewModel.stopUpdatingBooks() } just runs
+
+    mockUserRepository = mockk()
+    every { mockUserRepository.getUsers(any()) } just runs
+
+    userVM = mockk(relaxed = true)
+    every { userVM.getUser(any()) } returns standardUser
+    every { userVM.uuid } returns standardUser.userUUID
+    every { userVM.updateAddress(any<Double>(), any<Double>(), any<Context>()) } just runs
   }
 
   @Test
   fun displayAllComponents() {
     composeTestRule.setContent {
-      val navController = rememberNavController()
-      val navigationActions = NavigationActions(navController)
-      MapScreen(mockBookManagerViewModel, navigationActions, 0)
+      CompositionLocalProvider(LocalAppConfig provides AppConfig(userViewModel = userVM)) {
+        val navController = rememberNavController()
+        val navigationActions = NavigationActions(navController)
+        MapScreen(mockBookManagerViewModel, navigationActions, 0)
+      }
     }
     composeTestRule.onNodeWithTag(C.Tag.map_screen_container).assertIsDisplayed()
     composeTestRule.onNodeWithTag(C.Tag.Map.google_map).assertIsDisplayed()
@@ -156,9 +187,11 @@ class MapScreenTest {
     every { mockBookManagerViewModel.filteredBooks } answers { MutableStateFlow(emptyList()) }
     every { mockBookManagerViewModel.filteredUsers } answers { MutableStateFlow(userWithoutBooks) }
     composeTestRule.setContent {
-      val navController = rememberNavController()
-      val navigationActions = NavigationActions(navController)
-      MapScreen(mockBookManagerViewModel, navigationActions, 0)
+      CompositionLocalProvider(LocalAppConfig provides AppConfig(userViewModel = userVM)) {
+        val navController = rememberNavController()
+        val navigationActions = NavigationActions(navController)
+        MapScreen(mockBookManagerViewModel, navigationActions, 0)
+      }
     }
 
     // Assert that the marker info window is displayed, but without book entries
@@ -173,9 +206,11 @@ class MapScreenTest {
     every { mockBookManagerViewModel.filteredBooks } answers { MutableStateFlow(emptyList()) }
     every { mockBookManagerViewModel.filteredUsers } answers { MutableStateFlow(emptyList()) }
     composeTestRule.setContent {
-      val navController = rememberNavController()
-      val navigationActions = NavigationActions(navController)
-      MapScreen(mockBookManagerViewModel, navigationActions)
+      CompositionLocalProvider(LocalAppConfig provides AppConfig(userViewModel = userVM)) {
+        val navController = rememberNavController()
+        val navigationActions = NavigationActions(navController)
+        MapScreen(mockBookManagerViewModel, navigationActions)
+      }
     }
 
     // Assert that the map is displayed but no marker and info window is shown
@@ -190,9 +225,11 @@ class MapScreenTest {
     every { mockBookManagerViewModel.filteredBooks } answers { MutableStateFlow(emptyList()) }
     every { mockBookManagerViewModel.filteredUsers } answers { MutableStateFlow(emptyList()) }
     composeTestRule.setContent {
-      val navController = rememberNavController()
-      val navigationActions = NavigationActions(navController)
-      MapScreen(mockBookManagerViewModel, navigationActions)
+      CompositionLocalProvider(LocalAppConfig provides AppConfig(userViewModel = userVM)) {
+        val navController = rememberNavController()
+        val navigationActions = NavigationActions(navController)
+        MapScreen(mockBookManagerViewModel, navigationActions)
+      }
     }
     // Assert that the marker info window is displayed, but without book entries
     composeTestRule.onNodeWithTag(C.Tag.Map.bottom_drawer_container).assertIsDisplayed()
@@ -208,9 +245,11 @@ class MapScreenTest {
   @Test
   fun noUserSelectedInitially() {
     composeTestRule.setContent {
-      val navController = rememberNavController()
-      val navigationActions = NavigationActions(navController)
-      MapScreen(mockBookManagerViewModel, navigationActions)
+      CompositionLocalProvider(LocalAppConfig provides AppConfig(userViewModel = userVM)) {
+        val navController = rememberNavController()
+        val navigationActions = NavigationActions(navController)
+        MapScreen(mockBookManagerViewModel, navigationActions)
+      }
     }
 
     // Assert that no info window is displayed when no user is selected
@@ -223,9 +262,11 @@ class MapScreenTest {
   @Test
   fun draggableMenu_canBeDraggedVertically() {
     composeTestRule.setContent {
-      val navController = rememberNavController()
-      val navigationActions = NavigationActions(navController)
-      MapScreen(mockBookManagerViewModel, navigationActions, 0)
+      CompositionLocalProvider(LocalAppConfig provides AppConfig(userViewModel = userVM)) {
+        val navController = rememberNavController()
+        val navigationActions = NavigationActions(navController)
+        MapScreen(mockBookManagerViewModel, navigationActions, 0)
+      }
     }
     // Ensure the DraggableMenu is initially displayed
     composeTestRule.onNodeWithTag(C.Tag.Map.bottom_drawer_container).assertIsDisplayed()
@@ -256,9 +297,11 @@ class MapScreenTest {
           MutableStateFlow(userBooksWithLocationLongList)
         }
     composeTestRule.setContent {
-      val navController = rememberNavController()
-      val navigationActions = NavigationActions(navController)
-      MapScreen(mockBookManagerViewModel, navigationActions, 0)
+      CompositionLocalProvider(LocalAppConfig provides AppConfig(userViewModel = userVM)) {
+        val navController = rememberNavController()
+        val navigationActions = NavigationActions(navController)
+        MapScreen(mockBookManagerViewModel, navigationActions, 0)
+      }
     }
 
     // Assert initial state: Only first item(s) are visible
@@ -286,9 +329,11 @@ class MapScreenTest {
   fun mapHasGeoLocation() {
     val geolocation = DefaultGeolocation()
     composeTestRule.setContent {
-      val navController = rememberNavController()
-      val navigationActions = NavigationActions(navController)
-      MapScreen(mockBookManagerViewModel, navigationActions, 0)
+      CompositionLocalProvider(LocalAppConfig provides AppConfig(userViewModel = userVM)) {
+        val navController = rememberNavController()
+        val navigationActions = NavigationActions(navController)
+        MapScreen(mockBookManagerViewModel, navigationActions, 0)
+      }
     }
     val node1 = composeTestRule.onNodeWithTag(C.Tag.Map.google_map).fetchSemanticsNode()
     val cameraPositionState: CameraPositionState? = node1.config.getOrNull(CameraPositionKey)
