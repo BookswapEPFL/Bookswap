@@ -22,10 +22,10 @@ import io.mockk.just
 import io.mockk.mockk
 import io.mockk.mockkConstructor
 import io.mockk.runs
+import java.util.UUID
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import java.util.UUID
 
 class NavigationBarEndToEnd {
   @get:Rule val composeTestRule = createComposeRule()
@@ -42,38 +42,38 @@ class NavigationBarEndToEnd {
   private lateinit var mockMessageStorage: OfflineMessageStorage
   private lateinit var mockContext: Context
   private lateinit var userVM: UserViewModel
-  
+
   private val standardUser =
-	DataUser(
-	  UUID.randomUUID(),
-	  "M.",
-	  "John",
-	  "Doe",
-	  "John.Doe@example.com",
-	  "+41223456789",
-	  0.0,
-	  0.0,
-	  "dummyPic.png")
+      DataUser(
+          UUID.randomUUID(),
+          "M.",
+          "John",
+          "Doe",
+          "John.Doe@example.com",
+          "+41223456789",
+          0.0,
+          0.0,
+          "dummyPic.png")
 
   @Before
   fun setUp() {
     mockPhotoStorage = mockk()
     mockMessageStorage = mockk()
     mockContext = mockk()
-	
-	mockBookRepository = mockk()
+
+    mockBookRepository = mockk()
     every { mockBookRepository.getBook(any()) } just runs
-	
+
     mockUserRepository = mockk()
     every { mockUserRepository.getUsers(any()) } just runs
 
     mockkConstructor(ContactViewModel::class)
     every { anyConstructed<ContactViewModel>().updateMessageBoxMap() } just runs
-	
-	userVM = mockk(relaxed = true)
-	every { userVM.getUser(any()) } returns standardUser
-	every { userVM.uuid } returns standardUser.userUUID
-	every { userVM.updateAddress(any<Double>(), any<Double>(), any<Context>()) } just runs
+
+    userVM = mockk(relaxed = true)
+    every { userVM.getUser(any()) } returns standardUser
+    every { userVM.uuid } returns standardUser.userUUID
+    every { userVM.updateAddress(any<Double>(), any<Double>(), any<Context>()) } just runs
 
     composeTestRule.setContent {
       val db: FirebaseFirestore = mockk(relaxed = true)
