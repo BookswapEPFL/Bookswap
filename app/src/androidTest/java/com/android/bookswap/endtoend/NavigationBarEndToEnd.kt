@@ -66,6 +66,7 @@ class NavigationBarEndToEnd {
 
     mockUserRepository = mockk()
     every { mockUserRepository.getUsers(any()) } just runs
+    every { mockUserRepository.getUser(any<UUID>(), any()) } just runs
 
     mockkConstructor(ContactViewModel::class)
     every { anyConstructed<ContactViewModel>().updateMessageBoxMap() } just runs
