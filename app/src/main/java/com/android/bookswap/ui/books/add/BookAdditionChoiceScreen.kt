@@ -69,11 +69,16 @@ fun BookAdditionChoiceScreen(
         BookFromChatGPT(context, photoFirebaseStorageRepository, booksRepository).addBookFromImage(
             // Display error message in a toast.
             result.getOrThrow().asAndroidBitmap(),
-            appConfig.userViewModel.uuid) { error ->
-              Toast.makeText(
-                      context, context.resources.getString(error.message), Toast.LENGTH_SHORT)
-                  .show()
+            appConfig.userViewModel.uuid,
+        ) {
+            error, uuid ->
+            Toast.makeText(
+                context, context.resources.getString(error.message), Toast.LENGTH_SHORT)
+                .show()
+            if(error == BookFromChatGPT.Companion.ErrorType.NONE ) {
+                navController.navigateTo(C.Screen.EDIT_BOOK, uuid!!.toString())
             }
+        }
       }
   photoRequester.Init()
   Scaffold(

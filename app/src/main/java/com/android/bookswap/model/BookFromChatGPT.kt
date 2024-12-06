@@ -15,11 +15,11 @@ class BookFromChatGPT(
     private val photoStorageRepository: PhotoFirebaseStorageRepository,
     private val booksRepository: BooksRepository,
 ) {
-  fun addBookFromImage(image: Bitmap, userUUID: UUID, callback: (ErrorType) -> Unit) {
+  fun addBookFromImage(image: Bitmap, userUUID: UUID, callback: (ErrorType, UUID?) -> Unit) {
     // Send the image to firestore storage
     photoStorageRepository.addPhotoToStorage(UUID.randomUUID().toString(), image) { urlResult ->
       if (urlResult.isFailure) {
-        callback(ErrorType.FIREBASE_STORAGE_ERROR)
+        callback(ErrorType.FIREBASE_STORAGE_ERROR, null)
         return@addPhotoToStorage
       }
 
@@ -29,30 +29,30 @@ class BookFromChatGPT(
           urlResult.getOrThrow(),
           onSuccess = { map ->
             // Get isbn from result
-            val isbn = map["isbn"]
+            val isbn = map["isbn"]?.replace("-", "")
             if (isbn == null || isbn == ImageToDataSource.UNDEFINED_ATTRIBUTE) {
-              callback(ErrorType.CHATGPT_ANALYZER_ERROR)
+              callback(ErrorType.CHATGPT_ANALYZER_ERROR, null)
               return@analyzeImage
             }
 
             // Request book from ISBN
             GoogleBookDataSource(context).getBookFromISBN(isbn, userUUID) { dataBookResult ->
               if (dataBookResult.isFailure) {
-                callback(ErrorType.ISBN_ERROR)
+                callback(ErrorType.ISBN_ERROR, null)
                 return@getBookFromISBN
               }
 
               // Add book
               booksRepository.addBook(dataBookResult.getOrThrow()) { bookResult ->
                 if (bookResult.isFailure) {
-                  callback(ErrorType.BOOK_ADD_ERROR)
+                  callback(ErrorType.BOOK_ADD_ERROR, null)
                 } else {
-                  callback(ErrorType.NONE)
+                  callback(ErrorType.NONE, dataBookResult.getOrThrow().uuid)
                 }
               }
             }
           },
-          onError = { callback(ErrorType.CHATGPT_ANALYZER_ERROR) })
+          onError = { callback(ErrorType.CHATGPT_ANALYZER_ERROR, null) })
     }
   }
 
