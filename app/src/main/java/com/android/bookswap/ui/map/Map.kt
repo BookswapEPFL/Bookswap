@@ -123,7 +123,7 @@ fun MapScreen(
     }
   }
 
-  var mutableStateSelectedUser by remember { mutableStateOf(selectedUser) }
+  var mutableStateSelectedUser by remember { mutableIntStateOf(selectedUser) }
   var markerScreenPosition by remember { mutableStateOf<Offset?>(null) }
 
   val filteredBooks = bookManagerViewModel.filteredBooks.collectAsState()
