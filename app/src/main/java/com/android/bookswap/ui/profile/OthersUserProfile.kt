@@ -27,6 +27,7 @@ import com.android.bookswap.model.OthersUserViewModel
 import com.android.bookswap.model.UserBookViewModel
 import com.android.bookswap.resources.C
 import com.android.bookswap.ui.components.BookListComponent
+import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.theme.ColorVariable
 import java.util.UUID
 
@@ -53,6 +54,7 @@ fun OthersUserProfileScreen(
     otherUserVM: OthersUserViewModel = OthersUserViewModel(userId),
     booksRepository: BooksRepository,
     userBookViewModel: UserBookViewModel = UserBookViewModel(booksRepository),
+    navigationActions: NavigationActions,
     topAppBar: @Composable () -> Unit = {},
     bottomAppBar: @Composable () -> Unit = {}
 ) {
@@ -159,7 +161,10 @@ fun OthersUserProfileScreen(
                           Modifier.fillMaxWidth()
                               .padding(PADDING), // background(Color.LightGray) // Debug background
                       // .border(2.dp, Color.Red),    // Debug border,
-                      bookList = bookListData.value)
+                      bookList = bookListData.value,
+                      onBookClick = { bookId ->
+                        navigationActions.navigateTo("${C.Screen.BOOK_PROFILE}/$bookId")
+                      })
                 }
               }
         }

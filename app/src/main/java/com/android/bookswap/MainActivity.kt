@@ -224,8 +224,13 @@ class MainActivity : ComponentActivity() {
           }
         }
         navigation(startDestination = C.Screen.USER_PROFILE, route = C.Route.USER_PROFILE) {
-          composable(C.Screen.USER_PROFILE) { UserProfile(photoStorage) }
-          composable(C.Screen.BOOK_PROFILE) { backStackEntry ->
+          composable(C.Screen.USER_PROFILE) {
+            UserProfile(
+                photoStorage = photoStorage,
+                booksRepository = bookRepository,
+                navigationActions = navigationActions)
+          }
+          composable("${C.Screen.BOOK_PROFILE}/{bookId}") { backStackEntry ->
             val bookId = backStackEntry.arguments?.getString("bookId")?.let { UUID.fromString(it) }
 
             if (bookId != null) {
@@ -258,6 +263,7 @@ class MainActivity : ComponentActivity() {
                   OthersUserProfileScreen(
                       userId = userId,
                       booksRepository = bookRepository,
+                      navigationActions = navigationActions,
                       topAppBar = { topAppBar("User Profile") },
                       bottomAppBar = { bottomAppBar(this@navigation.route ?: "") })
                 } else {
