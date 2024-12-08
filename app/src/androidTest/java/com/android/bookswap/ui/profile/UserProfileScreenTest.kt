@@ -226,11 +226,13 @@ class UserProfileScreenTest : TestCase() {
         .assertAll(hasText("Author 1").or(hasText("Author 2")))
   }
 
-    @Test
-    fun testTopAppBar() {
-        composeTestRule.onNodeWithTag(C.Tag.top_app_bar_container).assertIsDisplayed()
-        composeTestRule.onNodeWithTag(C.Tag.TopAppBar.screen_title).assertIsDisplayed()
-        composeTestRule.onNodeWithTag(C.Tag.TopAppBar.screen_title).assertIsDisplayed()
-        composeTestRule.onNodeWithTag(C.Tag.TopAppBar.profile_button, useUnmergedTree = true).assertIsDisplayed()
-    }
+  @Test
+  fun testTopAppBar() {
+    composeTestRule.onNodeWithTag(C.Tag.top_app_bar_container).assertIsDisplayed()
+    composeTestRule.onNodeWithTag(C.Tag.TopAppBar.screen_title).assertIsDisplayed()
+    composeTestRule.onNodeWithTag(C.Tag.TopAppBar.screen_title).assertIsDisplayed()
+    composeTestRule
+        .onNodeWithTag(C.Tag.TopAppBar.profile_button, useUnmergedTree = true)
+        .assertIsDisplayed()
+  }
 }
