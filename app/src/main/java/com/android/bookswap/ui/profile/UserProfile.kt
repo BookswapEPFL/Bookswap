@@ -2,7 +2,6 @@ package com.android.bookswap.ui.profile
 
 import android.annotation.SuppressLint
 import android.util.Log
-import android.widget.Space
 import android.widget.Toast
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.Arrangement
@@ -44,7 +43,6 @@ import com.android.bookswap.model.UserBookViewModel
 import com.android.bookswap.resources.C
 import com.android.bookswap.ui.components.BookListComponent
 import com.android.bookswap.ui.components.ButtonComponent
-import com.android.bookswap.ui.map.SPACER_HEIGHT_DP
 import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.theme.*
 
@@ -179,83 +177,85 @@ fun UserProfile(
       topBar = topAppBar,
       bottomBar = bottomAppBar) {
         Column(modifier = Modifier.padding(it).fillMaxSize().background(ColorVariable.BackGround)) {
-          Box (
-              modifier = Modifier
-                  .fillMaxWidth(), // Ensure the Box takes up the full width
+          Box(
+              modifier = Modifier.fillMaxWidth(), // Ensure the Box takes up the full width
               contentAlignment = Alignment.Center // Center the content horizontally
-          ) {
-            IconButton(
-                onClick = { showEditPicture.value = true },
-                modifier =
-                    Modifier.size(90.dp)
-                        .clip(CircleShape)
-                        .testTag(C.Tag.UserProfile.profileImage)) {
-                  Box(
-                      modifier =
-                          Modifier.padding(2.5f.dp).border(3.5f.dp, Color(0xFFA98467), CircleShape),
-                      contentAlignment = Alignment.Center) {
-                        // show either the profile picture or the default icon
-                        if (userData.profilePictureUrl.isEmpty()) {
-                          Image(
-                              imageVector = Icons.Rounded.AccountCircle,
-                              contentDescription = "No profile picture",
-                              modifier =
-                                  Modifier
-                                      // .fillMaxSize()
-                                      .size(100.dp)
-                                      .scale(1.2f)
-                                      .clipToBounds(),
-                              colorFilter = ColorFilter.tint(Color(0xFF6C584C)))
-                        } else {
-                          AsyncImage(
-                              model = userData.profilePictureUrl,
-                              contentDescription = "profile picture",
-                              modifier =
-                                  Modifier.fillMaxSize()
-                                      .scale(1.2f)
-                                      .clipToBounds()
-                                      .clip(CircleShape))
-                        }
-                      }
-                  Box(
-                      modifier = Modifier.fillMaxSize().padding(0f.dp),
-                      contentAlignment = Alignment.TopEnd) {
-                        Image(
-                            imageVector = Icons.Outlined.Edit,
-                            contentDescription = "",
-                            colorFilter = ColorFilter.tint(Color(0xFFAAAAAA)))
-                      }
-                }
-          }
-            Spacer(modifier = Modifier.height(6.dp))
+              ) {
+                IconButton(
+                    onClick = { showEditPicture.value = true },
+                    modifier =
+                        Modifier.size(90.dp)
+                            .clip(CircleShape)
+                            .testTag(C.Tag.UserProfile.profileImage)) {
+                      Box(
+                          modifier =
+                              Modifier.padding(2.5f.dp)
+                                  .border(3.5f.dp, Color(0xFFA98467), CircleShape),
+                          contentAlignment = Alignment.Center) {
+                            // show either the profile picture or the default icon
+                            if (userData.profilePictureUrl.isEmpty()) {
+                              Image(
+                                  imageVector = Icons.Rounded.AccountCircle,
+                                  contentDescription = "No profile picture",
+                                  modifier =
+                                      Modifier
+                                          // .fillMaxSize()
+                                          .size(100.dp)
+                                          .scale(1.2f)
+                                          .clipToBounds(),
+                                  colorFilter = ColorFilter.tint(Color(0xFF6C584C)))
+                            } else {
+                              AsyncImage(
+                                  model = userData.profilePictureUrl,
+                                  contentDescription = "profile picture",
+                                  modifier =
+                                      Modifier.fillMaxSize()
+                                          .scale(1.2f)
+                                          .clipToBounds()
+                                          .clip(CircleShape))
+                            }
+                          }
+                      Box(
+                          modifier = Modifier.fillMaxSize().padding(0f.dp),
+                          contentAlignment = Alignment.TopEnd) {
+                            Image(
+                                imageVector = Icons.Outlined.Edit,
+                                contentDescription = "",
+                                colorFilter = ColorFilter.tint(Color(0xFFAAAAAA)))
+                          }
+                    }
+              }
+          Spacer(modifier = Modifier.height(6.dp))
 
-            // Full name text
-            LabeledTextUserProfile(
-                testTag = C.Tag.OtherUserProfile.fullname,
-                label = "Your name:",
-                value = "${userData.greeting} ${userData.firstName} ${userData.lastName}")
+          // Full name text
+          LabeledTextUserProfile(
+              testTag = C.Tag.OtherUserProfile.fullname,
+              label = "Your name:",
+              value = "${userData.greeting} ${userData.firstName} ${userData.lastName}")
 
           // Email text
-            LabeledTextUserProfile(
-                testTag = C.Tag.OtherUserProfile.email, label = "Your email:", value = userData.email)
+          LabeledTextUserProfile(
+              testTag = C.Tag.OtherUserProfile.email, label = "Your email:", value = userData.email)
 
           // Phone number text
-            LabeledTextUserProfile(
-                testTag = C.Tag.OtherUserProfile.phone,
-                label = "Your phone:",
-                value = userData.phoneNumber)
+          LabeledTextUserProfile(
+              testTag = C.Tag.OtherUserProfile.phone,
+              label = "Your phone:",
+              value = userData.phoneNumber)
           // User address:
-            LabeledTextUserProfile(
-                testTag = C.Tag.OtherUserProfile.address,
-                label = "Your address:",
-                value = "${userData.latitude}, ${userData.longitude}")
+          LabeledTextUserProfile(
+              testTag = C.Tag.OtherUserProfile.address,
+              label = "Your address:",
+              value = "${userData.latitude}, ${userData.longitude}")
 
           Spacer(modifier = Modifier.height(8.dp))
 
           // Edit Button
-          ButtonComponent({ showEditProfile = true }, Modifier.testTag(C.Tag.UserProfile.edit).align(Alignment.CenterHorizontally)) {
-            Text("Edit Profile")
-          }
+          ButtonComponent(
+              { showEditProfile = true },
+              Modifier.testTag(C.Tag.UserProfile.edit).align(Alignment.CenterHorizontally)) {
+                Text("Edit Profile")
+              }
 
           // Book List
           if (isBooksLoading) {
@@ -292,29 +292,29 @@ private val BOX_PADDING = 2.dp
  */
 @Composable
 fun LabeledTextUserProfile(testTag: String = "LabeledText", label: String, value: String) {
-    Box(
-        modifier =
-        Modifier.fillMaxWidth()
-            .padding(BOX_PADDING)
-            .background(ColorVariable.Secondary, shape = MaterialTheme.shapes.small)
-            .border(BORDER_WIDTH, ColorVariable.Accent, shape = MaterialTheme.shapes.small)) {
+  Box(
+      modifier =
+          Modifier.fillMaxWidth()
+              .padding(BOX_PADDING)
+              .background(ColorVariable.Secondary, shape = MaterialTheme.shapes.small)
+              .border(BORDER_WIDTH, ColorVariable.Accent, shape = MaterialTheme.shapes.small)) {
         Row(
             modifier = Modifier.fillMaxWidth().padding(ROW_PADDING),
             verticalAlignment = Alignment.CenterVertically) {
-            Text(
-                text = label,
-                color = ColorVariable.Accent,
-                style = MaterialTheme.typography.labelLarge,
-                modifier =
-                Modifier.weight(LABEL_WEIGHT).testTag(testTag + C.Tag.LabeledText.label))
-            Text(
-                text = value,
-                color = ColorVariable.Accent,
-                style = MaterialTheme.typography.bodyLarge,
-                modifier =
-                Modifier.weight(VALUE_WEIGHT).testTag(testTag + C.Tag.LabeledText.text))
-        }
-    }
+              Text(
+                  text = label,
+                  color = ColorVariable.Accent,
+                  style = MaterialTheme.typography.labelLarge,
+                  modifier =
+                      Modifier.weight(LABEL_WEIGHT).testTag(testTag + C.Tag.LabeledText.label))
+              Text(
+                  text = value,
+                  color = ColorVariable.Accent,
+                  style = MaterialTheme.typography.bodyLarge,
+                  modifier =
+                      Modifier.weight(VALUE_WEIGHT).testTag(testTag + C.Tag.LabeledText.text))
+            }
+      }
 }
 
 // @Preview(showBackground = true, widthDp = 540, heightDp = 1110)
