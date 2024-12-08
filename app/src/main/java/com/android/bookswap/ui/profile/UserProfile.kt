@@ -160,7 +160,7 @@ fun UserProfile(
                 Modifier.fillMaxWidth().padding(16.dp),
                 Arrangement.Center,
                 Alignment.CenterHorizontally) {
-                  Text("Edit Profile Picture", Modifier.testTag(C.Tag.TopAppBar.screen_title))
+                  Text("Edit Profile Picture")
                   ButtonComponent(
                       { photoRequester.requestPhoto() },
                       Modifier.testTag(C.Tag.UserProfile.take_photo)) {

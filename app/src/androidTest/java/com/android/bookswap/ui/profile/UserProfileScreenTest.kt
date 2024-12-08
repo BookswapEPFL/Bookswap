@@ -4,6 +4,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.assertAll
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithTag
@@ -224,4 +225,12 @@ class UserProfileScreenTest : TestCase() {
         .onAllNodesWithTag(C.Tag.BookDisplayComp.author)
         .assertAll(hasText("Author 1").or(hasText("Author 2")))
   }
+
+    @Test
+    fun testTopAppBar() {
+        composeTestRule.onNodeWithTag(C.Tag.top_app_bar_container).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(C.Tag.TopAppBar.screen_title).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(C.Tag.TopAppBar.screen_title).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(C.Tag.TopAppBar.profile_button, useUnmergedTree = true).assertIsDisplayed()
+    }
 }
