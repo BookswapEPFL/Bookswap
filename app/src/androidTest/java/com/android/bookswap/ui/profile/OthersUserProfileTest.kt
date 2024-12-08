@@ -1,6 +1,7 @@
 package com.android.bookswap.ui.profile
 
 import androidx.compose.ui.test.assertAll
+import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.hasText
@@ -148,6 +149,12 @@ class OthersUserProfileTest : TestCase() {
         .onNodeWithTag(C.Tag.OtherUserProfile.address + C.Tag.LabeledText.text)
         .assertIsDisplayed()
         .assertTextEquals("45.0, 50.0")
+
+    composeTestRule
+        .onNodeWithTag(C.Tag.OtherUserProfile.chatButton)
+        .assertIsDisplayed()
+        .assertHasClickAction()
+        .assertTextEquals("Message with John")
   }
 
   @Test

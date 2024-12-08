@@ -140,6 +140,7 @@ object C {
       const val email = "email"
       const val phone = "phoneNumber"
       const val address = "address"
+      const val chatButton = "chatButton"
     }
 
     // Edit User Profile Screen specific tags (EditProfile.kt)
