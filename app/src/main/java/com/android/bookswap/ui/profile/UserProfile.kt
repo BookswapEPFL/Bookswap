@@ -2,13 +2,17 @@ package com.android.bookswap.ui.profile
 
 import android.annotation.SuppressLint
 import android.util.Log
+import android.widget.Space
 import android.widget.Toast
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -40,6 +44,7 @@ import com.android.bookswap.model.UserBookViewModel
 import com.android.bookswap.resources.C
 import com.android.bookswap.ui.components.BookListComponent
 import com.android.bookswap.ui.components.ButtonComponent
+import com.android.bookswap.ui.map.SPACER_HEIGHT_DP
 import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.theme.*
 
@@ -173,8 +178,12 @@ fun UserProfile(
       modifier = Modifier.testTag(C.Tag.user_profile_screen_container),
       topBar = topAppBar,
       bottomBar = bottomAppBar) {
-        Column(modifier = Modifier.padding(it).fillMaxSize()) {
-          Box {
+        Column(modifier = Modifier.padding(it).fillMaxSize().background(ColorVariable.BackGround)) {
+          Box (
+              modifier = Modifier
+                  .fillMaxWidth(), // Ensure the Box takes up the full width
+              contentAlignment = Alignment.Center // Center the content horizontally
+          ) {
             IconButton(
                 onClick = { showEditPicture.value = true },
                 modifier =
@@ -218,24 +227,33 @@ fun UserProfile(
                       }
                 }
           }
-          // Full name text
-          Text(
-              text = "${userData.greeting} ${userData.firstName} ${userData.lastName}",
-              modifier = Modifier.testTag(C.Tag.UserProfile.fullname))
+            Spacer(modifier = Modifier.height(6.dp))
+
+            // Full name text
+            LabeledTextUserProfile(
+                testTag = C.Tag.OtherUserProfile.fullname,
+                label = "Your name:",
+                value = "${userData.greeting} ${userData.firstName} ${userData.lastName}")
 
           // Email text
-          Text(text = userData.email, modifier = Modifier.testTag(C.Tag.UserProfile.email))
+            LabeledTextUserProfile(
+                testTag = C.Tag.OtherUserProfile.email, label = "Your email:", value = userData.email)
 
           // Phone number text
-          Text(text = userData.phoneNumber, modifier = Modifier.testTag(C.Tag.UserProfile.phone))
+            LabeledTextUserProfile(
+                testTag = C.Tag.OtherUserProfile.phone,
+                label = "Your phone:",
+                value = userData.phoneNumber)
+          // User address:
+            LabeledTextUserProfile(
+                testTag = C.Tag.OtherUserProfile.address,
+                label = "Your address:",
+                value = "${userData.latitude}, ${userData.longitude}")
 
-          // User address
-          Text(
-              text = "${userData.latitude}, ${userData.longitude}",
-              modifier = Modifier.testTag(C.Tag.UserProfile.address))
+          Spacer(modifier = Modifier.height(8.dp))
 
           // Edit Button
-          ButtonComponent({ showEditProfile = true }, Modifier.testTag(C.Tag.UserProfile.edit)) {
+          ButtonComponent({ showEditProfile = true }, Modifier.testTag(C.Tag.UserProfile.edit).align(Alignment.CenterHorizontally)) {
             Text("Edit Profile")
           }
 
@@ -257,6 +275,46 @@ fun UserProfile(
           }
         }
       }
+}
+
+/** Constant * */
+private const val LABEL_WEIGHT = 0.75f
+private const val VALUE_WEIGHT = 2f
+private val BORDER_WIDTH = 2.dp
+private val ROW_PADDING = 4.dp
+private val BOX_PADDING = 2.dp
+
+/**
+ * A composable function to display a labeled text field.
+ *
+ * @param label The label for the field (e.g., "Email:").
+ * @param value The value of the field.
+ */
+@Composable
+fun LabeledTextUserProfile(testTag: String = "LabeledText", label: String, value: String) {
+    Box(
+        modifier =
+        Modifier.fillMaxWidth()
+            .padding(BOX_PADDING)
+            .background(ColorVariable.Secondary, shape = MaterialTheme.shapes.small)
+            .border(BORDER_WIDTH, ColorVariable.Accent, shape = MaterialTheme.shapes.small)) {
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(ROW_PADDING),
+            verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                text = label,
+                color = ColorVariable.Accent,
+                style = MaterialTheme.typography.labelLarge,
+                modifier =
+                Modifier.weight(LABEL_WEIGHT).testTag(testTag + C.Tag.LabeledText.label))
+            Text(
+                text = value,
+                color = ColorVariable.Accent,
+                style = MaterialTheme.typography.bodyLarge,
+                modifier =
+                Modifier.weight(VALUE_WEIGHT).testTag(testTag + C.Tag.LabeledText.text))
+        }
+    }
 }
 
 // @Preview(showBackground = true, widthDp = 540, heightDp = 1110)
