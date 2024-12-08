@@ -150,6 +150,25 @@ fun OthersUserProfileScreen(
                     label = "Address:",
                     value = "${user.latitude}, ${user.longitude}")
 
+                // Chat Button
+                Button(
+                    modifier =
+                        Modifier.testTag(C.Tag.OtherUserProfile.chatButton)
+                            .align(Alignment.CenterHorizontally)
+                            .fillMaxWidth(0.5f),
+                    colors =
+                        ButtonColors(
+                            ColorVariable.Secondary,
+                            ColorVariable.Accent,
+                            ColorVariable.Secondary,
+                            ColorVariable.Accent),
+                    border = BorderStroke(1.dp, ColorVariable.Accent),
+                    onClick = {
+                      navigationActions.navigateTo(C.Screen.CHAT, user.userUUID.toString())
+                    }) {
+                      Text("Message with ${user.firstName}")
+                    }
+
                 // Book List
                 if (isBooksLoading) {
                   Log.e("OtherUserProfileScreen", "Books are loading")
