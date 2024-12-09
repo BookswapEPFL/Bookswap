@@ -216,7 +216,9 @@ class OthersUserProfileTest : TestCase() {
           navigationActions = mockNavigationActions)
     }
     // Verify the container is displayed
-    composeTestRule.onNodeWithTag(C.Tag.OtherUserProfile.profilePictureContainer).assertIsDisplayed()
+    composeTestRule
+        .onNodeWithTag(C.Tag.OtherUserProfile.profilePictureContainer)
+        .assertIsDisplayed()
 
     // Verify the picture is displayed inside the container
     composeTestRule.onNodeWithTag(C.Tag.OtherUserProfile.profile_image_picture).assertIsDisplayed()
@@ -257,7 +259,9 @@ class OthersUserProfileTest : TestCase() {
           navigationActions = mockNavigationActions)
     }
     // Verify the container is displayed
-    composeTestRule.onNodeWithTag(C.Tag.OtherUserProfile.profilePictureContainer).assertIsDisplayed()
+    composeTestRule
+        .onNodeWithTag(C.Tag.OtherUserProfile.profilePictureContainer)
+        .assertIsDisplayed()
 
     // Verify the icon is displayed inside the container
     composeTestRule.onNodeWithTag(C.Tag.OtherUserProfile.profile_image_icon).assertIsDisplayed()
