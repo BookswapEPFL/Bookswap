@@ -18,8 +18,11 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
 import com.android.bookswap.data.DataBook
 import com.android.bookswap.data.DataUser
 import com.android.bookswap.data.repository.BooksRepository
@@ -36,7 +39,7 @@ private val PROFILE_PICTURE_SIZE = 90.dp
 private val PROFILE_PICTURE_BORDER_WIDTH = 3.dp
 private val ICON_SIZE = 80.dp
 private val PADDING = 16.dp
-private val ITEM_SPACING = 8.dp
+private val ITEM_SPACING = 4.dp
 
 /**
  * Composable function to display the user profile screen.
@@ -114,16 +117,28 @@ fun OthersUserProfileScreen(
                         Modifier.padding(PADDING)
                             .size(PROFILE_PICTURE_SIZE)
                             .border(PROFILE_PICTURE_BORDER_WIDTH, ColorVariable.Accent, CircleShape)
-                            .background(ColorVariable.AccentSecondary, CircleShape),
+                            .background(ColorVariable.AccentSecondary, CircleShape)
+                            .testTag(C.Tag.OtherUserProfile.image_container),
                     contentAlignment = Alignment.Center) {
-                      if (user.profilePictureUrl.isNotEmpty()) {
-                        // Replace with an image loader like Coil or Glide if required
-                        Text("Profile Picture Placeholder")
+
+                      val profilePictureUrl = user.profilePictureUrl
+                      if (profilePictureUrl.isNotEmpty()) {
+                          Log.i("BookDisplayComponent", "Photo URL: ${profilePictureUrl}")
+                          AsyncImage(
+                              model = profilePictureUrl,
+                              contentDescription = "Book Picture",
+                              modifier = Modifier
+                                  .fillMaxSize()
+                                  .clip(CircleShape)
+                                  .testTag(C.Tag.OtherUserProfile.profile_image_picture),
+                              contentScale = ContentScale.Crop)
                       } else {
                         Icon(
                             imageVector = Icons.Default.AccountCircle,
                             contentDescription = null,
-                            modifier = Modifier.size(ICON_SIZE),
+                            modifier = Modifier
+                                .size(ICON_SIZE)
+                                .testTag(C.Tag.OtherUserProfile.profile_image_icon),
                             tint = ColorVariable.Accent)
                       }
                     }
@@ -174,8 +189,9 @@ fun OthersUserProfileScreen(
 /** Constant * */
 private const val LABEL_WEIGHT = 0.5f
 private const val VALUE_WEIGHT = 2f
-private val BORDER_WIDTH = 1.dp
-private val PADDING_SMALL = 4.dp
+private val BORDER_WIDTH = 2.dp
+private val ROW_PADDING = 4.dp
+private val BOX_PADDING = 2.dp
 
 /**
  * A composable function to display a labeled text field.
@@ -188,10 +204,11 @@ fun LabeledText(testTag: String = "LabeledText", label: String, value: String) {
   Box(
       modifier =
           Modifier.fillMaxWidth()
+              .padding(BOX_PADDING)
               .background(ColorVariable.Secondary, shape = MaterialTheme.shapes.small)
               .border(BORDER_WIDTH, ColorVariable.Accent, shape = MaterialTheme.shapes.small)) {
         Row(
-            modifier = Modifier.fillMaxWidth().padding(PADDING_SMALL),
+            modifier = Modifier.fillMaxWidth().padding(ROW_PADDING),
             verticalAlignment = Alignment.CenterVertically) {
               Text(
                   text = label,
