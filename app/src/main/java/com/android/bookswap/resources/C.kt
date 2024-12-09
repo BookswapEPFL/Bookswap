@@ -143,6 +143,7 @@ object C {
       const val image_container = BOOK + UI_T.IMAGE
       const val profile_image_picture = "profile_image_picture" + UI_T.IMAGE
       const val profile_image_icon = "profile_image_icon" + UI_T.IMAGE
+      const val chatButton = "chatButton"
     }
 
     // Edit User Profile Screen specific tags (EditProfile.kt)

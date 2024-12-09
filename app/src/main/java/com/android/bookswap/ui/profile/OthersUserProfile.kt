@@ -40,6 +40,8 @@ private val PROFILE_PICTURE_BORDER_WIDTH = 3.dp
 private val ICON_SIZE = 80.dp
 private val PADDING = 16.dp
 private val ITEM_SPACING = 4.dp
+private val PADDING_SMALL = 4.dp
+private val HALF_WIDTH = 0.5f
 
 /**
  * Composable function to display the user profile screen.
@@ -163,6 +165,25 @@ fun OthersUserProfileScreen(
                     testTag = C.Tag.OtherUserProfile.address,
                     label = "Address:",
                     value = "${user.latitude}, ${user.longitude}")
+
+                // Chat Button
+                Button(
+                    modifier =
+                        Modifier.testTag(C.Tag.OtherUserProfile.chatButton)
+                            .align(Alignment.CenterHorizontally)
+                            .fillMaxWidth(HALF_WIDTH),
+                    colors =
+                        ButtonColors(
+                            ColorVariable.Secondary,
+                            ColorVariable.Accent,
+                            ColorVariable.Secondary,
+                            ColorVariable.Accent),
+                    border = BorderStroke(BORDER_WIDTH, ColorVariable.Accent),
+                    onClick = {
+                      navigationActions.navigateTo(C.Screen.CHAT, user.userUUID.toString())
+                    }) {
+                      Text("Message with ${user.firstName}")
+                    }
 
                 // Book List
                 if (isBooksLoading) {
