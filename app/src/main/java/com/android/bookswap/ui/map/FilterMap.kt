@@ -120,7 +120,7 @@ fun FilterMapScreen(navigationActions: NavigationActions, bookFilter: BookFilter
           Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
             Button(
                 onClick = {
-                  bookFilter.setGenres(selectedFiltersGenres.map { it.name })
+                  bookFilter.setGenres(selectedFiltersGenres.map { it.Genre })
                   bookFilter.setLanguages(selectedFiltersLanguages.map { it.name })
                   Toast.makeText(context, "Filters applied", Toast.LENGTH_SHORT).show()
                   navigationActions.goBack()
