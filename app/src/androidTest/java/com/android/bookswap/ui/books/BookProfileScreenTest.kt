@@ -1,23 +1,33 @@
 package com.android.bookswap.ui.books
 
 import android.annotation.SuppressLint
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performScrollToNode
 import androidx.compose.ui.test.performTouchInput
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import androidx.test.espresso.action.ViewActions.swipeUp
 import com.android.bookswap.data.BookGenres
 import com.android.bookswap.data.BookLanguages
 import com.android.bookswap.data.DataBook
 import com.android.bookswap.data.repository.BooksRepository
+import com.android.bookswap.data.repository.UsersRepository
+import com.android.bookswap.model.AppConfig
+import com.android.bookswap.model.LocalAppConfig
+import com.android.bookswap.model.UserViewModel
 import com.android.bookswap.resources.C
 import com.android.bookswap.ui.navigation.NavigationActions
+import io.mockk.clearAllMocks
 import io.mockk.coEvery
+import io.mockk.every
 import io.mockk.mockk
 import java.util.UUID
+import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -25,11 +35,15 @@ import org.junit.Test
 class BookProfileScreenTest {
 
   @get:Rule val composeTestRule = createComposeRule()
-  private lateinit var mockNavController: NavigationActions
+  private lateinit var mockNavController: NavHostController
+  private lateinit var mockNavigationActions: NavigationActions
+  private lateinit var mockUserRepository: UsersRepository
+  private lateinit var userVM: UserViewModel
   private lateinit var mockBookRepo: BooksRepository
   private val testBookId = UUID.randomUUID()
   private val modTestBookId = UUID.randomUUID()
   private val currentUserId = UUID.randomUUID()
+  private val otherUserId = UUID.randomUUID()
   private lateinit var modTestBook: DataBook
 
   private val testBook =
@@ -72,12 +86,20 @@ class BookProfileScreenTest {
 
   @Before
   fun setUp() {
-    mockNavController = mockk()
+    mockNavController = mockk<NavHostController>(relaxed = true)
+    mockNavigationActions = NavigationActions(mockNavController)
     mockBookRepo = mockk()
+    mockUserRepository = mockk()
+    userVM = UserViewModel(currentUserId, mockUserRepository)
 
     modTestBook =
         testBook.copy(
-            uuid = modTestBookId, description = "Historia de España", photo = "new_photo_url")
+            uuid = modTestBookId,
+            description = "Historia de España",
+            photo = "new_photo_url",
+            userId = otherUserId)
+
+    every { mockUserRepository.getUser(currentUserId, any()) } answers { currentUserId }
 
     // Mocking the getBook call to return the test book
     coEvery { mockBookRepo.getBook(any(), any(), any()) } answers
@@ -92,12 +114,19 @@ class BookProfileScreenTest {
         }
   }
 
+  @After
+  fun tearDown() {
+    clearAllMocks()
+  }
+
   @Test
   fun hasRequiredComponents() {
     composeTestRule.setContent {
       val navController = rememberNavController()
       val navigationActions = NavigationActions(navController)
-      BookProfileScreen(testBookId, mockBookRepo, navigationActions)
+      CompositionLocalProvider(LocalAppConfig provides AppConfig(userViewModel = userVM)) {
+        BookProfileScreen(testBookId, mockBookRepo, navigationActions)
+      }
     }
 
     composeTestRule.onNodeWithTag(C.Tag.BookProfile.imagePlaceholder).assertIsDisplayed()
@@ -105,7 +134,8 @@ class BookProfileScreenTest {
     composeTestRule.onNodeWithTag(C.Tag.BookProfile.author).assertIsDisplayed()
     composeTestRule
         .onNodeWithTag(C.Tag.BookProfile.scrollable)
-        .performScrollToNode(hasTestTag(C.Tag.BookProfile.location))
+        .performScrollToNode(hasTestTag(C.Tag.BookProfile.edit))
+
     composeTestRule.onNodeWithTag(C.Tag.BookProfile.language).assertIsDisplayed()
     composeTestRule.onNodeWithTag(C.Tag.BookProfile.genres).assertIsDisplayed()
     testBook.genres.forEach { genre ->
@@ -124,7 +154,9 @@ class BookProfileScreenTest {
     composeTestRule.setContent {
       val navController = rememberNavController()
       val navigationActions = NavigationActions(navController)
-      BookProfileScreen(modTestBookId, mockBookRepo, navigationActions)
+      CompositionLocalProvider(LocalAppConfig provides AppConfig(userViewModel = userVM)) {
+        BookProfileScreen(modTestBookId, mockBookRepo, navigationActions)
+      }
     }
 
     composeTestRule.onNodeWithTag(C.Tag.BookProfile.image).assertIsDisplayed()
@@ -136,7 +168,9 @@ class BookProfileScreenTest {
     composeTestRule.setContent {
       val navController = rememberNavController()
       val navigationActions = NavigationActions(navController)
-      BookProfileScreen(testBookId, mockBookRepo, navigationActions)
+      CompositionLocalProvider(LocalAppConfig provides AppConfig(userViewModel = userVM)) {
+        BookProfileScreen(testBookId, mockBookRepo, navigationActions)
+      }
     }
 
     // Check that the "Synopsis" title is displayed
@@ -159,5 +193,45 @@ class BookProfileScreenTest {
 
     // Optionally, check that after scrolling, the scroll bar is still visible
     scrollNode.assertIsDisplayed()
+  }
+
+  @Test
+  fun editButtonNavigatesToEditScreen() {
+    composeTestRule.setContent {
+      val navController = rememberNavController()
+      val navigationActions = NavigationActions(navController)
+      CompositionLocalProvider(LocalAppConfig provides AppConfig(userViewModel = userVM)) {
+        BookProfileScreen(testBookId, mockBookRepo, navigationActions)
+      }
+    }
+
+    composeTestRule
+        .onNodeWithTag(C.Tag.BookProfile.scrollable)
+        .performScrollToNode(hasTestTag(C.Tag.BookProfile.edit))
+
+    composeTestRule
+        .onNodeWithTag(C.Tag.BookProfile.edit)
+        .assertIsDisplayed()
+        .assertTextEquals("Edit Book")
+  }
+
+  @Test
+  fun otherUserButtonNavigatesToEditScreen() {
+    composeTestRule.setContent {
+      val navController = rememberNavController()
+      val navigationActions = NavigationActions(navController)
+      CompositionLocalProvider(LocalAppConfig provides AppConfig(userViewModel = userVM)) {
+        BookProfileScreen(modTestBookId, mockBookRepo, navigationActions)
+      }
+    }
+
+    composeTestRule
+        .onNodeWithTag(C.Tag.BookProfile.scrollable)
+        .performScrollToNode(hasTestTag(C.Tag.BookProfile.edit))
+
+    composeTestRule
+        .onNodeWithTag(C.Tag.BookProfile.edit)
+        .assertIsDisplayed()
+        .assertTextEquals("Go to User")
   }
 }

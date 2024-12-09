@@ -1,5 +1,6 @@
 package com.android.bookswap.ui.books
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -16,6 +17,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -41,7 +44,6 @@ import com.android.bookswap.data.DataBook
 import com.android.bookswap.data.repository.BooksRepository
 import com.android.bookswap.model.LocalAppConfig
 import com.android.bookswap.resources.C
-import com.android.bookswap.ui.components.ButtonComponent
 import com.android.bookswap.ui.components.drawVerticalScrollbar
 import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.theme.ColorVariable
@@ -54,6 +56,8 @@ val HORIZONTAL_PADDING = 16.dp
 val TOP_PADDING = 2.dp
 const val SCROLLBAR_PADDING = 12f
 const val MAX_LINES = 15
+const val BORDER_WIDTH = 1f
+const val HALF_WIDTH = 0.5f
 
 /**
  * Composable function to display the profile screen of a book.
@@ -230,19 +234,36 @@ fun BookProfileScreen(
                           }
                         }
                   }
-                  // Conditionally display the "Edit Book" button if the current user owns the book
-                  if (dataBook.userId == appConfig.userViewModel.getUser().userUUID) {
-                    item { Spacer(modifier = Modifier.height(COLUMN_PADDING)) }
-                    item {
-                      ButtonComponent(
-                          onClick = {
+                  // Conditionally display the "Edit Book" or "Go to User" button if the current
+                  // user owns the book or not
+                  item {
+                    Button(
+                        colors =
+                            ButtonColors(
+                                ColorVariable.Secondary,
+                                ColorVariable.Accent,
+                                ColorVariable.Secondary,
+                                ColorVariable.Accent),
+                        border = BorderStroke(BORDER_WIDTH.dp, ColorVariable.Accent),
+                        onClick = {
+                          if (dataBook.userId == appConfig.userViewModel.getUser().userUUID) {
                             navController.navigateTo(C.Screen.EDIT_BOOK, dataBook.uuid.toString())
-                          },
-                          modifier =
-                              Modifier.padding(COLUMN_PADDING).testTag(C.Tag.BookProfile.edit)) {
-                            Text("Edit Book")
+                          } else {
+                            navController.navigateTo(
+                                C.Screen.OTHERS_USER_PROFILE, dataBook.userId.toString())
                           }
-                    }
+                        },
+                        modifier =
+                            Modifier.padding(COLUMN_PADDING)
+                                .testTag(C.Tag.BookProfile.edit)
+                                .fillMaxWidth(HALF_WIDTH)) {
+                          Text(
+                              if (dataBook.userId == appConfig.userViewModel.getUser().userUUID) {
+                                "Edit Book"
+                              } else {
+                                "Go to User"
+                              })
+                        }
                   }
                 }
               }

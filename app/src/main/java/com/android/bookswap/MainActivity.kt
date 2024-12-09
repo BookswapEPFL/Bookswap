@@ -238,6 +238,7 @@ class MainActivity : ComponentActivity() {
             if (bookId != null) {
               BookProfileScreen(
                   bookId = bookId, // Default for testing
+                  topAppBar = { topAppBar("Book Profile") },
                   booksRepository = BooksFirestoreSource(FirebaseFirestore.getInstance()),
                   navController = NavigationActions(navController),
               )
