@@ -217,4 +217,24 @@ class PhotoFirebaseStorageSourceTest {
     // Verify the callback is called with failure
     verify { callback(Result.failure(exception)) }
   }
+
+  @Test
+  fun `deletePhotoFromStorageWithUrl calls callback with failure when photo URL is invalid`() {
+    val callback = mockk<(Result<Unit>) -> Unit>(relaxed = true)
+
+    val invalidPhotoUrl =
+        "https://firebasestorage.googleapis.com/v0/b/app.appspot.com/o/invalidPath.jpg?alt=media&token=someToken"
+
+    photoStorageSource.deletePhotoFromStorageWithUrl(invalidPhotoUrl, callback)
+
+    shadowOf(Looper.getMainLooper()).idle()
+
+    verify {
+      callback.invoke(
+          withArg {
+            it.isFailure &&
+                (it.exceptionOrNull() as? IllegalArgumentException)?.message == "Invalid photo URL"
+          })
+    }
+  }
 }

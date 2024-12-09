@@ -93,6 +93,12 @@ class PhotoFirebaseStorageSource(private val storage: FirebaseStorage) :
   override fun deletePhotoFromStorageWithUrl(photoUrl: String, callback: (Result<Unit>) -> Unit) {
     val regex = Regex("""images%2F([a-zA-Z0-9\-]+)""")
     val matchResult = regex.find(photoUrl)
-    deletePhotoFromStorage(matchResult?.groups?.get(1)?.value.toString(), callback)
+
+    if (matchResult != null && matchResult.groups[1] != null) {
+      val photoId = matchResult.groups[1]!!.value
+      deletePhotoFromStorage(photoId, callback)
+    } else {
+      callback(Result.failure(IllegalArgumentException("Invalid photo URL")))
+    }
   }
 }
