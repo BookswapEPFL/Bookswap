@@ -44,6 +44,16 @@ import com.android.bookswap.ui.theme.ColorVariable
 import java.util.UUID
 
 /**
+ * Constant values used in the BookProfileScreen.
+ */
+const val COLUMN_WEIGHT = 1f
+val COLUMN_PADDING = 8.dp
+val HORIZONTAL_PADDING = 16.dp
+val TOP_PADDING = 2.dp
+
+
+
+/**
  * Composable function to display the profile screen of a book.
  *
  * @param DataBook The data object containing book details.
@@ -59,7 +69,7 @@ fun BookProfileScreen(
     topAppBar: @Composable () -> Unit = {},
     bottomAppBar: @Composable () -> Unit = {}
 ) {
-  val columnPadding = 8.dp
+
   val pictureWidth = (LocalConfiguration.current.screenWidthDp.dp * (0.60f))
   val pictureHeight = pictureWidth * 1.41f
   val image = R.drawable.isabellacatolica
@@ -93,7 +103,7 @@ fun BookProfileScreen(
                     .padding(innerPadding)
                     .background(ColorVariable.BackGround)
                     .testTag(C.Tag.BookProfile.scrollable),
-            verticalArrangement = Arrangement.spacedBy(columnPadding),
+            verticalArrangement = Arrangement.spacedBy(COLUMN_PADDING),
             horizontalAlignment = Alignment.CenterHorizontally) {
               when {
                 isLoading -> {
@@ -116,7 +126,7 @@ fun BookProfileScreen(
                   item {
                     Text(
                         text = dataBook.title,
-                        modifier = Modifier.testTag(C.Tag.BookProfile.title).padding(columnPadding),
+                        modifier = Modifier.testTag(C.Tag.BookProfile.title).padding(COLUMN_PADDING),
                         color = ColorVariable.Accent,
                         style = MaterialTheme.typography.titleLarge)
                   }
@@ -127,7 +137,7 @@ fun BookProfileScreen(
                         color = ColorVariable.AccentSecondary,
                         style = MaterialTheme.typography.titleMedium)
                   }
-                  item { Spacer(modifier = Modifier.height(columnPadding)) }
+                  item { Spacer(modifier = Modifier.height(COLUMN_PADDING)) }
                   item {
                     Box(
                         modifier =
@@ -152,26 +162,26 @@ fun BookProfileScreen(
                           }
                         }
                   }
-                  item { Spacer(modifier = Modifier.height(columnPadding)) }
+                  item { Spacer(modifier = Modifier.height(COLUMN_PADDING)) }
                   item {
                     dataBook.rating?.let {
                       Text(
-                          text = "Rating: $it/10",
+                          text = "Rating: $it/5",
                           color = ColorVariable.Accent,
                           style = MaterialTheme.typography.bodyMedium,
                           modifier =
-                              Modifier.padding(vertical = 8.dp).testTag(C.Tag.BookProfile.rating))
+                              Modifier.testTag(C.Tag.BookProfile.rating))
+                      Spacer(modifier = Modifier.height(COLUMN_PADDING))
                     }
                   }
-                  item { Spacer(modifier = Modifier.height(columnPadding)) }
+
                   item {
                     Text(
                         text = "Synopsis",
                         color = ColorVariable.Accent,
                         style = MaterialTheme.typography.titleSmall,
                         modifier =
-                            Modifier.padding(vertical = 8.dp)
-                                .testTag(C.Tag.BookProfile.synopsis_label))
+                            Modifier.testTag(C.Tag.BookProfile.synopsis_label))
                   }
                   item {
                     Text(
@@ -179,13 +189,13 @@ fun BookProfileScreen(
                         color = ColorVariable.Accent,
                         style = MaterialTheme.typography.bodyMedium,
                         modifier =
-                            Modifier.padding(vertical = 8.dp).testTag(C.Tag.BookProfile.synopsis),
+                            Modifier.testTag(C.Tag.BookProfile.synopsis),
                         textAlign = TextAlign.Center)
                   }
-                  item { Spacer(modifier = Modifier.height(columnPadding)) }
+                  item { Spacer(modifier = Modifier.height(COLUMN_PADDING)) }
                   item {
-                    Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)) {
-                      Column(modifier = Modifier.weight(1f)) {
+                    Row(modifier = Modifier.fillMaxWidth().padding(horizontal = HORIZONTAL_PADDING)) {
+                      Column(modifier = Modifier.weight(COLUMN_WEIGHT)) {
                         ProfileText(
                             text = "Language: ${dataBook.language.languageCode}",
                             testTag = C.Tag.BookProfile.language)
@@ -196,7 +206,7 @@ fun BookProfileScreen(
                               color = ColorVariable.AccentSecondary,
                               style = MaterialTheme.typography.bodyMedium,
                               modifier =
-                                  Modifier.padding(top = 2.dp, start = 16.dp)
+                                  Modifier.padding(top = TOP_PADDING, start = HORIZONTAL_PADDING)
                                       .testTag(genre.Genre + C.Tag.BookProfile.genre))
                         }
                         ProfileText(
@@ -205,9 +215,7 @@ fun BookProfileScreen(
                             testTag = C.Tag.BookProfile.isbn)
                       }
 
-                      VerticalDivider(color = ColorVariable.Accent, thickness = 1.dp)
-
-                      Column(modifier = Modifier.weight(1f)) {
+                      Column(modifier = Modifier.weight(COLUMN_WEIGHT)) {
                         ProfileText(
                             text = "Date of Publication: [Temporary Date]",
                             testTag = C.Tag.BookProfile.date)
@@ -226,20 +234,16 @@ fun BookProfileScreen(
                   }
                   // Conditionally display the "Edit Book" button if the current user owns the book
                   if (dataBook.userId == appConfig.userViewModel.uuid) {
-                    item { Spacer(modifier = Modifier.height(columnPadding)) }
+                    item { Spacer(modifier = Modifier.height(COLUMN_PADDING)) }
                     item {
                       ButtonComponent(
                           onClick = {
                             navController.navigateTo(C.Screen.EDIT_BOOK, dataBook.uuid.toString())
                           },
-                          modifier = Modifier.padding(8.dp).testTag(C.Tag.BookProfile.edit)) {
+                          modifier = Modifier.padding(COLUMN_PADDING).testTag(C.Tag.BookProfile.edit)) {
                             Text("Edit Book")
                           }
                     }
-                  }
-                  item {
-                    Spacer(
-                        modifier = Modifier.height(0.dp).testTag(C.Tag.BookProfile.scrollable_end))
                   }
                 }
               }
@@ -258,5 +262,5 @@ fun ProfileText(text: String, testTag: String) {
       text = text,
       color = ColorVariable.Accent,
       style = MaterialTheme.typography.bodyMedium,
-      modifier = Modifier.padding(vertical = 8.dp).testTag(testTag))
+      modifier = Modifier.padding(vertical = COLUMN_PADDING).testTag(testTag))
 }
