@@ -231,7 +231,9 @@ class MainActivity : ComponentActivity() {
             UserProfile(
                 photoStorage = photoStorage,
                 booksRepository = bookRepository,
-                navigationActions = navigationActions)
+                navigationActions = navigationActions,
+                topAppBar = { topAppBar("Your Profile") },
+                bottomAppBar = { bottomAppBar(this@navigation.route ?: "") })
           }
           composable("${C.Screen.BOOK_PROFILE}/{bookId}") { backStackEntry ->
             val bookId = backStackEntry.arguments?.getString("bookId")?.let { UUID.fromString(it) }
