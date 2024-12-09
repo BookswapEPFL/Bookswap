@@ -54,7 +54,9 @@ class NavigationFromBookProfileToEditBookTest {
             BookLanguages.ENGLISH,
             "1234567890",
             listOf(BookGenres.FICTION),
-            currentUserId)
+            currentUserId,
+            false,
+            false)
 
     val mockBookRepo = mockk<BooksRepository>(relaxed = true)
     coEvery { mockBookRepo.getBook(eq(testBookId), any(), any()) } answers
@@ -72,12 +74,11 @@ class NavigationFromBookProfileToEditBookTest {
               composable(C.Screen.BOOK_PROFILE) {
                 BookProfileScreen(testBookId, mockBookRepo, NavigationActions(navController))
               }
-              composable("${C.Screen.EDIT_BOOK}/{bookId}") { backStackEntry ->
-                val bookId =
-                    backStackEntry.arguments?.getString("bookId")?.let { UUID.fromString(it) }
-                if (bookId != null) {
-                  EditBookScreen(
-                      mockBookRepo, NavigationActions(navController), testBook.copy(uuid = bookId))
+              composable("${C.Screen.EDIT_BOOK}/{bookUUID}") { backStackEntry ->
+                val bookUUID =
+                    backStackEntry.arguments?.getString("bookUUID")?.let { UUID.fromString(it) }
+                if (bookUUID != null) {
+                  EditBookScreen(mockBookRepo, NavigationActions(navController), bookUUID)
                 }
               }
             }
@@ -144,7 +145,9 @@ class NavigationFromBookProfileToEditBookTest {
             BookLanguages.ENGLISH,
             "1234567890",
             listOf(BookGenres.FICTION),
-            bookUserId // Different from currentUserId
+            bookUserId,
+            false,
+            false // Different from currentUserId
             )
 
     val mockBookRepo = mockk<BooksRepository>(relaxed = true)

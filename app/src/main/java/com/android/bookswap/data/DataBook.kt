@@ -3,16 +3,20 @@ package com.android.bookswap.data
 import java.util.UUID
 
 /**
- * Represent a book with various properties
+ * Represents a book with various properties.
  *
- * @param uuid Internal uuid for the book
- * @param title Title of the book
- * @param author Author of the book
- * @param description Short description of the book
- * @param rating Rating of the book out of 5 (if applicable)
- * @param photo Photo of a book
- * @param language Language of the book
- * @param isbn ISBN of the book (International Standard Book Number)
+ * @param uuid Internal UUID for the book.
+ * @param title Title of the book.
+ * @param author Author of the book.
+ * @param description Short description of the book.
+ * @param rating Rating of the book out of 5 (if applicable).
+ * @param photo Photo of the book.
+ * @param language Language of the book.
+ * @param isbn ISBN of the book (International Standard Book Number).
+ * @param genres List of genres the book belongs to.
+ * @param userId UUID of the user who owns the book.
+ * @param archived Indicates if the book is archived.
+ * @param exchange Indicates if the book is available for exchange.
  */
 data class DataBook(
     val uuid: UUID,
@@ -24,7 +28,9 @@ data class DataBook(
     val language: BookLanguages,
     val isbn: String?,
     val genres: List<BookGenres> = emptyList(),
-    var userId: UUID // better then string
+    var userId: UUID,
+    var archived: Boolean,
+    var exchange: Boolean
 )
 
 /** All supported book language type */

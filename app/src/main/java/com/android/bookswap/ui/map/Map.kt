@@ -236,7 +236,7 @@ fun MapScreen(
                 }
               }
               // Draggable Bottom List
-              DraggableMenu(filteredBooks.value)
+              DraggableMenu(filteredBooks.value, navigationActions)
             }
       })
 }
@@ -341,7 +341,7 @@ const val MAX_RATING = 5
  *   and the furthest one at the last position.
  */
 @Composable
-private fun DraggableMenu(listAllBooks: List<DataBook>) {
+private fun DraggableMenu(listAllBooks: List<DataBook>, navigationActions: NavigationActions) {
 
   // State for menu drag offset
   val configuration = LocalConfiguration.current
@@ -398,7 +398,12 @@ private fun DraggableMenu(listAllBooks: List<DataBook>) {
               modifier = Modifier.fillMaxWidth().testTag(C.Tag.Map.bottom_drawer_handle_divider),
               thickness = DIVIDER_THICKNESS_DP.dp,
               color = ColorVariable.Accent)
-          BookListComponent(Modifier, listAllBooks)
+          BookListComponent(
+              Modifier,
+              listAllBooks,
+              onBookClick = { bookId ->
+                navigationActions.navigateTo("${C.Screen.BOOK_PROFILE}/$bookId")
+              })
         }
       }
 }

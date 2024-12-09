@@ -55,7 +55,9 @@ val longListBook =
           BookLanguages.ENGLISH,
           "123-456-789",
           listOf(BookGenres.FICTION, BookGenres.NONFICTION),
-          userId)
+          userId,
+          false,
+          false)
     }
 
 val books =
@@ -70,7 +72,9 @@ val books =
             BookLanguages.ENGLISH,
             "123-456-789",
             listOf(BookGenres.FICTION, BookGenres.HORROR),
-            userId),
+            userId,
+            false,
+            false),
         DataBook(
             UUID(2000, 1000),
             "Book 2",
@@ -81,7 +85,9 @@ val books =
             BookLanguages.FRENCH,
             "234-567-890",
             listOf(BookGenres.FICTION),
-            userId))
+            userId,
+            false,
+            false))
 
 class MapScreenTest {
   private val user = listOf(DataUser(bookList = listOf(UUID(1000, 1000), UUID(2000, 1000))))
@@ -170,16 +176,34 @@ class MapScreenTest {
     composeTestRule
         .onNodeWithTag("1_" + C.Tag.BookDisplayComp.book_display_container)
         .assertIsDisplayed()
-    composeTestRule.onAllNodesWithTag(C.Tag.BookDisplayComp.image).assertCountEquals(2)
-    composeTestRule.onAllNodesWithTag(C.Tag.BookDisplayComp.title).assertCountEquals(2)
-    composeTestRule.onAllNodesWithTag(C.Tag.BookDisplayComp.author).assertCountEquals(2)
-    composeTestRule.onAllNodesWithTag(C.Tag.BookDisplayComp.rating).assertCountEquals(2)
-    composeTestRule.onAllNodesWithTag(C.Tag.BookDisplayComp.filled_star).assertCountEquals(9)
-    composeTestRule.onAllNodesWithTag(C.Tag.BookDisplayComp.hollow_star).assertCountEquals(1)
-    composeTestRule.onAllNodesWithTag(C.Tag.BookDisplayComp.genres).assertCountEquals(2)
-    composeTestRule.onAllNodesWithTag(C.Tag.BookListComp.divider).assertCountEquals(books.size - 1)
 
-    composeTestRule.onNodeWithTag(C.Tag.Map.filter_button).assertIsDisplayed()
+    composeTestRule
+        .onAllNodesWithTag(C.Tag.BookDisplayComp.image, useUnmergedTree = true)
+        .assertCountEquals(2)
+    composeTestRule
+        .onAllNodesWithTag(C.Tag.BookDisplayComp.title, useUnmergedTree = true)
+        .assertCountEquals(2)
+    composeTestRule
+        .onAllNodesWithTag(C.Tag.BookDisplayComp.author, useUnmergedTree = true)
+        .assertCountEquals(2)
+    composeTestRule
+        .onAllNodesWithTag(C.Tag.BookDisplayComp.rating, useUnmergedTree = true)
+        .assertCountEquals(2)
+    composeTestRule
+        .onAllNodesWithTag(C.Tag.BookDisplayComp.filled_star, useUnmergedTree = true)
+        .assertCountEquals(9)
+    composeTestRule
+        .onAllNodesWithTag(C.Tag.BookDisplayComp.hollow_star, useUnmergedTree = true)
+        .assertCountEquals(1)
+    composeTestRule
+        .onAllNodesWithTag(C.Tag.BookDisplayComp.genres, useUnmergedTree = true)
+        .assertCountEquals(2)
+    composeTestRule
+        .onAllNodesWithTag(C.Tag.BookListComp.divider, useUnmergedTree = true)
+        .assertCountEquals(books.size - 1)
+    composeTestRule
+        .onNodeWithTag(C.Tag.Map.filter_button, useUnmergedTree = true)
+        .assertIsDisplayed()
   }
 
   @Test

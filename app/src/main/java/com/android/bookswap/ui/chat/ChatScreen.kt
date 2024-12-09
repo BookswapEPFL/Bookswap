@@ -39,7 +39,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -68,17 +68,14 @@ import com.android.bookswap.data.repository.MessageRepository
 import com.android.bookswap.data.repository.PhotoFirebaseStorageRepository
 import com.android.bookswap.data.repository.UsersRepository
 import com.android.bookswap.model.PhotoRequester
+import com.android.bookswap.model.chat.ChatScreenViewModel
 import com.android.bookswap.model.chat.OfflineMessageStorage
 import com.android.bookswap.resources.C
 import com.android.bookswap.ui.MAXLENGTHMESSAGE
 import com.android.bookswap.ui.components.BackButtonComponent
 import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.theme.ColorVariable
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 import java.util.UUID
-import kotlinx.coroutines.delay
 
 /**
  * Composable function for the chat screen.
@@ -101,6 +98,7 @@ fun ChatScreen(
     messageStorage: OfflineMessageStorage,
     context: Context
 ) {
+  val chatScreenViewModel = ChatScreenViewModel()
   var messages by remember { mutableStateOf(emptyList<DataMessage>()) }
   var newMessageText by remember { mutableStateOf(TextFieldValue("")) }
   var selectedMessage by remember { mutableStateOf<DataMessage?>(null) }
@@ -150,82 +148,34 @@ fun ChatScreen(
 
   photoReq.Init()
 
-  LaunchedEffect(Unit) {
-    while (true) {
-      for (message in
-          messageStorage.extractMessages(messages.toMutableList(), maxMessagesStoredOffline)) {
-        messageStorage.addMessage(message)
-      }
-      messageStorage.setMessages()
-      messageRepository.getMessages(currentUser.userUUID, otherUser.userUUID) { result ->
-        if (result.isSuccess) {
-          messages =
-              result
-                  .getOrThrow()
-                  .filter {
-                    (it.senderUUID == currentUser.userUUID &&
-                        it.receiverUUID == otherUser.userUUID) ||
-                        (it.senderUUID == otherUser.userUUID &&
-                            it.receiverUUID == currentUser.userUUID)
-                  }
-                  .sortedBy { it.timestamp }
-          Log.d("ChatScreen", "Fetched messages: $messages")
-        } else {
-          messages = messageStorage.getMessagesFromText()
-          Log.e("ChatScreen", "Failed to fetch messages: ${result.exceptionOrNull()?.message}")
-        }
-      }
-      delay(2000) // Delay for 2 seconds
-
-      // Check and add contacts for both users
-      if (messages.isNotEmpty()) {
-        // Add otherUser to currentUser's contacts
-        userSource.getUser(currentUser.userUUID) { result ->
-          if (result.isSuccess) {
-            val updatedUser = result.getOrThrow()
-            if (!updatedUser.contactList.contains(otherUser.userUUID)) {
-              userSource.addContact(currentUser.userUUID, otherUser.userUUID) { contactResult ->
-                if (contactResult.isSuccess) {
-                  Log.d(
-                      "ChatScreen",
-                      "Added ${otherUser.userUUID} to ${currentUser.userUUID}'s contacts")
-                } else {
-                  Log.e(
-                      "ChatScreen",
-                      "Failed to add contact: ${contactResult.exceptionOrNull()?.message}")
+  DisposableEffect(Unit) {
+    val listenerRegistration =
+        messageRepository.addMessagesListener(otherUser.userUUID, currentUser.userUUID) { result ->
+          result
+              .onSuccess { fetchedMessages ->
+                // Directly use the fetched messages as they belong to the specific chat
+                messages = fetchedMessages.sortedBy { it.timestamp }
+                chatScreenViewModel.addContacts(userSource, currentUser, otherUser)
+                // Ensure offline storage logic is applied
+                for (message in
+                    messageStorage.extractMessages(
+                        messages.toMutableList(), maxMessagesStoredOffline)) {
+                  messageStorage.addMessage(message)
                 }
+                messageStorage.setMessages() // Save the messages locally
+                Log.d("ChatScreen", "Updated messages via listener: $messages")
               }
-            }
-          } else {
-            Log.e(
-                "ChatScreen", "Failed to fetch current user: ${result.exceptionOrNull()?.message}")
-          }
+              .onFailure { exception ->
+                // Fallback to locally stored messages
+                messages = messageStorage.getMessagesFromText()
+                Log.e("ChatScreen", "Failed to fetch messages via listener: ${exception.message}")
+              }
         }
 
-        // Add currentUser to otherUser's contacts
-        userSource.getUser(otherUser.userUUID) { result ->
-          if (result.isSuccess) {
-            val updatedOtherUser = result.getOrThrow()
-            if (!updatedOtherUser.contactList.contains(currentUser.userUUID)) {
-              userSource.addContact(otherUser.userUUID, currentUser.userUUID) { contactResult ->
-                if (contactResult.isSuccess) {
-                  Log.d(
-                      "ChatScreen",
-                      "Added ${currentUser.userUUID} to ${otherUser.userUUID}'s contacts")
-                } else {
-                  Log.e(
-                      "ChatScreen",
-                      "Failed to add contact: ${contactResult.exceptionOrNull()?.message}")
-                }
-              }
-            }
-          } else {
-            Log.e("ChatScreen", "Failed to fetch other user: ${result.exceptionOrNull()?.message}")
-          }
-        }
-      }
-    }
+    // Cleanup when the DisposableEffect leaves the composition
+    onDispose { listenerRegistration.remove() }
   }
+
   Box(modifier = Modifier.fillMaxSize().background(ColorVariable.BackGround)) {
     Column(modifier = Modifier.fillMaxSize()) {
       TopAppBar(
@@ -280,6 +230,7 @@ fun ChatScreen(
                 MessageItem(
                     message = message,
                     currentUserUUID = currentUser.userUUID,
+                    chatScreenViewModel = chatScreenViewModel,
                     onLongPress = { selectedMessage = message })
               }
             }
@@ -455,7 +406,12 @@ fun ChatScreen(
  */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun MessageItem(message: DataMessage, currentUserUUID: UUID, onLongPress: () -> Unit) {
+fun MessageItem(
+    message: DataMessage,
+    currentUserUUID: UUID,
+    chatScreenViewModel: ChatScreenViewModel,
+    onLongPress: () -> Unit
+) {
   val isCurrentUser = message.senderUUID == currentUserUUID
   val cornerRadius = 25.dp
   val padding8 = 8.dp
@@ -535,7 +491,7 @@ fun MessageItem(message: DataMessage, currentUserUUID: UUID, onLongPress: () -> 
                           color = ColorVariable.Accent)
                     }
                     Text(
-                        text = formatTimestamp(message.timestamp),
+                        text = chatScreenViewModel.formatTimestamp(message.timestamp),
                         color = ColorVariable.AccentSecondary,
                         style = MaterialTheme.typography.bodySmall,
                         modifier =
@@ -597,26 +553,6 @@ fun MessageItem(message: DataMessage, currentUserUUID: UUID, onLongPress: () -> 
                     }
               }
         }
-  }
-}
-/**
- * Formats a timestamp into a readable string.
- *
- * @param timestamp The timestamp to format.
- * @return A formatted string representing the timestamp. If the timestamp is from today, it returns
- *   the time in "HH:mm" format. Otherwise, it returns the date in "MMM dd, yyyy" format.
- */
-fun formatTimestamp(timestamp: Long): String {
-  val messageDate = Date(timestamp)
-  val currentDate = Date()
-  val dateFormat = SimpleDateFormat("yyyyMMdd", Locale.getDefault())
-  val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
-  val dateTimeFormat = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
-
-  return if (dateFormat.format(messageDate) == dateFormat.format(currentDate)) {
-    timeFormat.format(messageDate)
-  } else {
-    dateTimeFormat.format(messageDate)
   }
 }
 
