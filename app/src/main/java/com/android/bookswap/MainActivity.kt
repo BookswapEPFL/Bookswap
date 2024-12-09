@@ -57,7 +57,6 @@ import com.android.bookswap.ui.profile.NewUserScreen
 import com.android.bookswap.ui.profile.OthersUserProfileScreen
 import com.android.bookswap.ui.profile.UserProfile
 import com.android.bookswap.ui.theme.BookSwapAppTheme
-import com.android.bookswap.utils.ManifestUtils
 import com.google.android.libraries.places.api.Places
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
@@ -92,10 +91,9 @@ class MainActivity : ComponentActivity() {
 
     // Initialize the geolocation
     val geolocation = Geolocation(this)
-    val apiKey = ManifestUtils.getApiKeyFromManifest(this)
-    if (!Places.isInitialized() && apiKey != null) {
-      Places.initialize(applicationContext, apiKey)
-    }
+    val apiKey = BuildConfig.MAPS_API_KEY
+    if (!Places.isInitialized()) Places.initialize(applicationContext, apiKey)
+
     BookSwapAppTheme {
       // A surface container using the 'background' color from the theme
       Surface(
