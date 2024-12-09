@@ -67,6 +67,7 @@ fun UserProfile(
   val context = LocalContext.current
   val appConfig = LocalAppConfig.current
   var userData = appConfig.userViewModel.getUser()
+  val addressStr by appConfig.userViewModel.addressStr.collectAsState()
   val showEditPicture = remember { mutableStateOf(false) }
   var showEditProfile by remember { mutableStateOf(false) }
 
@@ -230,9 +231,7 @@ fun UserProfile(
           Text(text = userData.phoneNumber, modifier = Modifier.testTag(C.Tag.UserProfile.phone))
 
           // User address
-          Text(
-              text = "${userData.latitude}, ${userData.longitude}",
-              modifier = Modifier.testTag(C.Tag.UserProfile.address))
+          Text(text = addressStr, modifier = Modifier.testTag(C.Tag.UserProfile.address))
 
           // Edit Button
           ButtonComponent({ showEditProfile = true }, Modifier.testTag(C.Tag.UserProfile.edit)) {
