@@ -31,7 +31,9 @@ class PhotoFirebaseStorageSourceTest {
   @MockK private lateinit var mockStorageReference: StorageReference
 
   private lateinit var photoStorageSource: PhotoFirebaseStorageSource
-  private val photoId = "etranger_test"
+  private val photoId = "etranger-test"
+  private val photoUrl =
+      "https://firebasestorage.googleapis.com/v0/b/app.appspot.com/o/images%2F$photoId.jpg?alt=media&token=someToken"
 
   @Before
   fun setup() {
@@ -128,5 +130,91 @@ class PhotoFirebaseStorageSourceTest {
     photoStorageSource.init(callback)
 
     verify { callback(Result.success(Unit)) }
+  }
+
+  @Test
+  fun `deletePhotoFromStorage deletes photo and calls callback with success`() {
+    val callback = mockk<(Result<Unit>) -> Unit>(relaxed = true)
+
+    // Mock the storage reference behavior
+    val photoStorageReference = mockk<StorageReference>()
+    every { mockStorageReference.child("images/$photoId.jpg") } returns photoStorageReference
+
+    // Mock successful delete behavior
+    every { photoStorageReference.delete() } returns Tasks.forResult(null)
+
+    // Call the method
+    photoStorageSource.deletePhotoFromStorage(photoId, callback)
+
+    // Process pending tasks
+    shadowOf(Looper.getMainLooper()).idle()
+
+    // Verify the callback is called with success
+    verify { callback(Result.success(Unit)) }
+  }
+
+  @Test
+  fun `deletePhotoFromStorage calls callback with failure when delete fails`() {
+    val callback = mockk<(Result<Unit>) -> Unit>(relaxed = true)
+    val exception = Exception("Delete failed")
+
+    // Mock the storage reference behavior
+    val photoStorageReference = mockk<StorageReference>()
+    every { mockStorageReference.child("images/$photoId.jpg") } returns photoStorageReference
+
+    // Mock delete failure
+    every { photoStorageReference.delete() } returns Tasks.forException(exception)
+
+    // Call the method
+    photoStorageSource.deletePhotoFromStorage(photoId, callback)
+
+    // Process pending tasks
+    shadowOf(Looper.getMainLooper()).idle()
+
+    // Verify the callback is called with failure
+    verify { callback(Result.failure(exception)) }
+  }
+
+  @Test
+  fun `deletePhotoFromStorageWithUrl deletes photo and calls callback with success`() {
+    val callback = mockk<(Result<Unit>) -> Unit>(relaxed = true)
+
+    // Mock the storage reference behavior
+    val photoStorageReference = mockk<StorageReference>()
+    every { mockStorageReference.child("images/$photoId.jpg") } returns photoStorageReference
+
+    // Mock successful delete behavior
+    every { photoStorageReference.delete() } returns Tasks.forResult(null)
+
+    // Call the method
+    photoStorageSource.deletePhotoFromStorageWithUrl(photoUrl, callback)
+
+    // Process pending tasks
+    shadowOf(Looper.getMainLooper()).idle()
+
+    // Verify the callback is called with success
+    verify { callback(Result.success(Unit)) }
+  }
+
+  @Test
+  fun `deletePhotoFromStorageWithUrl calls callback with failure when delete fails`() {
+    val callback = mockk<(Result<Unit>) -> Unit>(relaxed = true)
+    val exception = Exception("Delete failed")
+
+    // Mock the storage reference behavior
+    val photoStorageReference = mockk<StorageReference>()
+    every { mockStorageReference.child("images/$photoId.jpg") } returns photoStorageReference
+
+    // Mock delete failure
+    every { photoStorageReference.delete() } returns Tasks.forException(exception)
+
+    // Call the method
+    photoStorageSource.deletePhotoFromStorageWithUrl(photoUrl, callback)
+
+    // Process pending tasks
+    shadowOf(Looper.getMainLooper()).idle()
+
+    // Verify the callback is called with failure
+    verify { callback(Result.failure(exception)) }
   }
 }

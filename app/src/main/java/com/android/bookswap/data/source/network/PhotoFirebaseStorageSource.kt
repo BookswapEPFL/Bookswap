@@ -67,4 +67,32 @@ class PhotoFirebaseStorageSource(private val storage: FirebaseStorage) :
         }
         .addOnFailureListener { e -> callback(Result.failure(e)) }
   }
+
+  /**
+   * Deletes a photo from Firebase Storage.
+   *
+   * @param photoId The ID of the photo to delete.
+   * @param callback A callback function that receives Result.success(Unit) on success or
+   *   Result.failure(exception) on failure.
+   */
+  override fun deletePhotoFromStorage(photoId: String, callback: (Result<Unit>) -> Unit) {
+    val storageRef = storage.reference.child("images/$photoId.jpg")
+    storageRef
+        .delete()
+        .addOnSuccessListener { callback(Result.success(Unit)) }
+        .addOnFailureListener { e -> callback(Result.failure(e)) }
+  }
+
+  /**
+   * Deletes a photo from Firebase Storage using the photo URL.
+   *
+   * @param photoUrl The URL of the photo to delete.
+   * @param callback A callback function that receives Result.success(Unit) on success or
+   *   Result.failure(exception) on failure.
+   */
+  override fun deletePhotoFromStorageWithUrl(photoUrl: String, callback: (Result<Unit>) -> Unit) {
+    val regex = Regex("""images%2F([a-zA-Z0-9\-]+)""")
+    val matchResult = regex.find(photoUrl)
+    deletePhotoFromStorage(matchResult?.groups?.get(1)?.value.toString(), callback)
+  }
 }
