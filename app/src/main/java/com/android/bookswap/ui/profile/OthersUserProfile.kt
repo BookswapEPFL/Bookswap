@@ -120,14 +120,14 @@ fun OthersUserProfileScreen(
                             .size(PROFILE_PICTURE_SIZE)
                             .border(PROFILE_PICTURE_BORDER_WIDTH, ColorVariable.Accent, CircleShape)
                             .background(ColorVariable.AccentSecondary, CircleShape)
-                            .testTag(C.Tag.OtherUserProfile.image_container),
+                            .testTag(C.Tag.OtherUserProfile.profilePictureContainer),
                     contentAlignment = Alignment.Center) {
                       val profilePictureUrl = user.profilePictureUrl
                       if (profilePictureUrl.isNotEmpty()) {
                         Log.i("BookDisplayComponent", "Photo URL: ${profilePictureUrl}")
                         AsyncImage(
                             model = profilePictureUrl,
-                            contentDescription = "Book Picture",
+                            contentDescription = "User's Picture",
                             modifier =
                                 Modifier.fillMaxSize()
                                     .clip(CircleShape)

@@ -140,9 +140,9 @@ object C {
       const val email = "email"
       const val phone = "phoneNumber"
       const val address = "address"
-      const val image_container = BOOK + UI_T.IMAGE
-      const val profile_image_picture = "profile_image_picture" + UI_T.IMAGE
-      const val profile_image_icon = "profile_image_icon" + UI_T.IMAGE
+      const val profilePictureContainer = S.OTHERS_USER_PROFILE + "_picture" + UI_T.CONTAINER
+      const val profile_image_picture = S.OTHERS_USER_PROFILE + "_picture" + UI_T.IMAGE
+      const val profile_image_icon = S.OTHERS_USER_PROFILE + "_picture" + UI_T.ICON
       const val chatButton = "chatButton"
     }
 
