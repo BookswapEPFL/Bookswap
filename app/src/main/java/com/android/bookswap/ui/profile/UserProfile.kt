@@ -224,14 +224,12 @@ fun UserProfile(
                                           .clip(CircleShape))
                             }
                           }
-                      Box(
-                          modifier = Modifier.fillMaxSize(),
-                          contentAlignment = Alignment.TopEnd) {
-                            Image(
-                                imageVector = Icons.Outlined.Edit,
-                                contentDescription = "",
-                                colorFilter = ColorFilter.tint(Color(0xFFAAAAAA)))
-                          }
+                      Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopEnd) {
+                        Image(
+                            imageVector = Icons.Outlined.Edit,
+                            contentDescription = "",
+                            colorFilter = ColorFilter.tint(Color(0xFFAAAAAA)))
+                      }
                     }
               }
           Spacer(modifier = Modifier.height(SPACER_HEIGHT_PIC_INFO))
