@@ -8,11 +8,19 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import com.android.bookswap.ui.theme.ColorVariable
 
+/** Constants for the scrollbar */
 const val STANDARD_THICKNESS = 4f
 const val MINIMUM_COERCION = 1f
 const val END_PADDING = 8f
 
-/** Modifier that draws a vertical scrollbar on the right side of the content. */
+/**
+ * Draw a vertical scrollbar on the right side of the composable that uses this modifier.
+ *
+ * @param scrollState The scroll state of the composable
+ * @param color The color of the scrollbar
+ * @param thickness The thickness of the scrollbar
+ * @param paddingEnd The padding from the right edge of the composable
+ */
 fun Modifier.drawVerticalScrollbar(
     scrollState: ScrollState,
     color: Color = ColorVariable.Accent,
