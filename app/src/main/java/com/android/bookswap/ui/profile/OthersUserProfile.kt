@@ -120,25 +120,24 @@ fun OthersUserProfileScreen(
                             .background(ColorVariable.AccentSecondary, CircleShape)
                             .testTag(C.Tag.OtherUserProfile.image_container),
                     contentAlignment = Alignment.Center) {
-
                       val profilePictureUrl = user.profilePictureUrl
                       if (profilePictureUrl.isNotEmpty()) {
-                          Log.i("BookDisplayComponent", "Photo URL: ${profilePictureUrl}")
-                          AsyncImage(
-                              model = profilePictureUrl,
-                              contentDescription = "Book Picture",
-                              modifier = Modifier
-                                  .fillMaxSize()
-                                  .clip(CircleShape)
-                                  .testTag(C.Tag.OtherUserProfile.profile_image_picture),
-                              contentScale = ContentScale.Crop)
+                        Log.i("BookDisplayComponent", "Photo URL: ${profilePictureUrl}")
+                        AsyncImage(
+                            model = profilePictureUrl,
+                            contentDescription = "Book Picture",
+                            modifier =
+                                Modifier.fillMaxSize()
+                                    .clip(CircleShape)
+                                    .testTag(C.Tag.OtherUserProfile.profile_image_picture),
+                            contentScale = ContentScale.Crop)
                       } else {
                         Icon(
                             imageVector = Icons.Default.AccountCircle,
                             contentDescription = null,
-                            modifier = Modifier
-                                .size(ICON_SIZE)
-                                .testTag(C.Tag.OtherUserProfile.profile_image_icon),
+                            modifier =
+                                Modifier.size(ICON_SIZE)
+                                    .testTag(C.Tag.OtherUserProfile.profile_image_icon),
                             tint = ColorVariable.Accent)
                       }
                     }
