@@ -231,7 +231,7 @@ fun BookProfileScreen(
                         }
                   }
                   // Conditionally display the "Edit Book" button if the current user owns the book
-                  if (dataBook.userId == appConfig.userViewModel.uuid) {
+                  if (dataBook.userId == appConfig.userViewModel.getUser().userUUID) {
                     item { Spacer(modifier = Modifier.height(COLUMN_PADDING)) }
                     item {
                       ButtonComponent(
