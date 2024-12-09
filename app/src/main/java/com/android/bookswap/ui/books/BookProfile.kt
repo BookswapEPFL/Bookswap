@@ -274,6 +274,20 @@ fun BookProfileScreen(
                     Spacer(
                         modifier = Modifier.height(0.dp).testTag(C.Tag.BookProfile.scrollable_end))
                   }
+                  item {
+                    ButtonComponent(
+                        onClick = {},
+                        modifier = Modifier.padding(8.dp).testTag(C.Tag.BookProfile.edit)) {
+                          Text("Exchange Book")
+                        }
+                  }
+                  item {
+                    ButtonComponent(
+                        onClick = { booksRepository.moveBookToArchive(dataBook) },
+                        modifier = Modifier.padding(8.dp).testTag(C.Tag.BookProfile.edit)) {
+                          Text("Archived Book")
+                        }
+                  }
                 }
               }
             }
