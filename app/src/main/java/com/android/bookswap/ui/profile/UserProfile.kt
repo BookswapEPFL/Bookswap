@@ -48,6 +48,15 @@ import com.android.bookswap.ui.theme.*
 
 /** Constants * */
 private val PADDING = 16.dp
+private val PROFILE_IMAGE_SIZE = 90.dp
+private val PICTURE_BORDER_WIDTH = 3.5f.dp
+private val PICTURE_SCALE = 1.2f
+private val ICON_SIZE = 100.dp
+private val ICON_PADDING = 2.5f.dp
+private val ICON_SCALE = 1.2f
+private val SPACER_HEIGHT_INFO_EDIT = 8.dp
+private val SPACER_HEIGHT_PIC_INFO = 6.dp
+
 /**
  * Composable function to display the user profile screen.
  *
@@ -155,9 +164,9 @@ fun UserProfile(
     Dialog(
         onDismissRequest = { showEditPicture.value = false },
         properties = DialogProperties(dismissOnBackPress = true, dismissOnClickOutside = true)) {
-          Card(Modifier.testTag(C.Tag.UserProfile.profileImageBox).padding(16.dp)) {
+          Card(Modifier.testTag(C.Tag.UserProfile.profileImageBox).padding(PADDING)) {
             Column(
-                Modifier.fillMaxWidth().padding(16.dp),
+                Modifier.fillMaxWidth().padding(PADDING),
                 Arrangement.Center,
                 Alignment.CenterHorizontally) {
                   Text("Edit Profile Picture")
@@ -184,13 +193,13 @@ fun UserProfile(
                 IconButton(
                     onClick = { showEditPicture.value = true },
                     modifier =
-                        Modifier.size(90.dp)
+                        Modifier.size(PROFILE_IMAGE_SIZE)
                             .clip(CircleShape)
                             .testTag(C.Tag.UserProfile.profileImage)) {
                       Box(
                           modifier =
-                              Modifier.padding(2.5f.dp)
-                                  .border(3.5f.dp, Color(0xFFA98467), CircleShape),
+                              Modifier.padding(ICON_PADDING)
+                                  .border(PICTURE_BORDER_WIDTH, Color(0xFFA98467), CircleShape),
                           contentAlignment = Alignment.Center) {
                             // show either the profile picture or the default icon
                             if (userData.profilePictureUrl.isEmpty()) {
@@ -200,8 +209,8 @@ fun UserProfile(
                                   modifier =
                                       Modifier
                                           // .fillMaxSize()
-                                          .size(100.dp)
-                                          .scale(1.2f)
+                                          .size(ICON_SIZE)
+                                          .scale(ICON_SCALE)
                                           .clipToBounds(),
                                   colorFilter = ColorFilter.tint(Color(0xFF6C584C)))
                             } else {
@@ -210,13 +219,13 @@ fun UserProfile(
                                   contentDescription = "profile picture",
                                   modifier =
                                       Modifier.fillMaxSize()
-                                          .scale(1.2f)
+                                          .scale(PICTURE_SCALE)
                                           .clipToBounds()
                                           .clip(CircleShape))
                             }
                           }
                       Box(
-                          modifier = Modifier.fillMaxSize().padding(0f.dp),
+                          modifier = Modifier.fillMaxSize(),
                           contentAlignment = Alignment.TopEnd) {
                             Image(
                                 imageVector = Icons.Outlined.Edit,
@@ -225,7 +234,7 @@ fun UserProfile(
                           }
                     }
               }
-          Spacer(modifier = Modifier.height(6.dp))
+          Spacer(modifier = Modifier.height(SPACER_HEIGHT_PIC_INFO))
 
           // Full name text
           LabeledTextUserProfile(
@@ -248,7 +257,7 @@ fun UserProfile(
               label = "Your address:",
               value = "${userData.latitude}, ${userData.longitude}")
 
-          Spacer(modifier = Modifier.height(8.dp))
+          Spacer(modifier = Modifier.height(SPACER_HEIGHT_INFO_EDIT))
 
           // Edit Button
           ButtonComponent(
