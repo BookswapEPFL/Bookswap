@@ -1,11 +1,9 @@
 package com.android.bookswap.ui.books
 
-import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollToNode
 import androidx.navigation.compose.rememberNavController
 import com.android.bookswap.data.BookGenres
@@ -27,7 +25,9 @@ class BookProfileScreenTest {
   private lateinit var mockNavController: NavigationActions
   private lateinit var mockBookRepo: BooksRepository
   private val testBookId = UUID.randomUUID()
+  private val modTestBookId = UUID.randomUUID()
   private val currentUserId = UUID.randomUUID()
+  private lateinit var modTestBook: DataBook
 
   private val testBook =
       DataBook(
@@ -49,11 +49,18 @@ class BookProfileScreenTest {
     mockNavController = mockk()
     mockBookRepo = mockk()
 
+    modTestBook = testBook.copy(uuid = modTestBookId, photo = "new_photo_url")
+
     // Mocking the getBook call to return the test book
-    coEvery { mockBookRepo.getBook(testBookId, any(), any()) } answers
+    coEvery { mockBookRepo.getBook(any(), any(), any()) } answers
         {
+          val bookId = it.invocation.args[0] as UUID
           val onSuccess = it.invocation.args[1] as (DataBook) -> Unit
-          onSuccess(testBook)
+          if (bookId == testBookId) {
+            onSuccess(testBook)
+          } else if (bookId == modTestBookId) {
+            onSuccess(modTestBook)
+          }
         }
   }
 
@@ -65,6 +72,7 @@ class BookProfileScreenTest {
       BookProfileScreen(testBookId, mockBookRepo, navigationActions)
     }
 
+    composeTestRule.onNodeWithTag(C.Tag.BookProfile.imagePlaceholder).assertIsDisplayed()
     composeTestRule.onNodeWithTag(C.Tag.BookProfile.title).assertIsDisplayed()
     composeTestRule.onNodeWithTag(C.Tag.BookProfile.author).assertIsDisplayed()
     composeTestRule
@@ -84,84 +92,13 @@ class BookProfileScreenTest {
   }
 
   @Test
-  fun iconsAreClickable() {
+  fun correctImageIsShownWhenBookHasPhoto() {
     composeTestRule.setContent {
       val navController = rememberNavController()
       val navigationActions = NavigationActions(navController)
-      BookProfileScreen(testBookId, mockBookRepo, navigationActions)
+      BookProfileScreen(modTestBookId, mockBookRepo, navigationActions)
     }
 
-    // Ensure visibility of the previous image button
-    composeTestRule
-        .onNodeWithTag(C.Tag.BookProfile.scrollable)
-        .performScrollToNode(hasTestTag(C.Tag.BookProfile.previous_image))
-
-    // Wait until the button is available
-    composeTestRule.waitUntil(timeoutMillis = 5000) {
-      try {
-        composeTestRule.onNodeWithTag(C.Tag.BookProfile.previous_image).fetchSemanticsNode()
-        true
-      } catch (e: Exception) {
-        false
-      }
-    }
-
-    // Assert the previous image button is clickable
-    composeTestRule.onNodeWithTag(C.Tag.BookProfile.previous_image).assertHasClickAction()
-
-    // Ensure visibility of the next image button
-    composeTestRule
-        .onNodeWithTag(C.Tag.BookProfile.scrollable)
-        .performScrollToNode(hasTestTag(C.Tag.BookProfile.next_image))
-
-    // Wait until the button is available
-    composeTestRule.waitUntil(timeoutMillis = 5000) {
-      try {
-        composeTestRule.onNodeWithTag(C.Tag.BookProfile.next_image).fetchSemanticsNode()
-        true
-      } catch (e: Exception) {
-        false
-      }
-    }
-
-    // Assert the next image button is clickable
-    composeTestRule.onNodeWithTag(C.Tag.BookProfile.next_image).assertHasClickAction()
-  }
-
-  @Test
-  fun pictureChangesOnIconClick() {
-    composeTestRule.setContent {
-      val navController = rememberNavController()
-      val navigationActions = NavigationActions(navController)
-      BookProfileScreen(
-          bookId = testBookId,
-          booksRepository = mockBookRepo,
-          navController = navigationActions,
-      )
-    }
-
-    // Ensure the button is visible
-    composeTestRule
-        .onNodeWithTag(C.Tag.BookProfile.scrollable)
-        .performScrollToNode(hasTestTag(C.Tag.BookProfile.next_image))
-
-    // Wait until the node is available
-    composeTestRule.waitUntil(timeoutMillis = 5000) {
-      try {
-        composeTestRule.onNodeWithTag(C.Tag.BookProfile.next_image).fetchSemanticsNode()
-        true
-      } catch (e: Exception) {
-        false
-      }
-    }
-
-    // Verify the first picture is displayed
-    composeTestRule.onNodeWithTag("0_" + C.Tag.BookProfile.image).assertIsDisplayed()
-
-    // Perform a click action on the next image button
-    composeTestRule.onNodeWithTag(C.Tag.BookProfile.next_image).performClick()
-
-    // Verify the next picture is displayed
-    composeTestRule.onNodeWithTag("1_" + C.Tag.BookProfile.image).assertIsDisplayed()
+    composeTestRule.onNodeWithTag(C.Tag.BookProfile.image).assertIsDisplayed()
   }
 }

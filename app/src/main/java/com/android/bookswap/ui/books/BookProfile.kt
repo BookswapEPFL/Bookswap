@@ -13,12 +13,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -26,7 +21,6 @@ import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -38,6 +32,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
 import com.android.bookswap.R
 import com.android.bookswap.data.DataBook
 import com.android.bookswap.data.repository.BooksRepository
@@ -67,10 +62,8 @@ fun BookProfileScreen(
   val columnPadding = 8.dp
   val pictureWidth = (LocalConfiguration.current.screenWidthDp.dp * (0.60f))
   val pictureHeight = pictureWidth * 1.41f
-  val buttonsHeight = pictureHeight / 12.0f
-  val images = listOf(R.drawable.isabellacatolica, R.drawable.felipeii)
-  val imagesDescription = listOf("Isabel La Catolica", "Felipe II")
-  var currentImageIndex by remember { mutableIntStateOf(0) }
+  val image = R.drawable.isabellacatolica
+  val imageDescription = "Isabel La Catolica"
 
   val appConfig = LocalAppConfig.current
   // State to hold the book data and loading status
@@ -140,49 +133,23 @@ fun BookProfileScreen(
                         modifier =
                             Modifier.size(pictureWidth, pictureHeight)
                                 .background(ColorVariable.BackGround)) {
-                          Image(
-                              painter = painterResource(id = images[currentImageIndex]),
-                              contentDescription = imagesDescription[currentImageIndex],
-                              modifier =
-                                  Modifier.height(pictureHeight)
-                                      .fillMaxWidth()
-                                      .testTag("${currentImageIndex}_" + C.Tag.BookProfile.image))
-                        }
-                  }
-                  item {
-                    Row(
-                        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween) {
-                          IconButton(
-                              onClick = {
-                                currentImageIndex =
-                                    (currentImageIndex - 1 + images.size) % images.size
-                              },
-                              modifier =
-                                  Modifier.height(buttonsHeight)
-                                      .testTag(C.Tag.BookProfile.previous_image)) {
-                                Icon(
-                                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                    contentDescription = "Previous Image",
-                                    tint = ColorVariable.Accent)
-                              }
-                          Text(
-                              text = imagesDescription[currentImageIndex],
-                              color = ColorVariable.AccentSecondary,
-                              modifier = Modifier.padding(horizontal = 8.dp))
-                          IconButton(
-                              onClick = {
-                                currentImageIndex = (currentImageIndex + 1) % images.size
-                              },
-                              modifier =
-                                  Modifier.height(buttonsHeight)
-                                      .testTag(C.Tag.BookProfile.next_image)) {
-                                Icon(
-                                    imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-                                    contentDescription = "Next Image",
-                                    tint = ColorVariable.Accent)
-                              }
+                          if (dataBook.photo?.isNotEmpty() == true) {
+                            AsyncImage(
+                                model = dataBook.photo,
+                                contentDescription = dataBook.title,
+                                modifier =
+                                    Modifier.height(pictureHeight)
+                                        .fillMaxWidth()
+                                        .testTag(C.Tag.BookProfile.image))
+                          } else {
+                            Image(
+                                painter = painterResource(id = image),
+                                contentDescription = imageDescription,
+                                modifier =
+                                    Modifier.height(pictureHeight)
+                                        .fillMaxWidth()
+                                        .testTag(C.Tag.BookProfile.imagePlaceholder))
+                          }
                         }
                   }
                   item { Spacer(modifier = Modifier.height(columnPadding)) }
