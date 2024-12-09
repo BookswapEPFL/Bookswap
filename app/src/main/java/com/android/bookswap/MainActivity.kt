@@ -93,7 +93,6 @@ class MainActivity : ComponentActivity() {
     val geolocation = Geolocation(this)
     val apiKey = BuildConfig.MAPS_API_KEY
     if (!Places.isInitialized()) Places.initialize(applicationContext, apiKey)
-
     BookSwapAppTheme {
       // A surface container using the 'background' color from the theme
       Surface(
@@ -103,7 +102,6 @@ class MainActivity : ComponentActivity() {
                 messageRepository = messageRepository,
                 bookRepository = bookRepository,
                 userRepository = userDataSource,
-                startDestination = C.Route.AUTH,
                 photoStorage = photoStorage,
                 messageStorage = messageStorage,
                 geolocation = geolocation,
@@ -231,13 +229,7 @@ class MainActivity : ComponentActivity() {
           }
         }
         navigation(startDestination = C.Screen.USER_PROFILE, route = C.Route.USER_PROFILE) {
-          composable(C.Screen.USER_PROFILE) {
-            UserProfile(
-                photoStorage,
-                topAppBar = { topAppBar("Your Profile") },
-                bottomAppBar = { bottomAppBar(this@navigation.route ?: "") },
-            )
-          }
+          composable(C.Screen.USER_PROFILE) { UserProfile(photoStorage) }
           composable(C.Screen.BOOK_PROFILE) { backStackEntry ->
             val bookId = backStackEntry.arguments?.getString("bookId")?.let { UUID.fromString(it) }
 
