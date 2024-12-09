@@ -50,9 +50,8 @@ class BookFilter {
   fun setGenres(genres: List<String>) {
     val newGenresFilter =
         genres.mapNotNull { genre ->
-          BookGenres.values().firstOrNull {
-            it.Genre.replace("-", "").equals(genre.replace("-", ""), ignoreCase = true)
-          }
+          // Use the Genre parameter to get the corresponding BookGenres enum
+          BookGenres.values().firstOrNull { it.Genre.equals(genre, ignoreCase = true) }
         }
     _genresFilter.value = newGenresFilter
   }
