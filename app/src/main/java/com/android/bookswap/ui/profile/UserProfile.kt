@@ -252,9 +252,7 @@ fun UserProfile(
               value = userData.phoneNumber)
           // User address:
           LabeledTextUserProfile(
-              testTag = C.Tag.OtherUserProfile.address,
-              label = "Your address:",
-              value = addressStr)
+              testTag = C.Tag.OtherUserProfile.address, label = "Your address:", value = addressStr)
 
           Spacer(modifier = Modifier.height(SPACER_HEIGHT_INFO_EDIT))
 
