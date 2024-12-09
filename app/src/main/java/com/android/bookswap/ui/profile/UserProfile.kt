@@ -144,79 +144,70 @@ fun UserProfile(
       topBar = topAppBar,
       bottomBar = bottomAppBar) {
         // Column layout to stack input fields vertically with spacing
-        Column(
-            modifier = Modifier.fillMaxHeight().padding(it).consumeWindowInsets(it).padding(10.dp),
-            verticalArrangement = Arrangement.SpaceBetween,
-            horizontalAlignment = Alignment.CenterHorizontally) {
-              Row(
-                  modifier = Modifier.fillMaxWidth(),
-                  horizontalArrangement = Arrangement.spacedBy(5f.dp)) {
-                    Column(modifier = Modifier.fillMaxWidth(0.25f)) {
-                      Box {
-                        IconButton(
-                            onClick = { showEditPicture.value = true },
+        Row(
+            modifier = Modifier.padding(it).consumeWindowInsets(it).fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(5f.dp)) {
+              Column(modifier = Modifier.fillMaxWidth(0.25f)) {
+                Box {
+                  IconButton(
+                      onClick = { showEditPicture.value = true },
+                      modifier = Modifier.aspectRatio(1f).testTag(C.Tag.UserProfile.profileImage)) {
+                        Box(
                             modifier =
-                                Modifier.aspectRatio(1f).testTag(C.Tag.UserProfile.profileImage)) {
-                              Box(
-                                  modifier =
-                                      Modifier.padding(2.5f.dp)
-                                          .border(3.5f.dp, Color(0xFFA98467), CircleShape)) {
-                                    // show either the profile picture or the default icon
-                                    if (userData.profilePictureUrl.isEmpty()) {
-                                      Image(
-                                          imageVector = Icons.Rounded.AccountCircle,
-                                          contentDescription = "No profile picture",
-                                          modifier =
-                                              Modifier.fillMaxSize().scale(1.2f).clipToBounds(),
-                                          colorFilter = ColorFilter.tint(Color(0xFF6C584C)))
-                                    } else {
-                                      AsyncImage(
-                                          model = userData.profilePictureUrl,
-                                          contentDescription = "profile picture",
-                                          modifier =
-                                              Modifier.fillMaxSize()
-                                                  .scale(1.2f)
-                                                  .clipToBounds()
-                                                  .clip(CircleShape))
-                                    }
-                                  }
-                              Box(
-                                  modifier = Modifier.fillMaxSize().padding(0f.dp),
-                                  contentAlignment = Alignment.TopEnd) {
-                                    Image(
-                                        imageVector = Icons.Outlined.Edit,
-                                        contentDescription = "",
-                                        colorFilter = ColorFilter.tint(Color(0xFFAAAAAA)))
-                                  }
+                                Modifier.padding(2.5f.dp)
+                                    .border(3.5f.dp, Color(0xFFA98467), CircleShape)) {
+                              // show either the profile picture or the default icon
+                              if (userData.profilePictureUrl.isEmpty()) {
+                                Image(
+                                    imageVector = Icons.Rounded.AccountCircle,
+                                    contentDescription = "No profile picture",
+                                    modifier = Modifier.fillMaxSize().scale(1.2f).clipToBounds(),
+                                    colorFilter = ColorFilter.tint(Color(0xFF6C584C)))
+                              } else {
+                                AsyncImage(
+                                    model = userData.profilePictureUrl,
+                                    contentDescription = "profile picture",
+                                    modifier =
+                                        Modifier.fillMaxSize()
+                                            .scale(1.2f)
+                                            .clipToBounds()
+                                            .clip(CircleShape))
+                              }
+                            }
+                        Box(
+                            modifier = Modifier.fillMaxSize().padding(0f.dp),
+                            contentAlignment = Alignment.TopEnd) {
+                              Image(
+                                  imageVector = Icons.Outlined.Edit,
+                                  contentDescription = "",
+                                  colorFilter = ColorFilter.tint(Color(0xFFAAAAAA)))
                             }
                       }
+                }
+              }
+              Column(Modifier.fillMaxHeight().fillMaxWidth(), Arrangement.spacedBy(8.dp)) {
+                // Full name text
+                Text(
+                    text = "${userData.greeting} ${userData.firstName} ${userData.lastName}",
+                    modifier = Modifier.testTag(C.Tag.UserProfile.fullname))
+
+                // Email text
+                Text(text = userData.email, modifier = Modifier.testTag(C.Tag.UserProfile.email))
+
+                // Phone number text
+                Text(
+                    text = userData.phoneNumber,
+                    modifier = Modifier.testTag(C.Tag.UserProfile.phone))
+
+                // User address
+                Text(text = addressStr, modifier = Modifier.testTag(C.Tag.UserProfile.address))
+
+                // Edit Button
+                ButtonComponent(
+                    { showEditProfile = true }, Modifier.testTag(C.Tag.UserProfile.edit)) {
+                      Text("Edit Profile")
                     }
-                    Column(Modifier.fillMaxWidth(), Arrangement.spacedBy(8.dp)) {
-                      // Full name text
-                      Text(
-                          text = userData.printFullname(),
-                          modifier = Modifier.testTag(C.Tag.UserProfile.fullname))
-
-                      // Email text
-                      Text(
-                          text = userData.email,
-                          modifier = Modifier.testTag(C.Tag.UserProfile.email))
-
-                      // Phone number text
-                      Text(
-                          text = userData.phoneNumber,
-                          modifier = Modifier.testTag(C.Tag.UserProfile.phone))
-
-                      // User address
-                      Text(
-                          text = addressStr, modifier = Modifier.testTag(C.Tag.UserProfile.address))
-                    }
-                  }
-              // Edit Button
-              ButtonComponent(
-                  { showEditProfile = true }, Modifier.testTag(C.Tag.UserProfile.edit)) {
-                    Text("Edit Profile")
-                  }
+              }
             }
       }
 }
