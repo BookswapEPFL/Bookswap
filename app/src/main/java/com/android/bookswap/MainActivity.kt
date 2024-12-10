@@ -1,6 +1,7 @@
 package com.android.bookswap
 
 import android.content.Context
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -14,10 +15,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTag
+import androidx.core.app.ActivityCompat
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
+import com.android.bookswap.data.DataMessage
 import com.android.bookswap.data.DataUser
 import com.android.bookswap.data.repository.BooksRepository
 import com.android.bookswap.data.repository.MessageRepository
@@ -31,6 +34,7 @@ import com.android.bookswap.model.AppConfig
 import com.android.bookswap.model.LocalAppConfig
 import com.android.bookswap.model.UserViewModel
 import com.android.bookswap.model.chat.ContactViewModel
+import com.android.bookswap.model.chat.MyFirebaseMessagingService
 import com.android.bookswap.model.chat.OfflineMessageStorage
 import com.android.bookswap.model.map.BookFilter
 import com.android.bookswap.model.map.BookManagerViewModel
@@ -59,16 +63,85 @@ import com.android.bookswap.ui.theme.BookSwapAppTheme
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.storage.FirebaseStorage
 import java.util.UUID
+import android.Manifest
+import com.android.bookswap.model.chat.PermissionHandler
 
 class MainActivity : ComponentActivity() {
 
-  override fun onCreate(savedInstanceState: Bundle?) {
-    super.onCreate(savedInstanceState)
-    // permissionHandler = PermissionHandler(this)
-    // permissionHandler.askNotificationPermission()
-    setContent { BookSwapApp() }
+    private var chatListener: ListenerRegistration? = null
+
+    private fun listenForChatUpdates() {
+        val db = FirebaseFirestore.getInstance()
+        val currentUser = Firebase.auth.currentUser
+
+        // Ensure we have a logged-in user
+        if (currentUser == null) {
+            Log.e("Firestore", "No logged-in user.")
+            return
+        }
+
+        val currentUserUUID = UUID.fromString(currentUser.uid)
+
+        chatListener = db.collection("chats")
+            .addSnapshotListener { snapshot, e ->
+                if (e != null) {
+                    Log.e("Firestore", "Listen failed: $e")
+                    return@addSnapshotListener
+                }
+
+                if (snapshot != null && !isAppInForeground) {
+                    for (change in snapshot.documentChanges) {
+                        if (change.type == com.google.firebase.firestore.DocumentChange.Type.ADDED) {
+                            val newMessage = change.document.toObject(DataMessage::class.java)
+
+                            // Check if the current user is the receiver
+                            if (newMessage.receiverUUID == currentUserUUID) {
+                                val senderName = newMessage.senderUUID.toString()
+                                val messageContent = newMessage.text
+
+                                // Send a notification
+                                sendNotification("New Message", "From $senderName: $messageContent")
+                            }
+                        }
+                    }
+                }
+            }
+    }
+
+    private fun sendNotification(title: String, messageBody: String) {
+        val notificationService = MyFirebaseMessagingService()
+        notificationService.sendNotification(title, messageBody)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        // Remove the listener to avoid memory leaks
+        chatListener?.remove()
+    }
+
+    companion object {
+        var isAppInForeground = false
+    }
+
+    override fun onStart() {
+        super.onStart()
+        isAppInForeground = true
+    }
+
+    override fun onStop() {
+        super.onStop()
+        isAppInForeground = false
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        val permissionHandler = PermissionHandler(this)
+        permissionHandler.askNotificationPermission()
+        setContent { BookSwapApp() }
+        listenForChatUpdates()
   }
 
   @Composable
