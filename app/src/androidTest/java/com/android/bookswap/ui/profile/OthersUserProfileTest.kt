@@ -62,7 +62,7 @@ class OthersUserProfileTest : TestCase() {
               description =
                   "Recuento de la historia de España desde los primeros pobladores hasta la actualidad.",
               rating = 3,
-              photo = null,
+              photo = "https://example.com/photo.jpg",
               language = BookLanguages.SPANISH,
               isbn = "978-84-09025-23-5",
               genres = listOf(BookGenres.HISTORICAL, BookGenres.NONFICTION, BookGenres.BIOGRAPHY),
@@ -182,5 +182,91 @@ class OthersUserProfileTest : TestCase() {
     composeTestRule
         .onAllNodesWithTag(C.Tag.BookDisplayComp.author)
         .assertAll(hasText("Author 1").or(hasText("Author 2")))
+  }
+
+  @Test
+  fun displaysImage_whenPhotoUrlIsNotEmpty() {
+    val imageTestUserId = UUID.randomUUID()
+    val imageTestUser =
+        DataUser(
+            userUUID = imageTestUserId,
+            greeting = "Mr.",
+            firstName = "John",
+            lastName = "Doe",
+            email = "john.doe@example.com",
+            phoneNumber = "1234567890",
+            latitude = 45.0,
+            longitude = 50.0,
+            profilePictureUrl = "https://test_profile_pic.jpg",
+            bookList = listOf(UUID.randomUUID(), UUID.randomUUID()))
+
+    // Mock the user data fetching
+    every { mockOthersUserViewModel.getUserByUUID(imageTestUserId, any()) } answers
+        {
+          val callback = secondArg<(DataUser?) -> Unit>()
+          callback(imageTestUser)
+        }
+
+    composeTestRule.setContent {
+      OthersUserProfileScreen(
+          userId = imageTestUserId,
+          otherUserVM = mockOthersUserViewModel,
+          booksRepository = mockBooksRepository,
+          userBookViewModel = mockUserBookViewModel,
+          navigationActions = mockNavigationActions)
+    }
+    // Verify the container is displayed
+    composeTestRule
+        .onNodeWithTag(C.Tag.OtherUserProfile.profilePictureContainer)
+        .assertIsDisplayed()
+
+    // Verify the picture is displayed inside the container
+    composeTestRule.onNodeWithTag(C.Tag.OtherUserProfile.profile_image_picture).assertIsDisplayed()
+
+    // Ensure the icon is not displayed
+    composeTestRule.onNodeWithTag(C.Tag.OtherUserProfile.profile_image_icon).assertDoesNotExist()
+  }
+
+  @Test
+  fun displaysIcon_whenPhotoUrlIsEmpty() {
+    val imageTestUserId = UUID.randomUUID()
+    val imageTestUser =
+        DataUser(
+            userUUID = imageTestUserId,
+            greeting = "Mr.",
+            firstName = "John",
+            lastName = "Doe",
+            email = "john.doe@example.com",
+            phoneNumber = "1234567890",
+            latitude = 45.0,
+            longitude = 50.0,
+            profilePictureUrl = "",
+            bookList = listOf(UUID.randomUUID(), UUID.randomUUID()))
+
+    // Mock the user data fetching
+    every { mockOthersUserViewModel.getUserByUUID(imageTestUserId, any()) } answers
+        {
+          val callback = secondArg<(DataUser?) -> Unit>()
+          callback(imageTestUser)
+        }
+
+    composeTestRule.setContent {
+      OthersUserProfileScreen(
+          userId = imageTestUserId,
+          otherUserVM = mockOthersUserViewModel,
+          booksRepository = mockBooksRepository,
+          userBookViewModel = mockUserBookViewModel,
+          navigationActions = mockNavigationActions)
+    }
+    // Verify the container is displayed
+    composeTestRule
+        .onNodeWithTag(C.Tag.OtherUserProfile.profilePictureContainer)
+        .assertIsDisplayed()
+
+    // Verify the icon is displayed inside the container
+    composeTestRule.onNodeWithTag(C.Tag.OtherUserProfile.profile_image_icon).assertIsDisplayed()
+
+    // Ensure the picture is not displayed
+    composeTestRule.onNodeWithTag(C.Tag.OtherUserProfile.profile_image_picture).assertDoesNotExist()
   }
 }
