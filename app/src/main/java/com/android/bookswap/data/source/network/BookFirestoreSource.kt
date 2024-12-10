@@ -65,8 +65,9 @@ class BooksFirestoreSource(private val db: FirebaseFirestore) : BooksRepository 
     db.collection(collectionBooks).get().addOnCompleteListener { task ->
       if (task.isSuccessful) {
         // Maps Firestore documents to DataBook objects or returns an empty list
-        val books = task.result?.mapNotNull { document -> documentToBook(document) } ?: emptyList()
-        callback(Result.success(books))
+        val books = task.result?.mapNotNull { documentToBook(it) } ?: emptyList()
+        Log.d("TAG_BookSource", "GetBooks! ${books.size} | ${task.result?.mapNotNull{it}?.size}")
+        callback(Result.success(task.result?.mapNotNull { documentToBook(it) } ?: emptyList()))
       } else {
         task.exception?.let { e -> callback(Result.failure(e)) }
       }
@@ -200,7 +201,7 @@ class BooksFirestoreSource(private val db: FirebaseFirestore) : BooksRepository 
       val photo = document.getString("photo")
       val isbn = document.getString("isbn")
       val languageBook = BookLanguages.valueOf(document.getString("language") ?: return null)
-      val genres = document.get("genres").toString().split(", ")
+      val genres = document.get("genres").toString().removeSurrounding("[", "]").split(", ")
       val bookGenres =
           genres.mapNotNull { genre ->
             try {
@@ -209,7 +210,7 @@ class BooksFirestoreSource(private val db: FirebaseFirestore) : BooksRepository 
               null
             }
           }
-      val userid = DataConverter.parse_raw_UUID(document.get("userid").toString()) ?: return null
+      val userid = DataConverter.parse_raw_UUID(document.get("userId").toString()) ?: return null
       DataBook(
           bookuuid,
           title,

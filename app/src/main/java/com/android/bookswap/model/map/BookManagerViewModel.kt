@@ -71,10 +71,11 @@ class BookManagerViewModel(
           while (true) {
             fetchBooksFromRepository()
             delay(REFRESH_TIME_DELAY)
+            computeDistanceOfUsers()
+            combineFlowsAndFilterBooks()
+            delay(REFRESH_TIME_DELAY)
           }
         }
-    computeDistanceOfUsers()
-    combineFlowsAndFilterBooks()
   }
   /** Stops updating books by canceling the coroutine scope. */
   fun stopUpdatingBooks() {
@@ -114,14 +115,13 @@ class BookManagerViewModel(
       if (!successBooks && !queryBooks) {
         queryBooks = true
         booksRepository.getBooks { result ->
-          if (result.isSuccess) {
-            _allBooks.value = result.getOrThrow()
-            successBooks = true
-          } else {
-            Log.e(
-                "BookManagerViewModel",
-                "Failed to fetch books: ${result.exceptionOrNull()!!.message}")
-          }
+          result.fold(
+              {
+                _allBooks.value = it
+                Log.d("TAG_BMVM", "${_allBooks.value.size} | ${it.size}")
+                successBooks = true
+              },
+              { Log.e("BookManagerViewModel", "Failed to fetch books: ${it.message}") })
           queryBooks = false
         }
       }
@@ -145,13 +145,20 @@ class BookManagerViewModel(
    * and `_filteredUsers` state flows with the filtered results.
    */
   private fun combineFlowsAndFilterBooks() {
+    android.util.Log.d(
+        "TAG",
+        "COMBINE FFS| ${_allUsers.value.size} ${_allBooks.value.size}  ||  ${_filteredUsers.value.size} ${_filteredBooks.value.size}")
     combineFlowsAndFilterBooksJob =
         scope.launch {
           combine(
                   _allBooks,
                   _allUserDistance,
                   bookFilter.genresFilter,
-                  bookFilter.languagesFilter) { books, userDistance, _, _ ->
+                  bookFilter.languagesFilter) {
+                      books,
+                      userDistance,
+                      selectedGenres,
+                      selectedLanguages ->
                     val userBooksWithLocation =
                         userDistance
                             .map { user ->
@@ -159,10 +166,7 @@ class BookManagerViewModel(
                                   userUUID = user.first.userUUID,
                                   longitude = user.first.longitude,
                                   latitude = user.first.latitude,
-                                  books =
-                                      bookFilter.filterBooks(books).filter { book ->
-                                        book.uuid in user.first.bookList
-                                      })
+                                  books = books.filter { book -> book.uuid in user.first.bookList })
                             }
                             .filter { it.books.isNotEmpty() }
 

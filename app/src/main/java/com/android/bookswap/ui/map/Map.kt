@@ -124,9 +124,15 @@ fun MapScreen(
   var mutableStateSelectedUser by remember { mutableIntStateOf(selectedUser) }
   var markerScreenPosition by remember { mutableStateOf<Offset?>(null) }
 
-  val filteredBooks = bookManagerViewModel.filteredBooks.collectAsState()
+  val filteredBooks =
+      bookManagerViewModel.filteredBooks.collectAsState().also {
+        android.util.Log.d("TAG_MAP", it.value.size.toString())
+      }
 
-  val filteredUsers = bookManagerViewModel.filteredUsers.collectAsState()
+  val filteredUsers =
+      bookManagerViewModel.filteredUsers.collectAsState().also {
+        android.util.Log.d("TAG_MAP", it.value.size.toString())
+      }
 
   // compute the position of the marker on the screen given the camera position and the marker's
   // position on the map
@@ -191,6 +197,7 @@ fun MapScreen(
                           BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE))
                 }
                 filteredUsers.value
+                    .also { android.util.Log.d("TAG_MAP", it.size.toString()) }
                     .filter {
                       !it.longitude.isNaN() && !it.latitude.isNaN() && it.books.isNotEmpty()
                     }
