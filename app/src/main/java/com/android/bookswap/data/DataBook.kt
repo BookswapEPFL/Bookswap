@@ -40,8 +40,7 @@ enum class BookLanguages(val languageCode: String) {
   ENGLISH("English"), // English language
   SPANISH("Spanish"), // Spanish language
   ITALIAN("Italian"), // Italian language
-  ROMANSH("Romansh"),
-  SMALLTEST("Small Test"), // Romansh, a language spoken in Switzerland
+  ROMANSH("Romansh"), // Romansh, a language spoken in Switzerland
   OTHER("Other") // All languages that are not yet implemented
 }
 /** Genre of a book */

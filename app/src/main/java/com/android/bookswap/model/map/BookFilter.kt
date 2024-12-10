@@ -64,7 +64,7 @@ class BookFilter {
   fun setLanguages(languages: List<String>) {
     val newLanguagesFilter =
         languages.mapNotNull { language ->
-          // Use the Genre parameter to get the corresponding BookGenres enum
+          // Use the language parameter to get the corresponding BookLanguages enum
           BookLanguages.values().firstOrNull { it.languageCode.equals(language, ignoreCase = true) }
         }
     _languagesFilter.value = newLanguagesFilter
