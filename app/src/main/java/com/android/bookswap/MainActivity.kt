@@ -18,7 +18,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
-import com.android.bookswap.data.DataBook
 import com.android.bookswap.data.DataUser
 import com.android.bookswap.data.repository.BooksRepository
 import com.android.bookswap.data.repository.MessageRepository
@@ -234,8 +233,15 @@ class MainActivity : ComponentActivity() {
           }
         }
         navigation(startDestination = C.Screen.USER_PROFILE, route = C.Route.USER_PROFILE) {
-          composable(C.Screen.USER_PROFILE) { UserProfile(photoStorage) }
-          composable(C.Screen.BOOK_PROFILE) { backStackEntry ->
+          composable(C.Screen.USER_PROFILE) {
+            UserProfile(
+                photoStorage = photoStorage,
+                booksRepository = bookRepository,
+                navigationActions = navigationActions,
+                topAppBar = { topAppBar("Your Profile") },
+                bottomAppBar = { bottomAppBar(this@navigation.route ?: "") })
+          }
+          composable("${C.Screen.BOOK_PROFILE}/{bookId}") { backStackEntry ->
             val bookId = backStackEntry.arguments?.getString("bookId")?.let { UUID.fromString(it) }
             if (bookId != null) {
               BookProfileScreen(
@@ -247,24 +253,13 @@ class MainActivity : ComponentActivity() {
               Log.e("Navigation", "Invalid bookId passed to BookProfileScreen")
             }
           }
-          composable("${C.Screen.EDIT_BOOK}/{bookId}") { backStackEntry ->
-            val bookId = backStackEntry.arguments?.getString("bookId")?.let { UUID.fromString(it) }
-            var book: DataBook? = null // How to create a book that will be assigned after ?
-            // Fetch book data
-            if (bookId != null) {
-
-              bookRepository.getBook(
-                  uuid = bookId,
-                  OnSucess = { fetchedbook -> book = fetchedbook },
-                  onFailure = { Log.e("EditScreen", "Error while loading the book") })
-              EditBookScreen(
-                  viewModel = editBookViewModel,
-                  topAppBar = { topAppBar("Edit Book") },
-                  bottomAppBar = { bottomAppBar(this@navigation.route ?: "") },
-                  book = book!!)
-            } else {
-              Log.e("Navigation", "Invalid bookId passed to EditBookScreen")
-            }
+          composable("${C.Screen.EDIT_BOOK}/{bookUUID}") { backStackEntry ->
+            val bookUUID =
+                backStackEntry.arguments?.getString("bookUUID")?.let { UUID.fromString(it) }
+            EditBookScreen(
+                booksRepository = bookRepository,
+                navigationActions = NavigationActions(navController),
+                bookUUID = bookUUID!!)
           }
         }
         navigation(
@@ -278,6 +273,7 @@ class MainActivity : ComponentActivity() {
                   OthersUserProfileScreen(
                       userId = userId,
                       booksRepository = bookRepository,
+                      navigationActions = navigationActions,
                       topAppBar = { topAppBar("User Profile") },
                       bottomAppBar = { bottomAppBar(this@navigation.route ?: "") })
                 } else {

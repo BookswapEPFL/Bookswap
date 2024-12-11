@@ -14,13 +14,15 @@ import com.android.bookswap.data.BookGenres
 import com.android.bookswap.data.BookLanguages
 import com.android.bookswap.data.DataBook
 import com.android.bookswap.model.edit.EditBookViewModel
+
+import com.android.bookswap.data.repository.BooksRepository
 import com.android.bookswap.resources.C
 import com.android.bookswap.ui.components.TopAppBarComponent
 import com.android.bookswap.ui.navigation.BottomNavigationMenu
 import com.android.bookswap.ui.navigation.List_Navigation_Bar_Destinations
 import com.android.bookswap.ui.navigation.NavigationActions
-import io.mockk.MockKAnnotations
 import io.mockk.every
+
 import io.mockk.impl.annotations.MockK
 import io.mockk.just
 import io.mockk.mockk
@@ -32,9 +34,13 @@ import org.junit.Test
 
 class EditBookScreenTest {
 
+
   private val mockViewModel: EditBookViewModel = mockk()
 
-  @MockK private lateinit var navigationActions: NavigationActions
+  private val booksRepository: BooksRepository = mockk()
+
+
+  private val navigationActions: NavigationActions = mockk()
 
   @get:Rule val composeTestRule = createComposeRule()
 
@@ -81,11 +87,21 @@ class EditBookScreenTest {
       EditBookScreen(
           mockViewModel, sampleBook, topAppBar = { topAppBar("Edit your Book") }, bottomAppBar = {})
     }
+    every { navigationActions.currentRoute() } returns "EDIT_BOOK"
+    every { booksRepository.getBook(any(), any(), any()) } answers
+        {
+          secondArg<(DataBook) -> Unit>()(sampleBook)
+        }
+
   }
 
   @Test
-  fun displayAllComponent() {
+  fun displayEditScreenComponent() {
     composeTestRule.onNodeWithTag(C.Tag.edit_book_screen_container).assertIsDisplayed()
+  }
+
+  @Test
+  fun displayEditTitleComponent() {
     composeTestRule.onNodeWithTag(C.Tag.TopAppBar.screen_title).assertIsDisplayed()
   }
 
@@ -121,7 +137,6 @@ class EditBookScreenTest {
 
   @Test
   fun displayEditBookTitleComponent() {
-
     composeTestRule.onNodeWithTag(C.Tag.BookEntryComp.title_field).assertIsDisplayed()
   }
 
@@ -152,7 +167,6 @@ class EditBookScreenTest {
 
   @Test
   fun inputsHaveInitialValue() {
-
     composeTestRule
         .onNodeWithTag(C.Tag.BookEntryComp.title_field)
         .assertTextContains(sampleBook.title)

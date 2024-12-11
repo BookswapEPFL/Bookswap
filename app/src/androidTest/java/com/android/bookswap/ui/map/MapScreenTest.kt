@@ -145,16 +145,34 @@ class MapScreenTest {
     composeTestRule
         .onNodeWithTag("1_" + C.Tag.BookDisplayComp.book_display_container)
         .assertIsDisplayed()
-    composeTestRule.onAllNodesWithTag(C.Tag.BookDisplayComp.image).assertCountEquals(2)
-    composeTestRule.onAllNodesWithTag(C.Tag.BookDisplayComp.title).assertCountEquals(2)
-    composeTestRule.onAllNodesWithTag(C.Tag.BookDisplayComp.author).assertCountEquals(2)
-    composeTestRule.onAllNodesWithTag(C.Tag.BookDisplayComp.rating).assertCountEquals(2)
-    composeTestRule.onAllNodesWithTag(C.Tag.BookDisplayComp.filled_star).assertCountEquals(9)
-    composeTestRule.onAllNodesWithTag(C.Tag.BookDisplayComp.hollow_star).assertCountEquals(1)
-    composeTestRule.onAllNodesWithTag(C.Tag.BookDisplayComp.genres).assertCountEquals(2)
-    composeTestRule.onAllNodesWithTag(C.Tag.BookListComp.divider).assertCountEquals(books.size - 1)
 
-    composeTestRule.onNodeWithTag(C.Tag.Map.filter_button).assertIsDisplayed()
+    composeTestRule
+        .onAllNodesWithTag(C.Tag.BookDisplayComp.image, useUnmergedTree = true)
+        .assertCountEquals(2)
+    composeTestRule
+        .onAllNodesWithTag(C.Tag.BookDisplayComp.title, useUnmergedTree = true)
+        .assertCountEquals(2)
+    composeTestRule
+        .onAllNodesWithTag(C.Tag.BookDisplayComp.author, useUnmergedTree = true)
+        .assertCountEquals(2)
+    composeTestRule
+        .onAllNodesWithTag(C.Tag.BookDisplayComp.rating, useUnmergedTree = true)
+        .assertCountEquals(2)
+    composeTestRule
+        .onAllNodesWithTag(C.Tag.BookDisplayComp.filled_star, useUnmergedTree = true)
+        .assertCountEquals(9)
+    composeTestRule
+        .onAllNodesWithTag(C.Tag.BookDisplayComp.hollow_star, useUnmergedTree = true)
+        .assertCountEquals(1)
+    composeTestRule
+        .onAllNodesWithTag(C.Tag.BookDisplayComp.genres, useUnmergedTree = true)
+        .assertCountEquals(2)
+    composeTestRule
+        .onAllNodesWithTag(C.Tag.BookListComp.divider, useUnmergedTree = true)
+        .assertCountEquals(books.size - 1)
+    composeTestRule
+        .onNodeWithTag(C.Tag.Map.filter_button, useUnmergedTree = true)
+        .assertIsDisplayed()
   }
 
   @Test
