@@ -336,9 +336,8 @@ fun EditBookScreen(
                     Button(
                         onClick = {
                           booksRepository.deleteBooks(
-                              book.uuid,
-                              book,
-                              callback = { result ->
+                              book.uuid)
+                              { result ->
                                 if (result.isSuccess) {
                                   navigationActions.goBack()
                                 } else {
@@ -346,7 +345,7 @@ fun EditBookScreen(
                                           context, "Failed to delete book.", Toast.LENGTH_SHORT)
                                       .show()
                                 }
-                              })
+                              }
                         },
                         modifier = Modifier.fillMaxWidth().testTag(C.Tag.EditBook.delete),
                         colors =
