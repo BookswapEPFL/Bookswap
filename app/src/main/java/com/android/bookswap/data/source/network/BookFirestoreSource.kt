@@ -189,7 +189,7 @@ class BooksFirestoreSource(private val db: FirebaseFirestore) : BooksRepository 
    * @param callback Callback to be invoked with the result of the operation. The result is Unit on
    *   success, or an exception on failure.
    */
-  override fun deleteBooks(uuid: UUID, callback: (Result<Unit>) -> Unit) {
+  override fun deleteBook(uuid: UUID, callback: (Result<Unit>) -> Unit) {
     performFirestoreOperation(
         db.collection(collectionBooks).document(uuid.toString()).delete(), callback)
   }

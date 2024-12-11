@@ -51,5 +51,5 @@ interface BooksRepository {
    * @param uuid The unique identifier of the book to be deleted.
    * @param callback A callback function that receives an exception if the operation fails.
    */
-  fun deleteBooks(uuid: UUID, callback: (Result<Unit>) -> Unit)
+  fun deleteBook(uuid: UUID, callback: (Result<Unit>) -> Unit)
 }

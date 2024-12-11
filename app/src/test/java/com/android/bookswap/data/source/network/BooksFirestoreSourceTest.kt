@@ -88,7 +88,7 @@ class BooksFirestoreSourceTest {
     every { mockDocumentReference.delete() }.returns(Tasks.forResult(null))
 
     // Act
-    bookSource.deleteBooks(testBook.uuid) {}
+    bookSource.deleteBook(testBook.uuid) {}
 
     // Assert
     verify { mockDocumentReference.delete() }

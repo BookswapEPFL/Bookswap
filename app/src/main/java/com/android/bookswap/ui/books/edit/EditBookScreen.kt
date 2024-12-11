@@ -335,7 +335,7 @@ fun EditBookScreen(
                   item {
                     Button(
                         onClick = {
-                          booksRepository.deleteBooks(book.uuid) { result ->
+                          booksRepository.deleteBook(book.uuid) { result ->
                             if (result.isSuccess) {
                               navigationActions.goBack()
                             } else {
