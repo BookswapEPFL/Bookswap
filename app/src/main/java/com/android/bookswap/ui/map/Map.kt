@@ -149,7 +149,11 @@ fun MapScreen(
   // Stop location and books updates when the screen is disposed
   DisposableEffect(Unit) {
     onDispose {
-      userVM.updateAddress(latitude.value, longitude.value, context)
+      if (latitude.value.isNaN() || longitude.value.isNaN()) {
+        userVM.updateAddress(userVM.getUser().latitude, userVM.getUser().longitude, context)
+      } else {
+        userVM.updateAddress(latitude.value, longitude.value, context)
+      }
       geolocation.stopLocationUpdates()
       bookManagerViewModel.stopUpdatingBooks()
     }
