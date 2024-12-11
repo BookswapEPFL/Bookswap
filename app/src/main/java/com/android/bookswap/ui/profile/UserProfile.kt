@@ -79,6 +79,7 @@ fun UserProfile(
   val context = LocalContext.current
   val appConfig = LocalAppConfig.current
   var userData = appConfig.userViewModel.getUser()
+  val addressStr by appConfig.userViewModel.addressStr.collectAsState()
   val showEditPicture = remember { mutableStateOf(false) }
   var showEditProfile by remember { mutableStateOf(false) }
 
@@ -251,9 +252,7 @@ fun UserProfile(
               value = userData.phoneNumber)
           // User address:
           LabeledTextUserProfile(
-              testTag = C.Tag.OtherUserProfile.address,
-              label = "Your address:",
-              value = "${userData.latitude}, ${userData.longitude}")
+              testTag = C.Tag.OtherUserProfile.address, label = "Your address:", value = addressStr)
 
           Spacer(modifier = Modifier.height(SPACER_HEIGHT_INFO_EDIT))
 
