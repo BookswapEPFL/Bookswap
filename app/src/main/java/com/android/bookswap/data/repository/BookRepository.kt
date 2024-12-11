@@ -49,8 +49,7 @@ interface BooksRepository {
    * Function to delete a book from the repository.
    *
    * @param uuid The unique identifier of the book to be deleted.
-   * @param dataBook The book data to be deleted (can also just use the uuid).
    * @param callback A callback function that receives an exception if the operation fails.
    */
-  fun deleteBooks(uuid: UUID, dataBook: DataBook, callback: (Result<Unit>) -> Unit)
+  fun deleteBook(uuid: UUID, callback: (Result<Unit>) -> Unit)
 }
