@@ -37,12 +37,10 @@ class GeolocationTest {
     every { LocationServices.getFusedLocationProviderClient(mockActivity) } returns
         mockFusedLocationClient
 
-    every {
-      mockActivity.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION)
-    } returns PackageManager.PERMISSION_GRANTED
-    every {
-      mockActivity.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION)
-    } returns PackageManager.PERMISSION_GRANTED
+    every { mockActivity.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) } returns
+        PackageManager.PERMISSION_GRANTED
+    every { mockActivity.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) } returns
+        PackageManager.PERMISSION_GRANTED
 
     geolocation = Geolocation(mockActivity)
   }
