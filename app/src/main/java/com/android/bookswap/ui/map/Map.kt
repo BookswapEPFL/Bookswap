@@ -1,6 +1,9 @@
 package com.android.bookswap.ui.map
 
+import android.content.pm.PackageManager
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -43,6 +46,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
 import com.android.bookswap.data.DataBook
 import com.android.bookswap.model.LocalAppConfig
 import com.android.bookswap.model.isNetworkAvailable
@@ -97,6 +101,22 @@ fun MapScreen(
         CameraPosition.fromLatLngZoom(
             userVM.getUser().let { LatLng(it.latitude, it.longitude) }, INIT_ZOOM)
   }
+  var mapProperties by remember { mutableStateOf(MapProperties()) }
+  var mapUISettings by remember {
+    mutableStateOf(MapUiSettings(myLocationButtonEnabled = false, zoomControlsEnabled = false))
+  }
+  val permissions =
+    arrayOf(
+      android.Manifest.permission.ACCESS_COARSE_LOCATION,
+      android.Manifest.permission.ACCESS_FINE_LOCATION)
+  val permLauncher =
+    rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
+      if (it.values.contains(true)) {
+        geolocation.startLocationUpdates()
+        mapProperties = MapProperties(isMyLocationEnabled = true)
+        mapUISettings = MapUiSettings(myLocationButtonEnabled = true, zoomControlsEnabled = false)
+      }
+    }
   // Get the user's current location
   val latitude = geolocation.latitude.collectAsState()
   val longitude = geolocation.longitude.collectAsState()
@@ -109,7 +129,19 @@ fun MapScreen(
     } else {
       Toast.makeText(context, "Please connect to Internet to actualise", Toast.LENGTH_SHORT).show()
     }
-    geolocation.startLocationUpdates()
+    val hasPermissions =
+      permissions
+        .map {
+          ContextCompat.checkSelfPermission(context, it) == PackageManager.PERMISSION_GRANTED
+        }
+        .contains(true)
+    if (hasPermissions) {
+      geolocation.startLocationUpdates()
+      mapProperties = MapProperties(isMyLocationEnabled = true)
+      mapUISettings = MapUiSettings(myLocationButtonEnabled = true, zoomControlsEnabled = false)
+    } else {
+      permLauncher.launch(permissions)
+    }
     cameraPositionState.position =
         CameraPosition.fromLatLngZoom(LatLng(latitude.value, longitude.value), INIT_ZOOM)
     isOnline = isNetworkAvailable(context)
@@ -181,9 +213,8 @@ fun MapScreen(
                         cameraPosition = cameraPositionState
                       },
                   cameraPositionState = cameraPositionState,
-                  uiSettings =
-                      MapUiSettings(myLocationButtonEnabled = true, zoomControlsEnabled = false),
-                  properties = MapProperties(isMyLocationEnabled = true),
+                  uiSettings = mapUISettings,
+                  properties = mapProperties,
               ) {
                 // Marker for user's current location
                 if (!latitude.value.isNaN() && !longitude.value.isNaN()) {
