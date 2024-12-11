@@ -105,6 +105,11 @@ fun MapScreen(
   var mapUISettings by remember {
     mutableStateOf(MapUiSettings(myLocationButtonEnabled = false, zoomControlsEnabled = false))
   }
+  fun enableLocation() {
+    geolocation.startLocationUpdates()
+    mapProperties = MapProperties(isMyLocationEnabled = true)
+    mapUISettings = MapUiSettings(myLocationButtonEnabled = true, zoomControlsEnabled = false)
+  }
   val permissions =
       arrayOf(
           android.Manifest.permission.ACCESS_COARSE_LOCATION,
@@ -112,9 +117,7 @@ fun MapScreen(
   val permLauncher =
       rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
         if (it.values.contains(true)) {
-          geolocation.startLocationUpdates()
-          mapProperties = MapProperties(isMyLocationEnabled = true)
-          mapUISettings = MapUiSettings(myLocationButtonEnabled = true, zoomControlsEnabled = false)
+          enableLocation()
         }
       }
   // Get the user's current location
@@ -136,9 +139,7 @@ fun MapScreen(
             }
             .contains(true)
     if (hasPermissions) {
-      geolocation.startLocationUpdates()
-      mapProperties = MapProperties(isMyLocationEnabled = true)
-      mapUISettings = MapUiSettings(myLocationButtonEnabled = true, zoomControlsEnabled = false)
+      enableLocation()
     } else {
       permLauncher.launch(permissions)
     }
