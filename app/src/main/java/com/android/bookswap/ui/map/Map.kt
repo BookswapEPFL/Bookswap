@@ -106,17 +106,17 @@ fun MapScreen(
     mutableStateOf(MapUiSettings(myLocationButtonEnabled = false, zoomControlsEnabled = false))
   }
   val permissions =
-    arrayOf(
-      android.Manifest.permission.ACCESS_COARSE_LOCATION,
-      android.Manifest.permission.ACCESS_FINE_LOCATION)
+      arrayOf(
+          android.Manifest.permission.ACCESS_COARSE_LOCATION,
+          android.Manifest.permission.ACCESS_FINE_LOCATION)
   val permLauncher =
-    rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
-      if (it.values.contains(true)) {
-        geolocation.startLocationUpdates()
-        mapProperties = MapProperties(isMyLocationEnabled = true)
-        mapUISettings = MapUiSettings(myLocationButtonEnabled = true, zoomControlsEnabled = false)
+      rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
+        if (it.values.contains(true)) {
+          geolocation.startLocationUpdates()
+          mapProperties = MapProperties(isMyLocationEnabled = true)
+          mapUISettings = MapUiSettings(myLocationButtonEnabled = true, zoomControlsEnabled = false)
+        }
       }
-    }
   // Get the user's current location
   val latitude = geolocation.latitude.collectAsState()
   val longitude = geolocation.longitude.collectAsState()
@@ -130,11 +130,11 @@ fun MapScreen(
       Toast.makeText(context, "Please connect to Internet to actualise", Toast.LENGTH_SHORT).show()
     }
     val hasPermissions =
-      permissions
-        .map {
-          ContextCompat.checkSelfPermission(context, it) == PackageManager.PERMISSION_GRANTED
-        }
-        .contains(true)
+        permissions
+            .map {
+              ContextCompat.checkSelfPermission(context, it) == PackageManager.PERMISSION_GRANTED
+            }
+            .contains(true)
     if (hasPermissions) {
       geolocation.startLocationUpdates()
       mapProperties = MapProperties(isMyLocationEnabled = true)
