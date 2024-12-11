@@ -71,6 +71,16 @@ class EditBookViewModel(
         })
   }
 
+    /**
+     * Fetches a book from the repository by UUID.
+     */
+  fun getBook(uuid: UUID, onSuccess: (DataBook) -> Unit, onFailure: () -> Unit) {
+    booksRepository.getBook(uuid,OnSucess = { onSuccess(it) }, onFailure = { onFailure() })
+  }
+
+    /**
+     * Deletes a book from the repository by UUID.
+     */
   fun deleteBooks(context: Context, uuid: UUID) {
     booksRepository.deleteBooks(uuid) {
       if (it.isSuccess) {

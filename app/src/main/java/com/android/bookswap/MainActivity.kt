@@ -257,7 +257,9 @@ class MainActivity : ComponentActivity() {
             val bookUUID =
                 backStackEntry.arguments?.getString("bookUUID")?.let { UUID.fromString(it) }
             EditBookScreen(
-                booksRepository = bookRepository,
+                viewModel = editBookViewModel,
+                topAppBar = { topAppBar("Edit your Book") },
+                bottomAppBar = { bottomAppBar(this@navigation.route ?: "") },
                 navigationActions = NavigationActions(navController),
                 bookUUID = bookUUID!!)
           }

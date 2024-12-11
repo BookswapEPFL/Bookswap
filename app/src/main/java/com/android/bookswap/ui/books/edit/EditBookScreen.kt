@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 
 import android.util.Log
-import android.widget.Toast
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -15,7 +14,9 @@ import androidx.compose.runtime.getValue
 
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import com.android.bookswap.data.BookLanguages
@@ -48,11 +49,11 @@ private const val SPACE_BETWEEN_BUTTON = 0.05f / (1f - WIDTH_BUTTON)
 @Composable
 fun EditBookScreen(
     viewModel: EditBookViewModel,
-    book: DataBook,
+    navigationActions: NavigationActions,
+    bookUUID: UUID,
     topAppBar: @Composable () -> Unit = {},
     bottomAppBar: @Composable () -> Unit = {}
-    navigationActions: NavigationActions,
-    bookUUID: UUID
+
 ) {
 
   val configuration = LocalConfiguration.current
@@ -63,9 +64,9 @@ fun EditBookScreen(
 
   // Request book when screen load
   LaunchedEffect(Unit) {
-    booksRepository.getBook(
+    viewModel.getBook(
         uuid = bookUUID,
-        OnSucess = { resultBook -> bookMutable = resultBook },
+        onSuccess = { resultBook -> bookMutable = resultBook },
         onFailure = { Log.e("EditScreen", "Error while loading the book") })
   }
   when (bookMutable) {
@@ -83,8 +84,8 @@ fun EditBookScreen(
       var selectedGenre by remember { mutableStateOf<BookGenres?>(null) } // Genre selection state
       var expanded by remember { mutableStateOf(false) } // State for dropdown menu
 
-    }
-val maxLengthTitle = 50
+    }}
+    val maxLengthTitle = 50
       val maxLengthAuthor = 50
       val maxLengthDescription = 10000
       val maxLengthRating = 1
