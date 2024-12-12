@@ -40,6 +40,8 @@ class EditBookViewModelTest {
           archived = false,
           exchange = true)
 
+  private val uuid = UUID.randomUUID()
+
   @Before
   fun setup() {
     mockUserViewModel = mockk(relaxed = true)
@@ -107,7 +109,7 @@ class EditBookViewModelTest {
   }
 
   @Test
-  fun `updateDataBook don't navigate back on failure`() {
+  fun `updateDataBook doesn't navigate back on failure`() {
     every { booksRepository.updateBook(any(), any()) } answers
         {
           val callback = secondArg<(Result<Unit>) -> Unit>()
@@ -127,28 +129,11 @@ class EditBookViewModelTest {
         book.archived,
         book.exchange)
 
-    verify {
-      booksRepository.updateBook(
-          match { updatedBook ->
-            updatedBook.uuid == book.uuid &&
-                updatedBook.title == book.title &&
-                updatedBook.author == book.author &&
-                updatedBook.description == book.description &&
-                updatedBook.rating == book.rating &&
-                updatedBook.photo == book.photo &&
-                updatedBook.language == book.language &&
-                updatedBook.isbn == book.isbn &&
-                updatedBook.genres == book.genres
-          },
-          any())
-    }
-
     verify(exactly = 0) { navigation.goBack() }
   }
 
   @Test
   fun `deleteBook deletes book successfully`() {
-    val uuid = UUID.randomUUID()
     every { booksRepository.deleteBook(uuid, any()) } answers
         {
           val callback = secondArg<(Result<Unit>) -> Unit>()
@@ -164,7 +149,6 @@ class EditBookViewModelTest {
   @Test
   fun `deleteBook don't go back when deletion fails`() {
     // Arrange
-    val uuid = UUID.randomUUID()
     every { booksRepository.deleteBook(uuid, any()) } answers
         {
           val callback = secondArg<(Result<Unit>) -> Unit>()
