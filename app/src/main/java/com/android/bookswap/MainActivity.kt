@@ -253,6 +253,7 @@ class MainActivity : ComponentActivity() {
                 navigationActions = NavigationActions(navController),
                 bookUUID = bookUUID!!)
           }
+          composable(C.Screen.AUTH) { SignInScreen(navigationActions) }
         }
         navigation(
             startDestination = C.Screen.OTHERS_USER_PROFILE, route = C.Route.OTHERS_USER_PROFILE) {

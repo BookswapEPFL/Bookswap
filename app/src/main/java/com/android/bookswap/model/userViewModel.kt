@@ -7,7 +7,9 @@ import androidx.lifecycle.ViewModel
 import com.android.bookswap.data.DataUser
 import com.android.bookswap.data.repository.UsersRepository
 import com.android.bookswap.data.source.network.UserFirestoreSource
+import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.ktx.Firebase
 import java.util.UUID
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -117,5 +119,17 @@ open class UserViewModel(
   fun updateGoogleUid(googleUid: String) {
     dataUser.googleUid = googleUid
     updateUser(dataUser)
+  }
+  /**
+   * Disconnect the current user by resetting the user data and UUID. This method sets the user data
+   * to a new `DataUser` instance with a new UUID, marks the user as not loaded, and updates the
+   * stored state to false.
+   */
+  fun disconnectUser() {
+    this.dataUser = DataUser(UUID.randomUUID())
+    this.uuid = UUID.randomUUID()
+    isLoaded = false
+    _isStored.value = false
+    Firebase.auth.signOut()
   }
 }
