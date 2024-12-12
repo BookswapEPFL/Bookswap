@@ -34,7 +34,6 @@ import com.android.bookswap.ui.MAXLENGTHISBN
 import com.android.bookswap.ui.components.ButtonComponent
 import com.android.bookswap.ui.components.FieldComponent
 import com.android.bookswap.ui.navigation.NavigationActions
-import com.android.bookswap.ui.navigation.TopLevelDestinations
 import com.android.bookswap.ui.theme.ColorVariable
 
 /** This is the main screen for the chat feature. It displays the list of messages */
@@ -91,7 +90,9 @@ fun AddISBNScreen(
                                                     result.getOrThrow().uuid
                                             appConfig.userViewModel.updateUser(
                                                 bookList = newBookList)
-                                              navigationActions.navigateTo(C.Screen.EDIT_BOOK, result.getOrThrow().uuid.toString())
+                                            navigationActions.navigateTo(
+                                                C.Screen.EDIT_BOOK,
+                                                result.getOrThrow().uuid.toString())
                                           } else {
                                             val error = res.exceptionOrNull()!!
                                             Log.e("AddBook", res.toString())
