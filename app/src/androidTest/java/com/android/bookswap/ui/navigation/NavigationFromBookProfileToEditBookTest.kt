@@ -48,36 +48,36 @@ class NavigationFromBookProfileToEditBookTest {
   private val bookUserId: UUID = UUID.randomUUID()
   private lateinit var testBookOwner: DataBook
   private lateinit var testBookOther: DataBook
-    private lateinit var mockEditVM: EditBookViewModel
+  private lateinit var mockEditVM: EditBookViewModel
 
   @Before
   fun setUp() {
-      testBookOwner =
-          DataBook(
-              testBookId,
-              "Original Title",
-              "Author",
-              "Original Description",
-              5,
-              "https://example.com/photo.jpg",
-              BookLanguages.ENGLISH,
-              "1234567890",
-              listOf(BookGenres.FICTION),
-              currentUserId,
-              false,
-              false)
-      testBookOther = testBookOwner.copy(userId = bookUserId)
+    testBookOwner =
+        DataBook(
+            testBookId,
+            "Original Title",
+            "Author",
+            "Original Description",
+            5,
+            "https://example.com/photo.jpg",
+            BookLanguages.ENGLISH,
+            "1234567890",
+            listOf(BookGenres.FICTION),
+            currentUserId,
+            false,
+            false)
+    testBookOther = testBookOwner.copy(userId = bookUserId)
 
-      mockEditVM = mockk(relaxed = true)
-      every { mockEditVM.deleteBook(any(), any()) } just runs
-      every {
-          mockEditVM.updateDataBook(
-              any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any())
-      } just runs
-      every { mockEditVM.getBook(any(), any(), any()) } answers
-              {
-                  secondArg<(DataBook) -> Unit>()(testBookOwner)
-              }
+    mockEditVM = mockk(relaxed = true)
+    every { mockEditVM.deleteBook(any(), any()) } just runs
+    every {
+      mockEditVM.updateDataBook(
+          any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any())
+    } just runs
+    every { mockEditVM.getBook(any(), any(), any()) } answers
+        {
+          secondArg<(DataBook) -> Unit>()(testBookOwner)
+        }
     mockUserRepository = mockk()
     userVM = UserViewModel(currentUserId, mockUserRepository)
     mockBookRepo = mockk<BooksRepository>(relaxed = true)

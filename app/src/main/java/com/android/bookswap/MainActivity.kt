@@ -139,8 +139,8 @@ class MainActivity : ComponentActivity() {
     val bookFilter = BookFilter()
     val bookManagerViewModel =
         BookManagerViewModel(geolocation, bookRepository, userRepository, bookFilter)
-      val addToBookViewModel = AddToBookViewModel(bookRepository, userVM)
-      val editBookViewModel = EditBookViewModel(bookRepository, navigationActions, userVM)
+    val addToBookViewModel = AddToBookViewModel(bookRepository, userVM)
+    val editBookViewModel = EditBookViewModel(bookRepository, navigationActions, userVM)
 
     val topAppBar =
         @Composable { s: String? ->

@@ -1,8 +1,6 @@
 package com.android.bookswap.ui.books.add
 
-import android.content.Context
 import android.util.Log
-import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -27,8 +25,6 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.android.bookswap.data.BookGenres
 import com.android.bookswap.data.BookLanguages
-import com.android.bookswap.data.DataBook
-import com.android.bookswap.data.repository.BooksRepository
 import com.android.bookswap.model.InputVerification
 import com.android.bookswap.model.LocalAppConfig
 import com.android.bookswap.model.add.AddToBookViewModel
@@ -42,7 +38,6 @@ import com.android.bookswap.ui.MAXLENGTHTITLE
 import com.android.bookswap.ui.components.ButtonComponent
 import com.android.bookswap.ui.components.FieldComponent
 import com.android.bookswap.ui.theme.ColorVariable.BackGround
-import java.util.UUID
 
 private const val HORIZONTAL_PADDING = 30
 /**
@@ -239,18 +234,18 @@ fun AddToBookScreen(
                           .fillMaxWidth(0.5f),
                   enabled = title.isNotBlank() && isbn.isNotBlank(),
                   onClick = {
-                      viewModel.saveDataBook(
-                          context,
-                          title,
-                          author,
-                          description,
-                          rating,
-                          photo,
-                          selectedLanguage?:BookLanguages.OTHER,
-                          isbn,
-                          selectedGenre?.let { listOf(it) }?: emptyList(),
-                          archived = false,
-                          exchange = true)
+                    viewModel.saveDataBook(
+                        context,
+                        title,
+                        author,
+                        description,
+                        rating,
+                        photo,
+                        selectedLanguage ?: BookLanguages.OTHER,
+                        isbn,
+                        selectedGenre?.let { listOf(it) } ?: emptyList(),
+                        archived = false,
+                        exchange = true)
                   }) {
                     Text("Save")
                   }

@@ -10,7 +10,6 @@ import androidx.compose.ui.test.performScrollToNode
 import com.android.bookswap.data.BookGenres
 import com.android.bookswap.data.BookLanguages
 import com.android.bookswap.data.DataBook
-import com.android.bookswap.data.repository.BooksRepository
 import com.android.bookswap.model.edit.EditBookViewModel
 import com.android.bookswap.resources.C
 import com.android.bookswap.ui.navigation.NavigationActions
@@ -26,7 +25,7 @@ import org.junit.Test
 
 class EditBookScreenTest {
 
-    private val mockViewModel: EditBookViewModel = mockk()
+  private val mockViewModel: EditBookViewModel = mockk()
 
   private val navigationActions: NavigationActions = mockk()
 
@@ -53,18 +52,15 @@ class EditBookScreenTest {
     every { mockViewModel.deleteBook(any(), any()) } just runs
     every {
       mockViewModel.updateDataBook(
-        any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any())
+          any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any())
     } just runs
-      every { mockViewModel.getBook(any(), any(), any()) } answers
-              {
-                  secondArg<(DataBook) -> Unit>()(sampleBook)
-              }
+    every { mockViewModel.getBook(any(), any(), any()) } answers
+        {
+          secondArg<(DataBook) -> Unit>()(sampleBook)
+        }
 
     every { navigationActions.currentRoute() } returns "EDIT_BOOK"
-    composeTestRule.setContent {
-      EditBookScreen(
-        mockViewModel, navigationActions, sampleBook.uuid)
-    }
+    composeTestRule.setContent { EditBookScreen(mockViewModel, navigationActions, sampleBook.uuid) }
   }
 
   @Test

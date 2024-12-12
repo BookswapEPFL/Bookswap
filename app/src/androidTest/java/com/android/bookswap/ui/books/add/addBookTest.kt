@@ -1,6 +1,5 @@
 package com.android.bookswap.ui.books.add
 
-import android.content.Context
 import android.widget.Toast
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsEnabled
@@ -11,9 +10,6 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import androidx.navigation.compose.rememberNavController
-import com.android.bookswap.data.BookGenres
-import com.android.bookswap.data.BookLanguages
-import com.android.bookswap.data.repository.BooksRepository
 import com.android.bookswap.model.add.AddToBookViewModel
 import com.android.bookswap.resources.C
 import com.android.bookswap.ui.navigation.NavigationActions
@@ -22,32 +18,30 @@ import io.mockk.just
 import io.mockk.mockk
 import io.mockk.mockkStatic
 import io.mockk.runs
-import java.util.UUID
-import junit.framework.TestCase.assertEquals
-import junit.framework.TestCase.assertNull
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
 class AddToBookTest {
   @get:Rule val composeTestRule = createComposeRule()
-    private val mockViewModel: AddToBookViewModel = mockk()
+  private val mockViewModel: AddToBookViewModel = mockk()
 
   @Before
   fun init() {
-      // Mock the ViewModel save method to run without side effects
-      every {
-          mockViewModel.saveDataBook(any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any())
-      } just runs
+    // Mock the ViewModel save method to run without side effects
+    every {
+      mockViewModel.saveDataBook(
+          any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any())
+    } just runs
 
-      composeTestRule.setContent {
-          val navController = rememberNavController()
-          NavigationActions(navController)
+    composeTestRule.setContent {
+      val navController = rememberNavController()
+      NavigationActions(navController)
 
-          AddToBookScreen(mockViewModel)
-      }
+      AddToBookScreen(mockViewModel)
+    }
 
-      // Mock Toast messages for testing purposes
+    // Mock Toast messages for testing purposes
     mockkStatic(Toast::class)
     val toastMock = mockk<Toast>()
     every { toastMock.show() } returns Unit

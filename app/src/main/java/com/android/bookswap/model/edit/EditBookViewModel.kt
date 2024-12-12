@@ -18,83 +18,78 @@ class EditBookViewModel(
     userVM: UserViewModel
 ) : ViewModel() {
 
-    private val userID = userVM.getUser().userUUID
-    /**
-     * Creates a DataBook instance after validating the input parameters.
-     *
-     * @param context The context of the screen
-     * @param title The title of the book.
-     * @param author The author of the book.
-     * @param description The description of the book.
-     * @param ratingStr The rating of the book as a string.
-     * @param photo The URL of the book's photo.
-     * @param language The language of the book as a string.
-     * @param isbn The ISBN of the book.
-     * @param genres The list of genres the book belongs to.
-     * @param archived Indicates if the book is archived.
-     * @param exchange Indicates if the book is available for exchange.
-     * @return A DataBook instance if all validations pass, null otherwise.
-     */
-    fun updateDataBook(
-        context: Context,
-        uuid: UUID,
-        title: String,
-        author: String,
-        description: String,
-        ratingStr: String,
-        photo: String,
-        language: BookLanguages,
-        isbn: String,
-        genres: List<BookGenres>,
-        archived: Boolean,
-        exchange: Boolean
-    ) {
-        val book =
-            DataBook(
-                uuid,
-                title,
-                author,
-                description,
-                ratingStr.toIntOrNull(),
-                photo,
-                language,
-                isbn,
-                genres,
-                userID,
-                archived,
-                exchange
-            )
-        Log.d("EditBookViewModel", "Editing book: $book")
-        booksRepository.updateBook(
-            book,
-            callback = {
-                if (it.isSuccess) {
-                    Toast.makeText(context, "Book updated.", Toast.LENGTH_LONG).show()
-                    navigation.goBack()
-                } else {
-                    Toast.makeText(context, "Failed to update book.", Toast.LENGTH_LONG).show()
-                }
-            })
-    }
+  private val userID = userVM.getUser().userUUID
+  /**
+   * Creates a DataBook instance after validating the input parameters.
+   *
+   * @param context The context of the screen
+   * @param title The title of the book.
+   * @param author The author of the book.
+   * @param description The description of the book.
+   * @param ratingStr The rating of the book as a string.
+   * @param photo The URL of the book's photo.
+   * @param language The language of the book as a string.
+   * @param isbn The ISBN of the book.
+   * @param genres The list of genres the book belongs to.
+   * @param archived Indicates if the book is archived.
+   * @param exchange Indicates if the book is available for exchange.
+   * @return A DataBook instance if all validations pass, null otherwise.
+   */
+  fun updateDataBook(
+      context: Context,
+      uuid: UUID,
+      title: String,
+      author: String,
+      description: String,
+      ratingStr: String,
+      photo: String,
+      language: BookLanguages,
+      isbn: String,
+      genres: List<BookGenres>,
+      archived: Boolean,
+      exchange: Boolean
+  ) {
+    val book =
+        DataBook(
+            uuid,
+            title,
+            author,
+            description,
+            ratingStr.toIntOrNull(),
+            photo,
+            language,
+            isbn,
+            genres,
+            userID,
+            archived,
+            exchange)
+    Log.d("EditBookViewModel", "Editing book: $book")
+    booksRepository.updateBook(
+        book,
+        callback = {
+          if (it.isSuccess) {
+            Toast.makeText(context, "Book updated.", Toast.LENGTH_LONG).show()
+            navigation.goBack()
+          } else {
+            Toast.makeText(context, "Failed to update book.", Toast.LENGTH_LONG).show()
+          }
+        })
+  }
 
-    /**
-     * Fetches a book from the repository by UUID.
-     */
-    fun getBook(uuid: UUID, onSuccess: (DataBook) -> Unit, onFailure: () -> Unit) {
-        booksRepository.getBook(uuid,OnSucess = { onSuccess(it) }, onFailure = { onFailure() })
-    }
+  /** Fetches a book from the repository by UUID. */
+  fun getBook(uuid: UUID, onSuccess: (DataBook) -> Unit, onFailure: () -> Unit) {
+    booksRepository.getBook(uuid, OnSucess = { onSuccess(it) }, onFailure = { onFailure() })
+  }
 
-    /**
-     * Deletes a book from the repository by UUID.
-     */
-    fun deleteBook(context: Context, uuid: UUID) {
-        booksRepository.deleteBook(uuid) {
-            if (it.isSuccess) {
-                Toast.makeText(context, "Book deleted.", Toast.LENGTH_LONG).show()
-                navigation.goBack()
-            } else {
-                Toast.makeText(context, "Failed to delete book.", Toast.LENGTH_LONG).show()
-            }
-        }
+  /** Deletes a book from the repository by UUID. */
+  fun deleteBook(context: Context, uuid: UUID) {
+    booksRepository.deleteBook(uuid) {
+      if (it.isSuccess) {
+        Toast.makeText(context, "Book deleted.", Toast.LENGTH_LONG).show()
+        navigation.goBack()
+      } else {
+        Toast.makeText(context, "Failed to delete book.", Toast.LENGTH_LONG).show()
+      }
     }
+  }
 }

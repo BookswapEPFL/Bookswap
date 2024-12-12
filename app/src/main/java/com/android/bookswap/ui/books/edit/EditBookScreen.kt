@@ -1,7 +1,6 @@
 package com.android.bookswap.ui.books.edit
 
 import android.util.Log
-import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Spacer
@@ -42,7 +41,6 @@ import androidx.compose.ui.unit.dp
 import com.android.bookswap.data.BookGenres
 import com.android.bookswap.data.BookLanguages
 import com.android.bookswap.data.DataBook
-import com.android.bookswap.data.repository.BooksRepository
 import com.android.bookswap.model.edit.EditBookViewModel
 import com.android.bookswap.resources.C
 import com.android.bookswap.ui.navigation.NavigationActions
@@ -271,19 +269,20 @@ fun EditBookScreen(
                   item {
                     Button(
                         onClick = {
-                            viewModel.updateDataBook(
-                                context,
-                                book.uuid,
-                                title,
-                                author,
-                                description,
-                                rating,
-                                photo,
-                                enumValues<BookLanguages>().firstOrNull { it.name == language } ?: BookLanguages.OTHER,
-                                book.isbn?:"",
-                                selectedGenre?.let { listOf(it) }?: emptyList(),
-                                book.archived,
-                                book.exchange)
+                          viewModel.updateDataBook(
+                              context,
+                              book.uuid,
+                              title,
+                              author,
+                              description,
+                              rating,
+                              photo,
+                              enumValues<BookLanguages>().firstOrNull { it.name == language }
+                                  ?: BookLanguages.OTHER,
+                              book.isbn ?: "",
+                              selectedGenre?.let { listOf(it) } ?: emptyList(),
+                              book.archived,
+                              book.exchange)
                         },
                         modifier = Modifier.fillMaxWidth().testTag(C.Tag.EditBook.save),
                         enabled = title.isNotBlank(),
@@ -295,9 +294,7 @@ fun EditBookScreen(
 
                   item {
                     Button(
-                        onClick = {
-                          viewModel.deleteBook(context, book.uuid)
-                        },
+                        onClick = { viewModel.deleteBook(context, book.uuid) },
                         modifier = Modifier.fillMaxWidth().testTag(C.Tag.EditBook.delete),
                         colors =
                             ButtonDefaults.buttonColors(containerColor = ColorVariable.Primary)) {
