@@ -59,7 +59,6 @@ import kotlinx.coroutines.tasks.await
  * Composable function for the SignIn screen.
  *
  * @param navigationActions Actions to navigate between screens.
- * @param userVM ViewModel for user-related operations.
  */
 @Composable
 fun SignInScreen(navigationActions: NavigationActions) {

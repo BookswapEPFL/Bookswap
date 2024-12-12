@@ -32,7 +32,6 @@ import com.android.bookswap.ui.theme.BookSwapAppTheme
  * @param onDismiss A lambda function to be called when the dialog is dismissed.
  * @param onSave A lambda function to be called when the save button is clicked, with the updated
  *   DataUser object.
- * @param dataUser The DataUser object containing the user's current profile information.
  */
 @Composable
 fun EditProfileDialog(onDismiss: () -> Unit, onSave: (DataUser) -> Unit) {

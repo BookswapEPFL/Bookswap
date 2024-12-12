@@ -306,6 +306,7 @@ fun AddToBookScreen(
  * @param bookLanguageStr The language of the book as a string.
  * @param isbn The ISBN of the book.
  * @param genres The list of genres the book belongs to.
+ * @param userId The unique identifier for the user.
  * @return A DataBook instance if all validations pass, null otherwise.
  */
 fun createDataBook(

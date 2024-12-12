@@ -46,7 +46,6 @@ import androidx.compose.ui.unit.sp
 import com.android.bookswap.data.DataBook
 import com.android.bookswap.model.LocalAppConfig
 import com.android.bookswap.model.isNetworkAvailable
-import com.android.bookswap.model.map.BookFilter
 import com.android.bookswap.model.map.BookManagerViewModel
 import com.android.bookswap.model.map.DefaultGeolocation
 import com.android.bookswap.model.map.IGeolocation
@@ -72,14 +71,17 @@ var SemanticsPropertyReceiver.cameraPosition by CameraPositionKey
 /**
  * Composable function to display a map with user locations and associated book information.
  *
- * This screen renders a GoogleMap that shows books locations as markers. Upon clicking a marker, it
+ * This screen renders a GoogleMap that shows book locations as markers. Upon clicking a marker, it
  * displays a custom info window with the list of books at this location.
  *
- * @param bookManagerViewModel the view model that give the mapScreen the list of books to display
- * @param bookFilter An instance of [BookFilter] to filter the books displayed on the map.
- * @param selectedUser An optional user, it will display the infoWindow related to this user. This
- *   user’s info window will be shown if it is bigger or equal to 0.
+ * @param bookManagerViewModel The view model that provides the map screen with the list of books to
+ *   display.
+ * @param navigationActions The navigation actions to handle navigation events.
+ * @param selectedUser An optional user, it will display the info window related to this user. This
+ *   user’s info window will be shown if it is greater than or equal to 0.
  * @param geolocation An instance of [IGeolocation] to get the user's current location.
+ * @param topAppBar A composable function to display the top app bar.
+ * @param bottomAppBar A composable function to display the bottom app bar.
  */
 @Composable
 fun MapScreen(
@@ -240,7 +242,7 @@ fun MapScreen(
             }
       })
 }
-
+/** Constants used for padding, dimensions, and font sizes in the UI components. */
 const val PADDING_VERTICAL_DP = 4
 const val PADDING_HORIZONTAL_DP = 8
 const val DIVIDER_THICKNESS_DP = 1
@@ -260,8 +262,8 @@ const val SECONDARY_TEXT_FONT_SP = 16
  * @param modifier A [Modifier] to apply to the card containing the custom info window. It can be
  *   used to modify the position, size, and appearance of the info window, but is mainly intended to
  *   give the position of the CustomInfoWindow. Default is `Modifier`.
- * @param user The `TempUser` object containing the list of books to be displayed inside the info
- *   window.
+ * @param userBooks The list of [DataBook] objects containing the books to be displayed inside the
+ *   info window.
  */
 @Composable
 private fun CustomInfoWindow(modifier: Modifier = Modifier, userBooks: List<DataBook>) {
@@ -318,7 +320,7 @@ private fun CustomInfoWindow(modifier: Modifier = Modifier, userBooks: List<Data
         Spacer(modifier.height(PADDING_VERTICAL_DP.dp))
       }
 }
-
+/** Constants used for dimensions and sizes in the draggable menu UI components. */
 const val HEIGHT_RETRACTED_DRAGGABLE_MENU_DP = 50
 const val MIN_BOX_BOOK_HEIGHT_DP = 90
 const val IMAGE_HEIGHT_DP = MIN_BOX_BOOK_HEIGHT_DP - PADDING_VERTICAL_DP * 2
@@ -337,8 +339,12 @@ const val MAX_RATING = 5
 /**
  * Composable function to display a draggable menu containing all the nearest books available.
  *
+ * This function creates a draggable menu that can be pulled up or down to show or hide the list of
+ * books. The menu's position is adjusted based on the user's drag gestures.
+ *
  * @param listAllBooks A [List] of all [DataBook] sorted with the nearest book at the first position
  *   and the furthest one at the last position.
+ * @param navigationActions The navigation actions to handle navigation events.
  */
 @Composable
 private fun DraggableMenu(listAllBooks: List<DataBook>, navigationActions: NavigationActions) {

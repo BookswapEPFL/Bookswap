@@ -56,7 +56,6 @@ import com.android.bookswap.ui.profile.NewUserScreen
 import com.android.bookswap.ui.profile.OthersUserProfileScreen
 import com.android.bookswap.ui.profile.UserProfile
 import com.android.bookswap.ui.theme.BookSwapAppTheme
-import com.google.android.libraries.places.api.Places
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -64,14 +63,23 @@ import com.google.firebase.storage.FirebaseStorage
 import java.util.UUID
 
 class MainActivity : ComponentActivity() {
-
+  /**
+   * Called when the activity is starting. This is where most initialization should go.
+   *
+   * @param savedInstanceState If the activity is being re-initialized after previously being shut
+   *   down then this Bundle contains the data it most recently supplied in
+   *   onSaveInstanceState(Bundle). Otherwise it is null.
+   */
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     // permissionHandler = PermissionHandler(this)
     // permissionHandler.askNotificationPermission()
     setContent { BookSwapApp() }
   }
-
+  /**
+   * Composable function for the main BookSwap application. Initializes Firebase Firestore, Firebase
+   * Storage, and other data sources. Sets up the geolocation and applies the app theme.
+   */
   @Composable
   fun BookSwapApp() {
     // Initialize a Firebase Firestore database instance
@@ -107,7 +115,18 @@ class MainActivity : ComponentActivity() {
           }
     }
   }
-
+  /**
+   * Composable function for the main BookSwap application.
+   *
+   * @param messageRepository The repository for handling messages.
+   * @param bookRepository The repository for handling books.
+   * @param userRepository The repository for handling users.
+   * @param startDestination The initial destination for navigation.
+   * @param photoStorage The repository for handling photo storage.
+   * @param messageStorage The storage for offline messages.
+   * @param geolocation The geolocation service.
+   * @param context The context of the application.
+   */
   @Composable
   fun BookSwapApp(
       messageRepository: MessageRepository,

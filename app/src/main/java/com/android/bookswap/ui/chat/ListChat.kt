@@ -43,7 +43,14 @@ import com.android.bookswap.resources.C
 import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.theme.ColorVariable
 
-/** This is the main screen for the chat feature. It displays the list of messages */
+/**
+ * Displays the main screen for the chat feature, showing a list of messages.
+ *
+ * @param navigationActions Actions for navigating between screens.
+ * @param topAppBar A composable function for the top app bar.
+ * @param bottomAppBar A composable function for the bottom app bar.
+ * @param contactViewModel The ViewModel for managing contact data.
+ */
 @Composable
 fun ListChatScreen(
     navigationActions: NavigationActions,
@@ -90,7 +97,12 @@ fun ListChatScreen(
       bottomBar = bottomAppBar)
 }
 
-/** This function is used to display the message box */
+/**
+ * Displays a message box with contact information and message preview.
+ *
+ * @param message The message box containing contact and message details.
+ * @param onClick The action to perform when the message box is clicked.
+ */
 @Composable
 fun MessageBoxDisplay(message: MessageBox, onClick: () -> Unit = {}) {
   Row(

@@ -49,7 +49,14 @@ class GoogleBookDataSource(context: Context) {
             { error -> Result.failure<VolleyError>(error) })
     queue.add(stringRequest)
   }
-
+  /**
+   * Parses the response from the Google Books API for a given ISBN.
+   *
+   * @param response The JSON response string from the Google Books API.
+   * @param userId The UUID of the user requesting the book information.
+   * @return A Result containing a DataBook object if parsing is successful, or an exception if it
+   *   fails.
+   */
   @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
   fun parseISBNResponse(response: String, userId: UUID): Result<DataBook> {
     try {
