@@ -109,7 +109,12 @@ open class NavigationActions(
   open fun currentRoute(): String {
     return navController.currentDestination?.route ?: ""
   }
-
+  /**
+   * Check if the given route is the current destination.
+   *
+   * @param route The route to check.
+   * @return True if the current route starts with the given route, false otherwise.
+   */
   private fun isCurrentDestination(route: String): Boolean {
     // Retrieve the current route and check if it starts with the same route name (as checking
     // equality of the route name didn't worked)

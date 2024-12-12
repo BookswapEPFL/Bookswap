@@ -17,7 +17,7 @@ import androidx.compose.ui.unit.dp
 import com.android.bookswap.resources.C
 import com.android.bookswap.ui.theme.ColorVariable
 
-// Constants
+/** Constants */
 private val PADDING_DP = 16.dp
 private val BUTTON_SIZE_DP = 40.dp
 private val ICON_SIZE_DP = 32.dp

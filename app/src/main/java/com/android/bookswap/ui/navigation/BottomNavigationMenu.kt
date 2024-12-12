@@ -18,8 +18,12 @@ val BOTTOM_NAV_HEIGHT = 60.dp
 private val ROUNDED_CORNER_SIZE = 60.dp
 
 /**
- * This Composable function creates a bottom navigation menu for the app Displaying different tabs
+ * This Composable function creates a bottom navigation menu for the app, displaying different tabs
  * (destinations) based on the provided list of destinations (tabList).
+ *
+ * @param onTabSelect A lambda function to handle tab selection events.
+ * @param tabList A list of [TopLevelDestination] representing the tabs to be displayed.
+ * @param selectedItem A string representing the currently selected tab.
  */
 @Composable
 fun BottomNavigationMenu(

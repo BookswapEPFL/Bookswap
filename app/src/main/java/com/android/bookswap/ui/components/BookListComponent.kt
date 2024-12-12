@@ -29,6 +29,7 @@ val DIVIDER_THICKNESS_DP = Dp.Hairline
  *
  * @param modifier The modifier to be applied to the LazyColumn.
  * @param bookList The list of `DataBook` objects to be displayed. Defaults to an empty list.
+ * @param onBookClick A lambda function to handle book click events, receiving the book's UUID.
  */
 @Composable
 fun BookListComponent(

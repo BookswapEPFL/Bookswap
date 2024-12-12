@@ -213,12 +213,10 @@ class MessageFirestoreSource(private val db: FirebaseFirestore) : MessageReposit
    * Updates a message in the Firestore database.
    *
    * @param dataMessage The message to be updated.
-   * @param message The message to be updated.
    * @param user1UUID The UUID of the first user.
    * @param user2UUID The UUID of the second user.
    * @param callback Callback to be invoked with the result of the operation. The result is a
    *   success if the message is updated successfully, or an exception on failure.
-   * @param context The context for displaying Toast messages.
    */
   override fun updateMessage(
       dataMessage: DataMessage,

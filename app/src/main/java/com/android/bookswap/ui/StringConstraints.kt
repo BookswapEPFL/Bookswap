@@ -1,5 +1,5 @@
 package com.android.bookswap.ui
-
+/** Maximum length constraints for various string fields. */
 const val MAXLENGTHGREETING = 5
 const val MAXLENGTHFIRSTNAME = 100
 const val MAXLENGTHLASTNAME = 300
