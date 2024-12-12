@@ -97,26 +97,34 @@ class BookManagerViewModel(
     var successUsers = false
     var currentAttempt = 0
     while ((!successBooks || !successUsers) && currentAttempt < MAXIMUM_RETRIES) {
-      userRepository.getUsers { users ->
-        if (users.isSuccess) {
-          _allUsers.value = users.getOrNull()!!
-          successUsers = true
-        } else {
-          Log.e("BookManagerViewModel", "Failed to fetch users.")
+      val userJob = coroutineScope {
+        launch {
+          userRepository.getUsers { users ->
+            if (users.isSuccess) {
+              _allUsers.value = users.getOrNull()!!
+              successUsers = true
+            } else {
+              Log.e("BookManagerViewModel", "Failed to fetch users.")
+            }
+          }
         }
       }
-      booksRepository.getBook(
-          callback = { result ->
-            if (result.isSuccess) {
-              _allBooks.value = result.getOrThrow()
+      val bookJob = coroutineScope {
+        launch {
+          booksRepository.getBook { books ->
+            if (books.isSuccess) {
+              _allBooks.value = books.getOrThrow()
               successBooks = true
             } else {
               Log.e(
                   "BookManagerViewModel",
-                  "Failed to fetch books: ${result.exceptionOrNull()!!.message}")
+                  "Failed to fetch books: ${books.exceptionOrNull()!!.message}")
             }
-          })
-
+          }
+        }
+      }
+      userJob.join()
+      bookJob.join()
       if (!successBooks || !successUsers) {
         currentAttempt++
         delay(RETRY_TIME_DELAY)
@@ -142,7 +150,11 @@ class BookManagerViewModel(
                   _allBooks,
                   _allUserDistance,
                   bookFilter.genresFilter,
-                  bookFilter.languagesFilter) { books, userDistance, _, _ ->
+                  bookFilter.languagesFilter) {
+                      books,
+                      userDistance,
+                      selectedGenres,
+                      selectedLanguages ->
                     val userBooksWithLocation =
                         userDistance
                             .map { user ->

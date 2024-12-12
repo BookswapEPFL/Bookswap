@@ -18,8 +18,11 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
 import com.android.bookswap.data.DataBook
 import com.android.bookswap.data.DataUser
 import com.android.bookswap.data.repository.BooksRepository
@@ -27,6 +30,7 @@ import com.android.bookswap.model.OthersUserViewModel
 import com.android.bookswap.model.UserBookViewModel
 import com.android.bookswap.resources.C
 import com.android.bookswap.ui.components.BookListComponent
+import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.theme.ColorVariable
 import java.util.UUID
 
@@ -35,7 +39,9 @@ private val PROFILE_PICTURE_SIZE = 90.dp
 private val PROFILE_PICTURE_BORDER_WIDTH = 3.dp
 private val ICON_SIZE = 80.dp
 private val PADDING = 16.dp
-private val ITEM_SPACING = 8.dp
+private val ITEM_SPACING = 4.dp
+private val PADDING_SMALL = 4.dp
+private val HALF_WIDTH = 0.5f
 
 /**
  * Composable function to display the user profile screen.
@@ -53,6 +59,7 @@ fun OthersUserProfileScreen(
     otherUserVM: OthersUserViewModel = OthersUserViewModel(userId),
     booksRepository: BooksRepository,
     userBookViewModel: UserBookViewModel = UserBookViewModel(booksRepository),
+    navigationActions: NavigationActions,
     topAppBar: @Composable () -> Unit = {},
     bottomAppBar: @Composable () -> Unit = {}
 ) {
@@ -112,16 +119,27 @@ fun OthersUserProfileScreen(
                         Modifier.padding(PADDING)
                             .size(PROFILE_PICTURE_SIZE)
                             .border(PROFILE_PICTURE_BORDER_WIDTH, ColorVariable.Accent, CircleShape)
-                            .background(ColorVariable.AccentSecondary, CircleShape),
+                            .background(ColorVariable.AccentSecondary, CircleShape)
+                            .testTag(C.Tag.OtherUserProfile.profilePictureContainer),
                     contentAlignment = Alignment.Center) {
-                      if (user.profilePictureUrl.isNotEmpty()) {
-                        // Replace with an image loader like Coil or Glide if required
-                        Text("Profile Picture Placeholder")
+                      val profilePictureUrl = user.profilePictureUrl
+                      if (profilePictureUrl.isNotEmpty()) {
+                        Log.i("BookDisplayComponent", "Photo URL: ${profilePictureUrl}")
+                        AsyncImage(
+                            model = profilePictureUrl,
+                            contentDescription = "User's Picture",
+                            modifier =
+                                Modifier.fillMaxSize()
+                                    .clip(CircleShape)
+                                    .testTag(C.Tag.OtherUserProfile.profile_image_picture),
+                            contentScale = ContentScale.Crop)
                       } else {
                         Icon(
                             imageVector = Icons.Default.AccountCircle,
                             contentDescription = null,
-                            modifier = Modifier.size(ICON_SIZE),
+                            modifier =
+                                Modifier.size(ICON_SIZE)
+                                    .testTag(C.Tag.OtherUserProfile.profile_image_icon),
                             tint = ColorVariable.Accent)
                       }
                     }
@@ -148,6 +166,25 @@ fun OthersUserProfileScreen(
                     label = "Address:",
                     value = "${user.latitude}, ${user.longitude}")
 
+                // Chat Button
+                Button(
+                    modifier =
+                        Modifier.testTag(C.Tag.OtherUserProfile.chatButton)
+                            .align(Alignment.CenterHorizontally)
+                            .fillMaxWidth(HALF_WIDTH),
+                    colors =
+                        ButtonColors(
+                            ColorVariable.Secondary,
+                            ColorVariable.Accent,
+                            ColorVariable.Secondary,
+                            ColorVariable.Accent),
+                    border = BorderStroke(BORDER_WIDTH, ColorVariable.Accent),
+                    onClick = {
+                      navigationActions.navigateTo(C.Screen.CHAT, user.userUUID.toString())
+                    }) {
+                      Text("Message with ${user.firstName}")
+                    }
+
                 // Book List
                 if (isBooksLoading) {
                   Log.e("OtherUserProfileScreen", "Books are loading")
@@ -159,7 +196,10 @@ fun OthersUserProfileScreen(
                           Modifier.fillMaxWidth()
                               .padding(PADDING), // background(Color.LightGray) // Debug background
                       // .border(2.dp, Color.Red),    // Debug border,
-                      bookList = bookListData.value)
+                      bookList = bookListData.value,
+                      onBookClick = { bookId ->
+                        navigationActions.navigateTo("${C.Screen.BOOK_PROFILE}/$bookId")
+                      })
                 }
               }
         }
@@ -169,8 +209,9 @@ fun OthersUserProfileScreen(
 /** Constant * */
 private const val LABEL_WEIGHT = 0.5f
 private const val VALUE_WEIGHT = 2f
-private val BORDER_WIDTH = 1.dp
-private val PADDING_SMALL = 4.dp
+private val BORDER_WIDTH = 2.dp
+private val ROW_PADDING = 4.dp
+private val BOX_PADDING = 2.dp
 
 /**
  * A composable function to display a labeled text field.
@@ -183,10 +224,11 @@ fun LabeledText(testTag: String = "LabeledText", label: String, value: String) {
   Box(
       modifier =
           Modifier.fillMaxWidth()
+              .padding(BOX_PADDING)
               .background(ColorVariable.Secondary, shape = MaterialTheme.shapes.small)
               .border(BORDER_WIDTH, ColorVariable.Accent, shape = MaterialTheme.shapes.small)) {
         Row(
-            modifier = Modifier.fillMaxWidth().padding(PADDING_SMALL),
+            modifier = Modifier.fillMaxWidth().padding(ROW_PADDING),
             verticalAlignment = Alignment.CenterVertically) {
               Text(
                   text = label,

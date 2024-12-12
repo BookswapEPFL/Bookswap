@@ -2,15 +2,25 @@ package com.android.bookswap.ui.profile
 
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.test.assertAll
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertTextEquals
+import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.navigation.compose.rememberNavController
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.android.bookswap.data.BookGenres
+import com.android.bookswap.data.BookLanguages
+import com.android.bookswap.data.DataBook
 import com.android.bookswap.data.DataUser
+import com.android.bookswap.data.repository.BooksRepository
 import com.android.bookswap.data.source.network.PhotoFirebaseStorageSource
 import com.android.bookswap.model.AppConfig
 import com.android.bookswap.model.LocalAppConfig
+import com.android.bookswap.model.UserBookViewModel
 import com.android.bookswap.model.UserViewModel
 import com.android.bookswap.resources.C
 import com.android.bookswap.screen.UserProfileScreen
@@ -18,9 +28,11 @@ import com.android.bookswap.ui.components.TopAppBarComponent
 import com.android.bookswap.ui.navigation.NavigationActions
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
 import io.github.kakaocup.compose.node.element.ComposeScreen
+import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
 import java.util.UUID
+import kotlinx.coroutines.flow.MutableStateFlow
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -35,11 +47,15 @@ import org.junit.runner.RunWith
 class UserProfileScreenTest : TestCase() {
 
   private lateinit var photoStorage: PhotoFirebaseStorageSource
+  private lateinit var mockUserBookViewModel: UserBookViewModel
+  private lateinit var mockBooksRepository: BooksRepository
+  private lateinit var mockNavigationActions: NavigationActions
 
   @get:Rule val composeTestRule = createComposeRule()
+  private val testUserId = UUID.randomUUID()
   private val standardUser =
       DataUser(
-          UUID.randomUUID(),
+          testUserId,
           "M.",
           "John",
           "Doe",
@@ -49,13 +65,52 @@ class UserProfileScreenTest : TestCase() {
           0.0,
           "dummyPic.png")
 
+  private val testBooks =
+      listOf(
+          DataBook(
+              uuid = UUID.randomUUID(),
+              title = "Book 1",
+              author = "Author 1",
+              description =
+                  "Recuento de la historia de España desde los primeros pobladores hasta la actualidad.",
+              rating = 3,
+              photo = null,
+              language = BookLanguages.SPANISH,
+              isbn = "978-84-09025-23-5",
+              genres = listOf(BookGenres.HISTORICAL, BookGenres.NONFICTION, BookGenres.BIOGRAPHY),
+              userId = testUserId,
+              false,
+              false),
+          DataBook(
+              uuid = UUID.randomUUID(),
+              title = "Book 2",
+              author = "Author 2",
+              description =
+                  "Recuento de la historia de España desde los primeros pobladores hasta la actualidad.",
+              rating = 4,
+              photo = null,
+              language = BookLanguages.SPANISH,
+              isbn = "978-84-09025-23-5",
+              genres = listOf(BookGenres.HISTORICAL, BookGenres.NONFICTION, BookGenres.BIOGRAPHY),
+              userId = testUserId,
+              false,
+              false))
+
   @Before
   fun setup() {
     val userVM: UserViewModel = mockk()
     every { userVM.getUser(any()) } returns standardUser
     every { userVM.uuid } returns standardUser.userUUID
+    every { userVM.addressStr } returns MutableStateFlow("address")
 
     photoStorage = mockk(relaxed = true)
+    mockBooksRepository = mockk()
+    mockNavigationActions = mockk()
+    photoStorage = mockk(relaxed = true)
+    mockUserBookViewModel = mockk(relaxed = true)
+
+    // Mock the book data fetching
+    coEvery { mockUserBookViewModel.getBooks(standardUser.bookList) } returns testBooks
 
     composeTestRule.setContent {
       val navController = rememberNavController()
@@ -63,6 +118,9 @@ class UserProfileScreenTest : TestCase() {
       CompositionLocalProvider(LocalAppConfig provides AppConfig(userViewModel = userVM)) {
         UserProfile(
             photoStorage = photoStorage,
+            booksRepository = mockBooksRepository,
+            userBookViewModel = mockUserBookViewModel,
+            navigationActions = mockNavigationActions,
             { TopAppBarComponent(Modifier, navigationActions, "Messages") })
       }
     }
@@ -88,7 +146,7 @@ class UserProfileScreenTest : TestCase() {
           }
           addressTxt {
             assertIsDisplayed()
-            assertTextEquals("0.0, 0.0")
+            assertTextEquals("address")
           }
           editProfileBtn {
             assertIsDisplayed()
@@ -126,7 +184,7 @@ class UserProfileScreenTest : TestCase() {
           }
           addressTxt {
             assertIsDisplayed()
-            assertTextEquals("0.0, 0.0")
+            assertTextEquals("address")
           }
           editProfileBtn {
             assertIsDisplayed()
@@ -144,5 +202,39 @@ class UserProfileScreenTest : TestCase() {
         }
       }
     }
+  }
+
+  @Test
+  fun testBookListIsDisplayed() {
+    // Verify book list container
+    composeTestRule.onNodeWithTag(C.Tag.BookListComp.book_list_container).assertIsDisplayed()
+
+    // Verify each book is displayed
+    composeTestRule
+        .onNodeWithTag("0_" + C.Tag.BookDisplayComp.book_display_container)
+        .assertIsDisplayed()
+    composeTestRule
+        .onNodeWithTag("1_" + C.Tag.BookDisplayComp.book_display_container)
+        .assertIsDisplayed()
+
+    // Verify book titles
+    composeTestRule
+        .onAllNodesWithTag(C.Tag.BookDisplayComp.title)
+        .assertAll(hasText("Book 1").or(hasText("Book 2")))
+
+    // Verify book authors
+    composeTestRule
+        .onAllNodesWithTag(C.Tag.BookDisplayComp.author)
+        .assertAll(hasText("Author 1").or(hasText("Author 2")))
+  }
+
+  @Test
+  fun testTopAppBar() {
+    composeTestRule.onNodeWithTag(C.Tag.top_app_bar_container).assertIsDisplayed()
+    composeTestRule.onNodeWithTag(C.Tag.TopAppBar.screen_title).assertIsDisplayed()
+    composeTestRule.onNodeWithTag(C.Tag.TopAppBar.screen_title).assertIsDisplayed()
+    composeTestRule
+        .onNodeWithTag(C.Tag.TopAppBar.profile_button, useUnmergedTree = true)
+        .assertIsDisplayed()
   }
 }

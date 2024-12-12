@@ -3,20 +3,19 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.android.bookswap">
 
+    <!-- Custom permission -->
     <permission
         android:name="com.android.bookswap.permission.SEND_MESSAGES"
         android:protectionLevel="signature" />
 
+    <!-- Permissions -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
-
-    <!-- Photo permissions -->
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-feature android:name="android.hardware.camera" android:required="false" />
 
@@ -24,41 +23,47 @@
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@drawable/logo5"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:roundIcon="@drawable/logo5"
         android:supportsRtl="true"
         android:theme="@style/Theme.BookSwapApp"
         tools:targetApi="31">
 
+        <!-- Main activity for the launcher -->
         <activity
             android:name=".MainActivity"
             android:exported="true"
-            android:label="@string/title_activity_main"
+            android:launchMode="singleTop"
             android:theme="@style/Theme.BookSwapApp">
             <intent-filter>
+                <!-- Launcher intent -->
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
+        <!-- Firebase Messaging Service -->
         <service
             android:name=".model.chat.MyFirebaseMessagingService"
             android:exported="true"
             android:permission="com.android.bookswap.permission.SEND_MESSAGES">
             <intent-filter>
-                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
 
+        <!-- Google Maps API -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="${MAPS_API_KEY}" />
 
+        <!-- Firebase Notification Channel -->
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_channel_id"
             android:value="bookswap_notifications_channel" />
 
+        <!-- Firebase Instance ID Receiver -->
         <receiver
             android:name="com.google.firebase.iid.FirebaseInstanceIdReceiver"
             android:exported="true"
