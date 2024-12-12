@@ -11,6 +11,12 @@ import com.android.bookswap.data.repository.BooksRepository
 import com.android.bookswap.model.UserViewModel
 import java.util.UUID
 
+/**
+ * ViewModel class for handling the logic to add a new book to the repository.
+ *
+ * @property booksRepository The repository to manage book-related operations with the database.
+ * @property userVM The UserViewModel instance used to retrieve the current user details.
+ */
 class AddToBookViewModel(private val booksRepository: BooksRepository, userVM: UserViewModel) :
     ViewModel() {
   private val userID: UUID = userVM.getUser().userUUID

@@ -12,6 +12,13 @@ import com.android.bookswap.model.UserViewModel
 import com.android.bookswap.ui.navigation.NavigationActions
 import java.util.UUID
 
+/**
+ * ViewModel class for handling the logic to edit, fetch, and delete books in the repository.
+ *
+ * @property booksRepository The repository managing book-related operations.
+ * @property navigation Provides navigation actions for UI transitions.
+ * @property userVM The UserViewModel instance used to retrieve the current user's information.
+ */
 class EditBookViewModel(
     private val booksRepository: BooksRepository,
     private val navigation: NavigationActions,
