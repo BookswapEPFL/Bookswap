@@ -282,8 +282,8 @@ fun EditBookScreen(
                                 enumValues<BookLanguages>().firstOrNull { it.name == language } ?: BookLanguages.OTHER,
                                 book.isbn?:"",
                                 selectedGenre?.let { listOf(it) }?: emptyList(),
-                                archived = false,
-                                exchange = true)
+                                book.archived,
+                                book.exchange)
                         },
                         modifier = Modifier.fillMaxWidth().testTag(C.Tag.EditBook.save),
                         enabled = title.isNotBlank(),
