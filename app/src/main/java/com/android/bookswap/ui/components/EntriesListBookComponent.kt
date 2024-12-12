@@ -34,6 +34,7 @@ import com.android.bookswap.ui.theme.ColorVariable.BackGround
 
 private const val HORIZONTAL_PADDING = 30
 
+/** Composable function to display entry fields for a book.(add or edit) */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EntriesListBookComponent(
@@ -48,186 +49,185 @@ fun EntriesListBookComponent(
     selectedLanguage: MutableState<BookLanguages?>,
     buttons: @Composable (modifier: Modifier) -> Unit
 ) {
-    val verifier = InputVerification()
+  val verifier = InputVerification()
 
-    var expanded by remember { mutableStateOf(false) }
-    var expandedLanguage by remember { mutableStateOf(false) }
+  var expanded by remember { mutableStateOf(false) }
+  var expandedLanguage by remember { mutableStateOf(false) }
 
-    LazyColumn(
-        modifier =
-        Modifier.background(BackGround)
-            .fillMaxWidth()
-            .fillMaxHeight()
-            .padding(paddingValues)
-            .testTag(C.Tag.BookEntryComp.scrollable),
-        verticalArrangement = Arrangement.spacedBy(8.dp)) {
+  LazyColumn(
+      modifier =
+          Modifier.background(BackGround)
+              .fillMaxWidth()
+              .fillMaxHeight()
+              .padding(paddingValues)
+              .testTag(C.Tag.BookEntryComp.scrollable),
+      verticalArrangement = Arrangement.spacedBy(8.dp)) {
         // Title Input Field
         item {
-            FieldComponent(
-                onValueChange = { title.value = it },
-                modifier =
-                Modifier.testTag(C.Tag.BookEntryComp.title_field)
-                    .fillMaxWidth()
-                    .padding(horizontal = HORIZONTAL_PADDING.dp),
-                value = title.value,
-                label = { Text(text = "Title*") })
+          FieldComponent(
+              onValueChange = { title.value = it },
+              modifier =
+                  Modifier.testTag(C.Tag.BookEntryComp.title_field)
+                      .fillMaxWidth()
+                      .padding(horizontal = HORIZONTAL_PADDING.dp),
+              value = title.value,
+              label = { Text(text = "Title*") })
         }
 
         // Genres Dropdown
         item {
-            ExposedDropdownMenuBox(
-                modifier = Modifier.fillMaxWidth().padding(horizontal = HORIZONTAL_PADDING.dp),
-                expanded = expanded,
-                onExpandedChange = { expanded = !expanded }) {
+          ExposedDropdownMenuBox(
+              modifier = Modifier.fillMaxWidth().padding(horizontal = HORIZONTAL_PADDING.dp),
+              expanded = expanded,
+              onExpandedChange = { expanded = !expanded }) {
                 FieldComponent(
                     value = genres.value.joinToString { it.Genre },
                     onValueChange = {},
                     readOnly = true,
                     label = { Text(text = "Genres*") },
                     modifier =
-                    Modifier.menuAnchor()
-                        .fillMaxWidth()
-                        .testTag(C.Tag.BookEntryComp.genre_field))
+                        Modifier.menuAnchor()
+                            .fillMaxWidth()
+                            .testTag(C.Tag.BookEntryComp.genre_field))
                 ExposedDropdownMenu(
                     expanded = expanded,
                     onDismissRequest = { expanded = false },
                     modifier = Modifier.fillMaxWidth().fillMaxHeight(0.5f)) {
-                    BookGenres.values().forEach { genre ->
+                      BookGenres.values().forEach { genre ->
                         val isSelected = genres.value.contains(genre)
                         DropdownMenuItem(
                             text = {
-                                Row(modifier = Modifier.fillMaxWidth()) {
-                                    Text(
-                                        text = genre.Genre,
-                                        modifier = Modifier.align(Alignment.CenterVertically))
-                                    Spacer(modifier = Modifier.weight(1f))
-                                    if (isSelected) {
-                                        Icon(
-                                            imageVector = Icons.Default.Check,
-                                            contentDescription = "Selected")
-                                    }
+                              Row(modifier = Modifier.fillMaxWidth()) {
+                                Text(
+                                    text = genre.Genre,
+                                    modifier = Modifier.align(Alignment.CenterVertically))
+                                Spacer(modifier = Modifier.weight(1f))
+                                if (isSelected) {
+                                  Icon(
+                                      imageVector = Icons.Default.Check,
+                                      contentDescription = "Selected")
                                 }
+                              }
                             },
                             onClick = {
-                                if (isSelected) {
-                                    genres.value -= genre
-                                } else {
-                                    genres.value += genre
-                                }
+                              if (isSelected) {
+                                genres.value -= genre
+                              } else {
+                                genres.value += genre
+                              }
                             },
                             modifier =
-                            Modifier.testTag(
-                                C.Tag.BookEntryComp.genre_menu + "_${genre.Genre}"))
+                                Modifier.testTag(
+                                    C.Tag.BookEntryComp.genre_menu + "_${genre.Genre}"))
+                      }
                     }
-                }
-            }
+              }
         }
 
         // Author Input Field
         item {
-            FieldComponent(
-                onValueChange = { author.value = it },
-                modifier =
-                Modifier.testTag(C.Tag.BookEntryComp.author_field)
-                    .fillMaxWidth()
-                    .padding(horizontal = HORIZONTAL_PADDING.dp),
-                value = author.value,
-                label = { Text(text = "Author*") })
+          FieldComponent(
+              onValueChange = { author.value = it },
+              modifier =
+                  Modifier.testTag(C.Tag.BookEntryComp.author_field)
+                      .fillMaxWidth()
+                      .padding(horizontal = HORIZONTAL_PADDING.dp),
+              value = author.value,
+              label = { Text(text = "Author*") })
         }
 
         // Description Input Field
         item {
-            FieldComponent(
-                onValueChange = { description.value = it },
-                modifier =
-                Modifier.testTag(C.Tag.BookEntryComp.description_field)
-                    .fillMaxWidth()
-                    .padding(horizontal = HORIZONTAL_PADDING.dp),
-                value = description.value,
-                label = { Text(text = "Description*") })
+          FieldComponent(
+              onValueChange = { description.value = it },
+              modifier =
+                  Modifier.testTag(C.Tag.BookEntryComp.description_field)
+                      .fillMaxWidth()
+                      .padding(horizontal = HORIZONTAL_PADDING.dp),
+              value = description.value,
+              label = { Text(text = "Description*") })
         }
 
         // Rating Input Field
         item {
-            var currentRating by remember { mutableStateOf(rating.value.toIntOrNull() ?: 0) }
+          var currentRating by remember { mutableStateOf(rating.value.toIntOrNull() ?: 0) }
 
-            RatingStarsComponent(
-                currentRating = currentRating,
-                onRatingChanged = { newRating ->
-                    currentRating = newRating
-                    rating.value = newRating.toString()
-                },
-                modifier = Modifier
-                    .testTag(C.Tag.BookEntryComp.rating_field_stars)
-                    .fillMaxWidth()
-                    .padding(horizontal = HORIZONTAL_PADDING.dp)
-            )
+          RatingStarsComponent(
+              currentRating = currentRating,
+              onRatingChanged = { newRating ->
+                currentRating = newRating
+                rating.value = newRating.toString()
+              },
+              modifier =
+                  Modifier.testTag(C.Tag.BookEntryComp.rating_field_stars)
+                      .fillMaxWidth()
+                      .padding(horizontal = HORIZONTAL_PADDING.dp))
         }
 
         // ISBN Input Field
         item {
-            FieldComponent(
-                onValueChange = {
-                    if (verifier.testIsbn(it)) {
-                        isbn.value = it
-                    }
-                },
-                modifier =
-                Modifier.testTag(C.Tag.BookEntryComp.isbn_field)
-                    .fillMaxWidth()
-                    .padding(horizontal = HORIZONTAL_PADDING.dp),
-                value = isbn.value,
-                label = { Text(text = "ISBN*") })
+          FieldComponent(
+              onValueChange = {
+                if (verifier.testIsbn(it)) {
+                  isbn.value = it
+                }
+              },
+              modifier =
+                  Modifier.testTag(C.Tag.BookEntryComp.isbn_field)
+                      .fillMaxWidth()
+                      .padding(horizontal = HORIZONTAL_PADDING.dp),
+              value = isbn.value,
+              label = { Text(text = "ISBN*") })
         }
 
         // Photo Input Field
         item {
-            FieldComponent(
-                onValueChange = { photo.value = it },
-                modifier =
-                Modifier.testTag(C.Tag.BookEntryComp.photo_field)
-                    .fillMaxWidth()
-                    .padding(horizontal = HORIZONTAL_PADDING.dp),
-                value = photo.value,
-                label = { Text(text = "Pics*") })
+          FieldComponent(
+              onValueChange = { photo.value = it },
+              modifier =
+                  Modifier.testTag(C.Tag.BookEntryComp.photo_field)
+                      .fillMaxWidth()
+                      .padding(horizontal = HORIZONTAL_PADDING.dp),
+              value = photo.value,
+              label = { Text(text = "Pics*") })
         }
 
         // Language Dropdown
         item {
-            ExposedDropdownMenuBox(
-                modifier =
-                Modifier.fillMaxWidth()
-                    .padding(horizontal = HORIZONTAL_PADDING.dp)
-                    .testTag(C.Tag.BookEntryComp.language_menu),
-                expanded = expandedLanguage,
-                onExpandedChange = { expandedLanguage = !expandedLanguage }) {
+          ExposedDropdownMenuBox(
+              modifier =
+                  Modifier.fillMaxWidth()
+                      .padding(horizontal = HORIZONTAL_PADDING.dp)
+                      .testTag(C.Tag.BookEntryComp.language_menu),
+              expanded = expandedLanguage,
+              onExpandedChange = { expandedLanguage = !expandedLanguage }) {
                 FieldComponent(
                     value = selectedLanguage.value?.languageCode ?: "",
                     onValueChange = {},
                     readOnly = true,
                     label = { Text(text = "Language*") },
                     modifier =
-                    Modifier.menuAnchor()
-                        .fillMaxWidth()
-                        .testTag(C.Tag.BookEntryComp.language_field))
+                        Modifier.menuAnchor()
+                            .fillMaxWidth()
+                            .testTag(C.Tag.BookEntryComp.language_field))
                 ExposedDropdownMenu(
                     expanded = expandedLanguage,
                     onDismissRequest = { expandedLanguage = false },
                     modifier = Modifier.fillMaxWidth()) {
-                    BookLanguages.values().forEach { language ->
+                      BookLanguages.values().forEach { language ->
                         DropdownMenuItem(
                             modifier =
-                            Modifier.testTag(
-                                C.Tag.BookEntryComp.language_menu +
+                                Modifier.testTag(
+                                    C.Tag.BookEntryComp.language_menu +
                                         "_${language.languageCode}"),
                             text = { Text(text = language.languageCode) },
                             onClick = {
-                                selectedLanguage.value = language
-                                expandedLanguage = false
+                              selectedLanguage.value = language
+                              expandedLanguage = false
                             })
+                      }
                     }
-                }
-            }
+              }
         }
 
         // Buttons
@@ -235,5 +235,5 @@ fun EntriesListBookComponent(
 
         // Spacer for padding
         item { Spacer(modifier = Modifier) }
-    }
+      }
 }
