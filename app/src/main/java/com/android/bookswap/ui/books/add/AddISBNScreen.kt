@@ -75,7 +75,7 @@ fun AddISBNScreen(
                         onClick = {
                           if (inputVerification.testIsbn(isbn)) {
                             GoogleBookDataSource(context).getBookFromISBN(
-                                isbn, appConfig.userViewModel.uuid) { result ->
+                                isbn, appConfig.userViewModel.getUser().userUUID) { result ->
                                   if (result.isFailure) {
                                     Toast.makeText(
                                             context, "Search unsuccessful", Toast.LENGTH_LONG)
@@ -88,16 +88,10 @@ fun AddISBNScreen(
                                           if (res.isSuccess) {
                                             val newBookList =
                                                 appConfig.userViewModel.getUser().bookList +
-                                                    result.getOrNull()?.uuid!!
+                                                    result.getOrThrow().uuid
                                             appConfig.userViewModel.updateUser(
                                                 bookList = newBookList)
-                                            Toast.makeText(
-                                                    context,
-                                                    "${result.getOrNull()?.title} added",
-                                                    Toast.LENGTH_LONG)
-                                                .show()
-                                            navigationActions.navigateTo(
-                                                TopLevelDestinations.NEW_BOOK)
+                                              navigationActions.navigateTo(C.Screen.EDIT_BOOK, result.getOrThrow().uuid.toString())
                                           } else {
                                             val error = res.exceptionOrNull()!!
                                             Log.e("AddBook", res.toString())
