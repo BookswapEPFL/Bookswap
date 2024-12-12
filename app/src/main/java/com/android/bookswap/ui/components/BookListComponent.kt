@@ -1,5 +1,6 @@
 package com.android.bookswap.ui.components
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.ScrollableDefaults
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -15,6 +16,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.Dp
 import com.android.bookswap.data.DataBook
 import com.android.bookswap.resources.C
+import java.util.UUID
 
 val DIVIDER_THICKNESS_DP = Dp.Hairline
 /**
@@ -32,6 +34,7 @@ val DIVIDER_THICKNESS_DP = Dp.Hairline
 fun BookListComponent(
     modifier: Modifier = Modifier,
     bookList: List<DataBook> = emptyList(),
+    onBookClick: (UUID) -> Unit
 ) {
   LazyColumn(
       modifier = modifier.fillMaxWidth().testTag(C.Tag.BookListComp.book_list_container),
@@ -48,7 +51,11 @@ fun BookListComponent(
     } else {
       itemsIndexed(bookList) { i, book ->
         BookDisplayComponent(
-            Modifier.testTag("${i}_" + C.Tag.BookDisplayComp.book_display_container), book = book)
+            modifier =
+                Modifier.testTag("${i}_" + C.Tag.BookDisplayComp.book_display_container).clickable {
+                  onBookClick(book.uuid)
+                }, // Pass book's ID to the click handler
+            book = book)
         if (i < bookList.size - 1) {
           HorizontalDivider(
               modifier = Modifier.testTag(C.Tag.BookListComp.divider),

@@ -7,7 +7,7 @@ plugins {
     alias(libs.plugins.jetbrainsKotlinAndroid)
     alias(libs.plugins.ktfmt)
     alias(libs.plugins.sonar)
-    id("com.google.gms.google-services")
+    alias(libs.plugins.gms)
 }
 
 android {
@@ -24,7 +24,7 @@ android {
         localProperties.load(FileInputStream(localPropertiesFile))
     }
 
-    val mapsApiKey: String = localProperties.getProperty("MAPS_API_KEY") ?: ""
+    val mapsApiKey: String = localProperties.getProperty("MAPS_API_KEY") ?: "placeholder"
 
 
     defaultConfig {
@@ -38,10 +38,11 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
-        val openAiApiKey: String = localProperties.getProperty("OPENAI_API_KEY") ?: "\" placeHolder \" "
+        val openAiApiKey: String = localProperties.getProperty("OPENAI_API_KEY") ?: "placeholder"
         manifestPlaceholders["MAPS_API_KEY"] = mapsApiKey
         manifestPlaceholders["OPENAI_API_KEY"] = openAiApiKey
-        buildConfigField("String", "OPENAI_API_KEY",  openAiApiKey)
+        buildConfigField("String", "OPENAI_API_KEY",  "\"$openAiApiKey\"")
+        buildConfigField("String", "MAPS_API_KEY",  "\"$mapsApiKey\"")
     }
 
     buildTypes {
@@ -189,6 +190,7 @@ dependencies {
     implementation(libs.play.services.maps)
     implementation(libs.maps.compose)
     implementation(libs.maps.compose.utils)
+    implementation(libs.maps.places)
 
     // ------------- Jetpack Compose ------------------
     implementation("androidx.compose.material:material:1.7.1")
