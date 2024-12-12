@@ -30,8 +30,10 @@ import com.android.bookswap.data.source.network.UserFirestoreSource
 import com.android.bookswap.model.AppConfig
 import com.android.bookswap.model.LocalAppConfig
 import com.android.bookswap.model.UserViewModel
+import com.android.bookswap.model.add.AddToBookViewModel
 import com.android.bookswap.model.chat.ContactViewModel
 import com.android.bookswap.model.chat.OfflineMessageStorage
+import com.android.bookswap.model.edit.EditBookViewModel
 import com.android.bookswap.model.map.BookFilter
 import com.android.bookswap.model.map.BookManagerViewModel
 import com.android.bookswap.model.map.DefaultGeolocation
@@ -137,6 +139,8 @@ class MainActivity : ComponentActivity() {
     val bookFilter = BookFilter()
     val bookManagerViewModel =
         BookManagerViewModel(geolocation, bookRepository, userRepository, bookFilter)
+      val addToBookViewModel = AddToBookViewModel(bookRepository, userVM)
+      val editBookViewModel = EditBookViewModel(bookRepository, navigationActions, userVM)
 
     val topAppBar =
         @Composable { s: String? ->
@@ -213,7 +217,7 @@ class MainActivity : ComponentActivity() {
           }
           composable(C.Screen.ADD_BOOK_MANUALLY) {
             AddToBookScreen(
-                bookRepository,
+                addToBookViewModel,
                 topAppBar = { topAppBar("Add your Book") },
                 bottomAppBar = { bottomAppBar(this@navigation.route ?: "") })
           }
@@ -253,7 +257,7 @@ class MainActivity : ComponentActivity() {
             val bookUUID =
                 backStackEntry.arguments?.getString("bookUUID")?.let { UUID.fromString(it) }
             EditBookScreen(
-                booksRepository = bookRepository,
+                viewModel = editBookViewModel,
                 navigationActions = NavigationActions(navController),
                 bookUUID = bookUUID!!)
           }
