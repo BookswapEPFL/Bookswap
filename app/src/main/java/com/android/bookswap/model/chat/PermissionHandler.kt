@@ -3,6 +3,7 @@ package com.android.bookswap.model.chat
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Build
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.result.ActivityResultLauncher
@@ -24,6 +25,7 @@ class PermissionHandler(private val activity: ComponentActivity) {
   val requestPermissionLauncher: ActivityResultLauncher<String> =
       activity.registerForActivityResult(ActivityResultContracts.RequestPermission()) {
           isGranted: Boolean ->
+        Log.d("PermissionHandler", "Permission result: $isGranted")
         if (isGranted) {
           enableNotifications()
         } else {

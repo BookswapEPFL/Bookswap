@@ -1,7 +1,6 @@
 package com.android.bookswap
 
 import android.content.Context
-import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -15,7 +14,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTag
-import androidx.core.app.ActivityCompat
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -67,24 +65,14 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.storage.FirebaseStorage
 import java.util.UUID
-import android.Manifest
 import com.android.bookswap.model.chat.PermissionHandler
 
 class MainActivity : ComponentActivity() {
 
     private var chatListener: ListenerRegistration? = null
 
-    private fun listenForChatUpdates() {
+    private fun listenForChatUpdates(currentUser: UUID) {
         val db = FirebaseFirestore.getInstance()
-        val currentUser = Firebase.auth.currentUser
-
-        // Ensure we have a logged-in user
-        if (currentUser == null) {
-            Log.e("Firestore", "No logged-in user.")
-            return
-        }
-
-        val currentUserUUID = UUID.fromString(currentUser.uid)
 
         chatListener = db.collection("chats")
             .addSnapshotListener { snapshot, e ->
@@ -99,7 +87,7 @@ class MainActivity : ComponentActivity() {
                             val newMessage = change.document.toObject(DataMessage::class.java)
 
                             // Check if the current user is the receiver
-                            if (newMessage.receiverUUID == currentUserUUID) {
+                            if (newMessage.receiverUUID == currentUser) {
                                 val senderName = newMessage.senderUUID.toString()
                                 val messageContent = newMessage.text
 
@@ -139,10 +127,12 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val userRepository = UserFirestoreSource(FirebaseFirestore.getInstance())
+        val userVM = UserViewModel(UUID.randomUUID(), userRepository)
         val permissionHandler = PermissionHandler(this)
         permissionHandler.askNotificationPermission()
         setContent { BookSwapApp() }
-        listenForChatUpdates()
+        listenForChatUpdates(userVM.getUser().userUUID)
   }
 
   @Composable
