@@ -22,7 +22,6 @@ import com.android.bookswap.model.LocalAppConfig
 import com.android.bookswap.model.UserViewModel
 import com.android.bookswap.resources.C
 import com.android.bookswap.ui.navigation.NavigationActions
-import com.android.bookswap.ui.navigation.TopLevelDestination
 import com.android.bookswap.utils.matchDataBook
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
 import io.mockk.Runs
@@ -152,7 +151,7 @@ class ISBNAddTest : TestCase() {
 
     // Mock the navigation
     val mockNavigationActions: NavigationActions = mockk()
-    every { mockNavigationActions.navigateTo(any(TopLevelDestination::class)) } just Runs
+    every { mockNavigationActions.navigateTo(C.Screen.EDIT_BOOK, any()) } just Runs
 
     composeTestRule.setContent {
       CompositionLocalProvider(LocalAppConfig provides AppConfig(userViewModel = mockUserVM)) {
@@ -169,7 +168,7 @@ class ISBNAddTest : TestCase() {
     } // Api is called
     verify { mockBooksRepository.addBook(matchDataBook(dataBook), any()) } // Book is added
     verify {
-      mockNavigationActions.navigateTo(any(TopLevelDestination::class))
+      mockNavigationActions.navigateTo(C.Screen.EDIT_BOOK, any())
     } // Navigation is called when book is added
   }
 
@@ -189,7 +188,11 @@ class ISBNAddTest : TestCase() {
     // Mock call to repository
     val mockBooksRepository: BooksRepository = mockk()
 
-    composeTestRule.setContent { AddISBNScreen(mockNavigationActions, mockBooksRepository) }
+    composeTestRule.setContent {
+      CompositionLocalProvider(LocalAppConfig provides AppConfig(userViewModel = mockUserVM)) {
+        AddISBNScreen(mockNavigationActions, mockBooksRepository)
+      }
+    }
 
     composeTestRule.onNodeWithTag(C.Tag.NewBookISBN.isbn).performTextInput("9783161484100")
     composeTestRule.onNodeWithTag(C.Tag.NewBookISBN.search).performClick()
