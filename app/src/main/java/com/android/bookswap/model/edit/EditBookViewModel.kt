@@ -90,6 +90,8 @@ class EditBookViewModel(
   fun deleteBook(context: Context, uuid: UUID) {
     booksRepository.deleteBook(uuid) {
       if (it.isSuccess) {
+        // remove the book from the list of books of the user
+        userVM.updateUser(bookList = userVM.getUser().bookList.minus(uuid))
         Toast.makeText(context, "Book deleted.", Toast.LENGTH_LONG).show()
         navigation.goBack()
       } else {
