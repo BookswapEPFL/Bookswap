@@ -11,10 +11,14 @@ import com.android.bookswap.data.BookGenres
 import com.android.bookswap.data.BookLanguages
 import com.android.bookswap.data.DataBook
 import com.android.bookswap.data.repository.BooksRepository
+import com.android.bookswap.model.edit.EditBookViewModel
 import com.android.bookswap.resources.C
 import com.android.bookswap.ui.navigation.NavigationActions
+import io.mockk.MockKAnnotations
 import io.mockk.every
+import io.mockk.just
 import io.mockk.mockk
+import io.mockk.runs
 import java.util.UUID
 import org.junit.Before
 import org.junit.Rule
@@ -22,7 +26,7 @@ import org.junit.Test
 
 class EditBookScreenTest {
 
-  private val booksRepository: BooksRepository = mockk()
+    private val mockViewModel: EditBookViewModel = mockk()
 
   private val navigationActions: NavigationActions = mockk()
 
@@ -40,58 +44,51 @@ class EditBookScreenTest {
           "123456789",
           listOf(BookGenres.FANTASY),
           UUID.randomUUID(),
-          false,
-          false)
+          archived = false,
+          exchange = true)
 
   @Before
   fun setUp() {
+    MockKAnnotations.init(this)
+    every { mockViewModel.deleteBook(any(), any()) } just runs
+    every {
+      mockViewModel.updateDataBook(
+        any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any())
+    } just runs
+      every { mockViewModel.getBook(any(), any(), any()) } answers
+              {
+                  secondArg<(DataBook) -> Unit>()(sampleBook)
+              }
+
     every { navigationActions.currentRoute() } returns "EDIT_BOOK"
-    every { booksRepository.getBook(any(), any(), any()) } answers
-        {
-          secondArg<(DataBook) -> Unit>()(sampleBook)
-        }
+    composeTestRule.setContent {
+      EditBookScreen(
+        mockViewModel, navigationActions, sampleBook.uuid)
+    }
   }
 
   @Test
   fun displayEditScreenComponent() {
-    composeTestRule.setContent {
-      EditBookScreen(booksRepository, navigationActions, sampleBook.uuid)
-    }
-
     composeTestRule.onNodeWithTag(C.Tag.edit_book_screen_container).assertIsDisplayed()
   }
 
   @Test
   fun displayEditTitleComponent() {
-    composeTestRule.setContent {
-      EditBookScreen(booksRepository, navigationActions, sampleBook.uuid)
-    }
-
     composeTestRule.onNodeWithTag(C.Tag.TopAppBar.screen_title).assertIsDisplayed()
   }
 
   @Test
   fun displayEditTitleValueComponent() {
-    composeTestRule.setContent {
-      EditBookScreen(booksRepository, navigationActions, sampleBook.uuid)
-    }
-
     composeTestRule.onNodeWithTag(C.Tag.TopAppBar.screen_title).assertTextEquals("Edit your Book")
   }
 
   @Test
   fun displayEditButtonComponent() {
-    composeTestRule.setContent {
-      EditBookScreen(booksRepository, navigationActions, sampleBook.uuid)
-    }
     composeTestRule.onNodeWithTag(C.Tag.TopAppBar.back_button).assertIsDisplayed()
   }
 
   @Test
   fun displayEditSaveValueComponent() {
-    composeTestRule.setContent {
-      EditBookScreen(booksRepository, navigationActions, sampleBook.uuid)
-    }
     composeTestRule
         .onNodeWithTag(C.Tag.EditBook.scrollable)
         .performScrollToNode(hasTestTag(C.Tag.EditBook.save))
@@ -101,9 +98,6 @@ class EditBookScreenTest {
 
   @Test
   fun displayEditDeleteValueComponent() {
-    composeTestRule.setContent {
-      EditBookScreen(booksRepository, navigationActions, sampleBook.uuid)
-    }
     composeTestRule
         .onNodeWithTag(C.Tag.EditBook.scrollable)
         .performScrollToNode(hasTestTag(C.Tag.EditBook.delete))
@@ -113,59 +107,36 @@ class EditBookScreenTest {
 
   @Test
   fun displayEditBookTitleComponent() {
-    composeTestRule.setContent {
-      EditBookScreen(booksRepository, navigationActions, sampleBook.uuid)
-    }
-
     composeTestRule.onNodeWithTag(C.Tag.EditBook.title).assertIsDisplayed()
   }
 
   @Test
   fun displayEditBookAuthorComponent() {
-    composeTestRule.setContent {
-      EditBookScreen(booksRepository, navigationActions, sampleBook.uuid)
-    }
     composeTestRule.onNodeWithTag(C.Tag.EditBook.author).assertIsDisplayed()
   }
 
   @Test
   fun displayEditBookDescriptionComponent() {
-    composeTestRule.setContent {
-      EditBookScreen(booksRepository, navigationActions, sampleBook.uuid)
-    }
     composeTestRule.onNodeWithTag(C.Tag.EditBook.synopsis).assertIsDisplayed()
   }
 
   @Test
   fun displayEditBookRatingComponent() {
-    composeTestRule.setContent {
-      EditBookScreen(booksRepository, navigationActions, sampleBook.uuid)
-    }
     composeTestRule.onNodeWithTag(C.Tag.EditBook.rating).assertIsDisplayed()
   }
 
   @Test
   fun displayEditBookPhotoComponent() {
-    composeTestRule.setContent {
-      EditBookScreen(booksRepository, navigationActions, sampleBook.uuid)
-    }
     composeTestRule.onNodeWithTag(C.Tag.EditBook.image).assertIsDisplayed()
   }
 
   @Test
   fun displayEditBookLanguageComponent() {
-    composeTestRule.setContent {
-      EditBookScreen(booksRepository, navigationActions, sampleBook.uuid)
-    }
     composeTestRule.onNodeWithTag(C.Tag.EditBook.language).assertIsDisplayed()
   }
 
   @Test
   fun inputsHaveInitialValue() {
-    composeTestRule.setContent {
-      EditBookScreen(booksRepository, navigationActions, sampleBook.uuid)
-    }
-
     composeTestRule.onNodeWithTag(C.Tag.EditBook.title).assertTextContains(sampleBook.title)
     composeTestRule.onNodeWithTag(C.Tag.EditBook.author).assertTextContains(sampleBook.author ?: "")
     composeTestRule
