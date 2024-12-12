@@ -17,8 +17,10 @@ import java.util.UUID
  * @property booksRepository The repository to manage book-related operations with the database.
  * @property userVM The UserViewModel instance used to retrieve the current user details.
  */
-class AddToBookViewModel(private val booksRepository: BooksRepository, private val userVM: UserViewModel) :
-    ViewModel() {
+class AddToBookViewModel(
+    private val booksRepository: BooksRepository,
+    private val userVM: UserViewModel
+) : ViewModel() {
   /**
    * Creates a DataBook instance after validating the input parameters.
    *
