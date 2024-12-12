@@ -204,7 +204,7 @@ fun EntriesListBookComponent(
               expanded = expandedLanguage,
               onExpandedChange = { expandedLanguage = !expandedLanguage }) {
                 FieldComponent(
-                    value = selectedLanguage.value?.languageCode ?: "",
+                    value = selectedLanguage.value?.languageName ?: "",
                     onValueChange = {},
                     readOnly = true,
                     label = { Text(text = stringResource(R.string.label_language)) },
