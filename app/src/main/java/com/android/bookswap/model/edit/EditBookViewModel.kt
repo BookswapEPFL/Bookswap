@@ -22,10 +22,8 @@ import java.util.UUID
 class EditBookViewModel(
     private val booksRepository: BooksRepository,
     private val navigation: NavigationActions,
-    userVM: UserViewModel
+    private val userVM: UserViewModel
 ) : ViewModel() {
-
-  private val userID = userVM.getUser().userUUID
   /**
    * Creates a DataBook instance after validating the input parameters.
    *
@@ -67,7 +65,7 @@ class EditBookViewModel(
             language,
             isbn,
             genres,
-            userID,
+            userVM.getUser().userUUID,
             archived,
             exchange)
     Log.d("EditBookViewModel", "Editing book: $book")
