@@ -140,7 +140,7 @@ class EditBookViewModelTest {
     }
 
     @Test
-    fun `deleteBooks deletes book successfully`() {
+    fun `deleteBook deletes book successfully`() {
         val uuid = UUID.randomUUID()
         every { booksRepository.deleteBook(uuid, any()) } answers
                 {
@@ -148,14 +148,14 @@ class EditBookViewModelTest {
                     callback(Result.success(Unit))
                 }
 
-        viewModel.deleteBooks(context, uuid)
+        viewModel.deleteBook(context, uuid)
 
         verify { booksRepository.deleteBook(uuid, any()) }
         verify { navigation.goBack() }
     }
 
     @Test
-    fun `deleteBooks don't go back when deletion fails`() {
+    fun `deleteBook don't go back when deletion fails`() {
         // Arrange
         val uuid = UUID.randomUUID()
         every { booksRepository.deleteBook(uuid, any()) } answers
@@ -165,7 +165,7 @@ class EditBookViewModelTest {
                 }
 
         // Act
-        viewModel.deleteBooks(context, uuid)
+        viewModel.deleteBook(context, uuid)
 
         // Assert
         verify { booksRepository.deleteBook(uuid, any()) }

@@ -87,7 +87,7 @@ class EditBookViewModel(
     /**
      * Deletes a book from the repository by UUID.
      */
-    fun deleteBooks(context: Context, uuid: UUID) {
+    fun deleteBook(context: Context, uuid: UUID) {
         booksRepository.deleteBook(uuid) {
             if (it.isSuccess) {
                 Toast.makeText(context, "Book deleted.", Toast.LENGTH_LONG).show()
