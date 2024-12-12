@@ -116,7 +116,7 @@ fun MapScreen(
           android.Manifest.permission.ACCESS_FINE_LOCATION)
   val permLauncher =
       rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
-        if (it.values.contains(true)) {
+        if (permissions.map { p -> it.getOrDefault(p, false) }.contains(true)) {
           enableLocation()
         }
       }
@@ -143,16 +143,12 @@ fun MapScreen(
     } else {
       permLauncher.launch(permissions)
     }
-    cameraPositionState.position =
-        CameraPosition.fromLatLngZoom(LatLng(latitude.value, longitude.value), INIT_ZOOM)
     isOnline = isNetworkAvailable(context)
   }
   // Stop location and books updates when the screen is disposed
   DisposableEffect(Unit) {
     onDispose {
-      if (latitude.value.isNaN() || longitude.value.isNaN()) {
-        userVM.updateAddress(userVM.getUser().latitude, userVM.getUser().longitude, context)
-      } else {
+      if (!latitude.value.isNaN() && !longitude.value.isNaN()) {
         userVM.updateAddress(latitude.value, longitude.value, context)
       }
       geolocation.stopLocationUpdates()
