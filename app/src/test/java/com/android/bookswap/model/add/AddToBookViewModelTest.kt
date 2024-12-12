@@ -9,8 +9,8 @@ import com.android.bookswap.data.DataUser
 import com.android.bookswap.data.repository.BooksRepository
 import com.android.bookswap.model.UserViewModel
 import io.mockk.*
-import org.junit.After
 import java.util.*
+import org.junit.After
 import org.junit.Before
 import org.junit.Test
 
@@ -42,7 +42,7 @@ class AddToBookViewModelTest {
     booksRepository = mockk()
     context = mockk()
     mockUserViewModel = mockk(relaxed = true)
-      every { mockUserViewModel.getUser(any()) } returns DataUser(userUUID = uuid)
+    every { mockUserViewModel.getUser(any()) } returns DataUser(userUUID = uuid)
     viewModel = AddToBookViewModel(booksRepository, mockUserViewModel)
 
     // Mock Toast.makeText
@@ -54,11 +54,11 @@ class AddToBookViewModelTest {
     every { UUID.randomUUID() } returns uuid
   }
 
-    @After
-    fun tearDown(){
-        //Clear all mocks to avoid problem with gradle task "check"
-        unmockkAll()
-    }
+  @After
+  fun tearDown() {
+    // Clear all mocks to avoid problem with gradle task "check"
+    unmockkAll()
+  }
 
   @Test
   fun `add book successfully`() {
@@ -83,7 +83,7 @@ class AddToBookViewModelTest {
     verify {
       booksRepository.addBook(
           match { updatedBook ->
-              updatedBook.uuid == book.uuid &&
+            updatedBook.uuid == book.uuid &&
                 updatedBook.title == book.title &&
                 updatedBook.author == book.author &&
                 updatedBook.description == book.description &&
@@ -92,7 +92,7 @@ class AddToBookViewModelTest {
                 updatedBook.language == book.language &&
                 updatedBook.isbn == book.isbn &&
                 updatedBook.genres == book.genres &&
-                      updatedBook.userId == book.userId &&
+                updatedBook.userId == book.userId &&
                 updatedBook.archived == book.archived &&
                 updatedBook.exchange == book.exchange
           },
