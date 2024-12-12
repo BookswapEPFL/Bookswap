@@ -60,7 +60,7 @@ class GoogleBookDataSource(context: Context) {
 
       val language =
           item.getStringOrNull("language")?.lowercase()?.let { languageCode ->
-            BookLanguages.values().find { it.languageName.equals(languageCode, ignoreCase = true) }
+            BookLanguages.values().find { it.languageCode.equals(languageCode, ignoreCase = true) }
           } ?: BookLanguages.OTHER
 
       // We do not know where the ISBN_13 is, so we need to filter for it
@@ -79,7 +79,7 @@ class GoogleBookDataSource(context: Context) {
               item.getStringOrNull("description"),
               null,
               item.getJSONObjectOrNull("imageLinks")?.getStringOrNull("thumbnail"),
-              language ?: BookLanguages.OTHER,
+              language,
               isbn = identifier,
               userId = userId,
               archived = false,
