@@ -60,6 +60,7 @@ import com.android.bookswap.ui.profile.NewUserScreen
 import com.android.bookswap.ui.profile.OthersUserProfileScreen
 import com.android.bookswap.ui.profile.UserProfile
 import com.android.bookswap.ui.theme.BookSwapAppTheme
+import com.google.android.libraries.places.api.Places
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -161,6 +162,8 @@ class MainActivity : ComponentActivity() {
 
     // Initialize the geolocation
     val geolocation = Geolocation(this)
+    val apiKey = BuildConfig.MAPS_API_KEY
+    if (!Places.isInitialized()) Places.initialize(applicationContext, apiKey)
     BookSwapAppTheme {
       // A surface container using the 'background' color from the theme
       Surface(
@@ -311,6 +314,7 @@ class MainActivity : ComponentActivity() {
             if (bookId != null) {
               BookProfileScreen(
                   bookId = bookId, // Default for testing
+                  topAppBar = { topAppBar("Book Profile") },
                   booksRepository = BooksFirestoreSource(FirebaseFirestore.getInstance()),
                   navController = NavigationActions(navController),
               )

@@ -37,17 +37,20 @@ class UserFirestoreSource(private val db: FirebaseFirestore) : UsersRepository {
    */
   override fun getUser(uuid: UUID, callback: (Result<DataUser>) -> Unit) {
 
-    db.collection(COLLECTION_NAME).whereEqualTo("userUUID", uuid).get().addOnCompleteListener { task
-      ->
-      if (task.isSuccessful) {
-        // Maps Firestore documents to DataUser objects or returns an empty list
-        callback(
-            Result.success(
-                task.result?.firstNotNullOfOrNull { documentToUser(it).getOrNull() } ?: DataUser()))
-      } else {
-        callback(Result.failure(task.exception!!))
-      }
-    }
+    db.collection(COLLECTION_NAME)
+        .whereEqualTo("userUUID", uuid.toString())
+        .get()
+        .addOnCompleteListener { task ->
+          if (task.isSuccessful) {
+            // Maps Firestore documents to DataUser objects or returns an empty list
+            callback(
+                Result.success(
+                    task.result?.firstNotNullOfOrNull { documentToUser(it).getOrNull() }
+                        ?: DataUser()))
+          } else {
+            callback(Result.failure(task.exception!!))
+          }
+        }
   }
   /**
    * Fetches the list of users from the Firestore collection If the task is successful, maps the

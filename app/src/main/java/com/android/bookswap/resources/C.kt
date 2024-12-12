@@ -170,9 +170,8 @@ object C {
       const val genre = "_genre" + UI_T.TEXT
       const val isbn = BOOK + "_isbn" + UI_T.TEXT
       const val date = BOOK + "_date" + UI_T.TEXT
+      const val imagePlaceholder = BOOK + "_placeholder" + UI_T.IMAGE
       const val image = BOOK + UI_T.IMAGE
-      const val next_image = BOOK + A.NEXT + UI_T.ICON_BUTTON
-      const val previous_image = BOOK + A.BACK + UI_T.ICON_BUTTON
       const val volume = BOOK + "_volume" + UI_T.TEXT
       const val issue = BOOK + "_issue" + UI_T.TEXT
       const val editorial = BOOK + "_editorial" + UI_T.TEXT
