@@ -7,6 +7,7 @@ import com.android.bookswap.data.BookLanguages
 import com.android.bookswap.data.DataBook
 import com.android.bookswap.data.DataUser
 import com.android.bookswap.data.repository.BooksRepository
+import com.android.bookswap.data.repository.UsersRepository
 import com.android.bookswap.model.UserViewModel
 import com.android.bookswap.ui.navigation.NavigationActions
 import io.mockk.*
@@ -23,11 +24,13 @@ class EditBookViewModelTest {
   private lateinit var viewModel: EditBookViewModel
   private lateinit var mockUserViewModel: UserViewModel
 
-  private val user = DataUser(UUID.randomUUID())
+  private val uuidBook = UUID.randomUUID()
+  private val uuidUser = UUID.randomUUID()
+  private val user = DataUser(userUUID = uuidUser, firstName = "Corin", bookList = listOf(uuidBook))
 
   private val book =
       DataBook(
-          uuid = UUID(1, 1),
+          uuid = uuidBook,
           title = "Test Title",
           author = "Test Author",
           description = "Test Description",
@@ -36,15 +39,23 @@ class EditBookViewModelTest {
           language = BookLanguages.ENGLISH,
           isbn = "123456789",
           genres = listOf(BookGenres.FICTION),
-          userId = user.userUUID,
+          userId = uuidUser,
           archived = false,
           exchange = true)
 
-  private val uuid = UUID.randomUUID()
-
   @Before
   fun setup() {
-    mockUserViewModel = mockk(relaxed = true)
+    val mockUserRepository: UsersRepository = mockk()
+
+    mockUserViewModel = spyk(UserViewModel(uuidUser, mockUserRepository, user))
+    every { mockUserViewModel.getUser(any()) } returns user
+    every { mockUserViewModel.uuid } returns uuidUser
+    every { mockUserViewModel.getUser() } returns user
+    every {
+      mockUserViewModel.updateUser(
+          any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any())
+    } just runs
+
     booksRepository = mockk()
     navigation = mockk()
     context = mockk()
@@ -134,32 +145,33 @@ class EditBookViewModelTest {
 
   @Test
   fun `deleteBook deletes book successfully`() {
-    every { booksRepository.deleteBook(uuid, any()) } answers
+    every { booksRepository.deleteBook(uuidBook, any()) } answers
         {
           val callback = secondArg<(Result<Unit>) -> Unit>()
           callback(Result.success(Unit))
         }
 
-    viewModel.deleteBook(context, uuid)
+    viewModel.deleteBook(context, uuidBook)
 
-    verify { booksRepository.deleteBook(uuid, any()) }
+    verify { booksRepository.deleteBook(uuidBook, any()) }
+    verify { mockUserViewModel.updateUser(firstName = "Corin", bookList = emptyList()) }
     verify { navigation.goBack() }
   }
 
   @Test
   fun `deleteBook don't go back when deletion fails`() {
     // Arrange
-    every { booksRepository.deleteBook(uuid, any()) } answers
+    every { booksRepository.deleteBook(uuidBook, any()) } answers
         {
           val callback = secondArg<(Result<Unit>) -> Unit>()
           callback(Result.failure(Exception("Deletion failed")))
         }
 
     // Act
-    viewModel.deleteBook(context, uuid)
+    viewModel.deleteBook(context, uuidBook)
 
     // Assert
-    verify { booksRepository.deleteBook(uuid, any()) }
+    verify { booksRepository.deleteBook(uuidBook, any()) }
     verify(exactly = 0) { navigation.goBack() }
   }
 }
