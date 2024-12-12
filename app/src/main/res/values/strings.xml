@@ -7,4 +7,12 @@
     <string name="book.gpt.error.chatgpt">Image could not be analyzed</string>
     <string name="book.gpt.error.isbn">ISBN detected from valid is invalid</string>
     <string name="book.gpt.error.bookadd">Book was not added</string>
+    <!-- Field Book Labels -->
+    <string name="label_title">Title*</string>
+    <string name="label_genres">Genres*</string>
+    <string name="label_author">Author*</string>
+    <string name="label_description">Description*</string>
+    <string name="label_isbn">ISBN*</string>
+    <string name="label_photo">Pics*</string>
+    <string name="label_language">Language*</string>
 </resources>
