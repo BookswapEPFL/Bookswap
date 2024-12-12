@@ -10,6 +10,7 @@ import com.android.bookswap.data.repository.BooksRepository
 import com.android.bookswap.model.UserViewModel
 import com.android.bookswap.ui.navigation.NavigationActions
 import io.mockk.*
+import org.junit.After
 import java.util.*
 import org.junit.Before
 import org.junit.Test
@@ -56,6 +57,12 @@ class EditBookViewModelTest {
 
     every { navigation.goBack() } just Runs
   }
+
+    @After
+    fun tearDown(){
+        //Clear all mocks to avoid problem with gradle task "check"
+        unmockkAll()
+    }
 
   @Test
   fun `updateDataBook updates book successfully`() {

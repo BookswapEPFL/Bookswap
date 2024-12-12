@@ -5,9 +5,11 @@ import android.widget.Toast
 import com.android.bookswap.data.BookGenres
 import com.android.bookswap.data.BookLanguages
 import com.android.bookswap.data.DataBook
+import com.android.bookswap.data.DataUser
 import com.android.bookswap.data.repository.BooksRepository
 import com.android.bookswap.model.UserViewModel
 import io.mockk.*
+import org.junit.After
 import java.util.*
 import org.junit.Before
 import org.junit.Test
@@ -19,9 +21,10 @@ class AddToBookViewModelTest {
   private lateinit var viewModel: AddToBookViewModel
   private lateinit var mockUserViewModel: UserViewModel
 
+  private val uuid = UUID.fromString("c0a9035e-0b1a-485d-a5ff-f234977b04ff")
   private val book =
       DataBook(
-          uuid = UUID(1, 1),
+          uuid = uuid,
           title = "Test Title",
           author = "Test Author",
           description = "Test Description",
@@ -30,7 +33,7 @@ class AddToBookViewModelTest {
           language = BookLanguages.ENGLISH,
           isbn = "123456789",
           genres = listOf(BookGenres.FICTION),
-          userId = UUID(2, 2),
+          userId = uuid,
           archived = false,
           exchange = true)
 
@@ -39,6 +42,7 @@ class AddToBookViewModelTest {
     booksRepository = mockk()
     context = mockk()
     mockUserViewModel = mockk(relaxed = true)
+      every { mockUserViewModel.getUser(any()) } returns DataUser(userUUID = uuid)
     viewModel = AddToBookViewModel(booksRepository, mockUserViewModel)
 
     // Mock Toast.makeText
@@ -47,11 +51,17 @@ class AddToBookViewModelTest {
     every { Toast.makeText(any(), any<String>(), any()) } returns mockToast
 
     mockkStatic(UUID::class)
-    every { UUID.randomUUID() } returns UUID(1, 1)
+    every { UUID.randomUUID() } returns uuid
   }
 
+    @After
+    fun tearDown(){
+        //Clear all mocks to avoid problem with gradle task "check"
+        unmockkAll()
+    }
+
   @Test
-  fun `updateDataBook updates book successfully`() {
+  fun `add book successfully`() {
     every { booksRepository.addBook(any(), any()) } answers
         {
           val callback = secondArg<(Result<Unit>) -> Unit>()
@@ -73,7 +83,7 @@ class AddToBookViewModelTest {
     verify {
       booksRepository.addBook(
           match { updatedBook ->
-            updatedBook.uuid == book.uuid &&
+              updatedBook.uuid == book.uuid &&
                 updatedBook.title == book.title &&
                 updatedBook.author == book.author &&
                 updatedBook.description == book.description &&
@@ -82,6 +92,7 @@ class AddToBookViewModelTest {
                 updatedBook.language == book.language &&
                 updatedBook.isbn == book.isbn &&
                 updatedBook.genres == book.genres &&
+                      updatedBook.userId == book.userId &&
                 updatedBook.archived == book.archived &&
                 updatedBook.exchange == book.exchange
           },
