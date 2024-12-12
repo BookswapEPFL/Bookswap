@@ -25,7 +25,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.android.bookswap.R
 import com.android.bookswap.data.BookGenres
 import com.android.bookswap.data.BookLanguages
 import com.android.bookswap.model.InputVerification
@@ -71,7 +73,7 @@ fun EntriesListBookComponent(
                       .fillMaxWidth()
                       .padding(horizontal = HORIZONTAL_PADDING.dp),
               value = title.value,
-              label = { Text(text = "Title*") })
+              label = { Text(text = stringResource(R.string.label_title)) })
         }
 
         // Genres Dropdown
@@ -84,7 +86,7 @@ fun EntriesListBookComponent(
                     value = genres.value.joinToString { it.Genre },
                     onValueChange = {},
                     readOnly = true,
-                    label = { Text(text = "Genres*") },
+                    label = { Text(text = stringResource(R.string.label_genres)) },
                     modifier =
                         Modifier.menuAnchor()
                             .fillMaxWidth()
@@ -133,7 +135,7 @@ fun EntriesListBookComponent(
                       .fillMaxWidth()
                       .padding(horizontal = HORIZONTAL_PADDING.dp),
               value = author.value,
-              label = { Text(text = "Author*") })
+              label = { Text(text = stringResource(R.string.label_author)) })
         }
 
         // Description Input Field
@@ -145,7 +147,7 @@ fun EntriesListBookComponent(
                       .fillMaxWidth()
                       .padding(horizontal = HORIZONTAL_PADDING.dp),
               value = description.value,
-              label = { Text(text = "Description*") })
+              label = { Text(text = stringResource(R.string.label_description)) })
         }
 
         // Rating Input Field
@@ -177,7 +179,7 @@ fun EntriesListBookComponent(
                       .fillMaxWidth()
                       .padding(horizontal = HORIZONTAL_PADDING.dp),
               value = isbn.value,
-              label = { Text(text = "ISBN*") })
+              label = { Text(text = stringResource(R.string.label_isbn)) })
         }
 
         // Photo Input Field
@@ -189,7 +191,7 @@ fun EntriesListBookComponent(
                       .fillMaxWidth()
                       .padding(horizontal = HORIZONTAL_PADDING.dp),
               value = photo.value,
-              label = { Text(text = "Pics*") })
+              label = { Text(text = stringResource(R.string.label_photo)) })
         }
 
         // Language Dropdown
@@ -205,7 +207,7 @@ fun EntriesListBookComponent(
                     value = selectedLanguage.value?.languageCode ?: "",
                     onValueChange = {},
                     readOnly = true,
-                    label = { Text(text = "Language*") },
+                    label = { Text(text = stringResource(R.string.label_language)) },
                     modifier =
                         Modifier.menuAnchor()
                             .fillMaxWidth()
