@@ -285,7 +285,7 @@ fun EditBookScreen(
                               book.exchange)
                         },
                         modifier = Modifier.fillMaxWidth().testTag(C.Tag.EditBook.save),
-                        enabled = title.isNotBlank(),
+                        enabled = title.isNotBlank() && author.isNotBlank() && enumValues<BookLanguages>().firstOrNull { it.name == language } != null,
                         colors =
                             ButtonDefaults.buttonColors(containerColor = ColorVariable.Primary)) {
                           Text("Save", color = Color.White)

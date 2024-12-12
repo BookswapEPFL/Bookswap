@@ -232,7 +232,7 @@ fun AddToBookScreen(
                       Modifier.testTag(C.Tag.NewBookManually.save)
                           .align(Alignment.CenterHorizontally)
                           .fillMaxWidth(0.5f),
-                  enabled = title.isNotBlank() && isbn.isNotBlank(),
+                  enabled = title.isNotBlank() && author.isNotBlank() && selectedLanguage != null && (isbn.isBlank() || inputVerification.testIsbn(isbn)) ,
                   onClick = {
                     viewModel.saveDataBook(
                         context,
@@ -243,7 +243,7 @@ fun AddToBookScreen(
                         photo,
                         selectedLanguage ?: BookLanguages.OTHER,
                         isbn,
-                        selectedGenre?.let { listOf(it) } ?: emptyList(),
+                        listOf(selectedGenre!!),
                         archived = false,
                         exchange = true)
                   }) {
