@@ -133,14 +133,8 @@ class MainActivity : ComponentActivity() {
     if (currentUser != null) {
       userVM.getUserByGoogleUid(currentUser.uid) // This will scrap the user from the database
     }
-    // Message part
-    val contactViewModel = ContactViewModel(userVM, userRepository, messageRepository)
     // Book part
     val bookFilter = BookFilter()
-    val bookManagerViewModel =
-        BookManagerViewModel(geolocation, bookRepository, userRepository, bookFilter)
-    val addToBookViewModel = AddToBookViewModel(bookRepository, userVM)
-    val editBookViewModel = EditBookViewModel(bookRepository, navigationActions, userVM)
 
     val topAppBar =
         @Composable { s: String? ->
@@ -165,6 +159,8 @@ class MainActivity : ComponentActivity() {
           composable(C.Screen.NEW_USER) { NewUserScreen(navigationActions, photoStorage) }
         }
         navigation(startDestination = C.Screen.CHAT_LIST, route = C.Route.CHAT_LIST) {
+          // Message part
+          val contactViewModel = ContactViewModel(userVM, userRepository, messageRepository)
           composable(C.Screen.CHAT_LIST) {
             ListChatScreen(
                 navigationActions,
@@ -198,7 +194,7 @@ class MainActivity : ComponentActivity() {
         navigation(startDestination = C.Screen.MAP, route = C.Route.MAP) {
           composable(C.Screen.MAP) {
             MapScreen(
-                bookManagerViewModel,
+                BookManagerViewModel(geolocation, bookRepository, userRepository, bookFilter),
                 navigationActions = navigationActions,
                 geolocation = geolocation,
                 topAppBar = { topAppBar("Map") },
@@ -217,7 +213,7 @@ class MainActivity : ComponentActivity() {
           }
           composable(C.Screen.ADD_BOOK_MANUALLY) {
             AddToBookScreen(
-                addToBookViewModel,
+                AddToBookViewModel(bookRepository, userVM),
                 topAppBar = { topAppBar("Add your Book") },
                 bottomAppBar = { bottomAppBar(this@navigation.route ?: "") })
           }
@@ -257,7 +253,7 @@ class MainActivity : ComponentActivity() {
             val bookUUID =
                 backStackEntry.arguments?.getString("bookUUID")?.let { UUID.fromString(it) }
             EditBookScreen(
-                viewModel = editBookViewModel,
+                viewModel = EditBookViewModel(bookRepository, navigationActions, userVM),
                 navigationActions = NavigationActions(navController),
                 bookUUID = bookUUID!!)
           }
