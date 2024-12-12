@@ -123,7 +123,7 @@ class EntriesListBookTest {
     composeTestRule.onNodeWithTag(languageDropdownTag).performClick()
 
     // Select a language
-    val languageToSelect = BookLanguages.ENGLISH.languageCode
+    val languageToSelect = BookLanguages.ENGLISH.languageName
     composeTestRule
         .onNodeWithTag("${C.Tag.BookEntryComp.language_menu}_$languageToSelect")
         .performClick()

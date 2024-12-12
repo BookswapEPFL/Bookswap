@@ -221,8 +221,8 @@ fun EntriesListBookComponent(
                             modifier =
                                 Modifier.testTag(
                                     C.Tag.BookEntryComp.language_menu +
-                                        "_${language.languageCode}"),
-                            text = { Text(text = language.languageCode) },
+                                        "_${language.languageName}"),
+                            text = { Text(text = language.languageName) },
                             onClick = {
                               selectedLanguage.value = language
                               expandedLanguage = false
