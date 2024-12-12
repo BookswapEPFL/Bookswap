@@ -21,12 +21,15 @@ import com.android.bookswap.data.repository.UsersRepository
 import com.android.bookswap.model.AppConfig
 import com.android.bookswap.model.LocalAppConfig
 import com.android.bookswap.model.UserViewModel
+import com.android.bookswap.model.edit.EditBookViewModel
 import com.android.bookswap.resources.C
 import com.android.bookswap.ui.books.BookProfileScreen
 import com.android.bookswap.ui.books.edit.EditBookScreen
 import io.mockk.coEvery
 import io.mockk.every
+import io.mockk.just
 import io.mockk.mockk
+import io.mockk.runs
 import java.util.UUID
 import org.junit.Before
 import org.junit.Rule
@@ -45,31 +48,42 @@ class NavigationFromBookProfileToEditBookTest {
   private val bookUserId: UUID = UUID.randomUUID()
   private lateinit var testBookOwner: DataBook
   private lateinit var testBookOther: DataBook
+    private lateinit var mockEditVM: EditBookViewModel
 
   @Before
   fun setUp() {
+      testBookOwner =
+          DataBook(
+              testBookId,
+              "Original Title",
+              "Author",
+              "Original Description",
+              5,
+              "https://example.com/photo.jpg",
+              BookLanguages.ENGLISH,
+              "1234567890",
+              listOf(BookGenres.FICTION),
+              currentUserId,
+              false,
+              false)
+      testBookOther = testBookOwner.copy(userId = bookUserId)
+
+      mockEditVM = mockk(relaxed = true)
+      every { mockEditVM.deleteBook(any(), any()) } just runs
+      every {
+          mockEditVM.updateDataBook(
+              any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any())
+      } just runs
+      every { mockEditVM.getBook(any(), any(), any()) } answers
+              {
+                  secondArg<(DataBook) -> Unit>()(testBookOwner)
+              }
     mockUserRepository = mockk()
     userVM = UserViewModel(currentUserId, mockUserRepository)
     mockBookRepo = mockk<BooksRepository>(relaxed = true)
 
     every { mockUserRepository.getUser(currentUserId, any()) } answers { currentUserId }
     every { userVM.getUser().userUUID } returns currentUserId
-
-    testBookOwner =
-        DataBook(
-            testBookId,
-            "Original Title",
-            "Author",
-            "Original Description",
-            5,
-            "https://example.com/photo.jpg",
-            BookLanguages.ENGLISH,
-            "1234567890",
-            listOf(BookGenres.FICTION),
-            currentUserId,
-            false,
-            false)
-    testBookOther = testBookOwner.copy(userId = bookUserId)
   }
 
   @Test
@@ -93,7 +107,7 @@ class NavigationFromBookProfileToEditBookTest {
             val bookUUID =
                 backStackEntry.arguments?.getString("bookUUID")?.let { UUID.fromString(it) }
             if (bookUUID != null) {
-              EditBookScreen(mockBookRepo, NavigationActions(navController), bookUUID)
+              EditBookScreen(mockEditVM, NavigationActions(navController), bookUUID)
             }
           }
         }
