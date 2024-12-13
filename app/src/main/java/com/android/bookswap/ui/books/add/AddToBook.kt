@@ -203,7 +203,7 @@ fun AddToBookScreen(
                   expanded = expandedLanguage,
                   onExpandedChange = { expandedLanguage = !expandedLanguage }) {
                     FieldComponent(
-                        value = selectedLanguage?.languageCode ?: "",
+                        value = selectedLanguage?.languageName ?: "",
                         onValueChange = {},
                         readOnly = true,
                         label = { Text(text = "Language*") },
@@ -216,7 +216,7 @@ fun AddToBookScreen(
                             DropdownMenuItem(
                                 text = {
                                   Text(
-                                      text = language.languageCode,
+                                      text = language.languageName,
                                   )
                                 },
                                 onClick = {
