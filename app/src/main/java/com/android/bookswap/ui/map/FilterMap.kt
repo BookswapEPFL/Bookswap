@@ -102,8 +102,8 @@ fun FilterMapScreen(navigationActions: NavigationActions, bookFilter: BookFilter
           }
           item {
             ButtonBlock(
-                buttonTexts = BookLanguages.values().map { it.languageCode },
-                selectedFiltersLanguages.map { it.languageCode }) { newSelection ->
+                buttonTexts = BookLanguages.values().map { it.languageName },
+                selectedFiltersLanguages.map { it.languageName }) { newSelection ->
                   bookFilter.setLanguages(
                       newSelection) // Actualize the selected languages as OnClick
             }
@@ -116,7 +116,7 @@ fun FilterMapScreen(navigationActions: NavigationActions, bookFilter: BookFilter
             Button(
                 onClick = {
                   bookFilter.setGenres(selectedFiltersGenres.map { it.Genre })
-                  bookFilter.setLanguages(selectedFiltersLanguages.map { it.languageCode })
+                  bookFilter.setLanguages(selectedFiltersLanguages.map { it.languageName })
                   Toast.makeText(context, "Filters applied", Toast.LENGTH_SHORT).show()
                   navigationActions.goBack()
                 },

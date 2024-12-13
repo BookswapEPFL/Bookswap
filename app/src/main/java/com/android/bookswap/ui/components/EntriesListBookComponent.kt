@@ -204,7 +204,7 @@ fun EntriesListBookComponent(
               expanded = expandedLanguage,
               onExpandedChange = { expandedLanguage = !expandedLanguage }) {
                 FieldComponent(
-                    value = selectedLanguage.value?.languageCode ?: "",
+                    value = selectedLanguage.value?.languageName ?: "",
                     onValueChange = {},
                     readOnly = true,
                     label = { Text(text = stringResource(R.string.label_language)) },
@@ -221,8 +221,8 @@ fun EntriesListBookComponent(
                             modifier =
                                 Modifier.testTag(
                                     C.Tag.BookEntryComp.language_menu +
-                                        "_${language.languageCode}"),
-                            text = { Text(text = language.languageCode) },
+                                        "_${language.languageName}"),
+                            text = { Text(text = language.languageName) },
                             onClick = {
                               selectedLanguage.value = language
                               expandedLanguage = false
