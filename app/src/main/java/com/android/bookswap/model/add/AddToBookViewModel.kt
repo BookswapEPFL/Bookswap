@@ -68,6 +68,8 @@ class AddToBookViewModel(
         book,
         callback = {
           if (it.isSuccess) {
+            // add the book to the list of books of the user
+            userVM.updateUser(bookList = userVM.getUser().bookList.plus(book.uuid))
             Toast.makeText(context, "Book added.", Toast.LENGTH_LONG).show()
           } else {
             Toast.makeText(context, "Failed to add book.", Toast.LENGTH_LONG).show()
