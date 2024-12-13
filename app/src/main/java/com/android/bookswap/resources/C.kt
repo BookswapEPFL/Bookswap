@@ -107,6 +107,36 @@ object C {
       const val divider = BOOK + LIST + UI_T.DIVIDER
     }
 
+    object BookEntryComp {
+      // Parent container
+      const val entries_list_book_container = "entries_list_book" + UI_T.CONTAINER
+      const val scrollable = "scrollable" + UI_T.SCROLLABLE_CONTAINER
+      // Fields
+      const val title_field = "title" + UI_T.TEXT_FIELD
+      const val genre_field = "genres" + UI_T.DROPDOWN
+      const val author_field = "author" + UI_T.TEXT_FIELD
+      const val description_field = "description" + UI_T.TEXT_FIELD
+      const val rating_field = "rating" + UI_T.TEXT_FIELD
+      const val isbn_field = "isbn" + UI_T.TEXT_FIELD
+      const val photo_field = "photo" + UI_T.IMAGE_FIELD
+      const val language_field = "language" + UI_T.DROPDOWN
+
+      // Dropdown menus
+      const val genre_menu = "genre_menu" + UI_T.SCROLLABLE_CONTAINER
+      const val genre_menu_item = "genre_menu_item" + UI_T.CONTAINER
+      const val language_menu = "language_menu" + UI_T.SCROLLABLE_CONTAINER
+      const val language_menu_item = "language_menu_item" + UI_T.CONTAINER
+
+      // Buttons
+      const val action_buttons = "action_buttons" + UI_T.CONTAINER
+      const val confirm_button = A.CONFIRM + UI_T.BUTTON
+      const val cancel_button = A.CANCEL + UI_T.BUTTON
+
+      const val rating_field_stars = "rating_stars" + UI_T.CONTAINER
+      const val rating_star = "rating_star" + UI_T.ICON
+      const val rating_star_empty = "rating_star_empty" + UI_T.ICON
+    }
+
     // BookDisplayComponent specific tags (BookDisplayComponent.kt)
     object BookDisplayComp {
       const val book_display_container = BOOK + UI_T.CONTAINER
@@ -170,9 +200,8 @@ object C {
       const val genre = "_genre" + UI_T.TEXT
       const val isbn = BOOK + "_isbn" + UI_T.TEXT
       const val date = BOOK + "_date" + UI_T.TEXT
+      const val imagePlaceholder = BOOK + "_placeholder" + UI_T.IMAGE
       const val image = BOOK + UI_T.IMAGE
-      const val next_image = BOOK + A.NEXT + UI_T.ICON_BUTTON
-      const val previous_image = BOOK + A.BACK + UI_T.ICON_BUTTON
       const val volume = BOOK + "_volume" + UI_T.TEXT
       const val issue = BOOK + "_issue" + UI_T.TEXT
       const val editorial = BOOK + "_editorial" + UI_T.TEXT

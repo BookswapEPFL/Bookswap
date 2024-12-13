@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.*
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -15,18 +16,23 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.rounded.AccountCircle
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import coil.compose.AsyncImage
 import com.android.bookswap.data.DataBook
 import com.android.bookswap.data.repository.BooksRepository
@@ -36,6 +42,7 @@ import com.android.bookswap.model.PhotoRequester
 import com.android.bookswap.model.UserBookViewModel
 import com.android.bookswap.resources.C
 import com.android.bookswap.ui.components.BookListComponent
+import com.android.bookswap.ui.components.ButtonComponent
 import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.theme.*
 
@@ -72,46 +79,60 @@ fun UserProfile(
   val context = LocalContext.current
   val appConfig = LocalAppConfig.current
   var userData = appConfig.userViewModel.getUser()
+  val addressStr by appConfig.userViewModel.addressStr.collectAsState()
   val showEditPicture = remember { mutableStateOf(false) }
   var showEditProfile by remember { mutableStateOf(false) }
+
   var needRecompose by remember { mutableStateOf(false) }
 
   val bookListData = remember { mutableStateOf<List<DataBook>>(emptyList()) }
   var isBooksLoading by remember { mutableStateOf(true) }
 
   LaunchedEffect(userData.bookList) {
+    val userBookList = userData.bookList
+    for (book in userBookList) {
+      Log.i("UserProfileScreen", "BookListUUID: $userBookList")
+    }
+
+    isBooksLoading = true
     try {
-      isBooksLoading = true
       bookListData.value = userBookViewModel.getBooks(userData.bookList)
     } catch (exception: Exception) {
       Log.e("UserProfileScreen", "Error fetching books: $exception")
     } finally {
       isBooksLoading = false
     }
+
+    Log.i("UserProfileScreen", "DataBookList: $bookListData.value")
   }
 
+  // Create a PhotoRequester instance
   val photoRequester =
       PhotoRequester(context) { result ->
         result.fold(
             onSuccess = { image ->
               photoStorage.addPhotoToStorage(
-                  photoId = "profile", bitmap = image.asAndroidBitmap()) { uploadResult ->
-                    uploadResult.fold(
+                  photoId = "profile",
+                  bitmap = image.asAndroidBitmap(),
+                  callback = { result ->
+                    result.fold(
                         onSuccess = { url ->
                           appConfig.userViewModel.updateUser(picURL = url)
                           showEditPicture.value = false
                         },
-                        onFailure = {
+                        onFailure = { exception ->
+                          Log.e("NewUserScreen", "Error uploading photo: $exception")
                           Toast.makeText(context, "Error uploading photo", Toast.LENGTH_SHORT)
                               .show()
                         })
-                  }
+                  })
             },
-            onFailure = {
+            onFailure = { exception ->
+              Log.e("NewUserScreen", "Error taking photo: $exception")
               Toast.makeText(context, "Error taking photo", Toast.LENGTH_SHORT).show()
             })
       }
-  photoRequester.Init()
+  photoRequester.Init() // Initialize the photoRequester
 
   if (showEditProfile) {
     EditProfileDialog(
@@ -126,8 +147,8 @@ fun UserProfile(
               lastName = it.lastName,
               email = it.email,
               phone = it.phoneNumber,
-              latitude = userData.latitude,
-              longitude = userData.longitude,
+              userData.latitude,
+              userData.longitude,
               picURL = userData.profilePictureUrl)
           showEditProfile = false
           needRecompose = true
@@ -140,80 +161,135 @@ fun UserProfile(
   }
 
   if (showEditPicture.value) {
-    Dialog(onDismissRequest = { showEditPicture.value = false }) {
-      Card(Modifier.padding(PADDING)) {
-        Column(
-            modifier = Modifier.padding(PADDING),
-            horizontalAlignment = Alignment.CenterHorizontally) {
-              Text("Edit Profile Picture")
-              Button(onClick = { photoRequester.requestPhoto() }) { Text("Take Photo") }
-            }
-      }
-    }
-  }
 
-  Scaffold(topBar = topAppBar, bottomBar = bottomAppBar) {
-    Column(modifier = Modifier.fillMaxSize().background(ColorVariable.BackGround).padding(it)) {
-      Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-        IconButton(
-            onClick = { showEditPicture.value = true },
-            modifier = Modifier.size(PROFILE_IMAGE_SIZE).clip(CircleShape)) {
-              if (userData.profilePictureUrl.isEmpty()) {
-                Image(
-                    imageVector = Icons.Rounded.AccountCircle,
-                    contentDescription = "Default profile picture",
-                    modifier = Modifier.size(ICON_SIZE).scale(ICON_SCALE))
-              } else {
-                AsyncImage(
-                    model = userData.profilePictureUrl,
-                    contentDescription = "Profile picture",
-                    modifier = Modifier.fillMaxSize().scale(PICTURE_SCALE).clip(CircleShape))
-              }
-            }
-      }
-
-      Spacer(modifier = Modifier.height(SPACER_HEIGHT_PIC_INFO))
-
-      // User Information
-      LabeledTextUserProfile(
-          label = "Your Name:", value = "${userData.firstName} ${userData.lastName}")
-      LabeledTextUserProfile(label = "Email:", value = userData.email)
-      LabeledTextUserProfile(label = "Phone:", value = userData.phoneNumber)
-      LabeledTextUserProfile(
-          label = "Address:", value = "${userData.latitude}, ${userData.longitude}")
-
-      Spacer(modifier = Modifier.height(SPACER_HEIGHT_INFO_EDIT))
-
-      // Edit Profile Button
-      Button(onClick = { showEditProfile = true }) { Text("Edit Profile") }
-
-      Spacer(modifier = Modifier.height(20.dp))
-
-      // Disconnect Button
-      Button(
-          onClick = {
-            appConfig.userViewModel.disconnectUser()
-            Toast.makeText(context, "Disconnected", Toast.LENGTH_SHORT).show()
-            navigationActions.navigateTo(C.Screen.AUTH)
-          },
-          modifier = Modifier.align(Alignment.CenterHorizontally)) {
-            Text("Disconnect")
+    Dialog(
+        onDismissRequest = { showEditPicture.value = false },
+        properties = DialogProperties(dismissOnBackPress = true, dismissOnClickOutside = true)) {
+          Card(Modifier.testTag(C.Tag.UserProfile.profileImageBox).padding(PADDING)) {
+            Column(
+                Modifier.fillMaxWidth().padding(PADDING),
+                Arrangement.Center,
+                Alignment.CenterHorizontally) {
+                  Text("Edit Profile Picture")
+                  ButtonComponent(
+                      { photoRequester.requestPhoto() },
+                      Modifier.testTag(C.Tag.UserProfile.take_photo)) {
+                        Text("Take Photo")
+                      }
+                }
           }
-
-      // Book List
-      if (isBooksLoading) {
-        CircularProgressIndicator(Modifier.padding(PADDING))
-      } else if (bookListData.value.isEmpty()) {
-        Text("No books available", style = MaterialTheme.typography.bodyLarge)
-      } else {
-        BookListComponent(
-            bookList = bookListData.value,
-            onBookClick = { bookId ->
-              navigationActions.navigateTo("${C.Screen.BOOK_PROFILE}/$bookId")
-            })
-      }
-    }
+        }
   }
+
+  // Scaffold to provide basic UI structure with a top app bar
+  Scaffold(
+      modifier = Modifier.testTag(C.Tag.user_profile_screen_container),
+      topBar = topAppBar,
+      bottomBar = bottomAppBar) {
+        Column(modifier = Modifier.padding(it).fillMaxSize().background(ColorVariable.BackGround)) {
+          Box(
+              modifier = Modifier.fillMaxWidth(), // Ensure the Box takes up the full width
+              contentAlignment = Alignment.Center // Center the content horizontally
+              ) {
+                IconButton(
+                    onClick = { showEditPicture.value = true },
+                    modifier =
+                        Modifier.size(PROFILE_IMAGE_SIZE)
+                            .clip(CircleShape)
+                            .testTag(C.Tag.UserProfile.profileImage)) {
+                      Box(
+                          modifier =
+                              Modifier.padding(ICON_PADDING)
+                                  .border(PICTURE_BORDER_WIDTH, Color(0xFFA98467), CircleShape),
+                          contentAlignment = Alignment.Center) {
+                            // show either the profile picture or the default icon
+                            if (userData.profilePictureUrl.isEmpty()) {
+                              Image(
+                                  imageVector = Icons.Rounded.AccountCircle,
+                                  contentDescription = "No profile picture",
+                                  modifier =
+                                      Modifier
+                                          // .fillMaxSize()
+                                          .size(ICON_SIZE)
+                                          .scale(ICON_SCALE)
+                                          .clipToBounds(),
+                                  colorFilter = ColorFilter.tint(Color(0xFF6C584C)))
+                            } else {
+                              AsyncImage(
+                                  model = userData.profilePictureUrl,
+                                  contentDescription = "profile picture",
+                                  modifier =
+                                      Modifier.fillMaxSize()
+                                          .scale(PICTURE_SCALE)
+                                          .clipToBounds()
+                                          .clip(CircleShape))
+                            }
+                          }
+                      Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopEnd) {
+                        Image(
+                            imageVector = Icons.Outlined.Edit,
+                            contentDescription = "",
+                            colorFilter = ColorFilter.tint(Color(0xFFAAAAAA)))
+                      }
+                    }
+              }
+          Spacer(modifier = Modifier.height(SPACER_HEIGHT_PIC_INFO))
+
+          // Full name text
+          LabeledTextUserProfile(
+              testTag = C.Tag.OtherUserProfile.fullname,
+              label = "Your name:",
+              value = "${userData.greeting} ${userData.firstName} ${userData.lastName}")
+
+          // Email text
+          LabeledTextUserProfile(
+              testTag = C.Tag.OtherUserProfile.email, label = "Your email:", value = userData.email)
+
+          // Phone number text
+          LabeledTextUserProfile(
+              testTag = C.Tag.OtherUserProfile.phone,
+              label = "Your phone:",
+              value = userData.phoneNumber)
+          // User address:
+          LabeledTextUserProfile(
+              testTag = C.Tag.OtherUserProfile.address, label = "Your address:", value = addressStr)
+
+          Spacer(modifier = Modifier.height(SPACER_HEIGHT_INFO_EDIT))
+
+          // Edit Button
+          ButtonComponent(
+              { showEditProfile = true },
+              Modifier.testTag(C.Tag.UserProfile.edit).align(Alignment.CenterHorizontally)) {
+                Text("Edit Profile")
+              }
+          // Disconnect Button
+          Button(
+              onClick = {
+                appConfig.userViewModel.disconnectUser()
+                Toast.makeText(context, "Disconnected", Toast.LENGTH_SHORT).show()
+                navigationActions.navigateTo(C.Screen.AUTH)
+              },
+              modifier = Modifier.align(Alignment.CenterHorizontally)) {
+                Text("Disconnect")
+              }
+          // Book List
+          if (isBooksLoading) {
+            Log.i("UserProfileScreen", "Books are loading")
+            CircularProgressIndicator(modifier = Modifier.padding(PADDING))
+          } else if (bookListData.value.isEmpty()) {
+            Log.e("UserProfileScreen", "No books available")
+            Text("No books available", style = MaterialTheme.typography.bodyLarge)
+          } else {
+            Log.i("UserProfileScreen", "Displaying book list")
+            BookListComponent(
+                modifier = Modifier.fillMaxWidth().padding(PADDING),
+                bookList = bookListData.value,
+                onBookClick = { bookId ->
+                  navigationActions.navigateTo("${C.Screen.BOOK_PROFILE}/$bookId")
+                })
+          }
+        }
+      }
 }
 
 /** Constant * */

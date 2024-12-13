@@ -1,7 +1,6 @@
 package com.android.bookswap.ui.books.edit
 
 import android.util.Log
-import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Spacer
@@ -40,10 +39,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.android.bookswap.data.BookGenres
+import com.android.bookswap.data.BookLanguages
 import com.android.bookswap.data.DataBook
-import com.android.bookswap.data.repository.BooksRepository
+import com.android.bookswap.model.edit.EditBookViewModel
 import com.android.bookswap.resources.C
-import com.android.bookswap.ui.books.add.createDataBook
 import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.theme.ColorVariable
 import java.util.UUID
@@ -56,14 +55,14 @@ private const val COLUMN_WIDTH_RATIO = 0.9f // Column width as 90% of screen wid
 /**
  * Composable function to display the Edit Book screen.
  *
- * @param booksRepository The repository to interact with the book data.
+ * @param viewModel Manages the updating and deleting of the books
  * @param navigationActions The navigation actions to handle navigation events.
  * @param bookUUID The uuid of the book data to be edited.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditBookScreen(
-    booksRepository: BooksRepository,
+    viewModel: EditBookViewModel,
     navigationActions: NavigationActions,
     bookUUID: UUID
 ) {
@@ -76,9 +75,9 @@ fun EditBookScreen(
 
   // Request book when screen load
   LaunchedEffect(Unit) {
-    booksRepository.getBook(
+    viewModel.getBook(
         uuid = bookUUID,
-        OnSucess = { resultBook -> bookMutable = resultBook },
+        onSuccess = { resultBook -> bookMutable = resultBook },
         onFailure = { Log.e("EditScreen", "Error while loading the book") })
   }
 
@@ -270,62 +269,27 @@ fun EditBookScreen(
                   item {
                     Button(
                         onClick = {
-                          try {
-                            if (title.isBlank())
-                                throw IllegalArgumentException("Title cannot be null or blank")
-                            if (author.isBlank())
-                                throw IllegalArgumentException("Author cannot be null or blank")
-                            if (description.isBlank())
-                                throw IllegalArgumentException(
-                                    "Description cannot be null or blank")
-                            if (rating.isBlank())
-                                throw IllegalArgumentException("Rating cannot be null or blank")
-                            if (photo.isBlank())
-                                throw IllegalArgumentException("Photo cannot be null or blank")
-                            if (language.isBlank())
-                                throw IllegalArgumentException("Language cannot be null or blank")
-                            if (book.isbn.isNullOrBlank())
-                                throw IllegalArgumentException("ISBN cannot be null or blank")
-                            if (genres.isEmpty())
-                                throw IllegalArgumentException("Genres cannot be empty")
-
-                            val updatedBook =
-                                createDataBook(
-                                    context = context,
-                                    uuid = book.uuid,
-                                    title = title,
-                                    author = author,
-                                    description = description,
-                                    ratingStr = rating,
-                                    photo = photo,
-                                    bookLanguageStr = language,
-                                    isbn = book.isbn,
-                                    genres = genres,
-                                    userId = book.userId,
-                                )
-
-                            booksRepository.updateBook(
-                                updatedBook!!,
-                                callback = { result ->
-                                  if (result.isSuccess) {
-                                    // Fetch the updated book data from Firestore
-                                    // booksRepository.getBook(updatedBook.uuid) {
-                                    // updatedBookFromFirestore ->
-                                    // createdBook.value = updatedBookFromFirestore
-                                    navigationActions.goBack()
-                                  } else {
-                                    Toast.makeText(
-                                            context, "Failed to update book.", Toast.LENGTH_SHORT)
-                                        .show()
-                                  }
-                                })
-                          } catch (e: Exception) {
-                            Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_SHORT)
-                                .show()
-                          }
+                          viewModel.updateDataBook(
+                              context,
+                              book.uuid,
+                              title,
+                              author,
+                              description,
+                              rating,
+                              photo,
+                              enumValues<BookLanguages>().firstOrNull { it.name == language }
+                                  ?: BookLanguages.OTHER,
+                              book.isbn ?: "",
+                              selectedGenre?.let { listOf(it) } ?: listOf(BookGenres.OTHER),
+                              book.archived,
+                              book.exchange)
                         },
                         modifier = Modifier.fillMaxWidth().testTag(C.Tag.EditBook.save),
-                        enabled = title.isNotBlank(),
+                        enabled =
+                            title.isNotBlank() &&
+                                author.isNotBlank() &&
+                                enumValues<BookLanguages>().firstOrNull { it.name == language } !=
+                                    null,
                         colors =
                             ButtonDefaults.buttonColors(containerColor = ColorVariable.Primary)) {
                           Text("Save", color = Color.White)
@@ -334,20 +298,7 @@ fun EditBookScreen(
 
                   item {
                     Button(
-                        onClick = {
-                          booksRepository.deleteBooks(
-                              book.uuid,
-                              book,
-                              callback = { result ->
-                                if (result.isSuccess) {
-                                  navigationActions.goBack()
-                                } else {
-                                  Toast.makeText(
-                                          context, "Failed to delete book.", Toast.LENGTH_SHORT)
-                                      .show()
-                                }
-                              })
-                        },
+                        onClick = { viewModel.deleteBook(context, book.uuid) },
                         modifier = Modifier.fillMaxWidth().testTag(C.Tag.EditBook.delete),
                         colors =
                             ButtonDefaults.buttonColors(containerColor = ColorVariable.Primary)) {

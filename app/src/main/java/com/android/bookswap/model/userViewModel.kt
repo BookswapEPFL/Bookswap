@@ -1,9 +1,14 @@
 package com.android.bookswap.model
 
+import android.content.Context
+import android.location.Address
+import android.location.Geocoder
+import android.os.Build
 import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.android.bookswap.data.DataUser
 import com.android.bookswap.data.repository.UsersRepository
 import com.android.bookswap.data.source.network.UserFirestoreSource
@@ -11,8 +16,11 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
 import java.util.UUID
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 /**
  * ViewModel for the user data of the application.
@@ -29,6 +37,7 @@ open class UserViewModel(
   private val _isStored = MutableStateFlow<Boolean?>(null)
   val isStored: StateFlow<Boolean?> = _isStored
   private val userRepository: UsersRepository = repository
+  val addressStr = MutableStateFlow("")
 
   open fun getUser(force: Boolean = false): DataUser {
     if (!isLoaded || force) {
@@ -120,16 +129,44 @@ open class UserViewModel(
     dataUser.googleUid = googleUid
     updateUser(dataUser)
   }
+
+  fun updateAddress(latitude: Double, longitude: Double, context: Context) {
+    dataUser.latitude = latitude
+    dataUser.longitude = longitude
+    val handleAddresses: (MutableList<Address>?) -> Unit = {
+      if (!it.isNullOrEmpty()) {
+        addressStr.value =
+            it.first().let {
+              var s = ""
+              for (i in 0..it.maxAddressLineIndex) {
+                s += (it.getAddressLine(i))
+              }
+              s
+            }
+      }
+    }
+
+    viewModelScope.launch {
+      val geocoder = Geocoder(context)
+      val geocodeListener = Geocoder.GeocodeListener(handleAddresses)
+      withContext(Dispatchers.IO) {
+        // Perform geocoding on a background thread
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+          geocoder.getFromLocation(latitude, longitude, 1, geocodeListener)
+        } else {
+          handleAddresses(geocoder.getFromLocation(latitude, longitude, 1))
+        }
+      }
+    }
+  }
   /**
    * Disconnect the current user by resetting the user data and UUID. This method sets the user data
-   * to a new `DataUser` instance with a new UUID, marks the user as not loaded, and updates the
+   * to a new DataUser instance with a new UUID, marks the user as not loaded, and updates the
    * stored state to false.
    */
   fun disconnectUser() {
     this.dataUser = DataUser(UUID.randomUUID())
     this.uuid = UUID.randomUUID()
-    isLoaded = false
-    _isStored.value = false
     Firebase.auth.signOut()
   }
 }

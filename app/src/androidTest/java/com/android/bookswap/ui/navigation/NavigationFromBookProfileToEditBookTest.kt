@@ -17,16 +17,21 @@ import com.android.bookswap.data.BookGenres
 import com.android.bookswap.data.BookLanguages
 import com.android.bookswap.data.DataBook
 import com.android.bookswap.data.repository.BooksRepository
+import com.android.bookswap.data.repository.UsersRepository
 import com.android.bookswap.model.AppConfig
 import com.android.bookswap.model.LocalAppConfig
 import com.android.bookswap.model.UserViewModel
+import com.android.bookswap.model.edit.EditBookViewModel
 import com.android.bookswap.resources.C
 import com.android.bookswap.ui.books.BookProfileScreen
 import com.android.bookswap.ui.books.edit.EditBookScreen
 import io.mockk.coEvery
 import io.mockk.every
+import io.mockk.just
 import io.mockk.mockk
+import io.mockk.runs
 import java.util.UUID
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -35,15 +40,19 @@ import org.junit.runner.RunWith
 class NavigationFromBookProfileToEditBookTest {
 
   @get:Rule val composeTestRule = createComposeRule()
+  private lateinit var mockUserRepository: UsersRepository
+  private lateinit var userVM: UserViewModel
+  private lateinit var mockBookRepo: BooksRepository
+  private val currentUserId: UUID = UUID.randomUUID()
+  private val testBookId: UUID = UUID.randomUUID()
+  private val bookUserId: UUID = UUID.randomUUID()
+  private lateinit var testBookOwner: DataBook
+  private lateinit var testBookOther: DataBook
+  private lateinit var mockEditVM: EditBookViewModel
 
-  @Test
-  fun EditBookScreen_allows_editing_when_currentUser_is_bookUser() {
-    // Arrange
-    val currentUserId = UUID.randomUUID()
-    val mockUserViewModel: UserViewModel = mockk()
-    every { mockUserViewModel.uuid } returns currentUserId
-    val testBookId = UUID.randomUUID()
-    val testBook =
+  @Before
+  fun setUp() {
+    testBookOwner =
         DataBook(
             testBookId,
             "Original Title",
@@ -57,37 +66,53 @@ class NavigationFromBookProfileToEditBookTest {
             currentUserId,
             false,
             false)
+    testBookOther = testBookOwner.copy(userId = bookUserId)
 
-    val mockBookRepo = mockk<BooksRepository>(relaxed = true)
+    mockEditVM = mockk(relaxed = true)
+    every { mockEditVM.deleteBook(any(), any()) } just runs
+    every {
+      mockEditVM.updateDataBook(
+          any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any())
+    } just runs
+    every { mockEditVM.getBook(any(), any(), any()) } answers
+        {
+          secondArg<(DataBook) -> Unit>()(testBookOwner)
+        }
+    mockUserRepository = mockk()
+    userVM = UserViewModel(currentUserId, mockUserRepository)
+    mockBookRepo = mockk<BooksRepository>(relaxed = true)
+
+    every { mockUserRepository.getUser(currentUserId, any()) } answers { currentUserId }
+    every { userVM.getUser().userUUID } returns currentUserId
+  }
+
+  @Test
+  fun EditBookScreen_allows_editing_when_currentUser_is_bookUser() {
+    // Arrange
     coEvery { mockBookRepo.getBook(eq(testBookId), any(), any()) } answers
         {
           val onSuccess = secondArg<(DataBook) -> Unit>()
-          onSuccess(testBook)
+          onSuccess(testBookOwner)
         }
 
     composeTestRule.setContent {
       val navController = rememberNavController()
-      CompositionLocalProvider(
-          LocalAppConfig provides AppConfig(userViewModel = mockUserViewModel)) {
-            // Add a NavHost to handle navigation
-            NavHost(navController, C.Screen.BOOK_PROFILE) {
-              composable(C.Screen.BOOK_PROFILE) {
-                BookProfileScreen(testBookId, mockBookRepo, NavigationActions(navController))
-              }
-              composable("${C.Screen.EDIT_BOOK}/{bookUUID}") { backStackEntry ->
-                val bookUUID =
-                    backStackEntry.arguments?.getString("bookUUID")?.let { UUID.fromString(it) }
-                if (bookUUID != null) {
-                  EditBookScreen(mockBookRepo, NavigationActions(navController), bookUUID)
-                }
-              }
+      CompositionLocalProvider(LocalAppConfig provides AppConfig(userViewModel = userVM)) {
+        // Add a NavHost to handle navigation
+        NavHost(navController, C.Screen.BOOK_PROFILE) {
+          composable(C.Screen.BOOK_PROFILE) {
+            BookProfileScreen(testBookId, mockBookRepo, NavigationActions(navController))
+          }
+          composable("${C.Screen.EDIT_BOOK}/{bookUUID}") { backStackEntry ->
+            val bookUUID =
+                backStackEntry.arguments?.getString("bookUUID")?.let { UUID.fromString(it) }
+            if (bookUUID != null) {
+              EditBookScreen(mockEditVM, NavigationActions(navController), bookUUID)
             }
           }
+        }
+      }
     }
-    // This is juste temporary as when Matias will do the MainActivity part for the navigation
-    // from the Profile to the BookProfile then I will finish the navigation in the main from the
-    // BookProfile to the EditBook
-
     // Act & Assert
     // Assert that the book title is displayed, i.e. the top of the scrollable column is shown
     composeTestRule.onNodeWithTag(C.Tag.BookProfile.title).assertExists()
@@ -96,18 +121,21 @@ class NavigationFromBookProfileToEditBookTest {
     // Scrolls to the end of the column
     composeTestRule
         .onNodeWithTag(C.Tag.BookProfile.scrollable)
-        .performScrollToNode(hasTestTag(C.Tag.BookProfile.scrollable_end))
+        .performScrollToNode(hasTestTag(C.Tag.BookProfile.edit))
 
     // Assert that the Edit Button is displayed
     composeTestRule.onNodeWithTag(C.Tag.BookProfile.edit).assertExists()
     composeTestRule.onNodeWithTag(C.Tag.BookProfile.edit).assertIsDisplayed()
+    composeTestRule.onNodeWithTag(C.Tag.BookProfile.edit).assertTextEquals("Edit Book")
 
     // Click the Edit Button and navigate to EditBookScreen
     composeTestRule.onNodeWithTag(C.Tag.BookProfile.edit).performClick()
 
     // Verify book information on EditBookScreen
     composeTestRule.onNodeWithTag(C.Tag.EditBook.title).assertIsDisplayed()
-    composeTestRule.onNodeWithTag(C.Tag.EditBook.title).assertTextEquals(testBook.title, "Title")
+    composeTestRule
+        .onNodeWithTag(C.Tag.EditBook.title)
+        .assertTextEquals(testBookOwner.title, "Title")
 
     // composeTestRule.onNodeWithTag("inputBookDescription").assertTextEquals("Original
     // Description")
@@ -124,50 +152,32 @@ class NavigationFromBookProfileToEditBookTest {
     coEvery { mockBookRepo.getBook(eq(testBookId), any(), any()) } answers
         {
           val onSuccess = secondArg<(DataBook) -> Unit>()
-          onSuccess(testBook.copy(title = "Updated Title"))
+          onSuccess(testBookOwner.copy(title = "Updated Title"))
         }
   }
 
   @Test
   fun EditButton_is_not_displayed_when_currentUser_is_different_from_bookUser() {
     // Arrange
-    val currentUserId = UUID.randomUUID()
-    val bookUserId = UUID.randomUUID()
-    val testBookId = UUID.randomUUID()
-    val testBook =
-        DataBook(
-            testBookId,
-            "A Book",
-            "Author",
-            "Description",
-            4,
-            null,
-            BookLanguages.ENGLISH,
-            "1234567890",
-            listOf(BookGenres.FICTION),
-            bookUserId,
-            false,
-            false // Different from currentUserId
-            )
-
-    val mockBookRepo = mockk<BooksRepository>(relaxed = true)
     coEvery { mockBookRepo.getBook(eq(testBookId), any(), any()) } answers
         {
           val onSuccess = secondArg<(DataBook) -> Unit>()
-          onSuccess(testBook)
+          onSuccess(testBookOther)
         }
 
     // Act
     composeTestRule.setContent {
       val navController = rememberNavController()
       val navigationActions = NavigationActions(navController)
-      BookProfileScreen(testBookId, mockBookRepo, navigationActions)
+      CompositionLocalProvider(LocalAppConfig provides AppConfig(userViewModel = userVM)) {
+        BookProfileScreen(testBookId, mockBookRepo, navigationActions)
+      }
     }
 
     composeTestRule
         .onNodeWithTag(C.Tag.BookProfile.scrollable)
-        .performScrollToNode(hasTestTag(C.Tag.BookProfile.scrollable_end))
+        .performScrollToNode(hasTestTag(C.Tag.BookProfile.edit))
     // Assert
-    composeTestRule.onNodeWithTag(C.Tag.BookProfile.edit).assertDoesNotExist()
+    composeTestRule.onNodeWithTag(C.Tag.BookProfile.edit).assertTextEquals("Go to User")
   }
 }
