@@ -60,11 +60,11 @@ private val SPACER_HEIGHT_PIC_INFO = 6.dp
 /**
  * Composable function to display the user profile screen.
  *
- * @param userVM The ViewModel containing user data. Defaults to a new UserViewModel instance.
- * @param topAppBar A composable function to display the top app bar. Defaults to an empty
- *   composable.
- * @param bottomAppBar A composable function to display the bottom app bar. Defaults to an empty
- *   composable.
+ * @param photoStorage The repository for storing photos.
+ * @param booksRepository The repository for managing books.
+ * @param userBookViewModel The ViewModel containing user book data. Defaults to a new
+ *   UserBookViewModel instance.
+ * @param navigationActions The navigation actions for navigating between screens.
  */
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable

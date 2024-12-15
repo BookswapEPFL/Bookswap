@@ -36,7 +36,14 @@ import com.android.bookswap.ui.components.FieldComponent
 import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.theme.ColorVariable
 
-/** This is the main screen for the chat feature. It displays the list of messages */
+/**
+ * Displays the screen for adding a new book by ISBN.
+ *
+ * @param navigationActions Actions for navigating between screens.
+ * @param booksRepository The repository for managing book data.
+ * @param topAppBar A composable function for the top app bar.
+ * @param bottomAppBar A composable function for the bottom app bar.
+ */
 @Composable
 fun AddISBNScreen(
     navigationActions: NavigationActions,

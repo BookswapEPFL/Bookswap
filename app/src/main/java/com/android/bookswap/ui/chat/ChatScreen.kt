@@ -80,11 +80,14 @@ import java.util.UUID
 /**
  * Composable function for the chat screen.
  *
+ * @param userSource Repository for handling user data.
  * @param messageRepository Repository for handling messages.
  * @param currentUser The current user data.
  * @param otherUser The other user data.
  * @param navController Navigation actions for navigating between screens.
  * @param photoStorage Repository for handling photo storage.
+ *     @param messageStorage Repository for handling offline message storage.
+ *     @param context The context of the application.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -403,6 +406,7 @@ fun ChatScreen(
  * @param message The message data to display.
  * @param currentUserUUID The UUID of the current user.
  * @param onLongPress Callback function to handle long press on the message item.
+ * @param chatScreenViewModel The ViewModel for the chat screen.
  */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
