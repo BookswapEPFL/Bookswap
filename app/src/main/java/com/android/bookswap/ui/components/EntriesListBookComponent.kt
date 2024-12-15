@@ -34,6 +34,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.core.text.isDigitsOnly
 import com.android.bookswap.R
 import com.android.bookswap.data.BookGenres
 import com.android.bookswap.data.BookLanguages
@@ -41,11 +42,17 @@ import com.android.bookswap.data.repository.PhotoFirebaseStorageRepository
 import com.android.bookswap.model.InputVerification
 import com.android.bookswap.model.PhotoRequester
 import com.android.bookswap.resources.C
+import com.android.bookswap.ui.MAXLENGTHAUTHOR
+import com.android.bookswap.ui.MAXLENGTHDESCRIPTION
+import com.android.bookswap.ui.MAXLENGTHISBN
+import com.android.bookswap.ui.MAXLENGTHTITLE
 import com.android.bookswap.ui.theme.ColorVariable.BackGround
 import java.util.UUID
 
 private const val HORIZONTAL_PADDING = 30
 private const val BUTTON_HEIGHT = 56
+private const val DESCRIPTION_MAX_LINE = 5
+private const val GENRES_MAX_LINE = 3
 
 /** Composable function to display entry fields for a book.(add or edit) */
 @OptIn(ExperimentalMaterial3Api::class)
@@ -63,8 +70,6 @@ fun EntriesListBookComponent(
     photoStorage: PhotoFirebaseStorageRepository,
     buttons: @Composable (modifier: Modifier) -> Unit
 ) {
-  val verifier = InputVerification()
-
     val screenWidth = LocalConfiguration.current.screenWidthDp
 
   var expanded by remember { mutableStateOf(false) }
@@ -107,13 +112,14 @@ fun EntriesListBookComponent(
         // Title Input Field
         item {
           FieldComponent(
-              onValueChange = { title.value = it },
+              onValueChange = { if (it.length <= MAXLENGTHTITLE) title.value = it },
               modifier =
                   Modifier.testTag(C.Tag.BookEntryComp.title_field)
                       .fillMaxWidth()
                       .padding(horizontal = HORIZONTAL_PADDING.dp),
               value = title.value,
-              label = { Text(text = stringResource(R.string.label_title)) })
+              label = { Text(text = stringResource(R.string.label_title)) },
+              singleLine = true)
         }
 
         // Genres Dropdown
@@ -169,41 +175,40 @@ fun EntriesListBookComponent(
         // Author Input Field
         item {
           FieldComponent(
-              onValueChange = { author.value = it },
+              onValueChange = {if (it.length <= MAXLENGTHAUTHOR) author.value = it },
               modifier =
                   Modifier.testTag(C.Tag.BookEntryComp.author_field)
                       .fillMaxWidth()
                       .padding(horizontal = HORIZONTAL_PADDING.dp),
               value = author.value,
-              label = { Text(text = stringResource(R.string.label_author)) })
+              label = { Text(text = stringResource(R.string.label_author)) },
+              singleLine = true)
         }
 
         // Description Input Field
         item {
           FieldComponent(
-              onValueChange = { description.value = it },
+              onValueChange = { if (it.length <= MAXLENGTHDESCRIPTION) description.value = it },
               modifier =
                   Modifier.testTag(C.Tag.BookEntryComp.description_field)
                       .fillMaxWidth()
                       .padding(horizontal = HORIZONTAL_PADDING.dp),
               value = description.value,
-              label = { Text(text = stringResource(R.string.label_description)) })
+              label = { Text(text = stringResource(R.string.label_description)) },
+              maxLines = DESCRIPTION_MAX_LINE)
         }
 
         // ISBN Input Field
         item {
           FieldComponent(
-              onValueChange = {
-                if (verifier.testIsbn(it)) {
-                  isbn.value = it
-                }
-              },
+              onValueChange = { if (it.length <= MAXLENGTHISBN && it.all { char -> char.isDigit() || char == '-' }) isbn.value = it },
               modifier =
                   Modifier.testTag(C.Tag.BookEntryComp.isbn_field)
                       .fillMaxWidth()
                       .padding(horizontal = HORIZONTAL_PADDING.dp),
               value = isbn.value,
-              label = { Text(text = stringResource(R.string.label_isbn)) })
+              label = { Text(text = stringResource(R.string.label_isbn)) },
+              singleLine = true)
         }
 
         // Language Dropdown
@@ -223,7 +228,8 @@ fun EntriesListBookComponent(
                     modifier =
                         Modifier.menuAnchor()
                             .fillMaxWidth()
-                            .testTag(C.Tag.BookEntryComp.language_field))
+                            .testTag(C.Tag.BookEntryComp.language_field),
+                    maxLines = GENRES_MAX_LINE)
                 ExposedDropdownMenu(
                     expanded = expandedLanguage,
                     onDismissRequest = { expandedLanguage = false },
