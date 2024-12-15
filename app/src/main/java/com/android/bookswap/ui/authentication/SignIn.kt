@@ -81,11 +81,11 @@ fun SignInScreen(navigationActions: NavigationActions) {
             appConfig.userViewModel.getUserByGoogleUid(googleUid)
             Log.d("SignInScreen", "isStored: ${appConfig.userViewModel.isStored}")
             Log.d("SignInScreen", "User signed in: $googleUserName")
-            Toast.makeText(context, "Welcome $googleUserName!", Toast.LENGTH_LONG).show()
+            Toast.makeText(context, context.resources.getString(R.string.sign_in_toast_welcome) +" $googleUserName!", Toast.LENGTH_LONG).show()
           },
           onAuthError = {
             Log.e("SignInScreen", "Failed to sign in: ${it.statusCode}")
-            Toast.makeText(context, "Login Failed!", Toast.LENGTH_LONG).show()
+            Toast.makeText(context, context.resources.getString(R.string.sign_in_toast_login_failed), Toast.LENGTH_LONG).show()
           })
   val token = stringResource(R.string.default_web_client_id)
 
@@ -121,7 +121,7 @@ fun SignInScreen(navigationActions: NavigationActions) {
           // First part of the title:
           Text(
               modifier = Modifier.testTag(C.Tag.TopAppBar.screen_title),
-              text = "Welcome to",
+              text = stringResource(R.string.sign_in_screen_welcome),
               style =
                   TextStyle(
                       fontSize = 40.sp,
@@ -137,7 +137,7 @@ fun SignInScreen(navigationActions: NavigationActions) {
           // Second part of the logo:
           Text(
               modifier = Modifier.testTag(C.Tag.SignIn.app_name),
-              text = "BookSwap",
+              text = stringResource(R.string.sign_in_screen_app_name),
               style =
                   TextStyle(
                       fontSize = 60.sp,
@@ -199,7 +199,7 @@ fun GoogleSignInButton(onSignInClick: () -> Unit) {
 
               // Text for the button
               Text(
-                  text = "Sign in with Google",
+                  text = stringResource(R.string.sign_in_button_google), // Button text
                   color = ColorVariable.Accent, // Text color
                   fontSize = 16.sp, // Font size
                   fontWeight = FontWeight.Medium)

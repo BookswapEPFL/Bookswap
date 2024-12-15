@@ -30,10 +30,12 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import coil.compose.AsyncImage
+import com.android.bookswap.R
 import com.android.bookswap.data.DataBook
 import com.android.bookswap.data.repository.BooksRepository
 import com.android.bookswap.data.repository.PhotoFirebaseStorageRepository
@@ -122,14 +124,14 @@ fun UserProfile(
                         },
                         onFailure = { exception ->
                           Log.e("NewUserScreen", "Error uploading photo: $exception")
-                          Toast.makeText(context, "Error uploading photo", Toast.LENGTH_SHORT)
+                          Toast.makeText(context, context.getString(R.string.new_user_toast_error_upload), Toast.LENGTH_SHORT)
                               .show()
                         })
                   })
             },
             onFailure = { exception ->
               Log.e("NewUserScreen", "Error taking photo: $exception")
-              Toast.makeText(context, "Error taking photo", Toast.LENGTH_SHORT).show()
+              Toast.makeText(context, context.getString(R.string.new_user_toast_error_taking), Toast.LENGTH_SHORT).show()
             })
       }
   photoRequester.Init() // Initialize the photoRequester
@@ -170,11 +172,11 @@ fun UserProfile(
                 Modifier.fillMaxWidth().padding(PADDING),
                 Arrangement.Center,
                 Alignment.CenterHorizontally) {
-                  Text("Edit Profile Picture")
+                  Text(stringResource(R.string.user_profile_edit_picture))
                   ButtonComponent(
                       { photoRequester.requestPhoto() },
                       Modifier.testTag(C.Tag.UserProfile.take_photo)) {
-                        Text("Take Photo")
+                        Text(stringResource(R.string.user_profile_take_photo))
                       }
                 }
           }
@@ -238,21 +240,21 @@ fun UserProfile(
           // Full name text
           LabeledTextUserProfile(
               testTag = C.Tag.OtherUserProfile.fullname,
-              label = "Your name:",
+              label = stringResource(R.string.user_profile_your_name),
               value = "${userData.greeting} ${userData.firstName} ${userData.lastName}")
 
           // Email text
           LabeledTextUserProfile(
-              testTag = C.Tag.OtherUserProfile.email, label = "Your email:", value = userData.email)
+              testTag = C.Tag.OtherUserProfile.email, label = stringResource(R.string.user_profile_your_email), value = userData.email)
 
           // Phone number text
           LabeledTextUserProfile(
               testTag = C.Tag.OtherUserProfile.phone,
-              label = "Your phone:",
+              label = stringResource(R.string.user_profile_your_phone),
               value = userData.phoneNumber)
           // User address:
           LabeledTextUserProfile(
-              testTag = C.Tag.OtherUserProfile.address, label = "Your address:", value = addressStr)
+              testTag = C.Tag.OtherUserProfile.address, label = stringResource(R.string.user_profile_your_address), value = addressStr)
 
           Spacer(modifier = Modifier.height(SPACER_HEIGHT_INFO_EDIT))
 
@@ -260,7 +262,7 @@ fun UserProfile(
           ButtonComponent(
               { showEditProfile = true },
               Modifier.testTag(C.Tag.UserProfile.edit).align(Alignment.CenterHorizontally)) {
-                Text("Edit Profile")
+                Text(stringResource(R.string.user_profile_edit))
               }
 
           // Book List
@@ -269,7 +271,7 @@ fun UserProfile(
             CircularProgressIndicator(modifier = Modifier.padding(PADDING))
           } else if (bookListData.value.isEmpty()) {
             Log.e("UserProfileScreen", "No books available")
-            Text("No books available", style = MaterialTheme.typography.bodyLarge)
+            Text(stringResource(R.string.user_profile_no_books), style = MaterialTheme.typography.bodyLarge)
           } else {
             Log.i("UserProfileScreen", "Displaying book list")
             BookListComponent(
