@@ -79,7 +79,10 @@ fun AddISBNScreen(
                                 isbn, appConfig.userViewModel.getUser().userUUID) { result ->
                                   if (result.isFailure) {
                                     Toast.makeText(
-                                            context, context.resources.getString(R.string.add_isbn_toast_search_unsuccessful), Toast.LENGTH_LONG)
+                                            context,
+                                            context.resources.getString(
+                                                R.string.add_isbn_toast_search_unsuccessful),
+                                            Toast.LENGTH_LONG)
                                         .show()
                                     Log.e("AddBook", result.exceptionOrNull().toString())
                                   } else {
@@ -106,7 +109,11 @@ fun AddISBNScreen(
                                   }
                                 }
                           } else {
-                            Toast.makeText(context, context.resources.getString(R.string.add_isbn_toast_invalid), Toast.LENGTH_LONG).show()
+                            Toast.makeText(
+                                    context,
+                                    context.resources.getString(R.string.add_isbn_toast_invalid),
+                                    Toast.LENGTH_LONG)
+                                .show()
                           }
                         }) {
                           Row(verticalAlignment = Alignment.CenterVertically) {

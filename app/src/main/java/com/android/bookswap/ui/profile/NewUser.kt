@@ -114,14 +114,21 @@ fun NewUserScreen(
                         onSuccess = { url -> profilPicture.value = url },
                         onFailure = { exception ->
                           Log.e("NewUserScreen", "Error uploading photo: $exception")
-                          Toast.makeText(context, context.getString(R.string.new_user_toast_error_upload), Toast.LENGTH_SHORT)
+                          Toast.makeText(
+                                  context,
+                                  context.getString(R.string.new_user_toast_error_upload),
+                                  Toast.LENGTH_SHORT)
                               .show()
                         })
                   })
             },
             onFailure = { exception ->
               Log.e("NewUserScreen", "Error taking photo: $exception")
-              Toast.makeText(context, context.getString(R.string.new_user_toast_error_taking), Toast.LENGTH_SHORT).show()
+              Toast.makeText(
+                      context,
+                      context.getString(R.string.new_user_toast_error_taking),
+                      Toast.LENGTH_SHORT)
+                  .show()
             })
       }
   photoRequester.Init() // This is the initialization of the photo requester
@@ -195,7 +202,9 @@ fun NewUserScreen(
                               .fillMaxWidth()
                               .padding(TEXT_PADDING),
                           label = { Text(stringResource(R.string.edit_profile_greeting)) },
-                          placeholder = { Text(stringResource(R.string.edit_profile_mr), Modifier, Color.Gray) },
+                          placeholder = {
+                            Text(stringResource(R.string.edit_profile_mr), Modifier, Color.Gray)
+                          },
                           keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                           singleLine = true)
 
@@ -206,7 +215,9 @@ fun NewUserScreen(
                               .fillMaxWidth()
                               .padding(TEXT_PADDING),
                           label = { Text(stringResource(R.string.edit_profile_firstname)) },
-                          placeholder = { Text(stringResource(R.string.edit_profile_john), Modifier, Color.Gray) },
+                          placeholder = {
+                            Text(stringResource(R.string.edit_profile_john), Modifier, Color.Gray)
+                          },
                           keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                           singleLine = true,
                           isError =
@@ -226,7 +237,9 @@ fun NewUserScreen(
                               .fillMaxWidth()
                               .padding(TEXT_PADDING),
                           label = { Text(stringResource(R.string.edit_profile_lastname)) },
-                          placeholder = { Text(stringResource(R.string.edit_profile_Doe), Modifier, Color.Gray) },
+                          placeholder = {
+                            Text(stringResource(R.string.edit_profile_Doe), Modifier, Color.Gray)
+                          },
                           keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                           singleLine = true,
                           isError = !verification.validateNonEmpty(lastName.value) && !firstAttempt)
@@ -245,7 +258,12 @@ fun NewUserScreen(
                               .fillMaxWidth()
                               .padding(TEXT_PADDING),
                           label = { Text(stringResource(R.string.edit_profile_email)) },
-                          placeholder = { Text(stringResource(R.string.edit_profile_email_example), Modifier, Color.Gray) },
+                          placeholder = {
+                            Text(
+                                stringResource(R.string.edit_profile_email_example),
+                                Modifier,
+                                Color.Gray)
+                          },
                           keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                           singleLine = true,
                           isError = !verification.validateEmail(email.value) && !firstAttempt)
@@ -264,7 +282,12 @@ fun NewUserScreen(
                               .fillMaxWidth()
                               .padding(TEXT_PADDING),
                           label = { Text(stringResource(R.string.edit_profile_phone)) },
-                          placeholder = { Text(stringResource(R.string.edit_profile_phone_example), Modifier, Color.Gray) },
+                          placeholder = {
+                            Text(
+                                stringResource(R.string.edit_profile_phone_example),
+                                Modifier,
+                                Color.Gray)
+                          },
                           keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
                           singleLine = true,
                           isError = !verification.validatePhone(phone.value) && !firstAttempt)
@@ -298,7 +321,11 @@ fun NewUserScreen(
                     navigationActions.navigateTo(C.Route.MAP)
                   } else {
                     firstAttempt = false
-                    Toast.makeText(context, context.getString(R.string.new_user_toast_correct_error), Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                            context,
+                            context.getString(R.string.new_user_toast_correct_error),
+                            Toast.LENGTH_SHORT)
+                        .show()
                   }
                 },
                 colors = ButtonDefaults.buttonColors(ColorVariable.Primary),

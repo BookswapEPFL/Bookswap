@@ -271,7 +271,9 @@ class MainActivity : ComponentActivity() {
                       userId = userId,
                       booksRepository = bookRepository,
                       navigationActions = navigationActions,
-                      topAppBar = { topAppBar(stringResource(R.string.other_user_profile_screen_title)) },
+                      topAppBar = {
+                        topAppBar(stringResource(R.string.other_user_profile_screen_title))
+                      },
                       bottomAppBar = { bottomAppBar(this@navigation.route ?: "") })
                 } else {
                   Log.e("Navigation", "Invalid userId passed to OthersUserProfileScreen")

@@ -154,7 +154,9 @@ fun OthersUserProfileScreen(
 
                 // Email:
                 LabeledText(
-                    testTag = C.Tag.OtherUserProfile.email, label = stringResource(R.string.user_profile_email), value = user.email)
+                    testTag = C.Tag.OtherUserProfile.email,
+                    label = stringResource(R.string.user_profile_email),
+                    value = user.email)
 
                 // Phone Number:
                 LabeledText(
@@ -184,7 +186,9 @@ fun OthersUserProfileScreen(
                     onClick = {
                       navigationActions.navigateTo(C.Screen.CHAT, user.userUUID.toString())
                     }) {
-                      Text(stringResource(R.string.user_profile_message_with_button) + user.firstName )
+                      Text(
+                          stringResource(R.string.user_profile_message_with_button) +
+                              user.firstName)
                     }
 
                 // Book List

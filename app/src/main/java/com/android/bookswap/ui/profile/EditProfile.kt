@@ -61,7 +61,9 @@ fun EditProfileDialog(onDismiss: () -> Unit, onSave: (DataUser) -> Unit) {
             Modifier.fillMaxWidth().padding(16.dp),
             Arrangement.Center,
             Alignment.CenterHorizontally) {
-              Text(stringResource(R.string.edit_profile_screen_title), Modifier.testTag(C.Tag.TopAppBar.screen_title))
+              Text(
+                  stringResource(R.string.edit_profile_screen_title),
+                  Modifier.testTag(C.Tag.TopAppBar.screen_title))
               OutlinedTextField(
                   value = _greeting.value,
                   onValueChange = {
@@ -75,7 +77,9 @@ fun EditProfileDialog(onDismiss: () -> Unit, onSave: (DataUser) -> Unit) {
                   },
                   Modifier.testTag(C.Tag.EditProfile.greeting).fillMaxWidth().padding(8.dp, 4.dp),
                   label = { Text(stringResource(R.string.edit_profile_greeting)) },
-                  placeholder = { Text(stringResource(R.string.edit_profile_mr), Modifier, Color.Gray) },
+                  placeholder = {
+                    Text(stringResource(R.string.edit_profile_mr), Modifier, Color.Gray)
+                  },
                   keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                   singleLine = true,
                   isError = greetingError.value,
@@ -94,7 +98,9 @@ fun EditProfileDialog(onDismiss: () -> Unit, onSave: (DataUser) -> Unit) {
                   },
                   Modifier.testTag(C.Tag.EditProfile.firstname).fillMaxWidth().padding(8.dp, 4.dp),
                   label = { Text(stringResource(R.string.edit_profile_firstname)) },
-                  placeholder = { Text(stringResource(R.string.edit_profile_john), Modifier, Color.Gray) },
+                  placeholder = {
+                    Text(stringResource(R.string.edit_profile_john), Modifier, Color.Gray)
+                  },
                   keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                   singleLine = true,
                   isError = firstNameError.value)
@@ -112,7 +118,9 @@ fun EditProfileDialog(onDismiss: () -> Unit, onSave: (DataUser) -> Unit) {
                   },
                   Modifier.testTag(C.Tag.EditProfile.lastname).fillMaxWidth().padding(8.dp, 4.dp),
                   label = { Text(stringResource(R.string.edit_profile_lastname)) },
-                  placeholder = { Text(stringResource(R.string.edit_profile_Doe), Modifier, Color.Gray) },
+                  placeholder = {
+                    Text(stringResource(R.string.edit_profile_Doe), Modifier, Color.Gray)
+                  },
                   keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                   singleLine = true,
                   isError = lastNameError.value)
@@ -132,7 +140,9 @@ fun EditProfileDialog(onDismiss: () -> Unit, onSave: (DataUser) -> Unit) {
                   },
                   Modifier.testTag(C.Tag.EditProfile.email).fillMaxWidth().padding(8.dp, 4.dp),
                   label = { Text(stringResource(R.string.edit_profile_email)) },
-                  placeholder = { Text(stringResource(R.string.edit_profile_email_example), Modifier, Color.Gray) },
+                  placeholder = {
+                    Text(stringResource(R.string.edit_profile_email_example), Modifier, Color.Gray)
+                  },
                   keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                   singleLine = true,
                   isError = emailError.value)
@@ -152,7 +162,9 @@ fun EditProfileDialog(onDismiss: () -> Unit, onSave: (DataUser) -> Unit) {
                   },
                   Modifier.testTag(C.Tag.EditProfile.phone).fillMaxWidth().padding(8.dp, 4.dp),
                   label = { Text(stringResource(R.string.edit_profile_phone)) },
-                  placeholder = { Text(stringResource(R.string.edit_profile_phone_example), Modifier, Color.Gray) },
+                  placeholder = {
+                    Text(stringResource(R.string.edit_profile_phone_example), Modifier, Color.Gray)
+                  },
                   keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
                   singleLine = true,
                   isError = phoneError.value)

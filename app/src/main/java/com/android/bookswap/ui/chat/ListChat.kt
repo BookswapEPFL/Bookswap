@@ -141,7 +141,9 @@ fun MessageBoxDisplay(message: MessageBox, onClick: () -> Unit = {}) {
               }
 
           Text(
-              text = message.message?.takeUnless { it.isEmpty() } ?: stringResource(R.string.chat_list_no_messages),
+              text =
+                  message.message?.takeUnless { it.isEmpty() }
+                      ?: stringResource(R.string.chat_list_no_messages),
               fontSize = 14.sp,
               color = ColorVariable.AccentSecondary,
               maxLines = 1,

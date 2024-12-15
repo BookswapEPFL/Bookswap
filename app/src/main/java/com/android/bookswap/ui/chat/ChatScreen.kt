@@ -131,7 +131,9 @@ fun ChatScreen(
                               Log.d("ChatScreen", "Image stored successfully")
                             } else {
                               Toast.makeText(
-                                      context, context.getString(R.string.chat_message_stored_error), Toast.LENGTH_LONG)
+                                      context,
+                                      context.getString(R.string.chat_message_stored_error),
+                                      Toast.LENGTH_LONG)
                                   .show()
                               Log.e("ChatScreen", "Image could not be stored.")
                             }
@@ -142,7 +144,9 @@ fun ChatScreen(
                     }
               })
         } else {
-          Toast.makeText(context, context.getString(R.string.chat_message_stored_error), Toast.LENGTH_LONG).show()
+          Toast.makeText(
+                  context, context.getString(R.string.chat_message_stored_error), Toast.LENGTH_LONG)
+              .show()
           Log.e("ChatScreen", "Image could not be stored.")
         }
       }
@@ -267,7 +271,11 @@ fun ChatScreen(
               Button(
                   onClick = {
                     if (newMessageText.text.isEmpty()) {
-                      Toast.makeText(context, context.getString(R.string.chat_message_empty_error), Toast.LENGTH_SHORT).show()
+                      Toast.makeText(
+                              context,
+                              context.getString(R.string.chat_message_empty_error),
+                              Toast.LENGTH_SHORT)
+                          .show()
                     } else if (updateActive) {
                       // Update the message
                       messageRepository.updateMessage(
@@ -311,7 +319,10 @@ fun ChatScreen(
                         if (result.isSuccess) {
                           newMessageText = TextFieldValue("")
                         } else {
-                          Toast.makeText(context, context.getString(R.string.chat_send_error), Toast.LENGTH_LONG)
+                          Toast.makeText(
+                                  context,
+                                  context.getString(R.string.chat_send_error),
+                                  Toast.LENGTH_LONG)
                               .show()
                           Log.e(
                               "MessageView",
@@ -329,7 +340,9 @@ fun ChatScreen(
                   modifier =
                       Modifier.padding(horizontal = padding8)
                           .testTag(C.Tag.ChatScreen.confirm_button)) {
-                    Text(if (updateActive) stringResource(R.string.chat_update_button) else stringResource(R.string.chat_send_button))
+                    Text(
+                        if (updateActive) stringResource(R.string.chat_update_button)
+                        else stringResource(R.string.chat_send_button))
                   }
             }
       }

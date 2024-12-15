@@ -124,14 +124,21 @@ fun UserProfile(
                         },
                         onFailure = { exception ->
                           Log.e("NewUserScreen", "Error uploading photo: $exception")
-                          Toast.makeText(context, context.getString(R.string.new_user_toast_error_upload), Toast.LENGTH_SHORT)
+                          Toast.makeText(
+                                  context,
+                                  context.getString(R.string.new_user_toast_error_upload),
+                                  Toast.LENGTH_SHORT)
                               .show()
                         })
                   })
             },
             onFailure = { exception ->
               Log.e("NewUserScreen", "Error taking photo: $exception")
-              Toast.makeText(context, context.getString(R.string.new_user_toast_error_taking), Toast.LENGTH_SHORT).show()
+              Toast.makeText(
+                      context,
+                      context.getString(R.string.new_user_toast_error_taking),
+                      Toast.LENGTH_SHORT)
+                  .show()
             })
       }
   photoRequester.Init() // Initialize the photoRequester
@@ -245,7 +252,9 @@ fun UserProfile(
 
           // Email text
           LabeledTextUserProfile(
-              testTag = C.Tag.OtherUserProfile.email, label = stringResource(R.string.user_profile_your_email), value = userData.email)
+              testTag = C.Tag.OtherUserProfile.email,
+              label = stringResource(R.string.user_profile_your_email),
+              value = userData.email)
 
           // Phone number text
           LabeledTextUserProfile(
@@ -254,7 +263,9 @@ fun UserProfile(
               value = userData.phoneNumber)
           // User address:
           LabeledTextUserProfile(
-              testTag = C.Tag.OtherUserProfile.address, label = stringResource(R.string.user_profile_your_address), value = addressStr)
+              testTag = C.Tag.OtherUserProfile.address,
+              label = stringResource(R.string.user_profile_your_address),
+              value = addressStr)
 
           Spacer(modifier = Modifier.height(SPACER_HEIGHT_INFO_EDIT))
 
@@ -271,7 +282,9 @@ fun UserProfile(
             CircularProgressIndicator(modifier = Modifier.padding(PADDING))
           } else if (bookListData.value.isEmpty()) {
             Log.e("UserProfileScreen", "No books available")
-            Text(stringResource(R.string.user_profile_no_books), style = MaterialTheme.typography.bodyLarge)
+            Text(
+                stringResource(R.string.user_profile_no_books),
+                style = MaterialTheme.typography.bodyLarge)
           } else {
             Log.i("UserProfileScreen", "Displaying book list")
             BookListComponent(

@@ -123,7 +123,11 @@ fun BookProfileScreen(
                   item {
                     // Display an error message
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                      Text(text =stringResource(R.string.book_profile_error_loading) + "${error.message}", color = Color.Red)
+                      Text(
+                          text =
+                              stringResource(R.string.book_profile_error_loading) +
+                                  "${error.message}",
+                          color = Color.Red)
                     }
                   }
                 }
@@ -138,7 +142,8 @@ fun BookProfileScreen(
                   }
                   item {
                     Text(
-                        text = dataBook.author ?: stringResource(R.string.book_profile_author_unknown),
+                        text =
+                            dataBook.author ?: stringResource(R.string.book_profile_author_unknown),
                         modifier = Modifier.testTag(C.Tag.BookProfile.author),
                         color = ColorVariable.AccentSecondary,
                         style = MaterialTheme.typography.titleMedium)
@@ -172,7 +177,7 @@ fun BookProfileScreen(
                   item {
                     dataBook.rating?.let {
                       Text(
-                          text = stringResource(R.string.book_profile_rating_label)+" $it/5",
+                          text = stringResource(R.string.book_profile_rating_label) + " $it/5",
                           color = ColorVariable.Accent,
                           style = MaterialTheme.typography.bodyMedium,
                           modifier = Modifier.testTag(C.Tag.BookProfile.rating))
@@ -195,9 +200,14 @@ fun BookProfileScreen(
                             Modifier.fillMaxWidth().padding(horizontal = HORIZONTAL_PADDING)) {
                           Column(modifier = Modifier.weight(COLUMN_WEIGHT)) {
                             ProfileText(
-                                text = stringResource(R.string.book_profile_language_label)+" " +dataBook.language.languageName,
+                                text =
+                                    stringResource(R.string.book_profile_language_label) +
+                                        " " +
+                                        dataBook.language.languageName,
                                 testTag = C.Tag.BookProfile.language)
-                            ProfileText(text = stringResource(R.string.book_profile_genres_label), testTag = C.Tag.BookProfile.genres)
+                            ProfileText(
+                                text = stringResource(R.string.book_profile_genres_label),
+                                testTag = C.Tag.BookProfile.genres)
                             dataBook.genres.forEach { genre ->
                               Text(
                                   text = "- ${genre.Genre}",
@@ -210,7 +220,8 @@ fun BookProfileScreen(
                             }
                             ProfileText(
                                 text =
-                                    stringResource(R.string.book_profile_isbn_label)+" ${dataBook.isbn ?: stringResource(R.string.book_profile_isbn_missing)}",
+                                    stringResource(R.string.book_profile_isbn_label) +
+                                        " ${dataBook.isbn ?: stringResource(R.string.book_profile_isbn_missing)}",
                                 testTag = C.Tag.BookProfile.isbn)
                           }
 

@@ -132,7 +132,11 @@ fun MapScreen(
     if (isOnline) {
       bookManagerViewModel.startUpdatingBooks()
     } else {
-      Toast.makeText(context, context.getString(R.string.map_screen_please_connect_to_internet), Toast.LENGTH_SHORT).show()
+      Toast.makeText(
+              context,
+              context.getString(R.string.map_screen_please_connect_to_internet),
+              Toast.LENGTH_SHORT)
+          .show()
     }
     val hasPermissions =
         permissions

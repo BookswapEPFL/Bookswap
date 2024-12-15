@@ -119,7 +119,11 @@ fun FilterMapScreen(navigationActions: NavigationActions, bookFilter: BookFilter
                 onClick = {
                   bookFilter.setGenres(selectedFiltersGenres.map { it.Genre })
                   bookFilter.setLanguages(selectedFiltersLanguages.map { it.languageName })
-                  Toast.makeText(context, context.getString(R.string.filters_applied_message), Toast.LENGTH_SHORT).show()
+                  Toast.makeText(
+                          context,
+                          context.getString(R.string.filters_applied_message),
+                          Toast.LENGTH_SHORT)
+                      .show()
                   navigationActions.goBack()
                 },
                 colors = ButtonDefaults.buttonColors(ColorVariable.Primary),
@@ -128,7 +132,9 @@ fun FilterMapScreen(navigationActions: NavigationActions, bookFilter: BookFilter
                         .height(BUTTON_HEIGHT)
                         .testTag(C.Tag.MapFilter.apply)) {
                   Text(
-                      text = stringResource(R.string.filter_apply_button_text), // Hard coded string that should
+                      text =
+                          stringResource(
+                              R.string.filter_apply_button_text), // Hard coded string that should
                       textAlign = TextAlign.Center,
                       style =
                           TextStyle(

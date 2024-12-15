@@ -81,11 +81,20 @@ fun SignInScreen(navigationActions: NavigationActions) {
             appConfig.userViewModel.getUserByGoogleUid(googleUid)
             Log.d("SignInScreen", "isStored: ${appConfig.userViewModel.isStored}")
             Log.d("SignInScreen", "User signed in: $googleUserName")
-            Toast.makeText(context, context.resources.getString(R.string.sign_in_toast_welcome) +" $googleUserName!", Toast.LENGTH_LONG).show()
+            Toast.makeText(
+                    context,
+                    context.resources.getString(R.string.sign_in_toast_welcome) +
+                        " $googleUserName!",
+                    Toast.LENGTH_LONG)
+                .show()
           },
           onAuthError = {
             Log.e("SignInScreen", "Failed to sign in: ${it.statusCode}")
-            Toast.makeText(context, context.resources.getString(R.string.sign_in_toast_login_failed), Toast.LENGTH_LONG).show()
+            Toast.makeText(
+                    context,
+                    context.resources.getString(R.string.sign_in_toast_login_failed),
+                    Toast.LENGTH_LONG)
+                .show()
           })
   val token = stringResource(R.string.default_web_client_id)
 
