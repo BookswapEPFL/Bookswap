@@ -214,6 +214,7 @@ class MainActivity : ComponentActivity() {
           composable(C.Screen.ADD_BOOK_MANUALLY) {
             AddToBookScreen(
                 AddToBookViewModel(bookRepository, userVM),
+                photoStorage,
                 topAppBar = { topAppBar("Add your Book") },
                 bottomAppBar = { bottomAppBar(this@navigation.route ?: "") })
           }
