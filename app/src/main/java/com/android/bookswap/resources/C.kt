@@ -235,10 +235,11 @@ object C {
     // New Book Choice Screen specific tags (BookAdditionChoice.kt)
     object NewBookChoice {
       object btnWIcon {
-        val button = UI_T.BUTTON
-        val icon = UI_T.ICON
-        val png = UI_T.IMAGE
-        val arrow = "_arrow" + UI_T.ICON
+        const val button = UI_T.BUTTON
+        const val leftIcon = "left" + UI_T.ICON
+        const val leftPng = "left" + UI_T.IMAGE
+        const val rightIcon = "right" + UI_T.ICON
+        const val rightPng = "right" + UI_T.IMAGE
       }
     }
 

@@ -35,6 +35,7 @@ import com.android.bookswap.model.BookFromChatGPT
 import com.android.bookswap.model.LocalAppConfig
 import com.android.bookswap.model.PhotoRequester
 import com.android.bookswap.resources.C
+import com.android.bookswap.ui.components.ButtonWithIcons
 import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.theme.ColorVariable
 
@@ -90,87 +91,30 @@ fun BookAdditionChoiceScreen(
                     .padding(bottom = 10f * columnPadding, top = columnPadding),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally) {
-              ButtonWithIcon(
+              ButtonWithIcons(
                   text = "Manually",
                   leftIcon = Icons.Default.Add,
                   leftIconPainter = null,
+                  rightIcon = Icons.AutoMirrored.Filled.ArrowForward,
                   onClick = { navController.navigateTo(C.Screen.ADD_BOOK_MANUALLY) },
                   buttonWidth = buttonWidth)
               Spacer(modifier = Modifier.height(2f * columnPadding))
-              ButtonWithIcon(
+              ButtonWithIcons(
                   text = "From ISBN",
                   leftIcon = null,
                   leftIconPainter = painterResource(id = R.drawable.download),
+                  rightIcon = Icons.AutoMirrored.Filled.ArrowForward,
                   onClick = { navController.navigateTo(C.Screen.ADD_BOOK_ISBN) },
                   buttonWidth = buttonWidth)
               Spacer(modifier = Modifier.height(2f * columnPadding))
-              ButtonWithIcon(
+              ButtonWithIcons(
                   text = "From Photo",
                   leftIcon = null,
                   leftIconPainter = painterResource(id = R.drawable.photoicon),
+                  rightIcon = Icons.AutoMirrored.Filled.ArrowForward,
                   onClick = { photoRequester.requestPhoto() },
                   buttonWidth = buttonWidth,
               )
-            }
-      }
-}
-/**
- * Composable function to display a button with an icon.
- *
- * @param text The text to display on the button.
- * @param leftIcon The optional left icon to display on the button.
- * @param leftIconPainter The optional left icon painter to display on the button.
- * @param onClick action on click
- * @param buttonWidth The width of the button.
- */
-@Composable
-fun ButtonWithIcon(
-    text: String,
-    leftIcon: ImageVector? = null,
-    leftIconPainter: Painter? = null,
-    onClick: () -> Unit,
-    buttonWidth: Dp
-) {
-  val borderPadding = 1.dp
-  val buttonPadding = 8.dp
-  val iconSize = 32.dp
-  val pngSize = 24.dp
-  val textSize = 18.sp
-  Button(
-      onClick = onClick,
-      colors =
-          ButtonDefaults.buttonColors(
-              containerColor = ColorVariable.AccentSecondary,
-              contentColor = ColorVariable.BackGround),
-      border = BorderStroke(borderPadding, ColorVariable.Accent),
-      shape = RoundedCornerShape(buttonPadding),
-      modifier =
-          Modifier.padding(buttonPadding)
-              .width(buttonWidth)
-              .testTag(text + C.Tag.NewBookChoice.btnWIcon.button)) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically) {
-              if (leftIcon != null) {
-                Icon(
-                    imageVector = leftIcon,
-                    contentDescription = null,
-                    modifier =
-                        Modifier.size(iconSize).testTag(text + C.Tag.NewBookChoice.btnWIcon.icon))
-              } else if (leftIconPainter != null) {
-                Image(
-                    painter = leftIconPainter,
-                    contentDescription = null,
-                    modifier =
-                        Modifier.size(pngSize).testTag(text + C.Tag.NewBookChoice.btnWIcon.png))
-              }
-              Text(text, fontSize = textSize)
-              Icon(
-                  imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-                  contentDescription = null,
-                  modifier =
-                      Modifier.size(iconSize).testTag(text + C.Tag.NewBookChoice.btnWIcon.arrow))
             }
       }
 }
