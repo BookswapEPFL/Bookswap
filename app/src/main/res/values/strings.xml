@@ -120,6 +120,58 @@
     <string name="user_profile_edit">Edit Profile</string>
     <string name="user_profile_no_books">No Books available</string>
 
+    <!-- Notification -->
+    <string name="notification_toast_disable">Notifications are disabled. You will not receive updates.</string>
+    <string name="notification_toast_enable">Notifications have been enabled.</string>
+    <string name="notification_title">Notification Permission Required</string>
+    <string name="notification_message">To keep you informed about important updates, please allow notification permissions.</string>
+    <string name="notification_ok">OK</string>
+    <string name="notification_no">No thanks</string>
+
+    <string name="notification_toast_request_action">Action: </string>
+
+    <!-- Add Book VM -->
+    <string name="add_book_toast">Book added</string>
+    <string name="add_book_toast_error">Failed to add book</string>
+
+    <!-- Book Languages -->
+    <string name="language_french">French</string>
+    <string name="language_german">German</string>
+    <string name="language_english">English</string>
+    <string name="language_spanish">Spanish</string>
+    <string name="language_italian">Italian</string>
+    <string name="language_romansh">Romansh</string>
+    <string name="language_other">Other</string>
+
+    <!-- Book Languages Codes -->
+    <string name="language_code_french">FR</string>
+    <string name="language_code_german">DE</string>
+    <string name="language_code_english">EN</string>
+    <string name="language_code_spanish">ES</string>
+    <string name="language_code_italian">IT</string>
+    <string name="language_code_romansh">RM</string>
+    <string name="language_code_other">OTHER</string>
+
+    <!-- Book Genres -->
+    <string name="genre_fiction">Fiction</string>
+    <string name="genre_nonfiction">Non-Fiction</string>
+    <string name="genre_fantasy">Fantasy</string>
+    <string name="genre_science_fiction">Science-Fiction</string>
+    <string name="genre_mystery">Mystery</string>
+    <string name="genre_thriller">Thriller</string>
+    <string name="genre_romance">Romance</string>
+    <string name="genre_horror">Horror</string>
+    <string name="genre_historical">Historical</string>
+    <string name="genre_western">Western</string>
+    <string name="genre_dystopian">Dystopian</string>
+    <string name="genre_memoir">Memoir</string>
+    <string name="genre_biography">Biography</string>
+    <string name="genre_autobiography">Autobiography</string>
+    <string name="genre_self_help">Self-Help</string>
+    <string name="genre_health">Health</string>
+    <string name="genre_travel">Travel</string>
+    <string name="genre_guide">Guide</string>
+    <string name="genre_other">Other</string>
 
 
 </resources>
