@@ -255,12 +255,11 @@ class UserFirestoreSourceTest {
   @Test
   fun `updateLocation succeeds`() {
     // Arrange: Mock the updateLocation method to return success
-    every {
-      mockUserFirestoreSource.updateLocation(userUUID, latitude, longitude, any())
-    } answers {
-      val callback = arg<(Result<Unit>) -> Unit>(3)
-      callback(Result.success(Unit))
-    }
+    every { mockUserFirestoreSource.updateLocation(userUUID, latitude, longitude, any()) } answers
+        {
+          val callback = arg<(Result<Unit>) -> Unit>(3)
+          callback(Result.success(Unit))
+        }
 
     // Act
     var result: Result<Unit>? = null
@@ -277,12 +276,11 @@ class UserFirestoreSourceTest {
   fun `updateLocation fails`() {
     // Arrange: Mock the updateLocation method to return failure
     val exception = RuntimeException("Firestore update failed")
-    every {
-      mockUserFirestoreSource.updateLocation(userUUID, latitude, longitude, any())
-    } answers {
-      val callback = arg<(Result<Unit>) -> Unit>(3)
-      callback(Result.failure(exception))
-    }
+    every { mockUserFirestoreSource.updateLocation(userUUID, latitude, longitude, any()) } answers
+        {
+          val callback = arg<(Result<Unit>) -> Unit>(3)
+          callback(Result.failure(exception))
+        }
 
     // Act
     var result: Result<Unit>? = null

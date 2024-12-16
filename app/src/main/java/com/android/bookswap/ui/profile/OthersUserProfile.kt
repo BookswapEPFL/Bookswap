@@ -1,5 +1,6 @@
 package com.android.bookswap.ui.profile
 
+import android.content.Context
 import android.util.Log
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.Arrangement
@@ -20,6 +21,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
@@ -55,8 +57,9 @@ private val HALF_WIDTH = 0.5f
  */
 @Composable
 fun OthersUserProfileScreen(
+    context: Context = LocalContext.current,
     userId: UUID,
-    otherUserVM: OthersUserViewModel = OthersUserViewModel(userId),
+    otherUserVM: OthersUserViewModel = OthersUserViewModel(context, userId),
     booksRepository: BooksRepository,
     userBookViewModel: UserBookViewModel = UserBookViewModel(booksRepository),
     navigationActions: NavigationActions,
@@ -66,6 +69,7 @@ fun OthersUserProfileScreen(
 
   var user by remember { mutableStateOf(DataUser()) }
   var isLoading by remember { mutableStateOf(true) }
+  val address by otherUserVM.addressStr.collectAsState()
 
   // I think it is better (good thing) to use LaunchedEffect
   LaunchedEffect(userId) {
@@ -164,7 +168,7 @@ fun OthersUserProfileScreen(
                 LabeledText(
                     testTag = C.Tag.OtherUserProfile.address,
                     label = "Address:",
-                    value = "${user.latitude}, ${user.longitude}")
+                    value = address.ifEmpty { "Address not available" })
 
                 // Chat Button
                 Button(

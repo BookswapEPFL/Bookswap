@@ -262,8 +262,6 @@ class UserFirestoreSource(private val db: FirebaseFirestore) : UsersRepository {
     val updates = mapOf("latitude" to latitude, "longitude" to longitude)
 
     performFirestoreOperation(
-        db.collection(COLLECTION_NAME)
-            .document(userUUID.toString())
-            .update(updates), callback)
+        db.collection(COLLECTION_NAME).document(userUUID.toString()).update(updates), callback)
   }
 }

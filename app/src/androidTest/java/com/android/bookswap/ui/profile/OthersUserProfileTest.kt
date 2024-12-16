@@ -1,5 +1,6 @@
 package com.android.bookswap.ui.profile
 
+import android.content.Context
 import androidx.compose.ui.test.assertAll
 import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertIsDisplayed
@@ -38,6 +39,7 @@ class OthersUserProfileTest : TestCase() {
   private lateinit var mockUserBookViewModel: UserBookViewModel
   private lateinit var mockBooksRepository: BooksRepository
   private lateinit var mockNavigationActions: NavigationActions
+  private lateinit var context: Context
 
   private val testUserId = UUID.randomUUID()
   private val testUser =
@@ -90,6 +92,7 @@ class OthersUserProfileTest : TestCase() {
     mockNavigationActions = mockk()
     mockOthersUserViewModel = mockk(relaxed = true)
     mockUserBookViewModel = mockk(relaxed = true)
+    context = mockk()
 
     // Mock the user data fetching
     every { mockOthersUserViewModel.getUserByUUID(testUserId, any()) } answers
@@ -106,6 +109,7 @@ class OthersUserProfileTest : TestCase() {
   fun testUserDetailsDisplayed() {
     composeTestRule.setContent {
       OthersUserProfileScreen(
+          context = context,
           userId = testUserId,
           otherUserVM = mockOthersUserViewModel,
           booksRepository = mockBooksRepository,
@@ -161,6 +165,7 @@ class OthersUserProfileTest : TestCase() {
   fun testBookListDisplayed() {
     composeTestRule.setContent {
       OthersUserProfileScreen(
+          context = context,
           userId = testUserId,
           otherUserVM = mockOthersUserViewModel,
           booksRepository = mockBooksRepository,
@@ -209,6 +214,7 @@ class OthersUserProfileTest : TestCase() {
 
     composeTestRule.setContent {
       OthersUserProfileScreen(
+          context = context,
           userId = imageTestUserId,
           otherUserVM = mockOthersUserViewModel,
           booksRepository = mockBooksRepository,
@@ -252,6 +258,7 @@ class OthersUserProfileTest : TestCase() {
 
     composeTestRule.setContent {
       OthersUserProfileScreen(
+          context = context,
           userId = imageTestUserId,
           otherUserVM = mockOthersUserViewModel,
           booksRepository = mockBooksRepository,

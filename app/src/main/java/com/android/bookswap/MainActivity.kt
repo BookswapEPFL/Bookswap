@@ -267,6 +267,7 @@ class MainActivity : ComponentActivity() {
                 Log.e("Main Launch OthersUserProfile", "userId: $userId")
                 if (userId != null) {
                   OthersUserProfileScreen(
+                      context = context,
                       userId = userId,
                       booksRepository = bookRepository,
                       navigationActions = navigationActions,
