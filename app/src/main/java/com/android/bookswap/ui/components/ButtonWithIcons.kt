@@ -36,8 +36,8 @@ val textSize = 18.sp
 private const val BUTTON_HEIGHT = 48
 
 /**
- * Composable function to display a button with icons to the left and right.
- * If there is an argument for both icon and iconPainter, only the icon will be displayed.
+ * Composable function to display a button with icons to the left and right. If there is an argument
+ * for both icon and iconPainter, only the icon will be displayed.
  *
  * @param text The text to display on the button.
  * @param leftIcon The optional left icon to display on the button.
@@ -60,48 +60,56 @@ fun ButtonWithIcons(
     buttonHeight: Dp = BUTTON_HEIGHT.dp,
     buttonShape: RoundedCornerShape = RoundedCornerShape(buttonPadding)
 ) {
-    Button(
-        onClick = onClick,
-        colors =
-        ButtonDefaults.buttonColors(
-            containerColor = ColorVariable.AccentSecondary,
-            contentColor = ColorVariable.BackGround),
-        border = BorderStroke(borderPadding, ColorVariable.Accent),
-        shape = buttonShape,
-        modifier =
-        Modifier.padding(buttonPadding)
-            .width(buttonWidth)
-            .height(buttonHeight)
-            .testTag(text + C.Tag.NewBookChoice.btnWIcon.button)
-    ) {
+  Button(
+      onClick = onClick,
+      colors =
+          ButtonDefaults.buttonColors(
+              containerColor = ColorVariable.AccentSecondary,
+              contentColor = ColorVariable.BackGround),
+      border = BorderStroke(borderPadding, ColorVariable.Accent),
+      shape = buttonShape,
+      modifier =
+          Modifier.padding(buttonPadding)
+              .width(buttonWidth)
+              .height(buttonHeight)
+              .testTag(text + C.Tag.NewBookChoice.btnWIcon.button)) {
         Row(
             modifier = Modifier.fillMaxWidth().fillMaxHeight(),
             horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            IconOrPainter(leftIcon, leftIconPainter, text + C.Tag.NewBookChoice.btnWIcon.leftIcon, text + C.Tag.NewBookChoice.btnWIcon.leftPng)
-            Text(text, fontSize = textSize)
-            IconOrPainter(rightIcon, rightIconPainter, text + C.Tag.NewBookChoice.btnWIcon.rightIcon, text + C.Tag.NewBookChoice.btnWIcon.rightPng)
-        }
-    }
+            verticalAlignment = Alignment.CenterVertically) {
+              IconOrPainter(
+                  leftIcon,
+                  leftIconPainter,
+                  text + C.Tag.NewBookChoice.btnWIcon.leftIcon,
+                  text + C.Tag.NewBookChoice.btnWIcon.leftPng)
+              Text(text, fontSize = textSize)
+              IconOrPainter(
+                  rightIcon,
+                  rightIconPainter,
+                  text + C.Tag.NewBookChoice.btnWIcon.rightIcon,
+                  text + C.Tag.NewBookChoice.btnWIcon.rightPng)
+            }
+      }
 }
 
 @Composable
-private fun IconOrPainter(icon: ImageVector? = null, iconPainter: Painter? = null, iconTag: String, iconPainterTag: String){
-    if (icon != null) {
-        Icon(
-            imageVector = icon,
-            contentDescription = null,
-            modifier =
-            Modifier.size(iconSize).testTag(iconTag))
-    } else if (iconPainter != null) {
-        Image(
-            painter = iconPainter,
-            contentDescription = null,
-            modifier =
-            Modifier.size(pngSize).testTag(iconPainterTag))
-    }
-    else {
-        Spacer(modifier = Modifier.width(iconSize)) // Reserve space when no icon or iconPainter
-    }
+private fun IconOrPainter(
+    icon: ImageVector? = null,
+    iconPainter: Painter? = null,
+    iconTag: String,
+    iconPainterTag: String
+) {
+  if (icon != null) {
+    Icon(
+        imageVector = icon,
+        contentDescription = null,
+        modifier = Modifier.size(iconSize).testTag(iconTag))
+  } else if (iconPainter != null) {
+    Image(
+        painter = iconPainter,
+        contentDescription = null,
+        modifier = Modifier.size(pngSize).testTag(iconPainterTag))
+  } else {
+    Spacer(modifier = Modifier.width(iconSize)) // Reserve space when no icon or iconPainter
+  }
 }

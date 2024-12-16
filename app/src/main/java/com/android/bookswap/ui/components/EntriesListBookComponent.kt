@@ -34,12 +34,10 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.core.text.isDigitsOnly
 import com.android.bookswap.R
 import com.android.bookswap.data.BookGenres
 import com.android.bookswap.data.BookLanguages
 import com.android.bookswap.data.repository.PhotoFirebaseStorageRepository
-import com.android.bookswap.model.InputVerification
 import com.android.bookswap.model.PhotoRequester
 import com.android.bookswap.resources.C
 import com.android.bookswap.ui.MAXLENGTHAUTHOR
@@ -66,39 +64,38 @@ fun EntriesListBookComponent(
     rating: MutableState<String>,
     isbn: MutableState<String>,
     photo: MutableState<String>,
-    selectedLanguage: MutableState<BookLanguages?>,
+    selectedLanguage: MutableState<BookLanguages>,
     photoStorage: PhotoFirebaseStorageRepository,
     buttons: @Composable (modifier: Modifier) -> Unit
 ) {
-    val screenWidth = LocalConfiguration.current.screenWidthDp
+  val screenWidth = LocalConfiguration.current.screenWidthDp
 
   var expanded by remember { mutableStateOf(false) }
   var expandedLanguage by remember { mutableStateOf(false) }
 
-    val context = LocalContext.current
+  val context = LocalContext.current
 
-    val photoReq = remember {
-        PhotoRequester(context) { result ->
-            if (result.isSuccess) {
-                photoStorage.addPhotoToStorage(
-                    photoId = UUID.randomUUID().toString(),
-                    bitmap = result.getOrThrow().asAndroidBitmap(),
-                    callback = { resultStorage ->
-                        resultStorage.onSuccess { url ->
-                                photo.value = url
-                            }
-                            .onFailure { exception ->
-                                Log.e("EntriesListBookComponent", "Failed to store image: ${exception.message}")
-                            }
-                    })
-            } else {
-                Toast.makeText(context, "Image could not be stored.", Toast.LENGTH_LONG).show()
-                Log.e("EntriesListBookComponent", "Image could not be stored.")
-            }
-        }
+  val photoReq = remember {
+    PhotoRequester(context) { result ->
+      if (result.isSuccess) {
+        photoStorage.addPhotoToStorage(
+            photoId = UUID.randomUUID().toString(),
+            bitmap = result.getOrThrow().asAndroidBitmap(),
+            callback = { resultStorage ->
+              resultStorage
+                  .onSuccess { url -> photo.value = url }
+                  .onFailure { exception ->
+                    Log.e("EntriesListBookComponent", "Failed to store image: ${exception.message}")
+                  }
+            })
+      } else {
+        Toast.makeText(context, "Image could not be stored.", Toast.LENGTH_LONG).show()
+        Log.e("EntriesListBookComponent", "Image could not be stored.")
+      }
     }
+  }
 
-    photoReq.Init()
+  photoReq.Init()
 
   LazyColumn(
       modifier =
@@ -175,7 +172,7 @@ fun EntriesListBookComponent(
         // Author Input Field
         item {
           FieldComponent(
-              onValueChange = {if (it.length <= MAXLENGTHAUTHOR) author.value = it },
+              onValueChange = { if (it.length <= MAXLENGTHAUTHOR) author.value = it },
               modifier =
                   Modifier.testTag(C.Tag.BookEntryComp.author_field)
                       .fillMaxWidth()
@@ -201,7 +198,10 @@ fun EntriesListBookComponent(
         // ISBN Input Field
         item {
           FieldComponent(
-              onValueChange = { if (it.length <= MAXLENGTHISBN && it.all { char -> char.isDigit() || char == '-' }) isbn.value = it },
+              onValueChange = {
+                if (it.length <= MAXLENGTHISBN && it.all { char -> char.isDigit() || char == '-' })
+                    isbn.value = it
+              },
               modifier =
                   Modifier.testTag(C.Tag.BookEntryComp.isbn_field)
                       .fillMaxWidth()
@@ -221,7 +221,7 @@ fun EntriesListBookComponent(
               expanded = expandedLanguage,
               onExpandedChange = { expandedLanguage = !expandedLanguage }) {
                 FieldComponent(
-                    value = selectedLanguage.value?.languageName ?: "",
+                    value = selectedLanguage.value.languageName,
                     onValueChange = {},
                     readOnly = true,
                     label = { Text(text = stringResource(R.string.label_language)) },
@@ -250,33 +250,32 @@ fun EntriesListBookComponent(
               }
         }
 
-      // Photo Input Field
-      item {
-              ButtonWithIcons(
-                  text = stringResource(R.string.label_photo),
-                  leftIconPainter = painterResource(id = R.drawable.photoicon),
-                  onClick = { photoReq.requestPhoto() },
-                  buttonWidth = (screenWidth - 2 * HORIZONTAL_PADDING).dp,
-                  buttonHeight = BUTTON_HEIGHT.dp,
-                  buttonShape = RoundedCornerShape(100)
-              )
-      }
+        // Photo Input Field
+        item {
+          ButtonWithIcons(
+              text = stringResource(R.string.label_photo),
+              leftIconPainter = painterResource(id = R.drawable.photoicon),
+              onClick = { photoReq.requestPhoto() },
+              buttonWidth = (screenWidth - 2 * HORIZONTAL_PADDING).dp,
+              buttonHeight = BUTTON_HEIGHT.dp,
+              buttonShape = RoundedCornerShape(100))
+        }
 
-      // Rating Input Field
-      item {
+        // Rating Input Field
+        item {
           var currentRating by remember { mutableStateOf(rating.value.toIntOrNull() ?: 0) }
 
           RatingStarsComponent(
               currentRating = currentRating,
               onRatingChanged = { newRating ->
-                  currentRating = newRating
-                  rating.value = newRating.toString()
+                currentRating = newRating
+                rating.value = newRating.toString()
               },
               modifier =
-              Modifier.testTag(C.Tag.BookEntryComp.rating_field_stars)
-                  .fillMaxWidth()
-                  .padding(horizontal = HORIZONTAL_PADDING.dp))
-      }
+                  Modifier.testTag(C.Tag.BookEntryComp.rating_field_stars)
+                      .fillMaxWidth()
+                      .padding(horizontal = HORIZONTAL_PADDING.dp))
+        }
 
         // Buttons
         item { buttons(Modifier.fillMaxWidth().padding(horizontal = HORIZONTAL_PADDING.dp)) }
