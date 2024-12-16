@@ -157,4 +157,45 @@ open class UserViewModel(
       }
     }
   }
+
+  fun updateCoordinates(addressComponents: List<String>, context: Context, userUUID: UUID) {
+    val fullAddress = addressComponents.joinToString(", ")
+
+    val handleCoordinates: (MutableList<Address>?) -> Unit = {
+      if (!it.isNullOrEmpty()) {
+        val address = it.first()
+        val latitude = address.latitude
+        val longitude = address.longitude
+
+        // Update the local dataUser object
+        dataUser.latitude = latitude
+        dataUser.longitude = longitude
+
+        // Call the function to update the coordinates in Firebase
+        userRepository.updateLocation(userUUID, latitude, longitude) { result ->
+          result
+              .onSuccess { Log.d("Geocoding", "Coordinates updated successfully in Firebase.") }
+              .onFailure { exception ->
+                Log.e("Geocoding", "Failed to update coordinates in Firebase: ${exception.message}")
+              }
+        }
+      } else {
+        Log.e("Geocoding", "Failed to find coordinates for the given address.")
+      }
+    }
+
+    viewModelScope.launch {
+      val geocoder = Geocoder(context)
+      val geocodeListener = Geocoder.GeocodeListener(handleCoordinates)
+
+      withContext(Dispatchers.IO) {
+        // Perform geocoding on a background thread
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+          geocoder.getFromLocationName(fullAddress, 1, geocodeListener)
+        } else {
+          handleCoordinates(geocoder.getFromLocationName(fullAddress, 1))
+        }
+      }
+    }
+  }
 }

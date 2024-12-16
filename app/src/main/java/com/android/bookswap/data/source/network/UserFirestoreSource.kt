@@ -179,7 +179,7 @@ class UserFirestoreSource(private val db: FirebaseFirestore) : UsersRepository {
    * @param callback callback function that receives Result.success() when operation succeed of
    *   Result.failure(exception) if error
    */
-  private fun performFirestoreOperation(task: Task<Void>, callback: (Result<Unit>) -> Unit) {
+  fun performFirestoreOperation(task: Task<Void>, callback: (Result<Unit>) -> Unit) {
     task.addOnCompleteListener { result ->
       if (result.isSuccessful) {
         callback(Result.success(Unit))
@@ -243,5 +243,27 @@ class UserFirestoreSource(private val db: FirebaseFirestore) : UsersRepository {
           }
         }
         .addOnFailureListener { e -> callback(Result.failure(e)) }
+  }
+
+  /**
+   * Updates the location of a user in Firestore.
+   *
+   * @param userUUID UUID of the user whose location is being updated.
+   * @param latitude The new latitude of the user.
+   * @param longitude The new longitude of the user.
+   * @param callback Callback for success or failure.
+   */
+  override fun updateLocation(
+      userUUID: UUID,
+      latitude: Double,
+      longitude: Double,
+      callback: (Result<Unit>) -> Unit
+  ) {
+    val updates = mapOf("latitude" to latitude, "longitude" to longitude)
+
+    performFirestoreOperation(
+        db.collection(COLLECTION_NAME)
+            .document(userUUID.toString())
+            .update(updates), callback)
   }
 }
