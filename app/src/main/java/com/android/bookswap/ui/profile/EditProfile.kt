@@ -39,7 +39,7 @@ import com.android.bookswap.ui.theme.BookSwapAppTheme
 @Composable
 fun EditProfileDialog(onDismiss: () -> Unit, onSave: (DataUser) -> Unit) {
   val appConfig = LocalAppConfig.current
-  val dataUser = appConfig.userViewModel.getUser()
+  val dataUser = appConfig.userViewModel.getUser().copy()
   val _email = remember { mutableStateOf<String>(dataUser.email) }
   val _phone = remember { mutableStateOf<String>(dataUser.phoneNumber) }
   val _greeting = remember { mutableStateOf<String>(dataUser.greeting) }
@@ -55,7 +55,7 @@ fun EditProfileDialog(onDismiss: () -> Unit, onSave: (DataUser) -> Unit) {
   val lastNameError = remember { mutableStateOf(false) }
 
   BookSwapAppTheme {
-    Dialog({ onDismiss() }, DialogProperties(true, true)) {
+    Dialog({ onDismiss() }, DialogProperties(true, false)) {
       Card(Modifier.testTag(C.Tag.edit_profile_screen_container).padding(16.dp)) {
         Column(
             Modifier.fillMaxWidth().padding(16.dp),
@@ -172,7 +172,7 @@ fun EditProfileDialog(onDismiss: () -> Unit, onSave: (DataUser) -> Unit) {
               Row(Modifier.fillMaxWidth().padding(8.dp), Arrangement.SpaceEvenly) {
                 Button(
                     {
-                      Log.d(
+                      Log.i(
                           "EditProfile_ClickBtn",
                           "Save Clicked, User info: ${dataUser.printFullname()}")
                       onSave(dataUser)
@@ -182,7 +182,10 @@ fun EditProfileDialog(onDismiss: () -> Unit, onSave: (DataUser) -> Unit) {
                     }
 
                 Button(
-                    { Log.d("EditProfile_ClickBtn", "Cancel Clicked") },
+                    {
+                      Log.i("EditProfile_ClickBtn", "Cancel Clicked")
+                      onDismiss()
+                    },
                     Modifier.testTag(C.Tag.EditProfile.dismiss)) {
                       Text(stringResource(R.string.edit_profile_cancel_button))
                     }
