@@ -158,7 +158,7 @@ fun EditProfileDialog(onDismiss: () -> Unit, onSave: (DataUser) -> Unit) {
               Row(Modifier.fillMaxWidth().padding(8.dp), Arrangement.SpaceEvenly) {
                 Button(
                     {
-                      Log.d(
+                      Log.i(
                           "EditProfile_ClickBtn",
                           "Save Clicked, User info: ${dataUser.printFullname()}")
                       onSave(dataUser)
@@ -169,7 +169,7 @@ fun EditProfileDialog(onDismiss: () -> Unit, onSave: (DataUser) -> Unit) {
 
                 Button(
                     {
-                      Log.d("EditProfile_ClickBtn", "Cancel Clicked")
+                      Log.i("EditProfile_ClickBtn", "Cancel Clicked")
                       onDismiss()
                     },
                     Modifier.testTag(C.Tag.EditProfile.dismiss)) {
