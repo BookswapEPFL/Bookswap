@@ -34,6 +34,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
@@ -124,7 +125,11 @@ fun BookProfileScreen(
                   item {
                     // Display an error message
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                      Text(text = "Error loading book details: ${error.message}", color = Color.Red)
+                      Text(
+                          text =
+                              stringResource(R.string.book_profile_error_loading) +
+                                  "${error.message}",
+                          color = Color.Red)
                     }
                   }
                 }
@@ -139,7 +144,8 @@ fun BookProfileScreen(
                   }
                   item {
                     Text(
-                        text = dataBook.author ?: "Author Unknown",
+                        text =
+                            dataBook.author ?: stringResource(R.string.book_profile_author_unknown),
                         modifier = Modifier.testTag(C.Tag.BookProfile.author),
                         color = ColorVariable.AccentSecondary,
                         style = MaterialTheme.typography.titleMedium)
@@ -173,7 +179,7 @@ fun BookProfileScreen(
                   item {
                     dataBook.rating?.let {
                       Text(
-                          text = "Rating: $it/5",
+                          text = stringResource(R.string.book_profile_rating_label) + " $it/5",
                           color = ColorVariable.Accent,
                           style = MaterialTheme.typography.bodyMedium,
                           modifier = Modifier.testTag(C.Tag.BookProfile.rating))
@@ -183,7 +189,7 @@ fun BookProfileScreen(
 
                   item {
                     Text(
-                        text = "Synopsis",
+                        text = stringResource(R.string.book_profile_synopsis_label),
                         color = ColorVariable.Accent,
                         style = MaterialTheme.typography.titleSmall,
                         modifier = Modifier.testTag(C.Tag.BookProfile.synopsis_label))
@@ -196,9 +202,14 @@ fun BookProfileScreen(
                             Modifier.fillMaxWidth().padding(horizontal = HORIZONTAL_PADDING)) {
                           Column(modifier = Modifier.weight(COLUMN_WEIGHT)) {
                             ProfileText(
-                                text = "Language: ${dataBook.language.languageName}",
+                                text =
+                                    stringResource(R.string.book_profile_language_label) +
+                                        " " +
+                                        dataBook.language.languageName,
                                 testTag = C.Tag.BookProfile.language)
-                            ProfileText(text = "Genres:", testTag = C.Tag.BookProfile.genres)
+                            ProfileText(
+                                text = stringResource(R.string.book_profile_genres_label),
+                                testTag = C.Tag.BookProfile.genres)
                             dataBook.genres.forEach { genre ->
                               Text(
                                   text = "- ${genre.Genre}",
@@ -211,25 +222,26 @@ fun BookProfileScreen(
                             }
                             ProfileText(
                                 text =
-                                    "ISBN: ${dataBook.isbn ?: "ISBN doesn't exist or is not available"}",
+                                    stringResource(R.string.book_profile_isbn_label) +
+                                        " ${dataBook.isbn ?: stringResource(R.string.book_profile_isbn_missing)}",
                                 testTag = C.Tag.BookProfile.isbn)
                           }
 
                           Column(modifier = Modifier.weight(COLUMN_WEIGHT)) {
                             ProfileText(
-                                text = "Date of Publication: [Temporary Date]",
+                                text = stringResource(R.string.book_profile_date_label),
                                 testTag = C.Tag.BookProfile.date)
                             ProfileText(
-                                text = "Volume: [Temporary Volume]",
+                                text = stringResource(R.string.book_profile_volume_label),
                                 testTag = C.Tag.BookProfile.volume)
                             ProfileText(
-                                text = "Issue: [Temporary Issue]",
+                                text = stringResource(R.string.book_profile_issue_label),
                                 testTag = C.Tag.BookProfile.issue)
                             ProfileText(
-                                text = "Editorial: [Temporary Editorial]",
+                                text = stringResource(R.string.book_profile_editorial_label),
                                 testTag = C.Tag.BookProfile.editorial)
                             ProfileText(
-                                text = "Place of Edition: [Temporary Place]",
+                                text = stringResource(R.string.book_profile_location_label),
                                 testTag = C.Tag.BookProfile.location)
                           }
                         }
@@ -259,9 +271,9 @@ fun BookProfileScreen(
                                 .fillMaxWidth(HALF_WIDTH)) {
                           Text(
                               if (dataBook.userId == appConfig.userViewModel.getUser().userUUID) {
-                                "Edit Book"
+                                stringResource(R.string.book_profile_edit_button)
                               } else {
-                                "Go to User"
+                                stringResource(R.string.book_profile_go_to_user_button)
                               })
                         }
                   }
@@ -307,7 +319,7 @@ fun BookSynopsis(description: String) {
               .padding(start = HORIZONTAL_PADDING, end = HORIZONTAL_PADDING)
               .testTag(C.Tag.BookProfile.synopsis)) {
         Text(
-            text = description.ifEmpty { "No description available" },
+            text = description.ifEmpty { stringResource(R.string.book_profile_synopsis_empty) },
             color = ColorVariable.Accent,
             style = MaterialTheme.typography.bodyMedium,
             textAlign = TextAlign.Start)

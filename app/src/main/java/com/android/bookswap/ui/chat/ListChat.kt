@@ -30,12 +30,14 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import com.android.bookswap.R
 import com.android.bookswap.data.MessageBox
 import com.android.bookswap.model.LocalAppConfig
 import com.android.bookswap.model.chat.ContactViewModel
@@ -75,7 +77,7 @@ fun ListChatScreen(
               if (messageBoxMap.isEmpty()) {
                 item {
                   Text(
-                      text = "No messages yet",
+                      text = stringResource(R.string.chat_list_no_messages),
                       modifier = Modifier.fillMaxWidth().padding(16.dp),
                       color = ColorVariable.Primary,
                       fontSize = 20.sp,
@@ -151,7 +153,9 @@ fun MessageBoxDisplay(message: MessageBox, onClick: () -> Unit = {}) {
               }
 
           Text(
-              text = message.message?.takeUnless { it.isEmpty() } ?: "No messages yet",
+              text =
+                  message.message?.takeUnless { it.isEmpty() }
+                      ?: stringResource(R.string.chat_list_no_messages),
               fontSize = 14.sp,
               color = ColorVariable.AccentSecondary,
               maxLines = 1,

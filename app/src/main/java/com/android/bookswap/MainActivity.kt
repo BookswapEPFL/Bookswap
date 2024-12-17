@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTag
 import androidx.navigation.compose.NavHost
@@ -184,7 +185,7 @@ class MainActivity : ComponentActivity() {
           composable(C.Screen.CHAT_LIST) {
             ListChatScreen(
                 navigationActions,
-                topAppBar = { topAppBar("Messages") },
+                topAppBar = { topAppBar(stringResource(R.string.chat_list_screen_title)) },
                 bottomAppBar = { bottomAppBar(this@navigation.route ?: "") },
                 contactViewModel = contactViewModel)
           }
@@ -204,7 +205,7 @@ class MainActivity : ComponentActivity() {
             } else {
               BookAdditionChoiceScreen(
                   navigationActions,
-                  topAppBar = { topAppBar("Add a Book") },
+                  topAppBar = { topAppBar(stringResource(R.string.book_addition_choice_title)) },
                   bottomAppBar = { bottomAppBar(this@navigation.route ?: "") },
                   photoFirebaseStorageRepository = photoStorage,
                   booksRepository = bookRepository)
@@ -217,7 +218,7 @@ class MainActivity : ComponentActivity() {
                 BookManagerViewModel(geolocation, bookRepository, userRepository, bookFilter),
                 navigationActions = navigationActions,
                 geolocation = geolocation,
-                topAppBar = { topAppBar("Map") },
+                topAppBar = { topAppBar(stringResource(R.string.map_screen_title)) },
                 bottomAppBar = { bottomAppBar(this@navigation.route ?: "") })
           }
           composable(C.Screen.MAP_FILTER) { FilterMapScreen(navigationActions, bookFilter) }
@@ -226,7 +227,7 @@ class MainActivity : ComponentActivity() {
           composable(C.Screen.NEW_BOOK) {
             BookAdditionChoiceScreen(
                 navigationActions,
-                topAppBar = { topAppBar("Add a Book") },
+                topAppBar = { topAppBar(stringResource(R.string.book_addition_choice_title)) },
                 bottomAppBar = { bottomAppBar(this@navigation.route ?: "") },
                 photoFirebaseStorageRepository = photoStorage,
                 booksRepository = bookRepository)
@@ -252,7 +253,7 @@ class MainActivity : ComponentActivity() {
                 photoStorage = photoStorage,
                 booksRepository = bookRepository,
                 navigationActions = navigationActions,
-                topAppBar = { topAppBar("Your Profile") },
+                topAppBar = { topAppBar(stringResource(R.string.user_profile_screen_title)) },
                 bottomAppBar = { bottomAppBar(this@navigation.route ?: "") })
           }
           composable("${C.Screen.BOOK_PROFILE}/{bookId}") { backStackEntry ->
@@ -261,7 +262,7 @@ class MainActivity : ComponentActivity() {
             if (bookId != null) {
               BookProfileScreen(
                   bookId = bookId, // Default for testing
-                  topAppBar = { topAppBar("Book Profile") },
+                  topAppBar = { topAppBar(stringResource(R.string.book_profile_screen_title)) },
                   booksRepository = BooksFirestoreSource(FirebaseFirestore.getInstance()),
                   navController = NavigationActions(navController),
               )
@@ -291,7 +292,9 @@ class MainActivity : ComponentActivity() {
                       userId = userId,
                       booksRepository = bookRepository,
                       navigationActions = navigationActions,
-                      topAppBar = { topAppBar("User Profile") },
+                      topAppBar = {
+                        topAppBar(stringResource(R.string.other_user_profile_screen_title))
+                      },
                       bottomAppBar = { bottomAppBar(this@navigation.route ?: "") })
                 } else {
                   Log.e("Navigation", "Invalid userId passed to OthersUserProfileScreen")

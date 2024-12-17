@@ -36,6 +36,7 @@ import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -43,6 +44,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import com.android.bookswap.R
 import com.android.bookswap.data.repository.PhotoFirebaseStorageRepository
 import com.android.bookswap.model.InputVerification
 import com.android.bookswap.model.LocalAppConfig
@@ -113,14 +115,21 @@ fun NewUserScreen(
                         onSuccess = { url -> profilPicture.value = url },
                         onFailure = { exception ->
                           Log.e("NewUserScreen", "Error uploading photo: $exception")
-                          Toast.makeText(context, "Error uploading photo", Toast.LENGTH_SHORT)
+                          Toast.makeText(
+                                  context,
+                                  context.getString(R.string.new_user_toast_error_upload),
+                                  Toast.LENGTH_SHORT)
                               .show()
                         })
                   })
             },
             onFailure = { exception ->
               Log.e("NewUserScreen", "Error taking photo: $exception")
-              Toast.makeText(context, "Error taking photo", Toast.LENGTH_SHORT).show()
+              Toast.makeText(
+                      context,
+                      context.getString(R.string.new_user_toast_error_taking),
+                      Toast.LENGTH_SHORT)
+                  .show()
             })
       }
   photoRequester.Init() // This is the initialization of the photo requester
@@ -132,7 +141,7 @@ fun NewUserScreen(
               .testTag(C.Tag.new_user_screen_container)) {
         item {
           Text(
-              "Welcome",
+              stringResource(R.string.new_user_welcome),
               modifier = Modifier.testTag(C.Tag.TopAppBar.screen_title).fillMaxWidth(),
               style =
                   TextStyle(
@@ -145,7 +154,7 @@ fun NewUserScreen(
         item {
           // The personal information text
           Text(
-              "Please fill in your personal information to start BookSwapping",
+              stringResource(R.string.new_user_indication_text),
               modifier = Modifier.testTag(C.Tag.NewUser.personal_info).fillMaxWidth(),
               style =
                   TextStyle(
@@ -193,8 +202,10 @@ fun NewUserScreen(
                           Modifier.testTag(C.Tag.NewUser.greeting)
                               .fillMaxWidth()
                               .padding(TEXT_PADDING),
-                          label = { Text("Greeting") },
-                          placeholder = { Text("Mr.", Modifier, Color.Gray) },
+                          label = { Text(stringResource(R.string.edit_profile_greeting)) },
+                          placeholder = {
+                            Text(stringResource(R.string.edit_profile_mr), Modifier, Color.Gray)
+                          },
                           keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                           singleLine = true)
 
@@ -204,8 +215,10 @@ fun NewUserScreen(
                           Modifier.testTag(C.Tag.NewUser.firstname)
                               .fillMaxWidth()
                               .padding(TEXT_PADDING),
-                          label = { Text("Firstname") },
-                          placeholder = { Text("John", Modifier, Color.Gray) },
+                          label = { Text(stringResource(R.string.edit_profile_firstname)) },
+                          placeholder = {
+                            Text(stringResource(R.string.edit_profile_john), Modifier, Color.Gray)
+                          },
                           keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                           singleLine = true,
                           isError =
@@ -224,8 +237,10 @@ fun NewUserScreen(
                           Modifier.testTag(C.Tag.NewUser.lastname)
                               .fillMaxWidth()
                               .padding(TEXT_PADDING),
-                          label = { Text("Lastname") },
-                          placeholder = { Text("Doe", Modifier, Color.Gray) },
+                          label = { Text(stringResource(R.string.edit_profile_lastname)) },
+                          placeholder = {
+                            Text(stringResource(R.string.edit_profile_Doe), Modifier, Color.Gray)
+                          },
                           keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                           singleLine = true,
                           isError = !verification.validateNonEmpty(lastName.value) && !firstAttempt)
@@ -243,8 +258,13 @@ fun NewUserScreen(
                           Modifier.testTag(C.Tag.NewUser.email)
                               .fillMaxWidth()
                               .padding(TEXT_PADDING),
-                          label = { Text("Email") },
-                          placeholder = { Text("John.Doe@example.com", Modifier, Color.Gray) },
+                          label = { Text(stringResource(R.string.edit_profile_email)) },
+                          placeholder = {
+                            Text(
+                                stringResource(R.string.edit_profile_email_example),
+                                Modifier,
+                                Color.Gray)
+                          },
                           keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                           singleLine = true,
                           isError = !verification.validateEmail(email.value) && !firstAttempt)
@@ -262,8 +282,13 @@ fun NewUserScreen(
                           Modifier.testTag(C.Tag.NewUser.phone)
                               .fillMaxWidth()
                               .padding(TEXT_PADDING),
-                          label = { Text("Phone") },
-                          placeholder = { Text("+4122345678", Modifier, Color.Gray) },
+                          label = { Text(stringResource(R.string.edit_profile_phone)) },
+                          placeholder = {
+                            Text(
+                                stringResource(R.string.edit_profile_phone_example),
+                                Modifier,
+                                Color.Gray)
+                          },
                           keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
                           singleLine = true,
                           isError = !verification.validatePhone(phone.value) && !firstAttempt)
@@ -297,7 +322,11 @@ fun NewUserScreen(
                     navigationActions.navigateTo(C.Route.MAP)
                   } else {
                     firstAttempt = false
-                    Toast.makeText(context, "Please correct the errors", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                            context,
+                            context.getString(R.string.new_user_toast_correct_error),
+                            Toast.LENGTH_SHORT)
+                        .show()
                   }
                 },
                 colors = ButtonDefaults.buttonColors(ColorVariable.Primary),
@@ -306,7 +335,7 @@ fun NewUserScreen(
                         .height(BUTTON_HEIGHT)
                         .testTag(C.Tag.NewUser.confirm)) {
                   Text(
-                      text = "Create",
+                      text = stringResource(R.string.new_user_create_button),
                       textAlign = TextAlign.Center,
                       style = TextStyle(color = ColorVariable.BackGround))
                 }
