@@ -10,6 +10,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
+import com.android.bookswap.R
 import com.google.firebase.messaging.FirebaseMessaging
 
 class PermissionHandler(private val activity: ComponentActivity) {
@@ -61,7 +62,9 @@ class PermissionHandler(private val activity: ComponentActivity) {
     // Initialize FCM SDK
     FirebaseMessaging.getInstance().isAutoInitEnabled = true
     // Additional setup if needed
-    Toast.makeText(activity, "Notifications have been enabled.", Toast.LENGTH_LONG).show()
+    Toast.makeText(
+            activity, activity.getString(R.string.notification_toast_enable), Toast.LENGTH_LONG)
+        .show()
   }
   /**
    * Informs the user that notifications are disabled.
@@ -74,9 +77,7 @@ class PermissionHandler(private val activity: ComponentActivity) {
     // For example, you might show a Toast or a Snackbar
     // This is a placeholder implementation
     Toast.makeText(
-            activity,
-            "Notifications are disabled. You will not receive updates.",
-            Toast.LENGTH_LONG)
+            activity, activity.getString(R.string.notification_toast_disable), Toast.LENGTH_LONG)
         .show()
   }
   /**
@@ -88,14 +89,13 @@ class PermissionHandler(private val activity: ComponentActivity) {
   @RequiresApi(Build.VERSION_CODES.TIRAMISU)
   private fun showRationaleDialog() {
     AlertDialog.Builder(activity)
-        .setTitle("Notification Permission Required")
-        .setMessage(
-            "To keep you informed about important updates, please allow notification permissions.")
-        .setPositiveButton("OK") { _, _ ->
+        .setTitle(activity.getString(R.string.notification_title))
+        .setMessage(activity.getString(R.string.notification_message))
+        .setPositiveButton(activity.getString(R.string.notification_ok)) { _, _ ->
           // Request the permission when the user agrees
           requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
         }
-        .setNegativeButton("No thanks") { dialog, _ ->
+        .setNegativeButton(activity.getString(R.string.notification_no)) { dialog, _ ->
           // Dismiss the dialog and continue without asking for permission
           dialog.dismiss()
         }
