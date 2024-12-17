@@ -364,3 +364,48 @@ object C {
     const val SETTINGS = S.SETTINGS + SCREEN
   }
 }
+
+object Enums {
+
+  object Languages {
+    const val FRENCH = "French"
+    const val GERMAN = "German"
+    const val ENGLISH = "English"
+    const val SPANISH = "Spanish"
+    const val ITALIAN = "Italian"
+    const val ROMANSH = "Romansh"
+    const val OTHER = "Other"
+  }
+
+  object LanguagesCode {
+    const val FRENCH = "FR"
+    const val GERMAN = "DE"
+    const val ENGLISH = "EN"
+    const val SPANISH = "ES"
+    const val ITALIAN = "IT"
+    const val ROMANSH = "RM"
+    const val OTHER = "OTHER"
+  }
+
+  object Genres {
+    const val FICTION = "Fiction"
+    const val NONFICTION = "Non-Fiction"
+    const val FANTASY = "Fantasy"
+    const val SCIENCEFICTION = "Science-Fiction"
+    const val MYSTERY = "Mystery"
+    const val THRILLER = "Thriller"
+    const val ROMANCE = "Romance"
+    const val HORROR = "Horror"
+    const val HISTORICAL = "Historical"
+    const val WESTERN = "Western"
+    const val DYSTOPIAN = "Dystopian"
+    const val MEMOIR = "Memoir"
+    const val BIOGRAPHY = "Biography"
+    const val AUTOBIOGRAPHY = "Autobiography"
+    const val SELFHELP = "Self-Help"
+    const val HEALTH = "Health"
+    const val TRAVEL = "Travel"
+    const val GUIDE = "Guide"
+    const val OTHER = "Other"
+  }
+}

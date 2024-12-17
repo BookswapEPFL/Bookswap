@@ -15,4 +15,166 @@
     <string name="label_isbn">ISBN*</string>
     <string name="label_photo">Pics*</string>
     <string name="label_language">Language*</string>
+    <!-- Book Addition Choice Screen -->
+    <string name="book_addition_choice_title">Add a Book</string>
+    <string name="book_addition_choice_button_manually">Manually</string>
+    <string name="book_addition_choice_button_from_isbn">From ISBN</string>
+    <string name="book_addition_choice_button_from_photo">From Photo</string>
+    <string name="book_addition_choice_toast_error">An error occurred while adding the book</string>
+
+    <!-- Book Profile Screen -->
+    <string name="book_profile_screen_title">Book Profile</string>
+    <string name="book_profile_error_loading">Error loading book details: %1$s</string>
+    <string name="book_profile_author_unknown">Author Unknown</string>
+    <string name="book_profile_rating_label">Rating: </string>
+    <string name="book_profile_synopsis_label">Synopsis</string>
+    <string name="book_profile_synopsis_empty">No description available</string>
+    <string name="book_profile_language_label">Language: </string>
+    <string name="book_profile_genres_label">Genres:</string>
+    <string name="book_profile_isbn_label">ISBN:</string>
+    <string name="book_profile_isbn_missing">ISBN does not exist or is not available</string>
+    <string name="book_profile_date_label">Date of Publication: [Temporary Date]</string>
+    <string name="book_profile_volume_label">Volume: [Temporary Volume]</string>
+    <string name="book_profile_issue_label">Issue: [Temporary Issue]</string>
+    <string name="book_profile_editorial_label">Editorial: [Temporary Editorial]</string>
+    <string name="book_profile_location_label">Place of Edition: [Temporary Place]</string>
+    <string name="book_profile_edit_button">Edit Book</string>
+    <string name="book_profile_go_to_user_button">Go to User</string>
+    <!-- SignIn Screen -->
+    <string name="sign_in_screen_welcome">Welcome to</string>
+    <string name="sign_in_screen_app_name">BookSwap</string>
+    <string name="sign_in_button_google">Sign in with Google</string>
+    <string name="sign_in_toast_welcome">Welcome </string>
+    <string name="sign_in_toast_login_failed">Login Failed!</string>
+    <!-- ISBN Screen -->
+    <string name="add_isbn_screen_title">Add a Book by ISBN</string>
+    <string name="add_isbn_field_label">ISBN*</string>
+    <string name="add_isbn_button_search">Search</string>
+    <string name="add_isbn_toast_invalid">Invalid ISBN</string>
+    <string name="add_isbn_toast_search_unsuccessful">Search unsuccessful</string>
+    <string name="add_isbn_toast_error_message">Error: </string>
+    <!-- List Chat Screen -->
+    <string name="chat_list_screen_title">Messages</string>
+    <string name="chat_list_no_messages">No messages yet</string>
+
+    <!-- Chat Screen -->
+
+    <string name="chat_message_empty_error">Message cannot be empty</string>
+    <string name="chat_update_error">Message can only be updated within 15 minutes of being sent</string>
+    <string name="chat_send_error">Message could not be sent.</string>
+    <string name="chat_delete_error">Message can only be deleted within 15 minutes of being sent</string>
+    <string name="chat_message_stored_error">"Image could not be stored."</string>
+
+    <string name="chat_update_button">Update</string>
+    <string name="chat_send_button">Send</string>
+    <string name="chat_edit_button">Edit</string>
+    <string name="chat_delete_button">Delete</string>
+
+    <!-- Filter Screen -->
+    <string name="filter_map_screen_title">Filters</string>
+    <string name="filter_apply_button_text">Apply</string>
+    <string name="filters_applied_message">Filters applied</string>
+    <!-- Map Screen -->
+    <string name="map_screen_title">Map</string>
+    <string name="map_screen_please_connect_to_internet">Please connect to Internet to actualise</string>
+    <string name="map_screen_your_location">Your Location</string>
+    <!-- Edit Profile Screen -->
+    <string name="edit_profile_screen_title">Edit Profile</string>
+    <string name="edit_profile_greeting">Greeting</string>
+    <string name="edit_profile_mr">Mr.</string>
+    <string name="edit_profile_firstname">Firstname</string>
+    <string name="edit_profile_john">John</string>
+    <string name="edit_profile_lastname">Lastname</string>
+    <string name="edit_profile_Doe">Doe</string>
+    <string name="edit_profile_email">Email</string>
+    <string name="edit_profile_email_example">John.Doe@example.com</string>
+    <string name="edit_profile_phone">Phone</string>
+    <string name="edit_profile_phone_example">+4122345678</string>
+    <string name="edit_profile_save_button">Save</string>
+    <string name="edit_profile_cancel_button">Cancel</string>
+
+    <!-- New User Screen -->
+    <string name="new_user_screen_title">New User</string>
+    <string name="new_user_toast_error_upload">Error uploading photo</string>
+    <string name="new_user_toast_error_taking">Error taking photo</string>
+    <string name="new_user_welcome">Welcome</string>
+    <string name="new_user_indication_text">Please fill in your personal information to start BookSwapping</string>
+    <string name="new_user_toast_correct_error">Please correct the errors</string>
+    <string name="new_user_create_button">Create</string>
+
+    <!-- User Profile Screen -->
+    <string name="other_user_profile_screen_title">User Profile</string>
+    <string name="user_profile_screen_title">Your Profile</string>
+    <string name="user_profile_name">Name:</string>
+    <string name="user_profile_email">Email:</string>
+    <string name="user_profile_phone">Phone:</string>
+    <string name="user_profile_address">Address:</string>
+    <string name="user_profile_message_with_button">Message with </string>
+    <string name="user_profile_toast_error_upload">Error uploading photo</string>
+    <string name="user_profile_toast_error_taking">Error taking photo</string>
+    <string name="user_profile_take_photo">Take Photo</string>
+    <string name="user_profile_edit_picture">Edit Profile Picture</string>
+    <string name="user_profile_your_name">Your name:</string>
+    <string name="user_profile_your_email">Your email:</string>
+    <string name="user_profile_your_phone">Your phone:</string>
+    <string name="user_profile_your_address">Your address:</string>
+    <string name="user_profile_edit">Edit Profile</string>
+    <string name="user_profile_no_books">No Books available</string>
+
+    <!-- Notification -->
+    <string name="notification_toast_disable">Notifications are disabled. You will not receive updates.</string>
+    <string name="notification_toast_enable">Notifications have been enabled.</string>
+    <string name="notification_title">Notification Permission Required</string>
+    <string name="notification_message">To keep you informed about important updates, please allow notification permissions.</string>
+    <string name="notification_ok">OK</string>
+    <string name="notification_no">No thanks</string>
+
+    <string name="notification_toast_request_action">Action: </string>
+
+    <!-- Add Book VM -->
+    <string name="add_book_toast">Book added</string>
+    <string name="add_book_toast_error">Failed to add book</string>
+
+    <!-- Book Languages -->
+    <string name="language_french">French</string>
+    <string name="language_german">German</string>
+    <string name="language_english">English</string>
+    <string name="language_spanish">Spanish</string>
+    <string name="language_italian">Italian</string>
+    <string name="language_romansh">Romansh</string>
+    <string name="language_other">Other</string>
+
+    <!-- Book Languages Codes -->
+    <string name="language_code_french">FR</string>
+    <string name="language_code_german">DE</string>
+    <string name="language_code_english">EN</string>
+    <string name="language_code_spanish">ES</string>
+    <string name="language_code_italian">IT</string>
+    <string name="language_code_romansh">RM</string>
+    <string name="language_code_other">OTHER</string>
+
+    <!-- Book Genres -->
+    <string name="genre_fiction">Fiction</string>
+    <string name="genre_nonfiction">Non-Fiction</string>
+    <string name="genre_fantasy">Fantasy</string>
+    <string name="genre_science_fiction">Science-Fiction</string>
+    <string name="genre_mystery">Mystery</string>
+    <string name="genre_thriller">Thriller</string>
+    <string name="genre_romance">Romance</string>
+    <string name="genre_horror">Horror</string>
+    <string name="genre_historical">Historical</string>
+    <string name="genre_western">Western</string>
+    <string name="genre_dystopian">Dystopian</string>
+    <string name="genre_memoir">Memoir</string>
+    <string name="genre_biography">Biography</string>
+    <string name="genre_autobiography">Autobiography</string>
+    <string name="genre_self_help">Self-Help</string>
+    <string name="genre_health">Health</string>
+    <string name="genre_travel">Travel</string>
+    <string name="genre_guide">Guide</string>
+    <string name="genre_other">Other</string>
+    <!-- Prompt -->
+    <string name="prompt_book_scanning">You are an AI designed to analyze images of book covers. Given an image of a book\'s back cover in URL format, extract the following information in a structured format (JSON) with the specified fields: title, author, description, language, and ISBN. Please ensure that: 1. If any of the fields are not present or cannot be confidently identified, indicate them with \"N/A\". 2. If the image does not appear to be a book cover, return an error message stating \"The image does not appear to be a valid book cover.\" 3. If the title, author, description, or other fields are in a different language, keep the original text for reference, and provide the appropriate language code using the following classification: - FRENCH (\"FR\") - GERMAN (\"DE\") - ENGLISH (\"EN\") - SPANISH (\"ES\") - ITALIAN (\"IT\") - ROMANSH (\"RM\") - OTHER (\"OTHER\") 4. The description should be the one written on the book\'s. 5. The ISBN is often over a barcode, in the bottom left or right corner. Example output format: { \"title\": \"Example Title\", \"author\": \"Example Author\", \"description\": \"An example description of the book.\", \"language\": \"EN\", \"isbn\": \"1234567890\" } The image URL:</string>
+
+
 </resources>
