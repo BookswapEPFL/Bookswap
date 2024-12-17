@@ -53,6 +53,7 @@ import com.android.bookswap.ui.MAXLENGTHFIRSTNAME
 import com.android.bookswap.ui.MAXLENGTHGREETING
 import com.android.bookswap.ui.MAXLENGTHLASTNAME
 import com.android.bookswap.ui.MAXLENGTHPHONE
+import com.android.bookswap.ui.components.AddressFieldsComponent
 import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.theme.ColorVariable
 import com.google.firebase.Firebase
@@ -94,6 +95,12 @@ fun NewUserScreen(
   val phoneError = remember { mutableStateOf<String?>("Invalid phone number") }
   val firstNameError = remember { mutableStateOf<String?>("First name required") }
   val lastNameError = remember { mutableStateOf<String?>("Last name required") }
+
+  val address = remember { mutableStateOf("") }
+  val city = remember { mutableStateOf("") }
+  val canton = remember { mutableStateOf("") }
+  val postal = remember { mutableStateOf("") }
+  val country = remember { mutableStateOf("") }
 
   val appConfig = LocalAppConfig.current
   var firstAttempt = true
@@ -274,6 +281,13 @@ fun NewUserScreen(
                             modifier = Modifier.testTag(C.Tag.NewUser.phone_error))
                       }
                     }
+                  AddressFieldsComponent(
+                      onAddressChange = { address.value = it },
+                      onCityChange = { city.value = it },
+                      onCantonChange = { canton.value = it },
+                      onPostalChange = { postal.value = it },
+                      onCountryChange = { country.value = it }
+                  )
               }
         }
 
@@ -284,7 +298,9 @@ fun NewUserScreen(
                   if (verification.validateEmail(email.value) &&
                       verification.validatePhone(phone.value) &&
                       verification.validateNonEmpty(firstName.value) &&
-                      verification.validateNonEmpty(lastName.value)) {
+                      verification.validateNonEmpty(lastName.value) &&
+                      verification.validateNonEmpty(city.value) &&
+                      verification.validateNonEmpty(country.value)){
                     appConfig.userViewModel.updateUser(
                         greeting = greeting.value,
                         firstName = firstName.value,
@@ -293,6 +309,16 @@ fun NewUserScreen(
                         phone = phone.value,
                         picURL = profilPicture.value ?: "",
                         googleUid = Firebase.auth.currentUser?.uid ?: "")
+                    val addressComponents = if (address.value.isEmpty() || canton.value.isEmpty() || postal.value.isEmpty()) {
+                      listOf(city.value, country.value)
+                    } else {
+                      listOf(address.value, city.value, canton.value, postal.value, country.value)
+                    }
+                    appConfig.userViewModel.updateCoordinates(
+                        addressComponents = addressComponents,
+                        context = context,
+                        userUUID = appConfig.userViewModel.getUser().userUUID
+                    )
                     navigationActions.navigateTo(C.Route.MAP)
                   } else {
                     firstAttempt = false
