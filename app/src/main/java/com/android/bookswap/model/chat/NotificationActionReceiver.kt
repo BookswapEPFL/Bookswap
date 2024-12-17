@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.widget.Toast
+import com.android.bookswap.R
 
 /** BroadcastReceiver to handle notification actions. */
 class NotificationActionReceiver : BroadcastReceiver() {
@@ -33,6 +34,10 @@ class NotificationActionReceiver : BroadcastReceiver() {
    */
   private fun requestCode(context: Context, action: String) {
     // Implement the logic to handle the request code based on the action
-    Toast.makeText(context, "Action: $action", Toast.LENGTH_SHORT).show()
+    Toast.makeText(
+            context,
+            context.getString(R.string.notification_toast_request_action) + action,
+            Toast.LENGTH_SHORT)
+        .show()
   }
 }

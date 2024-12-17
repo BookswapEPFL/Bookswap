@@ -21,8 +21,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import com.android.bookswap.R
 import com.android.bookswap.data.DataBook
 import com.android.bookswap.data.DataUser
 import com.android.bookswap.data.repository.BooksRepository
@@ -152,18 +154,20 @@ fun OthersUserProfileScreen(
 
                 // Email:
                 LabeledText(
-                    testTag = C.Tag.OtherUserProfile.email, label = "Email:", value = user.email)
+                    testTag = C.Tag.OtherUserProfile.email,
+                    label = stringResource(R.string.user_profile_email),
+                    value = user.email)
 
                 // Phone Number:
                 LabeledText(
                     testTag = C.Tag.OtherUserProfile.phone,
-                    label = "Phone:",
+                    label = stringResource(R.string.user_profile_phone),
                     value = user.phoneNumber)
 
                 // Address:
                 LabeledText(
                     testTag = C.Tag.OtherUserProfile.address,
-                    label = "Address:",
+                    label = stringResource(R.string.user_profile_address),
                     value = "${user.latitude}, ${user.longitude}")
 
                 // Chat Button
@@ -182,7 +186,10 @@ fun OthersUserProfileScreen(
                     onClick = {
                       navigationActions.navigateTo(C.Screen.CHAT, user.userUUID.toString())
                     }) {
-                      Text("Message with ${user.firstName}")
+                      Text(
+                          stringResource(R.string.user_profile_message_with_button) +
+                              " " +
+                              user.firstName)
                     }
 
                 // Book List
