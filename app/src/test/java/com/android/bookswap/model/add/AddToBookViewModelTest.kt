@@ -43,7 +43,7 @@ class AddToBookViewModelTest {
   @Before
   fun setup() {
     booksRepository = mockk()
-    context = mockk()
+    context = mockk(relaxed = true)
     val mockUserRepository: UsersRepository = mockk()
 
     mockUserViewModel = spyk(UserViewModel(uuid, mockUserRepository, user))

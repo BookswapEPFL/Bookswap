@@ -40,6 +40,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.SemanticsPropertyKey
 import androidx.compose.ui.semantics.SemanticsPropertyReceiver
 import androidx.compose.ui.semantics.semantics
@@ -47,6 +48,7 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
+import com.android.bookswap.R
 import com.android.bookswap.data.DataBook
 import com.android.bookswap.model.LocalAppConfig
 import com.android.bookswap.model.isNetworkAvailable
@@ -130,7 +132,11 @@ fun MapScreen(
     if (isOnline) {
       bookManagerViewModel.startUpdatingBooks()
     } else {
-      Toast.makeText(context, "Please connect to Internet to actualise", Toast.LENGTH_SHORT).show()
+      Toast.makeText(
+              context,
+              context.getString(R.string.map_screen_please_connect_to_internet),
+              Toast.LENGTH_SHORT)
+          .show()
     }
     val hasPermissions =
         permissions
@@ -221,7 +227,7 @@ fun MapScreen(
                 if (!latitude.value.isNaN() && !longitude.value.isNaN()) {
                   Marker(
                       state = MarkerState(position = LatLng(latitude.value, longitude.value)),
-                      title = "Your Location",
+                      title = stringResource(R.string.map_screen_your_location),
                       icon =
                           BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE))
                 }

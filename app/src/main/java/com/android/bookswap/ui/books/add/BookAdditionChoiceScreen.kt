@@ -24,6 +24,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -91,21 +92,21 @@ fun BookAdditionChoiceScreen(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally) {
               ButtonWithIcon(
-                  text = "Manually",
+                  text = stringResource(R.string.book_addition_choice_button_manually),
                   leftIcon = Icons.Default.Add,
                   leftIconPainter = null,
                   onClick = { navController.navigateTo(C.Screen.ADD_BOOK_MANUALLY) },
                   buttonWidth = buttonWidth)
               Spacer(modifier = Modifier.height(2f * columnPadding))
               ButtonWithIcon(
-                  text = "From ISBN",
+                  text = stringResource(R.string.book_addition_choice_button_from_isbn),
                   leftIcon = null,
                   leftIconPainter = painterResource(id = R.drawable.download),
                   onClick = { navController.navigateTo(C.Screen.ADD_BOOK_ISBN) },
                   buttonWidth = buttonWidth)
               Spacer(modifier = Modifier.height(2f * columnPadding))
               ButtonWithIcon(
-                  text = "From Photo",
+                  text = stringResource(R.string.book_addition_choice_button_from_photo),
                   leftIcon = null,
                   leftIconPainter = painterResource(id = R.drawable.photoicon),
                   onClick = { photoRequester.requestPhoto() },
