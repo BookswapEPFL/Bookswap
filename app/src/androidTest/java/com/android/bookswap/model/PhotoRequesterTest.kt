@@ -33,6 +33,10 @@ import org.junit.Test
 import org.mockito.kotlin.mock
 import java.io.File
 
+/*
+ Thanks https://medium.com/@adrian.gl/how-to-mock-and-test-activityresult-apis-with-jetpack-compose-f3a1d6311171
+ for most parts on how to implement this.
+ */
 class PhotoRequesterTest {
     @get:Rule val composeTestRule = createComposeRule()
     private val mockContext: Context = mockk()
@@ -48,6 +52,7 @@ class PhotoRequesterTest {
         every { mockContext.cacheDir } returns mockFile
         every { mockContext.contentResolver } returns mockContentResolver
 
+        //Mock all file functions for PhotoRequester#getTempUri()
         mockkStatic(File::class)
         every { File.createTempFile(any(), any(), any()) } returns mockFile
         mockkStatic(FileProvider::class)
@@ -60,16 +65,14 @@ class PhotoRequesterTest {
         val mockCallback: (Result<ImageBitmap>) -> Unit = mockk()
         every { mockCallback(any()) } just Runs
 
-
         val mockSource: ImageDecoder.Source = mockk()
         val mockBitmap: Bitmap = mockk()
-
 
         mockkStatic(ImageDecoder::class)
         every { ImageDecoder.createSource(any<ContentResolver>(), any()) } returns mockSource
         every { ImageDecoder.decodeBitmap(mockSource) } returns mockBitmap
 
-
+        // Every ActivityResultContracts needed returns true
         val testRegistry = object : ActivityResultRegistry() {
 
             override fun <I, O> onLaunch(
@@ -96,6 +99,7 @@ class PhotoRequesterTest {
 
         val photoRequester = PhotoRequester(mockContext, mockCallback)
 
+        // Init PhotoRequester
         composeTestRule.setContent {
             WithActivityResultRegistry(testRegistry) {
                 photoRequester.Init()
@@ -104,6 +108,7 @@ class PhotoRequesterTest {
         }
         photoRequester.requestPhoto()
 
+        // Received ImageBitmap
         verify { mockCallback(Result.success(any<ImageBitmap>())) }
     }
 
@@ -114,15 +119,17 @@ class PhotoRequesterTest {
 
         val photoRequester = PhotoRequester(mockContext, mockCallback)
 
+        // If PhotoRequester#Init() was not called, correct exception is raised
         assertThrows(PhotoRequester.Companion.ExceptionType.INIT_NOT_CALLED.toException()::class.java) {
             photoRequester.requestPhoto()
         }
     }
 
     @Test
-    fun photoRequesterErrorPermissionDenied() {
+    fun photoRequesterErrorImageSaved() {
         val mockCallback: (Result<ImageBitmap>) -> Unit = mockk()
 
+        // Register all contracts, but image was not saved
         val testRegistry = object : ActivityResultRegistry() {
 
             override fun <I, O> onLaunch(
@@ -159,18 +166,21 @@ class PhotoRequesterTest {
 
         every { mockCallback(any()) } answers {
             val exception = firstArg<Result<ImageBitmap>>().exceptionOrNull()
+            // Check that exception message is correct. Direct exception check is not possible.
             assertEquals(PhotoRequester.Companion.ExceptionType.IMAGE_NOT_SAVED.toException().message, exception!!.message)
         }
 
         photoRequester.requestPhoto()
 
+        // Verify that the callback and thus subsequent checks was call at least once
         verify { mockCallback(any()) }
     }
 
     @Test
-    fun photoRequesterErrorImageSaved() {
+    fun photoRequesterErrorCameraPermissionDenied() {
         val mockCallback: (Result<ImageBitmap>) -> Unit = mockk()
 
+        // Register all contracts, but camera permission is denied
         val testRegistry = object : ActivityResultRegistry() {
 
             override fun <I, O> onLaunch(
@@ -203,11 +213,13 @@ class PhotoRequesterTest {
 
         every { mockCallback(any()) } answers {
             val exception = firstArg<Result<ImageBitmap>>().exceptionOrNull()
+            // Check that exception message is correct. Direct exception check is not possible.
             assertEquals(PhotoRequester.Companion.ExceptionType.PERMISSION_DENIED.toException().message, exception!!.message)
         }
 
         photoRequester.requestPhoto()
 
+        // Verify that the callback and thus subsequent checks was call at least once
         verify { mockCallback(any()) }
     }
 
@@ -217,6 +229,8 @@ class PhotoRequesterTest {
      * Defines a custom [ActivityResultRegistry] to be used when calls to ActivityResultContracts API via rememberLauncherForActivityResult.
      *
      * This allow us to mock external Activity calls in tests or in mock mode.
+     *
+     * Thanks https://medium.com/@adrian.gl/how-to-mock-and-test-activityresult-apis-with-jetpack-compose-f3a1d6311171
      */
     @Composable
     fun WithActivityResultRegistry(activityResultRegistry: ActivityResultRegistry, content: @Composable () -> Unit) {
