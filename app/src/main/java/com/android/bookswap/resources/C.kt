@@ -171,6 +171,8 @@ object C {
       const val canton = "canton" + UI_T.TEXT_FIELD
       const val postal = "postal" + UI_T.TEXT_FIELD
       const val country = "country" + UI_T.TEXT_FIELD
+      const val cityError = "city_error" + UI_T.TEXT
+      const val countryError = "canton_error" + UI_T.TEXT
     }
 
     object OtherUserProfile {

@@ -10,79 +10,95 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.android.bookswap.R
+import com.android.bookswap.model.InputVerification
 import com.android.bookswap.resources.C
 import com.android.bookswap.ui.theme.ColorVariable
 
+private val ERROR_FONT_SIZE = 12.sp
+private val PADDING_COLUMN = 8.dp
+private val PADDING_ROW = 4.dp
+private const val THREE_QUARTERS = 0.75f
+private const val ONE_QUARTER = 0.25f
+private val COLOUR = ColorVariable.AccentSecondary
+
 @Composable
 fun AddressFieldsComponent(
+    firstAttempt: Boolean = false,
     address: String = "",
     onAddressChange: (String) -> Unit,
     city: String = "",
     onCityChange: (String) -> Unit,
+    cityError: String = "",
     canton: String = "",
     onCantonChange: (String) -> Unit,
     postal: String = "",
     onPostalChange: (String) -> Unit,
     country: String = "",
-    onCountryChange: (String) -> Unit
+    onCountryChange: (String) -> Unit,
+    countryError: String = ""
 ) {
-    Column {
-        OutlinedTextField(
-            value = address,
-            onValueChange = onAddressChange,
-            label = { Text("Address") },
-            placeholder = { Text("Avenue de la Gare 20", color = Color.Gray) },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp)
-                .testTag(C.Tag.AddressFields.address)
-        )
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp)
-        ) {
-            OutlinedTextField(
-                value = city,
-                onValueChange = onCityChange,
-                label = { Text("City") },
-                placeholder = { Text("Lausanne", color = ColorVariable.AccentSecondary) },
-                modifier = Modifier
-                    .weight(0.75f)
-                    .padding(end = 4.dp)
-                    .testTag(C.Tag.AddressFields.city)
-            )
-            OutlinedTextField(
-                value = postal,
-                onValueChange = onPostalChange,
-                label = { Text("PLZ") },
-                placeholder = { Text("1003",  color = ColorVariable.AccentSecondary) },
-                modifier = Modifier
-                    .weight(0.25f)
-                    .padding(start = 4.dp)
-                    .testTag(C.Tag.AddressFields.postal)
-            )
-        }
-        OutlinedTextField(
-            value = canton,
-            onValueChange = onCantonChange,
-            label = { Text("Region") },
-            placeholder = { Text("Vaud",  color = ColorVariable.AccentSecondary) },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp)
-                .testTag(C.Tag.AddressFields.canton)
-        )
-        OutlinedTextField(
-            value = country,
-            onValueChange = onCountryChange,
-            label = { Text("Country") },
-            placeholder = { Text("Switzerland",  color = ColorVariable.AccentSecondary) },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp)
-                .testTag(C.Tag.AddressFields.country)
-        )
+  val verification = InputVerification()
+  Column {
+    OutlinedTextField(
+        value = address,
+        onValueChange = onAddressChange,
+        label = { Text(stringResource(R.string.street_display)) },
+        placeholder = { Text(stringResource(R.string.street_example), color = COLOUR) },
+        modifier =
+            Modifier.fillMaxWidth().padding(PADDING_COLUMN).testTag(C.Tag.AddressFields.address))
+    Row(modifier = Modifier.fillMaxWidth().padding(PADDING_COLUMN)) {
+      OutlinedTextField(
+          value = city,
+          onValueChange = onCityChange,
+          label = { Text(stringResource(R.string.city_display)) },
+          placeholder = { Text(stringResource(R.string.city_example), color = COLOUR) },
+          modifier =
+              Modifier.weight(THREE_QUARTERS)
+                  .padding(end = PADDING_ROW)
+                  .testTag(C.Tag.AddressFields.city),
+          isError = !verification.validateNonEmpty(city) && !firstAttempt)
+      OutlinedTextField(
+          value = postal,
+          onValueChange = onPostalChange,
+          label = { Text(stringResource(R.string.postal_display)) },
+          placeholder = { Text(stringResource(R.string.postal_example), color = COLOUR) },
+          modifier =
+              Modifier.weight(ONE_QUARTER)
+                  .padding(start = PADDING_ROW)
+                  .testTag(C.Tag.AddressFields.postal))
     }
+    if (!verification.validateNonEmpty(city) && !firstAttempt) {
+      Text(
+          cityError,
+          color = Color.Red,
+          fontSize = ERROR_FONT_SIZE,
+          modifier = Modifier.testTag(C.Tag.AddressFields.cityError))
+    }
+    OutlinedTextField(
+        value = canton,
+        onValueChange = onCantonChange,
+        label = { Text(stringResource(R.string.canton_display)) },
+        placeholder = { Text(stringResource(R.string.canton_example), color = COLOUR) },
+        modifier =
+            Modifier.fillMaxWidth().padding(PADDING_COLUMN).testTag(C.Tag.AddressFields.canton))
+    OutlinedTextField(
+        value = country,
+        onValueChange = onCountryChange,
+        label = { Text(stringResource(R.string.country_display)) },
+        placeholder = { Text(stringResource(R.string.country_example), color = COLOUR) },
+        modifier =
+            Modifier.fillMaxWidth().padding(PADDING_COLUMN).testTag(C.Tag.AddressFields.country),
+        isError = !verification.validateNonEmpty(country) && !firstAttempt)
+    if (!verification.validateNonEmpty(country) && !firstAttempt) {
+      Text(
+          countryError,
+          color = Color.Red,
+          fontSize = ERROR_FONT_SIZE,
+          modifier = Modifier.testTag(C.Tag.AddressFields.countryError))
+    }
+  }
 }

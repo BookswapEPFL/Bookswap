@@ -104,6 +104,9 @@ fun NewUserScreen(
   val postal = remember { mutableStateOf("") }
   val country = remember { mutableStateOf("") }
 
+  val cityError = remember { mutableStateOf<String?>("City required") }
+  val countryError = remember { mutableStateOf<String?>("Country required") }
+
   val appConfig = LocalAppConfig.current
   var firstAttempt = true
 
@@ -306,14 +309,23 @@ fun NewUserScreen(
                             modifier = Modifier.testTag(C.Tag.NewUser.phone_error))
                       }
                     }
-                  AddressFieldsComponent(
-                      onAddressChange = { address.value = it },
-                      onCityChange = { city.value = it },
-                      onCantonChange = { canton.value = it },
-                      onPostalChange = { postal.value = it },
-                      onCountryChange = { country.value = it }
-                  )
               }
+        }
+        item {
+          AddressFieldsComponent(
+              firstAttempt = firstAttempt,
+              address = address.value,
+              onAddressChange = { address.value = it },
+              city = city.value,
+              onCityChange = { city.value = it },
+              cityError = cityError.value!!,
+              canton = canton.value,
+              onCantonChange = { canton.value = it },
+              postal = postal.value,
+              onPostalChange = { postal.value = it },
+              countryError = countryError.value!!,
+              country = country.value,
+              onCountryChange = { country.value = it })
         }
 
         item {
@@ -325,7 +337,7 @@ fun NewUserScreen(
                       verification.validateNonEmpty(firstName.value) &&
                       verification.validateNonEmpty(lastName.value) &&
                       verification.validateNonEmpty(city.value) &&
-                      verification.validateNonEmpty(country.value)){
+                      verification.validateNonEmpty(country.value)) {
                     appConfig.userViewModel.updateUser(
                         greeting = greeting.value,
                         firstName = firstName.value,
@@ -334,16 +346,19 @@ fun NewUserScreen(
                         phone = phone.value,
                         picURL = profilPicture.value ?: "",
                         googleUid = Firebase.auth.currentUser?.uid ?: "")
-                    val addressComponents = if (address.value.isEmpty() || canton.value.isEmpty() || postal.value.isEmpty()) {
-                      listOf(city.value, country.value)
-                    } else {
-                      listOf(address.value, city.value, canton.value, postal.value, country.value)
-                    }
+                    val addressComponents =
+                        if (address.value.isEmpty() ||
+                            canton.value.isEmpty() ||
+                            postal.value.isEmpty()) {
+                          listOf(city.value, country.value)
+                        } else {
+                          listOf(
+                              address.value, city.value, canton.value, postal.value, country.value)
+                        }
                     appConfig.userViewModel.updateCoordinates(
                         addressComponents = addressComponents,
                         context = context,
-                        userUUID = appConfig.userViewModel.getUser().userUUID
-                    )
+                        userUUID = appConfig.userViewModel.getUser().userUUID)
                     navigationActions.navigateTo(C.Route.MAP)
                   } else {
                     firstAttempt = false

@@ -102,6 +102,18 @@
     <string name="new_user_toast_correct_error">Please correct the errors</string>
     <string name="new_user_create_button">Create</string>
 
+    <!-- Address fields -->
+    <string name="street_display">Street</string>
+    <string name="street_example">Avenue de la Gare 20</string>
+    <string name="city_display">City</string>
+    <string name="city_example">Lausanne</string>
+    <string name="postal_display">PLZ</string>
+    <string name="postal_example">1003</string>
+    <string name="canton_display">Region</string>
+    <string name="canton_example">Vaud</string>
+    <string name="country_display">Country</string>
+    <string name="country_example">Switzerland</string>
+
     <!-- User Profile Screen -->
     <string name="other_user_profile_screen_title">User Profile</string>
     <string name="user_profile_screen_title">Your Profile</string>
