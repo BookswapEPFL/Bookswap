@@ -7,6 +7,7 @@ import com.android.bookswap.data.BookLanguages
 import com.android.bookswap.data.DataBook
 import com.android.bookswap.data.DataUser
 import com.android.bookswap.data.repository.BooksRepository
+import com.android.bookswap.data.repository.UsersRepository
 import com.android.bookswap.model.UserViewModel
 import io.mockk.*
 import java.util.*
@@ -37,12 +38,23 @@ class AddToBookViewModelTest {
           archived = false,
           exchange = true)
 
+  private val user = DataUser(userUUID = uuid, firstName = "Corin")
+
   @Before
   fun setup() {
     booksRepository = mockk()
-    context = mockk()
-    mockUserViewModel = mockk(relaxed = true)
-    every { mockUserViewModel.getUser(any()) } returns DataUser(userUUID = uuid)
+    context = mockk(relaxed = true)
+    val mockUserRepository: UsersRepository = mockk()
+
+    mockUserViewModel = spyk(UserViewModel(uuid, mockUserRepository, user))
+    every { mockUserViewModel.getUser(any()) } returns user
+    every { mockUserViewModel.uuid } returns uuid
+    every { mockUserViewModel.getUser() } returns user
+    every {
+      mockUserViewModel.updateUser(
+          any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any())
+    } just runs
+
     viewModel = AddToBookViewModel(booksRepository, mockUserViewModel)
 
     // Mock Toast.makeText
@@ -98,5 +110,7 @@ class AddToBookViewModelTest {
           },
           any())
     }
+
+    verify { mockUserViewModel.updateUser(firstName = "Corin", bookList = listOf(book.uuid)) }
   }
 }

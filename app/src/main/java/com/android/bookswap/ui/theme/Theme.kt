@@ -17,6 +17,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 
+/** Light color scheme for the BookSwap app. */
 private val lightScheme =
     lightColorScheme(
         primary = primaryLight,
@@ -55,7 +56,7 @@ private val lightScheme =
         surfaceContainerHigh = surfaceContainerHighLight,
         surfaceContainerHighest = surfaceContainerHighestLight,
     )
-
+/** Dark color scheme for the BookSwap app. */
 private val darkScheme =
     darkColorScheme(
         primary = primaryDark,
@@ -94,7 +95,7 @@ private val darkScheme =
         surfaceContainerHigh = surfaceContainerHighDark,
         surfaceContainerHighest = surfaceContainerHighestDark,
     )
-
+/** Medium contrast light color scheme for the BookSwap app. */
 private val mediumContrastLightColorScheme =
     lightColorScheme(
         primary = primaryLightMediumContrast,
@@ -133,7 +134,7 @@ private val mediumContrastLightColorScheme =
         surfaceContainerHigh = surfaceContainerHighLightMediumContrast,
         surfaceContainerHighest = surfaceContainerHighestLightMediumContrast,
     )
-
+/** High contrast light color scheme for the BookSwap app. */
 private val highContrastLightColorScheme =
     lightColorScheme(
         primary = primaryLightHighContrast,
@@ -172,7 +173,7 @@ private val highContrastLightColorScheme =
         surfaceContainerHigh = surfaceContainerHighLightHighContrast,
         surfaceContainerHighest = surfaceContainerHighestLightHighContrast,
     )
-
+/** Medium contrast dark color scheme for the BookSwap app. */
 private val mediumContrastDarkColorScheme =
     darkColorScheme(
         primary = primaryDarkMediumContrast,
@@ -211,7 +212,7 @@ private val mediumContrastDarkColorScheme =
         surfaceContainerHigh = surfaceContainerHighDarkMediumContrast,
         surfaceContainerHighest = surfaceContainerHighestDarkMediumContrast,
     )
-
+/** High contrast dark color scheme for the BookSwap app. */
 private val highContrastDarkColorScheme =
     darkColorScheme(
         primary = primaryDarkHighContrast,
@@ -250,7 +251,14 @@ private val highContrastDarkColorScheme =
         surfaceContainerHigh = surfaceContainerHighDarkHighContrast,
         surfaceContainerHighest = surfaceContainerHighestDarkHighContrast,
     )
-
+/**
+ * Data class representing a color family with its associated colors.
+ *
+ * @property color The main color.
+ * @property onColor The color used on top of the main color.
+ * @property colorContainer The container color.
+ * @property onColorContainer The color used on top of the container color.
+ */
 @Immutable
 data class ColorFamily(
     val color: Color,
@@ -258,10 +266,16 @@ data class ColorFamily(
     val colorContainer: Color,
     val onColorContainer: Color
 )
-
+/** Unspecified color scheme used as a placeholder. */
 val unspecified_scheme =
     ColorFamily(Color.Unspecified, Color.Unspecified, Color.Unspecified, Color.Unspecified)
-
+/**
+ * Applies the BookSwap app theme to the content.
+ *
+ * @param darkTheme Whether the dark theme is enabled.
+ * @param dynamicColor Whether dynamic color is enabled (available on Android 12+).
+ * @param content The content to which the theme is applied.
+ */
 @Composable
 fun BookSwapAppTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
