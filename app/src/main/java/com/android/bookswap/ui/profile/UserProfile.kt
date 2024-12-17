@@ -263,7 +263,10 @@ fun UserProfile(
                 Text("Edit Profile")
               }
           Button(
-              onClick = { appConfig.userViewModel.disconnectUser() },
+              onClick = {
+                appConfig.userViewModel.disconnectUser()
+                navigationActions.navigateTo(C.Screen.AUTH)
+              },
               modifier =
                   Modifier.align(Alignment.CenterHorizontally)
                       .testTag("disconnect_button") // Add testTag for testing
