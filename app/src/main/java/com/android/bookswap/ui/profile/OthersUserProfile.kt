@@ -188,6 +188,7 @@ fun OthersUserProfileScreen(
                     }) {
                       Text(
                           stringResource(R.string.user_profile_message_with_button) +
+                              " " +
                               user.firstName)
                     }
 
