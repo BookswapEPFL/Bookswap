@@ -19,15 +19,19 @@ import com.android.bookswap.resources.C
 import com.android.bookswap.ui.theme.ColorVariable
 
 private val ERROR_FONT_SIZE = 12.sp
+private val NEW_ADDRESS_FONT_SIZE = 18.sp
 private val PADDING_COLUMN = 8.dp
 private val PADDING_ROW = 4.dp
 private const val THREE_QUARTERS = 0.75f
 private const val ONE_QUARTER = 0.25f
+private const val TWO_THIRDS = 0.66f
+private const val ONE_THIRD = 0.33f
 private val COLOUR = ColorVariable.AccentSecondary
 
 @Composable
 fun AddressFieldsComponent(
     firstAttempt: Boolean = false,
+    editVSNew: Boolean = true,
     address: String = "",
     onAddressChange: (String) -> Unit,
     city: String = "",
@@ -43,6 +47,12 @@ fun AddressFieldsComponent(
 ) {
   val verification = InputVerification()
   Column {
+    if(!editVSNew) {
+      Text(
+          stringResource(R.string.new_address),
+          fontSize = NEW_ADDRESS_FONT_SIZE,
+          modifier = Modifier.padding(PADDING_COLUMN).testTag(C.Tag.AddressFields.newAddress))
+    }
     OutlinedTextField(
         value = address,
         onValueChange = onAddressChange,
@@ -57,21 +67,21 @@ fun AddressFieldsComponent(
           label = { Text(stringResource(R.string.city_display)) },
           placeholder = { Text(stringResource(R.string.city_example), color = COLOUR) },
           modifier =
-              Modifier.weight(THREE_QUARTERS)
+              Modifier.weight(if(!editVSNew) TWO_THIRDS else THREE_QUARTERS)
                   .padding(end = PADDING_ROW)
                   .testTag(C.Tag.AddressFields.city),
-          isError = !verification.validateNonEmpty(city) && !firstAttempt)
+          isError = !verification.validateNonEmpty(city) && !firstAttempt && editVSNew)
       OutlinedTextField(
           value = postal,
           onValueChange = onPostalChange,
           label = { Text(stringResource(R.string.postal_display)) },
           placeholder = { Text(stringResource(R.string.postal_example), color = COLOUR) },
           modifier =
-              Modifier.weight(ONE_QUARTER)
+              Modifier.weight(if(!editVSNew) ONE_THIRD else ONE_QUARTER)
                   .padding(start = PADDING_ROW)
                   .testTag(C.Tag.AddressFields.postal))
     }
-    if (!verification.validateNonEmpty(city) && !firstAttempt) {
+    if (!verification.validateNonEmpty(city) && !firstAttempt && editVSNew) {
       Text(
           cityError,
           color = Color.Red,
@@ -92,8 +102,8 @@ fun AddressFieldsComponent(
         placeholder = { Text(stringResource(R.string.country_example), color = COLOUR) },
         modifier =
             Modifier.fillMaxWidth().padding(PADDING_COLUMN).testTag(C.Tag.AddressFields.country),
-        isError = !verification.validateNonEmpty(country) && !firstAttempt)
-    if (!verification.validateNonEmpty(country) && !firstAttempt) {
+        isError = !verification.validateNonEmpty(country) && !firstAttempt && editVSNew)
+    if (!verification.validateNonEmpty(country) && !firstAttempt && editVSNew) {
       Text(
           countryError,
           color = Color.Red,

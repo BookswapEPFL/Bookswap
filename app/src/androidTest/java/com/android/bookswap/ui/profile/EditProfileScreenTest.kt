@@ -1,5 +1,6 @@
 package com.android.bookswap.ui.profile
 
+import android.content.Context
 import android.util.Log
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -17,6 +18,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.mock
 
 /**
  * Instrumented test, which will execute on an Android device.
@@ -27,9 +29,11 @@ import org.junit.runner.RunWith
 class EditProfileScreenTest : TestCase() {
 
   private val mockUserViewModel: UserViewModel = mockk(relaxed = true)
+  private lateinit var mockContext: Context
 
   @Before
   fun setup() {
+    mockContext = mockk()
     every { mockUserViewModel.uuid } returns UUID.randomUUID()
   }
 
@@ -42,6 +46,7 @@ class EditProfileScreenTest : TestCase() {
           CompositionLocalProvider(
               LocalAppConfig provides AppConfig(userViewModel = mockUserViewModel)) {
                 EditProfileDialog(
+                  mockContext,
                     { Log.d("EditProfileTest_Dismiss", "User info discarded") },
                     { Log.d("EditProfileTest_Save", "User info saved ${it.printFullname()}") },
                 )
@@ -109,6 +114,7 @@ class EditProfileScreenTest : TestCase() {
           CompositionLocalProvider(
               LocalAppConfig provides AppConfig(userViewModel = mockUserViewModel)) {
                 EditProfileDialog(
+                  mockContext,
                     { Log.d("EditProfileTest_Dismiss", "User info discarded") },
                     { Log.d("EditProfileTest_Save", "User info saved ${it.printFullname()}") })
               }
@@ -185,6 +191,7 @@ class EditProfileScreenTest : TestCase() {
           CompositionLocalProvider(
               LocalAppConfig provides AppConfig(userViewModel = mockUserViewModel)) {
                 EditProfileDialog(
+                  mockContext,
                     { Log.d("EditProfileTest_Dismiss", "User info discarded") },
                     { Log.d("EditProfileTest_Save", "User info saved ${it.printFullname()}") })
               }
@@ -294,6 +301,7 @@ class EditProfileScreenTest : TestCase() {
           CompositionLocalProvider(
               LocalAppConfig provides AppConfig(userViewModel = mockUserViewModel)) {
                 EditProfileDialog(
+                  mockContext,
                     { Log.d("EditProfileTest_Dismiss", "User info discarded") },
                     { Log.d("EditProfileTest_Save", "User info saved ${it.printFullname()}") })
               }

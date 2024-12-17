@@ -103,6 +103,7 @@
     <string name="new_user_create_button">Create</string>
 
     <!-- Address fields -->
+    <string name="new_address">Please write your new address below</string>
     <string name="street_display">Street</string>
     <string name="street_example">Avenue de la Gare 20</string>
     <string name="city_display">City</string>

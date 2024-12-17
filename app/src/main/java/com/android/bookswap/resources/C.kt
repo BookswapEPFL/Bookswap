@@ -166,6 +166,7 @@ object C {
     }
 
     object AddressFields {
+      const val newAddress = "new_address" + UI_T.TEXT
       const val address = "address" + UI_T.TEXT_FIELD
       const val city = "city" + UI_T.TEXT_FIELD
       const val canton = "canton" + UI_T.TEXT_FIELD
