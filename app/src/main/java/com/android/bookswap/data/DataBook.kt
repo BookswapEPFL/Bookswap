@@ -49,7 +49,7 @@ enum class BookLanguages(val languageName: String, val languageCode: String) {
       Enums.LanguagesCode.OTHER) // All languages that are not yet implemented
 }
 /** Genre of a book */
-enum class BookGenres(val genre: String) {
+enum class BookGenres(val Genre: String) {
   FICTION(Enums.Genres.FICTION),
   NONFICTION(Enums.Genres.NONFICTION),
   FANTASY(Enums.Genres.FANTASY),
