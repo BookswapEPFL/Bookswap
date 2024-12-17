@@ -27,8 +27,13 @@ class ChatGPTApiService(context: Context, mode: Boolean = true) : ApiService {
   private val requestQueue: RequestQueue = Volley.newRequestQueue(context)
   private val apiKey = if (mode) BuildConfig.OPENAI_API_KEY else ""
   private val apiUrl = "https://api.openai.com/v1/chat/completions"
-
-  // Send a chat request to the OpenAI API
+  /**
+   * Send a chat request to the OpenAI API.
+   *
+   * @param userMessages List of user messages to send.
+   * @param onSuccess Callback for a successful response.
+   * @param onError Callback for handling errors.
+   */
   override fun sendChatRequest(
       userMessages: List<String>,
       onSuccess: (String) -> Unit,

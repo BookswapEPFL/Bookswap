@@ -56,6 +56,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
@@ -80,11 +81,14 @@ import java.util.UUID
 /**
  * Composable function for the chat screen.
  *
+ * @param userSource Repository for handling user data.
  * @param messageRepository Repository for handling messages.
  * @param currentUser The current user data.
  * @param otherUser The other user data.
  * @param navController Navigation actions for navigating between screens.
  * @param photoStorage Repository for handling photo storage.
+ *     @param messageStorage Repository for handling offline message storage.
+ *     @param context The context of the application.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -130,7 +134,9 @@ fun ChatScreen(
                               Log.d("ChatScreen", "Image stored successfully")
                             } else {
                               Toast.makeText(
-                                      context, "Image could not be stored.", Toast.LENGTH_LONG)
+                                      context,
+                                      context.getString(R.string.chat_message_stored_error),
+                                      Toast.LENGTH_LONG)
                                   .show()
                               Log.e("ChatScreen", "Image could not be stored.")
                             }
@@ -141,7 +147,9 @@ fun ChatScreen(
                     }
               })
         } else {
-          Toast.makeText(context, "Image could not be stored.", Toast.LENGTH_LONG).show()
+          Toast.makeText(
+                  context, context.getString(R.string.chat_message_stored_error), Toast.LENGTH_LONG)
+              .show()
           Log.e("ChatScreen", "Image could not be stored.")
         }
       }
@@ -266,7 +274,11 @@ fun ChatScreen(
               Button(
                   onClick = {
                     if (newMessageText.text.isEmpty()) {
-                      Toast.makeText(context, "Message cannot be empty", Toast.LENGTH_SHORT).show()
+                      Toast.makeText(
+                              context,
+                              context.getString(R.string.chat_message_empty_error),
+                              Toast.LENGTH_SHORT)
+                          .show()
                     } else if (updateActive) {
                       // Update the message
                       messageRepository.updateMessage(
@@ -281,7 +293,7 @@ fun ChatScreen(
                             } else {
                               Toast.makeText(
                                       context,
-                                      "Message can only be updated within 15 minutes of being sent",
+                                      context.getString(R.string.chat_update_error),
                                       Toast.LENGTH_LONG)
                                   .show()
                               Log.e(
@@ -310,7 +322,10 @@ fun ChatScreen(
                         if (result.isSuccess) {
                           newMessageText = TextFieldValue("")
                         } else {
-                          Toast.makeText(context, "Message could not be sent.", Toast.LENGTH_LONG)
+                          Toast.makeText(
+                                  context,
+                                  context.getString(R.string.chat_send_error),
+                                  Toast.LENGTH_LONG)
                               .show()
                           Log.e(
                               "MessageView",
@@ -328,7 +343,9 @@ fun ChatScreen(
                   modifier =
                       Modifier.padding(horizontal = padding8)
                           .testTag(C.Tag.ChatScreen.confirm_button)) {
-                    Text(if (updateActive) "Update" else "Send")
+                    Text(
+                        if (updateActive) stringResource(R.string.chat_update_button)
+                        else stringResource(R.string.chat_send_button))
                   }
             }
       }
@@ -360,7 +377,7 @@ fun ChatScreen(
                                     ColorVariable.Primary, shape = RoundedCornerShape(50))
                                 .padding(padding8)
                                 .testTag(C.Tag.ChatScreen.edit)) {
-                          Text("Edit")
+                          Text(stringResource(R.string.chat_edit_button))
                         }
                     Button(
                         onClick = {
@@ -374,7 +391,7 @@ fun ChatScreen(
                                   } else {
                                     Toast.makeText(
                                             context,
-                                            "Message can only be deleted within 15 minutes of being sent",
+                                            context.getString(R.string.chat_delete_error),
                                             Toast.LENGTH_LONG)
                                         .show()
                                     Log.e(
@@ -389,7 +406,7 @@ fun ChatScreen(
                                     ColorVariable.Primary, shape = RoundedCornerShape(50))
                                 .padding(padding8)
                                 .testTag(C.Tag.ChatScreen.delete)) {
-                          Text("Delete")
+                          Text(stringResource(R.string.chat_delete_button))
                         }
                   }
             }
@@ -403,6 +420,7 @@ fun ChatScreen(
  * @param message The message data to display.
  * @param currentUserUUID The UUID of the current user.
  * @param onLongPress Callback function to handle long press on the message item.
+ * @param chatScreenViewModel The ViewModel for the chat screen.
  */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
