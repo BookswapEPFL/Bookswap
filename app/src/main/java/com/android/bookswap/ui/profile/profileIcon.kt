@@ -13,7 +13,11 @@ import com.android.bookswap.resources.C
 import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.theme.ColorVariable
 
-/** Profile Icon for the top app bar */
+/**
+ * Profile Icon for the top app bar.
+ *
+ * @param navigationActions The navigation actions to handle navigation events.
+ */
 @Composable
 fun ProfileIcon(navigationActions: NavigationActions) {
   IconButton(
