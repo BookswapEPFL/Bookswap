@@ -107,6 +107,7 @@ open class UserViewModel(
       // If the user is found, update the dataUser and set isLoaded to true
       result.onSuccess {
         dataUser = it
+        uuid = dataUser.userUUID
         isLoaded = true
         _isStored.value = true
       }
