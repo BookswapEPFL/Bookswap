@@ -165,8 +165,25 @@ open class UserViewModel(
    * stored state to false.
    */
   fun disconnectUser() {
-    this.dataUser = DataUser(UUID.randomUUID())
-    this.uuid = UUID.randomUUID()
-    Firebase.auth.signOut()
+    viewModelScope.launch {
+      // Update user if _isStored is false before disconnecting
+      if (_isStored.value == false) {
+        updateUser()
+      }
+
+      // Generate a single UUID for consistency
+      val newUUID = UUID.randomUUID()
+      dataUser = DataUser(newUUID)
+      uuid = newUUID
+
+      // Update flags
+      isLoaded = false
+      _isStored.value = false
+
+      // Sign out from Firebase
+      Firebase.auth.signOut()
+
+      Log.d("UserViewModel", "User disconnected and data reset.")
+    }
   }
 }

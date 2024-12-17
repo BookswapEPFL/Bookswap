@@ -3,6 +3,7 @@ package com.android.bookswap.ui.profile
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.assertAll
+import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.hasText
@@ -31,6 +32,7 @@ import io.github.kakaocup.compose.node.element.ComposeScreen
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.verify
 import java.util.UUID
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.junit.Before
@@ -236,5 +238,26 @@ class UserProfileScreenTest : TestCase() {
     composeTestRule
         .onNodeWithTag(C.Tag.TopAppBar.profile_button, useUnmergedTree = true)
         .assertIsDisplayed()
+  }
+
+  @Test
+  fun testDisconnectButton() {
+    // Verify that the Disconnect button exists and is displayed
+    composeTestRule.onNodeWithTag(C.Tag.UserProfile.disconnect).assertExists()
+    composeTestRule.onNodeWithTag(C.Tag.UserProfile.disconnect).assertIsDisplayed()
+    composeTestRule.onNodeWithTag(C.Tag.UserProfile.disconnect).assertHasClickAction()
+
+    // Mock the disconnectUser function and navigation action
+    every { mockNavigationActions.navigateTo(C.Screen.AUTH) } returns Unit
+    coEvery { photoStorage.addPhotoToStorage(any(), any(), any()) } returns Unit
+
+    // Perform the click on the disconnect button
+    composeTestRule.onNodeWithTag(C.Tag.UserProfile.disconnect).performClick()
+
+    // Verify that the navigation action is triggered
+    verify { mockNavigationActions.navigateTo(C.Screen.AUTH) }
+
+    // Optionally, you can check that "Disconnected" toast message is displayed
+    // This requires toast instrumentation or Espresso's toast testing workaround
   }
 }

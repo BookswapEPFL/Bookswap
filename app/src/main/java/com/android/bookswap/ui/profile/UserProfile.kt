@@ -262,14 +262,12 @@ fun UserProfile(
               Modifier.testTag(C.Tag.UserProfile.edit).align(Alignment.CenterHorizontally)) {
                 Text("Edit Profile")
               }
-          // Disconnect Button
           Button(
-              onClick = {
-                appConfig.userViewModel.disconnectUser()
-                Toast.makeText(context, "Disconnected", Toast.LENGTH_SHORT).show()
-                navigationActions.navigateTo(C.Screen.AUTH)
-              },
-              modifier = Modifier.align(Alignment.CenterHorizontally)) {
+              onClick = { appConfig.userViewModel.disconnectUser() },
+              modifier =
+                  Modifier.align(Alignment.CenterHorizontally)
+                      .testTag("disconnect_button") // Add testTag for testing
+              ) {
                 Text("Disconnect")
               }
           // Book List
