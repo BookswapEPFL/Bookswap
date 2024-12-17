@@ -67,6 +67,9 @@ private val SPACER_HEIGHT_PIC_INFO = 6.dp
  * @param userBookViewModel The ViewModel containing user book data. Defaults to a new
  *   UserBookViewModel instance.
  * @param navigationActions The navigation actions for navigating between screens.
+ * @param topAppBar A composable function for the top app bar. Defaults to an empty composable.
+ * @param bottomAppBar A composable function for the bottom app bar. Defaults to an empty
+ *   composable.
  */
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
