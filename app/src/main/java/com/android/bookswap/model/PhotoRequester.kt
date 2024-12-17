@@ -86,13 +86,13 @@ class PhotoRequester(
     return uri
   }
 
-    companion object {
-        enum class ExceptionType(private val exceptionMessage: String) {
-            INIT_NOT_CALLED("Always call #Init() before using #requestPhoto()."),
-            PERMISSION_DENIED("Camera permission denied."),
-            IMAGE_NOT_SAVED("Image could not be saved in phone.");
+  companion object {
+    enum class ExceptionType(private val exceptionMessage: String) {
+      INIT_NOT_CALLED("Always call #Init() before using #requestPhoto()."),
+      PERMISSION_DENIED("Camera permission denied."),
+      IMAGE_NOT_SAVED("Image could not be saved in phone.");
 
-            fun toException(): Exception = Exception(exceptionMessage)
-        }
+      fun toException(): Exception = Exception(exceptionMessage)
     }
+  }
 }
