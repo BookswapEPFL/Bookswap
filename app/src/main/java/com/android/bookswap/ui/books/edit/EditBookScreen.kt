@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -120,8 +119,7 @@ fun EditBookScreen(
                         }
                     Spacer(modifier = Modifier.fillMaxWidth(SPACE_BETWEEN_BUTTON))
                     ButtonComponent(
-                        modifier =
-                            Modifier.testTag(C.Tag.BookEntryComp.cancel_button).fillMaxWidth(),
+                        modifier = Modifier.testTag(C.Tag.EditBook.delete).fillMaxWidth(),
                         onClick = { viewModel.deleteBook(context, book.uuid) }) {
                           Text("Delete")
                         }

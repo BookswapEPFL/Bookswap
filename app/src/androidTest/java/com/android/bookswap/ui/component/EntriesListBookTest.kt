@@ -16,8 +16,6 @@ import com.android.bookswap.data.repository.PhotoFirebaseStorageRepository
 import com.android.bookswap.model.PhotoRequester
 import com.android.bookswap.resources.C
 import com.android.bookswap.ui.components.EntriesListBookComponent
-import com.google.android.gms.auth.api.signin.internal.Storage
-import io.mockk.awaits
 import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
@@ -31,15 +29,14 @@ class EntriesListBookTest {
 
   @get:Rule val composeTestRule = createComposeRule()
 
-    private lateinit var photoStorage: PhotoFirebaseStorageRepository
+  private lateinit var photoStorage: PhotoFirebaseStorageRepository
 
-    @Before
-    fun setup(){
-        photoStorage = mockk()
-        every { photoStorage.addPhotoToStorage(any(),any(),any())} just runs
-        mockkStatic(PhotoRequester::class)
-
-    }
+  @Before
+  fun setup() {
+    photoStorage = mockk()
+    every { photoStorage.addPhotoToStorage(any(), any(), any()) } just runs
+    mockkStatic(PhotoRequester::class)
+  }
 
   @Test
   fun testTitleFieldInput() {

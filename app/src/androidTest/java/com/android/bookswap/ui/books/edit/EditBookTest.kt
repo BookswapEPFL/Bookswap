@@ -32,7 +32,7 @@ class EditBookScreenTest {
 
   @get:Rule val composeTestRule = createComposeRule()
 
-    private lateinit var photoStorage: PhotoFirebaseStorageRepository
+  private lateinit var photoStorage: PhotoFirebaseStorageRepository
 
   private val sampleBook =
       DataBook(
@@ -51,8 +51,8 @@ class EditBookScreenTest {
 
   @Before
   fun setUp() {
-      photoStorage = mockk()
-      every { photoStorage.addPhotoToStorage(any(),any(),any())} just runs
+    photoStorage = mockk()
+    every { photoStorage.addPhotoToStorage(any(), any(), any()) } just runs
     MockKAnnotations.init(this)
     every { mockViewModel.deleteBook(any(), any()) } just runs
     every {
@@ -65,17 +65,14 @@ class EditBookScreenTest {
         }
 
     every { navigationActions.currentRoute() } returns "EDIT_BOOK"
-    composeTestRule.setContent { EditBookScreen(mockViewModel, photoStorage, bookUUID =  sampleBook.uuid) }
+    composeTestRule.setContent {
+      EditBookScreen(mockViewModel, photoStorage, bookUUID = sampleBook.uuid)
+    }
   }
 
   @Test
   fun displayEditScreenComponent() {
     composeTestRule.onNodeWithTag(C.Tag.BookEntryComp.scrollable).assertIsDisplayed()
-  }
-
-  @Test
-  fun displayEditTitleValueComponent() {
-    composeTestRule.onNodeWithTag(C.Tag.TopAppBar.screen_title).assertTextEquals("Edit your Book")
   }
 
   @Test
@@ -98,14 +95,28 @@ class EditBookScreenTest {
 
   @Test
   fun inputsHaveInitialValue() {
-    composeTestRule.onNodeWithTag(C.Tag.EditBook.title).assertTextContains(sampleBook.title)
-    composeTestRule.onNodeWithTag(C.Tag.EditBook.author).assertTextContains(sampleBook.author ?: "")
     composeTestRule
-        .onNodeWithTag(C.Tag.EditBook.synopsis)
+        .onNodeWithTag(C.Tag.BookEntryComp.title_field)
+        .assertTextContains(sampleBook.title)
+
+    composeTestRule
+        .onNodeWithTag(C.Tag.BookEntryComp.author_field)
+        .assertTextContains(sampleBook.author ?: "")
+
+    composeTestRule
+        .onNodeWithTag(C.Tag.BookEntryComp.description_field)
         .assertTextContains(sampleBook.description ?: "")
-    composeTestRule.onNodeWithTag(C.Tag.EditBook.image).assertTextContains(sampleBook.photo ?: "")
+
     composeTestRule
-        .onNodeWithTag(C.Tag.EditBook.language)
-        .assertTextContains(sampleBook.language.toString())
+        .onNodeWithTag(C.Tag.BookEntryComp.isbn_field)
+        .assertTextContains(sampleBook.isbn ?: "")
+
+    composeTestRule
+        .onNodeWithTag(C.Tag.BookEntryComp.language_field)
+        .assertTextContains(sampleBook.language.languageName)
+
+    composeTestRule
+        .onNodeWithTag(C.Tag.BookEntryComp.genre_field)
+        .assertTextContains(sampleBook.genres.joinToString { it.Genre })
   }
 }

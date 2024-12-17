@@ -68,7 +68,7 @@ fun AddToBookScreen(
             buttons = { modifier ->
               Row(modifier.fillMaxWidth(0.5f)) {
                 ButtonComponent(
-                    modifier = Modifier.testTag(C.Tag.BookEntryComp.action_buttons).fillMaxWidth(),
+                    modifier = Modifier.testTag(C.Tag.NewBookManually.save).fillMaxWidth(),
                     enabled =
                         title.value.isNotBlank() &&
                             author.value.isNotBlank() &&

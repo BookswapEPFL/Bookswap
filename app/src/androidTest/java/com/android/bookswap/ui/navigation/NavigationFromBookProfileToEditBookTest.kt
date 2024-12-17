@@ -2,6 +2,7 @@ package com.android.bookswap.ui.navigation
 
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -50,12 +51,12 @@ class NavigationFromBookProfileToEditBookTest {
   private lateinit var testBookOwner: DataBook
   private lateinit var testBookOther: DataBook
   private lateinit var mockEditVM: EditBookViewModel
-    private lateinit var photoStorage: PhotoFirebaseStorageRepository
+  private lateinit var photoStorage: PhotoFirebaseStorageRepository
 
   @Before
   fun setUp() {
-      photoStorage = mockk()
-      every { photoStorage.addPhotoToStorage(any(),any(),any())} just runs
+    photoStorage = mockk()
+    every { photoStorage.addPhotoToStorage(any(), any(), any()) } just runs
     testBookOwner =
         DataBook(
             testBookId,
@@ -111,7 +112,7 @@ class NavigationFromBookProfileToEditBookTest {
             val bookUUID =
                 backStackEntry.arguments?.getString("bookUUID")?.let { UUID.fromString(it) }
             if (bookUUID != null) {
-              EditBookScreen(mockEditVM, photoStorage, bookUUID =  bookUUID)
+              EditBookScreen(mockEditVM, photoStorage, bookUUID = bookUUID)
             }
           }
         }
@@ -136,19 +137,16 @@ class NavigationFromBookProfileToEditBookTest {
     composeTestRule.onNodeWithTag(C.Tag.BookProfile.edit).performClick()
 
     // Verify book information on EditBookScreen
-    composeTestRule.onNodeWithTag(C.Tag.EditBook.title).assertIsDisplayed()
+    composeTestRule.onNodeWithTag(C.Tag.BookEntryComp.title_field).assertIsDisplayed()
     composeTestRule
-        .onNodeWithTag(C.Tag.EditBook.title)
-        .assertTextEquals(testBookOwner.title, "Title")
+        .onNodeWithTag(C.Tag.BookEntryComp.title_field)
+        .assertTextContains(testBookOwner.title)
 
     // composeTestRule.onNodeWithTag("inputBookDescription").assertTextEquals("Original
     // Description")
 
     // Edit book title and save
-    composeTestRule.onNodeWithTag(C.Tag.EditBook.title).performTextInput("Updated Title")
-    composeTestRule
-        .onNodeWithTag(C.Tag.EditBook.scrollable)
-        .performScrollToNode(hasTestTag(C.Tag.EditBook.save))
+    composeTestRule.onNodeWithTag(C.Tag.BookEntryComp.title_field).performTextInput("Updated Title")
     composeTestRule.onNodeWithTag(C.Tag.EditBook.save).assertIsDisplayed()
     composeTestRule.onNodeWithTag(C.Tag.EditBook.save).performClick()
 
