@@ -17,6 +17,7 @@ import com.android.bookswap.data.BookGenres
 import com.android.bookswap.data.BookLanguages
 import com.android.bookswap.data.DataBook
 import com.android.bookswap.data.repository.BooksRepository
+import com.android.bookswap.data.repository.PhotoFirebaseStorageRepository
 import com.android.bookswap.data.repository.UsersRepository
 import com.android.bookswap.model.AppConfig
 import com.android.bookswap.model.LocalAppConfig
@@ -49,9 +50,12 @@ class NavigationFromBookProfileToEditBookTest {
   private lateinit var testBookOwner: DataBook
   private lateinit var testBookOther: DataBook
   private lateinit var mockEditVM: EditBookViewModel
+    private lateinit var photoStorage: PhotoFirebaseStorageRepository
 
   @Before
   fun setUp() {
+      photoStorage = mockk()
+      every { photoStorage.addPhotoToStorage(any(),any(),any())} just runs
     testBookOwner =
         DataBook(
             testBookId,
@@ -107,7 +111,7 @@ class NavigationFromBookProfileToEditBookTest {
             val bookUUID =
                 backStackEntry.arguments?.getString("bookUUID")?.let { UUID.fromString(it) }
             if (bookUUID != null) {
-              EditBookScreen(mockEditVM, NavigationActions(navController), bookUUID)
+              EditBookScreen(mockEditVM, photoStorage, bookUUID =  bookUUID)
             }
           }
         }

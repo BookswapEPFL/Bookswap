@@ -10,6 +10,7 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import androidx.navigation.compose.rememberNavController
+import com.android.bookswap.data.repository.PhotoFirebaseStorageRepository
 import com.android.bookswap.model.add.AddToBookViewModel
 import com.android.bookswap.resources.C
 import com.android.bookswap.ui.navigation.NavigationActions
@@ -25,10 +26,13 @@ import org.junit.Test
 class AddToBookTest {
   @get:Rule val composeTestRule = createComposeRule()
   private val mockViewModel: AddToBookViewModel = mockk()
+  private lateinit var photoStorage: PhotoFirebaseStorageRepository
 
   @Before
   fun init() {
     // Mock the ViewModel save method to run without side effects
+    photoStorage = mockk()
+    every { photoStorage.addPhotoToStorage(any(),any(),any())} just runs
     every {
       mockViewModel.saveDataBook(
           any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any())
@@ -38,7 +42,7 @@ class AddToBookTest {
       val navController = rememberNavController()
       NavigationActions(navController)
 
-      AddToBookScreen(mockViewModel)
+      AddToBookScreen(mockViewModel, photoStorage)
     }
 
     // Mock Toast messages for testing purposes

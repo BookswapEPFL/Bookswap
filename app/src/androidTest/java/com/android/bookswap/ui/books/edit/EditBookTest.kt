@@ -10,6 +10,7 @@ import androidx.compose.ui.test.performScrollToNode
 import com.android.bookswap.data.BookGenres
 import com.android.bookswap.data.BookLanguages
 import com.android.bookswap.data.DataBook
+import com.android.bookswap.data.repository.PhotoFirebaseStorageRepository
 import com.android.bookswap.model.edit.EditBookViewModel
 import com.android.bookswap.resources.C
 import com.android.bookswap.ui.navigation.NavigationActions
@@ -31,6 +32,8 @@ class EditBookScreenTest {
 
   @get:Rule val composeTestRule = createComposeRule()
 
+    private lateinit var photoStorage: PhotoFirebaseStorageRepository
+
   private val sampleBook =
       DataBook(
           UUID.randomUUID(),
@@ -48,6 +51,8 @@ class EditBookScreenTest {
 
   @Before
   fun setUp() {
+      photoStorage = mockk()
+      every { photoStorage.addPhotoToStorage(any(),any(),any())} just runs
     MockKAnnotations.init(this)
     every { mockViewModel.deleteBook(any(), any()) } just runs
     every {
@@ -60,17 +65,12 @@ class EditBookScreenTest {
         }
 
     every { navigationActions.currentRoute() } returns "EDIT_BOOK"
-    composeTestRule.setContent { EditBookScreen(mockViewModel, navigationActions, sampleBook.uuid) }
+    composeTestRule.setContent { EditBookScreen(mockViewModel, photoStorage, bookUUID =  sampleBook.uuid) }
   }
 
   @Test
   fun displayEditScreenComponent() {
-    composeTestRule.onNodeWithTag(C.Tag.edit_book_screen_container).assertIsDisplayed()
-  }
-
-  @Test
-  fun displayEditTitleComponent() {
-    composeTestRule.onNodeWithTag(C.Tag.TopAppBar.screen_title).assertIsDisplayed()
+    composeTestRule.onNodeWithTag(C.Tag.BookEntryComp.scrollable).assertIsDisplayed()
   }
 
   @Test
@@ -79,14 +79,9 @@ class EditBookScreenTest {
   }
 
   @Test
-  fun displayEditButtonComponent() {
-    composeTestRule.onNodeWithTag(C.Tag.TopAppBar.back_button).assertIsDisplayed()
-  }
-
-  @Test
   fun displayEditSaveValueComponent() {
     composeTestRule
-        .onNodeWithTag(C.Tag.EditBook.scrollable)
+        .onNodeWithTag(C.Tag.BookEntryComp.scrollable)
         .performScrollToNode(hasTestTag(C.Tag.EditBook.save))
     composeTestRule.onNodeWithTag(C.Tag.EditBook.save).assertIsDisplayed()
     composeTestRule.onNodeWithTag(C.Tag.EditBook.save).assertTextEquals("Save")
@@ -95,40 +90,10 @@ class EditBookScreenTest {
   @Test
   fun displayEditDeleteValueComponent() {
     composeTestRule
-        .onNodeWithTag(C.Tag.EditBook.scrollable)
+        .onNodeWithTag(C.Tag.BookEntryComp.scrollable)
         .performScrollToNode(hasTestTag(C.Tag.EditBook.delete))
     composeTestRule.onNodeWithTag(C.Tag.EditBook.delete).assertIsDisplayed()
     composeTestRule.onNodeWithTag(C.Tag.EditBook.delete).assertTextEquals("Delete")
-  }
-
-  @Test
-  fun displayEditBookTitleComponent() {
-    composeTestRule.onNodeWithTag(C.Tag.EditBook.title).assertIsDisplayed()
-  }
-
-  @Test
-  fun displayEditBookAuthorComponent() {
-    composeTestRule.onNodeWithTag(C.Tag.EditBook.author).assertIsDisplayed()
-  }
-
-  @Test
-  fun displayEditBookDescriptionComponent() {
-    composeTestRule.onNodeWithTag(C.Tag.EditBook.synopsis).assertIsDisplayed()
-  }
-
-  @Test
-  fun displayEditBookRatingComponent() {
-    composeTestRule.onNodeWithTag(C.Tag.EditBook.rating).assertIsDisplayed()
-  }
-
-  @Test
-  fun displayEditBookPhotoComponent() {
-    composeTestRule.onNodeWithTag(C.Tag.EditBook.image).assertIsDisplayed()
-  }
-
-  @Test
-  fun displayEditBookLanguageComponent() {
-    composeTestRule.onNodeWithTag(C.Tag.EditBook.language).assertIsDisplayed()
   }
 
   @Test

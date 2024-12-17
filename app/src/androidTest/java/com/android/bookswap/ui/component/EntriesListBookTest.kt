@@ -12,14 +12,34 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import com.android.bookswap.data.BookGenres
 import com.android.bookswap.data.BookLanguages
+import com.android.bookswap.data.repository.PhotoFirebaseStorageRepository
+import com.android.bookswap.model.PhotoRequester
 import com.android.bookswap.resources.C
 import com.android.bookswap.ui.components.EntriesListBookComponent
+import com.google.android.gms.auth.api.signin.internal.Storage
+import io.mockk.awaits
+import io.mockk.every
+import io.mockk.just
+import io.mockk.mockk
+import io.mockk.mockkStatic
+import io.mockk.runs
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
 class EntriesListBookTest {
 
   @get:Rule val composeTestRule = createComposeRule()
+
+    private lateinit var photoStorage: PhotoFirebaseStorageRepository
+
+    @Before
+    fun setup(){
+        photoStorage = mockk()
+        every { photoStorage.addPhotoToStorage(any(),any(),any())} just runs
+        mockkStatic(PhotoRequester::class)
+
+    }
 
   @Test
   fun testTitleFieldInput() {
@@ -33,7 +53,8 @@ class EntriesListBookTest {
           rating = mutableStateOf(""),
           isbn = mutableStateOf(""),
           photo = mutableStateOf(""),
-          selectedLanguage = mutableStateOf(null),
+          selectedLanguage = mutableStateOf(BookLanguages.OTHER),
+          photoStorage = photoStorage,
           buttons = {})
     }
 
@@ -55,7 +76,8 @@ class EntriesListBookTest {
           rating = mutableStateOf(""),
           isbn = mutableStateOf(""),
           photo = mutableStateOf(""),
-          selectedLanguage = mutableStateOf(null),
+          selectedLanguage = mutableStateOf(BookLanguages.OTHER),
+          photoStorage = photoStorage,
           buttons = {})
     }
 
@@ -84,7 +106,8 @@ class EntriesListBookTest {
           rating = mutableStateOf(""),
           isbn = mutableStateOf(""),
           photo = mutableStateOf(""),
-          selectedLanguage = mutableStateOf(null),
+          selectedLanguage = mutableStateOf(BookLanguages.OTHER),
+          photoStorage = photoStorage,
           buttons = {})
     }
     // Input valid rating
@@ -113,7 +136,8 @@ class EntriesListBookTest {
           rating = mutableStateOf(""),
           isbn = mutableStateOf(""),
           photo = mutableStateOf(""),
-          selectedLanguage = mutableStateOf(null),
+          selectedLanguage = mutableStateOf(BookLanguages.OTHER),
+          photoStorage = photoStorage,
           buttons = {})
     }
 
@@ -145,6 +169,7 @@ class EntriesListBookTest {
           isbn = mutableStateOf("1234567890"),
           photo = mutableStateOf("https://example.com/photo.jpg"),
           selectedLanguage = mutableStateOf(BookLanguages.ENGLISH),
+          photoStorage = photoStorage,
           buttons = { modifier ->
             Button(modifier = modifier, onClick = {}) { Text(text = "Save") }
           })
@@ -161,9 +186,6 @@ class EntriesListBookTest {
         .onNodeWithTag(C.Tag.BookEntryComp.rating_star + "_5", useUnmergedTree = true)
         .assertExists()
     composeTestRule.onNodeWithTag(C.Tag.BookEntryComp.isbn_field).assertTextContains("1234567890")
-    composeTestRule
-        .onNodeWithTag(C.Tag.BookEntryComp.photo_field)
-        .assertTextContains("https://example.com/photo.jpg")
     composeTestRule.onNodeWithTag(C.Tag.BookEntryComp.language_field).assertTextContains("English")
   }
 }

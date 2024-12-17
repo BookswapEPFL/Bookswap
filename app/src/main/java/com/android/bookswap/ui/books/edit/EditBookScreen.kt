@@ -38,7 +38,6 @@ private const val SPACE_BETWEEN_BUTTON = 0.05f / (1f - WIDTH_BUTTON)
  * @param navigationActions The navigation actions to handle navigation events.
  * @param bookUUID The uuid of the book data to be edited.
  */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditBookScreen(
     viewModel: EditBookViewModel,
