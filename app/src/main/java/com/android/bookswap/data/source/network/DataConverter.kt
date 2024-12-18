@@ -4,6 +4,13 @@ import android.util.Log
 import java.util.UUID
 
 object DataConverter {
+  /**
+   * Converts a string to a UUID.
+   *
+   * @param string The string to be converted to a UUID.
+   * @return The UUID if the string is in the correct format, or null if the string is not in the
+   *   correct format.
+   */
   private fun parse_string_UUID(string: String): UUID? {
     return try {
       UUID.fromString(string)
@@ -14,7 +21,14 @@ object DataConverter {
       null
     }
   }
-
+  /**
+   * Parses a string representation of a UUID with most and least significant bits.
+   *
+   * @param string The string to be parsed, expected in the format {mostSignificantBits=<Long>,
+   *   leastSignificantBits=<Long>}.
+   * @return The UUID if the string is in the correct format, or null if the string cannot be
+   *   parsed.
+   */
   private fun parse_bits_UUID(string: String): UUID? {
     val uid =
         string.removePrefix("{").removeSuffix("}").let { sid ->
@@ -39,7 +53,13 @@ object DataConverter {
       null
     }
   }
-
+  /**
+   * Parses a string representation of a UUID.
+   *
+   * @param string The string to be parsed.
+   * @return The UUID if the string is in the correct format, or null if the string cannot be
+   *   parsed.
+   */
   fun parse_raw_UUID(string: String): UUID? {
     if (string.isEmpty() || string.contentEquals("null", true)) return null
     return when (string.contains("=")) {
@@ -51,7 +71,14 @@ object DataConverter {
   fun parse_raw_UUID_list(string: String): List<UUID> {
     return parse_raw_string_list(string).mapNotNull { parse_raw_UUID(it) }
   }
-
+  /**
+   * Parses a string representation of a list of UUIDs.
+   *
+   * @param string The string to be parsed, expected in the format [UUID1, UUID2, ...] or
+   *   [{mostSignificantBits=<Long>, leastSignificantBits=<Long>}, ...].
+   * @return A list of UUIDs if the string is in the correct format, or null if the string cannot be
+   *   parsed.
+   */
   fun parse_raw_long(string: String): Long {
     return try {
       string.toLong()
@@ -62,7 +89,14 @@ object DataConverter {
       0L.also { throw e }
     }
   }
-
+  /**
+   * Parses a string representation of a Long.
+   *
+   * @param string The string to be parsed.
+   * @return The Long value if the string is in the correct format, or 0 if the string cannot be
+   *   parsed.
+   * @throws Exception if the string cannot be parsed as a Long.
+   */
   fun parse_raw_long_list(string: String): List<Long> {
     return parse_raw_string_list(string).map { parse_raw_long(it) }
   }
@@ -73,19 +107,40 @@ object DataConverter {
       false -> return string.removeSurrounding("[", "]").split(", ")
     }
   }
-
+  /**
+   * Converts a UUID to its string representation.
+   *
+   * @param uuid The UUID to be converted.
+   * @return The string representation of the UUID.
+   */
   fun convert_UUID(uuid: UUID): String {
     return uuid.toString()
   }
 
   fun convert_UUID_list(uuid_list: List<UUID>): List<String> {
+  /**
+   * Converts a list of UUIDs to their string representations.
+   *
+   * @param uuid_list The list of UUIDs to be converted.
+   * @return A list of string representations of the UUIDs.
+   */
     return uuid_list.map { it.toString() }
   }
-
+  /**
+   * Converts a Long to its string representation.
+   *
+   * @param long The Long to be converted.
+   * @return The string representation of the Long.
+   */
   fun convert_Long(long: Long): String {
     return long.toString()
   }
-
+  /**
+   * Converts a list of Long values to their string representations.
+   *
+   * @param long_list The list of Long values to be converted.
+   * @return A list of string representations of the Long values.
+   */
   fun convert_Long_list(long_list: List<Long>): List<String> {
     return long_list.map { it.toString() }
   }

@@ -113,9 +113,7 @@ class BooksFirestoreSource(private val db: FirebaseFirestore) : BooksRepository 
    */
   override fun addBook(dataBook: DataBook, callback: (Result<Unit>) -> Unit) {
     // Check if essential fields are non-null before attempting to save
-    if (dataBook.title.isBlank() ||
-        dataBook.author.isNullOrBlank() ||
-        dataBook.isbn.isNullOrBlank()) {
+    if (dataBook.title.isBlank() || dataBook.author.isNullOrBlank()) {
       val exception = IllegalArgumentException("Missing required book fields.")
       Log.e("BooksFirestoreRepository", "Failed to add book: ${exception.message}")
       callback(Result.failure(exception))
