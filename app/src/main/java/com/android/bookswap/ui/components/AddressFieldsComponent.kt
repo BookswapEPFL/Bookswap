@@ -28,6 +28,25 @@ private const val TWO_THIRDS = 0.66f
 private const val ONE_THIRD = 0.33f
 private val COLOUR = ColorVariable.AccentSecondary
 
+/**
+ * Component for a series of fields that when merged together allow for an accurate geolocation
+ *
+ * @param firstAttempt: Boolean to indicate if the user has attempted to submit the form before
+ * @param editVSNew: Boolean to indicate if the user is editing an existing address or creating a
+ *   new one
+ * @param address: String representing the street address
+ * @param onAddressChange: Function to update the street address
+ * @param city: String representing the city
+ * @param onCityChange: Function to update the city
+ * @param cityError: String representing the error message for the city field
+ * @param canton: String representing the canton
+ * @param onCantonChange: Function to update the canton
+ * @param postal: String representing the postal code
+ * @param onPostalChange: Function to update the postal code
+ * @param country: String representing the country
+ * @param onCountryChange: Function to update the country
+ * @param countryError: String representing the error message for the country field
+ */
 @Composable
 fun AddressFieldsComponent(
     firstAttempt: Boolean = false,
