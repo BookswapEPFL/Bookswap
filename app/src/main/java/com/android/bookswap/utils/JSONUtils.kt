@@ -93,10 +93,19 @@ fun createJsonObjectRequestOpenAI(
             Log.e("ChatGPTApiService", "Error message: $errorMessage")
             onError("Request error: $errorMessage")
           }) {
+    /**
+     * Override the default headers for the request.
+     *
+     * @return A mutable map containing the headers for the request.
+     */
     override fun getHeaders(): MutableMap<String, String> {
       return hashMapOf("Authorization" to "Bearer $apiKey", "Content-Type" to "application/json")
     }
-
+    /**
+     * Override the default retry policy for the request.
+     *
+     * @return The retry policy to use for the request.
+     */
     override fun getRetryPolicy(): com.android.volley.RetryPolicy {
       return com.android.volley.DefaultRetryPolicy(
           30000, // Timeout in milliseconds (e.g., 30 seconds)

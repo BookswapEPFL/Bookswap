@@ -15,6 +15,9 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.times
 import com.android.bookswap.R
@@ -81,7 +84,7 @@ fun BookAdditionChoiceScreen(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally) {
               ButtonWithIcons(
-                  text = "Manually",
+                  text = stringResource(R.string.book_addition_choice_button_manually),
                   leftIcon = Icons.Default.Add,
                   leftIconPainter = null,
                   rightIcon = Icons.AutoMirrored.Filled.ArrowForward,
@@ -89,7 +92,7 @@ fun BookAdditionChoiceScreen(
                   buttonWidth = buttonWidth)
               Spacer(modifier = Modifier.height(2f * columnPadding))
               ButtonWithIcons(
-                  text = "From ISBN",
+                  text = stringResource(R.string.book_addition_choice_button_from_isbn),
                   leftIcon = null,
                   leftIconPainter = painterResource(id = R.drawable.download),
                   rightIcon = Icons.AutoMirrored.Filled.ArrowForward,
@@ -97,7 +100,7 @@ fun BookAdditionChoiceScreen(
                   buttonWidth = buttonWidth)
               Spacer(modifier = Modifier.height(2f * columnPadding))
               ButtonWithIcons(
-                  text = "From Photo",
+                  text = stringResource(R.string.book_addition_choice_button_from_photo),
                   leftIcon = null,
                   leftIconPainter = painterResource(id = R.drawable.photoicon),
                   rightIcon = Icons.AutoMirrored.Filled.ArrowForward,

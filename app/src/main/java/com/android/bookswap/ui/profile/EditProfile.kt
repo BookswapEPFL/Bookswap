@@ -11,10 +11,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import com.android.bookswap.R
 import com.android.bookswap.data.DataUser
 import com.android.bookswap.model.InputVerification
 import com.android.bookswap.model.LocalAppConfig
@@ -37,7 +39,7 @@ import com.android.bookswap.ui.theme.BookSwapAppTheme
 @Composable
 fun EditProfileDialog(onDismiss: () -> Unit, onSave: (DataUser) -> Unit) {
   val appConfig = LocalAppConfig.current
-  val dataUser = appConfig.userViewModel.getUser()
+  val dataUser = appConfig.userViewModel.getUser().copy()
   val _email = remember { mutableStateOf<String>(dataUser.email) }
   val _phone = remember { mutableStateOf<String>(dataUser.phoneNumber) }
   val _greeting = remember { mutableStateOf<String>(dataUser.greeting) }
@@ -53,13 +55,15 @@ fun EditProfileDialog(onDismiss: () -> Unit, onSave: (DataUser) -> Unit) {
   val lastNameError = remember { mutableStateOf(false) }
 
   BookSwapAppTheme {
-    Dialog({ onDismiss() }, DialogProperties(true, true)) {
+    Dialog({ onDismiss() }, DialogProperties(true, false)) {
       Card(Modifier.testTag(C.Tag.edit_profile_screen_container).padding(16.dp)) {
         Column(
             Modifier.fillMaxWidth().padding(16.dp),
             Arrangement.Center,
             Alignment.CenterHorizontally) {
-              Text("Edit Profile", Modifier.testTag(C.Tag.TopAppBar.screen_title))
+              Text(
+                  stringResource(R.string.edit_profile_screen_title),
+                  Modifier.testTag(C.Tag.TopAppBar.screen_title))
               OutlinedTextField(
                   value = _greeting.value,
                   onValueChange = {
@@ -72,8 +76,10 @@ fun EditProfileDialog(onDismiss: () -> Unit, onSave: (DataUser) -> Unit) {
                     }
                   },
                   Modifier.testTag(C.Tag.EditProfile.greeting).fillMaxWidth().padding(8.dp, 4.dp),
-                  label = { Text("Greeting") },
-                  placeholder = { Text("Mr.", Modifier, Color.Gray) },
+                  label = { Text(stringResource(R.string.edit_profile_greeting)) },
+                  placeholder = {
+                    Text(stringResource(R.string.edit_profile_mr), Modifier, Color.Gray)
+                  },
                   keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                   singleLine = true,
                   isError = greetingError.value,
@@ -91,8 +97,10 @@ fun EditProfileDialog(onDismiss: () -> Unit, onSave: (DataUser) -> Unit) {
                     }
                   },
                   Modifier.testTag(C.Tag.EditProfile.firstname).fillMaxWidth().padding(8.dp, 4.dp),
-                  label = { Text("Firstname") },
-                  placeholder = { Text("John", Modifier, Color.Gray) },
+                  label = { Text(stringResource(R.string.edit_profile_firstname)) },
+                  placeholder = {
+                    Text(stringResource(R.string.edit_profile_john), Modifier, Color.Gray)
+                  },
                   keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                   singleLine = true,
                   isError = firstNameError.value)
@@ -109,8 +117,10 @@ fun EditProfileDialog(onDismiss: () -> Unit, onSave: (DataUser) -> Unit) {
                     }
                   },
                   Modifier.testTag(C.Tag.EditProfile.lastname).fillMaxWidth().padding(8.dp, 4.dp),
-                  label = { Text("Lastname") },
-                  placeholder = { Text("Doe", Modifier, Color.Gray) },
+                  label = { Text(stringResource(R.string.edit_profile_lastname)) },
+                  placeholder = {
+                    Text(stringResource(R.string.edit_profile_Doe), Modifier, Color.Gray)
+                  },
                   keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                   singleLine = true,
                   isError = lastNameError.value)
@@ -129,8 +139,10 @@ fun EditProfileDialog(onDismiss: () -> Unit, onSave: (DataUser) -> Unit) {
                     }
                   },
                   Modifier.testTag(C.Tag.EditProfile.email).fillMaxWidth().padding(8.dp, 4.dp),
-                  label = { Text("Email") },
-                  placeholder = { Text("John.Doe@example.com", Modifier, Color.Gray) },
+                  label = { Text(stringResource(R.string.edit_profile_email)) },
+                  placeholder = {
+                    Text(stringResource(R.string.edit_profile_email_example), Modifier, Color.Gray)
+                  },
                   keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                   singleLine = true,
                   isError = emailError.value)
@@ -149,8 +161,10 @@ fun EditProfileDialog(onDismiss: () -> Unit, onSave: (DataUser) -> Unit) {
                     }
                   },
                   Modifier.testTag(C.Tag.EditProfile.phone).fillMaxWidth().padding(8.dp, 4.dp),
-                  label = { Text("Phone") },
-                  placeholder = { Text("+4122345678", Modifier, Color.Gray) },
+                  label = { Text(stringResource(R.string.edit_profile_phone)) },
+                  placeholder = {
+                    Text(stringResource(R.string.edit_profile_phone_example), Modifier, Color.Gray)
+                  },
                   keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
                   singleLine = true,
                   isError = phoneError.value)
@@ -158,19 +172,22 @@ fun EditProfileDialog(onDismiss: () -> Unit, onSave: (DataUser) -> Unit) {
               Row(Modifier.fillMaxWidth().padding(8.dp), Arrangement.SpaceEvenly) {
                 Button(
                     {
-                      Log.d(
+                      Log.i(
                           "EditProfile_ClickBtn",
                           "Save Clicked, User info: ${dataUser.printFullname()}")
                       onSave(dataUser)
                     },
                     Modifier.testTag(C.Tag.EditProfile.confirm)) {
-                      Text("Save")
+                      Text(stringResource(R.string.edit_profile_save_button))
                     }
 
                 Button(
-                    { Log.d("EditProfile_ClickBtn", "Cancel Clicked") },
+                    {
+                      Log.i("EditProfile_ClickBtn", "Cancel Clicked")
+                      onDismiss()
+                    },
                     Modifier.testTag(C.Tag.EditProfile.dismiss)) {
-                      Text("Cancel")
+                      Text(stringResource(R.string.edit_profile_cancel_button))
                     }
               }
             }

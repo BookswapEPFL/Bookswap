@@ -24,7 +24,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.android.bookswap.R
 import com.android.bookswap.data.repository.BooksRepository
 import com.android.bookswap.data.source.api.GoogleBookDataSource
 import com.android.bookswap.model.InputVerification
@@ -36,7 +38,14 @@ import com.android.bookswap.ui.components.FieldComponent
 import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.theme.ColorVariable
 
-/** This is the main screen for the chat feature. It displays the list of messages */
+/**
+ * Displays the screen for adding a new book by ISBN.
+ *
+ * @param navigationActions Actions for navigating between screens.
+ * @param booksRepository The repository for managing book data.
+ * @param topAppBar A composable function for the top app bar.
+ * @param bottomAppBar A composable function for the bottom app bar.
+ */
 @Composable
 fun AddISBNScreen(
     navigationActions: NavigationActions,
@@ -63,7 +72,7 @@ fun AddISBNScreen(
                   verticalArrangement = Arrangement.spacedBy(45.dp)) {
                     FieldComponent(
                         modifier = Modifier.testTag(C.Tag.NewBookISBN.isbn),
-                        labelText = "ISBN*",
+                        labelText = stringResource(R.string.add_isbn_field_label),
                         value = isbn,
                         maxLength = MAXLENGTHISBN) {
                           isbn = it
@@ -77,7 +86,10 @@ fun AddISBNScreen(
                                 isbn, appConfig.userViewModel.getUser().userUUID) { result ->
                                   if (result.isFailure) {
                                     Toast.makeText(
-                                            context, "Search unsuccessful", Toast.LENGTH_LONG)
+                                            context,
+                                            context.resources.getString(
+                                                R.string.add_isbn_toast_search_unsuccessful),
+                                            Toast.LENGTH_LONG)
                                         .show()
                                     Log.e("AddBook", result.exceptionOrNull().toString())
                                   } else {
@@ -104,11 +116,15 @@ fun AddISBNScreen(
                                   }
                                 }
                           } else {
-                            Toast.makeText(context, "Invalid ISBN", Toast.LENGTH_LONG).show()
+                            Toast.makeText(
+                                    context,
+                                    context.resources.getString(R.string.add_isbn_toast_invalid),
+                                    Toast.LENGTH_LONG)
+                                .show()
                           }
                         }) {
                           Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text("Search")
+                            Text(stringResource(R.string.add_isbn_button_search))
                             Icon(
                                 Icons.Filled.Search,
                                 contentDescription = "Search icon",
