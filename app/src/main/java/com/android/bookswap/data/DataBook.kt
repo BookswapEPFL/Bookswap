@@ -46,7 +46,24 @@ enum class BookLanguages(val languageName: String, val languageCode: String) {
       Enums.LanguagesCode.ROMANSH), // Romansh, a language spoken in Switzerland
   OTHER(
       Enums.Languages.OTHER,
-      Enums.LanguagesCode.OTHER) // All languages that are not yet implemented
+      Enums.LanguagesCode.OTHER); // All languages that are not yet implemented
+
+  fun isDefinedBy(string: String): Boolean {
+    fun f(s: String) = s.trim().uppercase()
+    val identifier = f(string)
+    return when (identifier.length) {
+      0,
+      1 -> false
+      2 -> f(languageCode).contentEquals(identifier)
+      else -> f(languageName).contentEquals(identifier)
+    }
+  }
+
+  companion object {
+    fun get(language: String): BookLanguages {
+      return values().find { it.isDefinedBy(language) } ?: OTHER
+    }
+  }
 }
 /** Genre of a book */
 enum class BookGenres(val Genre: String) {
@@ -68,5 +85,21 @@ enum class BookGenres(val Genre: String) {
   HEALTH(Enums.Genres.HEALTH),
   TRAVEL(Enums.Genres.TRAVEL),
   GUIDE(Enums.Genres.GUIDE),
-  OTHER(Enums.Genres.OTHER)
+  OTHER(Enums.Genres.OTHER);
+
+  fun isDefinedBy(string: String): Boolean {
+    fun f(s: String) = s.trim().uppercase()
+    val identifier = f(string)
+    return when (identifier.length) {
+      0,
+      1 -> false
+      else -> f(Genre).contentEquals(identifier)
+    }
+  }
+
+  companion object {
+    fun get(genre: String): BookGenres {
+      return values().find { it.isDefinedBy(genre) } ?: OTHER
+    }
+  }
 }

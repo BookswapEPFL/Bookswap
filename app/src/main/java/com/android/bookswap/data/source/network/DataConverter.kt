@@ -41,21 +41,15 @@ object DataConverter {
   }
 
   fun parse_raw_UUID(string: String): UUID? {
+    if (string.isEmpty() || string.contentEquals("null", true)) return null
     return when (string.contains("=")) {
       true -> parse_bits_UUID(string)
       false -> parse_string_UUID(string)
     }
   }
 
-  fun parse_raw_UUID_list(string: String): List<UUID?> {
-    val temp_string = string.removeSurrounding("[", "]").removeSurrounding("{", "}")
-    val delimiter =
-        if (temp_string.contains("=")) {
-          "}, "
-        } else {
-          ", "
-        }
-    return temp_string.split(delimiter).map { parse_raw_UUID(it) }
+  fun parse_raw_UUID_list(string: String): List<UUID> {
+    return parse_raw_string_list(string).mapNotNull { parse_raw_UUID(it) }
   }
 
   fun parse_raw_long(string: String): Long {
@@ -70,14 +64,21 @@ object DataConverter {
   }
 
   fun parse_raw_long_list(string: String): List<Long> {
-    return string.removeSurrounding("[", "]").split(", ").map { parse_raw_long(it) }.filterNotNull()
+    return parse_raw_string_list(string).map { parse_raw_long(it) }
+  }
+
+  fun parse_raw_string_list(string: String): List<String> {
+    when (string.contains("=")) {
+      true -> return string.removeSurrounding("[", "]").removeSurrounding("{", "}").split("}, ")
+      false -> return string.removeSurrounding("[", "]").split(", ")
+    }
   }
 
   fun convert_UUID(uuid: UUID): String {
     return uuid.toString()
   }
 
-  fun convert_UUID_list(uuid_list: List<UUID?>): List<String> {
+  fun convert_UUID_list(uuid_list: List<UUID>): List<String> {
     return uuid_list.map { it.toString() }
   }
 
