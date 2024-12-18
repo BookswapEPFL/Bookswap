@@ -65,126 +65,130 @@ fun EditProfileDialog(context: Context, onDismiss: () -> Unit, onSave: (DataUser
 
   BookSwapAppTheme {
     Dialog({ onDismiss() }, DialogProperties(true, false)) {
-      Card(Modifier.testTag(C.Tag.edit_profile_screen_container).padding(16.dp)) {
+      Card(Modifier.padding(16.dp)) {
         LazyColumn(
-            Modifier.fillMaxWidth().padding(16.dp),
+            Modifier.fillMaxWidth().padding(16.dp).testTag(C.Tag.edit_profile_screen_container),
             horizontalAlignment = Alignment.CenterHorizontally) {
-            item{
+              item {
                 Text(
                     stringResource(R.string.edit_profile_screen_title),
                     Modifier.testTag(C.Tag.TopAppBar.screen_title))
-            }
-            item{
+              }
+              item {
                 OutlinedTextField(
                     value = _greeting.value,
                     onValueChange = {
-                        if (it.length <= MAXLENGTHGREETING) {
-                            _greeting.value = it
-                            dataUser.greeting = _greeting.value
-                            greetingError.value = false
-                        } else {
-                            greetingError.value = true
-                        }
+                      if (it.length <= MAXLENGTHGREETING) {
+                        _greeting.value = it
+                        dataUser.greeting = _greeting.value
+                        greetingError.value = false
+                      } else {
+                        greetingError.value = true
+                      }
                     },
                     Modifier.testTag(C.Tag.EditProfile.greeting).fillMaxWidth().padding(8.dp, 4.dp),
                     label = { Text(stringResource(R.string.edit_profile_greeting)) },
                     placeholder = {
-                        Text(stringResource(R.string.edit_profile_mr), Modifier, Color.Gray)
+                      Text(stringResource(R.string.edit_profile_mr), Modifier, Color.Gray)
                     },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                     singleLine = true,
                     isError = greetingError.value,
                 )
-            }
-            item{
+              }
+              item {
                 OutlinedTextField(
                     value = _firstName.value,
                     onValueChange = {
-                        if (it.length <= MAXLENGTHFIRSTNAME) {
-                            _firstName.value = it
-                            dataUser.firstName = _firstName.value
-                            firstNameError.value = false
-                        } else {
-                            firstNameError.value = true
-                        }
+                      if (it.length <= MAXLENGTHFIRSTNAME) {
+                        _firstName.value = it
+                        dataUser.firstName = _firstName.value
+                        firstNameError.value = false
+                      } else {
+                        firstNameError.value = true
+                      }
                     },
-                    Modifier.testTag(C.Tag.EditProfile.firstname).fillMaxWidth().padding(8.dp, 4.dp),
+                    Modifier.testTag(C.Tag.EditProfile.firstname)
+                        .fillMaxWidth()
+                        .padding(8.dp, 4.dp),
                     label = { Text(stringResource(R.string.edit_profile_firstname)) },
                     placeholder = {
-                        Text(stringResource(R.string.edit_profile_john), Modifier, Color.Gray)
+                      Text(stringResource(R.string.edit_profile_john), Modifier, Color.Gray)
                     },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                     singleLine = true,
                     isError = firstNameError.value)
-            }
-            item{
+              }
+              item {
                 OutlinedTextField(
                     value = _lastName.value,
                     onValueChange = {
-                        if (it.length <= MAXLENGTHLASTNAME) {
-                            _lastName.value = it
-                            dataUser.lastName = _lastName.value
-                            lastNameError.value = false
-                        } else {
-                            lastNameError.value = true
-                        }
+                      if (it.length <= MAXLENGTHLASTNAME) {
+                        _lastName.value = it
+                        dataUser.lastName = _lastName.value
+                        lastNameError.value = false
+                      } else {
+                        lastNameError.value = true
+                      }
                     },
                     Modifier.testTag(C.Tag.EditProfile.lastname).fillMaxWidth().padding(8.dp, 4.dp),
                     label = { Text(stringResource(R.string.edit_profile_lastname)) },
                     placeholder = {
-                        Text(stringResource(R.string.edit_profile_Doe), Modifier, Color.Gray)
+                      Text(stringResource(R.string.edit_profile_Doe), Modifier, Color.Gray)
                     },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                     singleLine = true,
                     isError = lastNameError.value)
-            }
-            item{
+              }
+              item {
                 OutlinedTextField(
                     value = _email.value,
                     onValueChange = {
-                        if (it.length <= MAXLENGTHEMAIL) {
-                            _email.value = it
-                            emailError.value = false
-                            if (verification.validateEmail(_email.value)) {
-                                dataUser.email = _email.value
-                            }
-                        } else {
-                            emailError.value = true
+                      if (it.length <= MAXLENGTHEMAIL) {
+                        _email.value = it
+                        emailError.value = false
+                        if (verification.validateEmail(_email.value)) {
+                          dataUser.email = _email.value
                         }
+                      } else {
+                        emailError.value = true
+                      }
                     },
                     Modifier.testTag(C.Tag.EditProfile.email).fillMaxWidth().padding(8.dp, 4.dp),
                     label = { Text(stringResource(R.string.edit_profile_email)) },
                     placeholder = {
-                        Text(stringResource(R.string.edit_profile_email_example), Modifier, Color.Gray)
+                      Text(
+                          stringResource(R.string.edit_profile_email_example), Modifier, Color.Gray)
                     },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                     singleLine = true,
                     isError = emailError.value)
-            }
-            item{
+              }
+              item {
                 OutlinedTextField(
                     value = _phone.value,
                     onValueChange = {
-                        if (it.length <= MAXLENGTHPHONE) {
-                            _phone.value = it
-                            phoneError.value = false
-                            if (verification.validatePhone(_phone.value)) {
-                                dataUser.phoneNumber = _phone.value
-                            }
-                        } else {
-                            phoneError.value = true
+                      if (it.length <= MAXLENGTHPHONE) {
+                        _phone.value = it
+                        phoneError.value = false
+                        if (verification.validatePhone(_phone.value)) {
+                          dataUser.phoneNumber = _phone.value
                         }
+                      } else {
+                        phoneError.value = true
+                      }
                     },
                     Modifier.testTag(C.Tag.EditProfile.phone).fillMaxWidth().padding(8.dp, 4.dp),
                     label = { Text(stringResource(R.string.edit_profile_phone)) },
                     placeholder = {
-                        Text(stringResource(R.string.edit_profile_phone_example), Modifier, Color.Gray)
+                      Text(
+                          stringResource(R.string.edit_profile_phone_example), Modifier, Color.Gray)
                     },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
                     singleLine = true,
                     isError = phoneError.value)
-            }
-            item{
+              }
+              item {
                 AddressFieldsComponent(
                     editVSNew = false,
                     address = address.value,
@@ -197,39 +201,50 @@ fun EditProfileDialog(context: Context, onDismiss: () -> Unit, onSave: (DataUser
                     onPostalChange = { postal.value = it },
                     country = country.value,
                     onCountryChange = { country.value = it })
-            }
-            item{
+              }
+              item {
                 Row(Modifier.fillMaxWidth().padding(8.dp), Arrangement.SpaceEvenly) {
-                    Button(
-                        onClick = {
-                            Log.d(
-                                "EditProfile_ClickBtn",
-                                "Save Clicked, User info: ${dataUser.printFullname()}")
-                            appConfig.userViewModel.updateCoordinates(listOf(
-                                address.value,
-                                city.value,
-                                canton.value,
-                                postal.value,
-                                country.value),
-                                context,
-                                appConfig.userViewModel.getUser().userUUID)
-                            onSave(dataUser)
-                        },
-                        Modifier.testTag(C.Tag.EditProfile.confirm)) {
+                  Button(
+                      modifier = Modifier.testTag(C.Tag.EditProfile.confirm),
+                      onClick = {
+                        Log.d(
+                            "EditProfile_ClickBtn",
+                            "Save Clicked, User info: ${dataUser.printFullname()}")
+                        if (city.value.isNotEmpty() && country.value.isNotEmpty()) {
+                          val addressComponents =
+                              if (address.value.isEmpty() ||
+                                  canton.value.isEmpty() ||
+                                  postal.value.isEmpty()) {
+                                listOf(city.value, country.value)
+                              } else {
+                                listOf(
+                                    address.value,
+                                    city.value,
+                                    canton.value,
+                                    postal.value,
+                                    country.value)
+                              }
+                          appConfig.userViewModel.updateCoordinates(
+                              addressComponents,
+                              context,
+                              appConfig.userViewModel.getUser().userUUID)
+                        }
+                        onSave(dataUser)
+                      }) {
                         Text(stringResource(R.string.edit_profile_save_button))
-                    }
+                      }
 
-                    Button(
-                        onClick = {
-                            Log.d("EditProfile_ClickBtn", "Cancel Clicked")
-                            onDismiss()
-                        },
-                        Modifier.testTag(C.Tag.EditProfile.dismiss)) {
+                  Button(
+                      onClick = {
+                        Log.d("EditProfile_ClickBtn", "Cancel Clicked")
+                        onDismiss()
+                      },
+                      Modifier.testTag(C.Tag.EditProfile.dismiss)) {
                         Text(stringResource(R.string.edit_profile_cancel_button))
-                    }
+                      }
                 }
+              }
             }
-        }
       }
     }
   }

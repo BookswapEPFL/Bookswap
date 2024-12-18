@@ -47,7 +47,7 @@ fun AddressFieldsComponent(
 ) {
   val verification = InputVerification()
   Column {
-    if(!editVSNew) {
+    if (!editVSNew) {
       Text(
           stringResource(R.string.new_address),
           fontSize = NEW_ADDRESS_FONT_SIZE,
@@ -67,7 +67,7 @@ fun AddressFieldsComponent(
           label = { Text(stringResource(R.string.city_display)) },
           placeholder = { Text(stringResource(R.string.city_example), color = COLOUR) },
           modifier =
-              Modifier.weight(if(!editVSNew) TWO_THIRDS else THREE_QUARTERS)
+              Modifier.weight(if (!editVSNew) TWO_THIRDS else THREE_QUARTERS)
                   .padding(end = PADDING_ROW)
                   .testTag(C.Tag.AddressFields.city),
           isError = !verification.validateNonEmpty(city) && !firstAttempt && editVSNew)
@@ -77,7 +77,7 @@ fun AddressFieldsComponent(
           label = { Text(stringResource(R.string.postal_display)) },
           placeholder = { Text(stringResource(R.string.postal_example), color = COLOUR) },
           modifier =
-              Modifier.weight(if(!editVSNew) ONE_THIRD else ONE_QUARTER)
+              Modifier.weight(if (!editVSNew) ONE_THIRD else ONE_QUARTER)
                   .padding(start = PADDING_ROW)
                   .testTag(C.Tag.AddressFields.postal))
     }
