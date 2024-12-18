@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -31,6 +32,9 @@ import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
@@ -274,15 +278,22 @@ fun UserProfile(
               { showEditProfile = true },
               Modifier.testTag(C.Tag.UserProfile.edit).align(Alignment.CenterHorizontally)) {
                 Text(stringResource(R.string.user_profile_edit))
-              }
+                }
+            // Disconnect Button"
           Button(
               onClick = {
                 appConfig.userViewModel.disconnectUser()
                 navigationActions.navigateTo(C.Screen.AUTH)
               },
               modifier =
-                  Modifier.align(Alignment.CenterHorizontally)
-                      .testTag("disconnect_button") // Add testTag for testing
+              Modifier
+                  .align(Alignment.CenterHorizontally)
+                  .height(56.dp) // Use the specified height
+                  .defaultMinSize(minWidth = 56.dp*3) // Ensure consistent minimum width
+                  .padding(8.dp) // Add content padding
+                  .clip(CircleShape)
+                  .semantics { role = Role.Button }
+                  .testTag(C.Tag.UserProfile.disconnect)
               ) {
                 Text("Disconnect")
               }
