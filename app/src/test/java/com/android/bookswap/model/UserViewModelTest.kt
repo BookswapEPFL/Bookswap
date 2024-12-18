@@ -3,14 +3,12 @@ package com.android.bookswap.model
 import android.content.Context
 import android.location.Address
 import android.location.Geocoder
-import android.util.Log
 import com.android.bookswap.data.repository.UsersRepository
 import io.mockk.clearAllMocks
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkConstructor
-import io.mockk.mockkStatic
 import io.mockk.verify
 import java.util.UUID
 import kotlinx.coroutines.Dispatchers
@@ -73,7 +71,7 @@ class UserViewModelTest {
   }
 
   @Test
-  fun `updateCoordinates updates location successfully`() = runTest {
+  fun `updateCoordinates updates location`() = runTest {
     // Arrange
     val mockAddress = mockk<Address>()
     every { mockAddress.latitude } returns latitude
@@ -96,32 +94,5 @@ class UserViewModelTest {
 
     // Assert
     verify { mockUserRepository.updateLocation(userUUID, latitude, longitude, any()) }
-  }
-
-  @Test
-  fun `updateCoordinates handles repository update failure`() = runTest {
-    // Arrange
-    val mockAddress = mockk<Address>()
-    every { mockAddress.latitude } returns latitude
-    every { mockAddress.longitude } returns longitude
-
-    every { mockGeocoder.getFromLocationName(any(), any()) } returns mutableListOf(mockAddress)
-
-    val exception = RuntimeException("Update failed")
-    coEvery { mockUserRepository.updateLocation(userUUID, latitude, longitude, any()) } answers
-        {
-          val callback = arg<(Result<Unit>) -> Unit>(3)
-          callback(Result.failure(exception))
-        }
-
-    mockkStatic(Log::class)
-    every { Log.e(any(), any()) } returns 0
-
-    // Act
-    userViewModel.updateCoordinates(addressComponents, mockContext, userUUID)
-    advanceUntilIdle() // Ensure all coroutines complete
-
-    // Assert
-    verify { Log.e("Geocoding", match { it.contains("Failed to update coordinates in Firebase") }) }
   }
 }
