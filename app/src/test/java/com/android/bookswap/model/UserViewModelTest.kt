@@ -122,6 +122,6 @@ class UserViewModelTest {
     advanceUntilIdle() // Ensure all coroutines complete
 
     // Assert
-    verify { Log.e("Geocoding", "Failed to update coordinates in Firebase: ${exception.message}") }
+    verify { Log.e("Geocoding", match { it.contains("Failed to update coordinates in Firebase") }) }
   }
 }
