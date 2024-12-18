@@ -234,21 +234,20 @@ fun EditProfileDialog(context: Context, onDismiss: () -> Unit, onSave: (DataUser
                         Text(stringResource(R.string.edit_profile_save_button))
                       }
 
-                  Button(
-                      onClick = {
-                        Log.d("EditProfile_ClickBtn", "Cancel Clicked")
-                        onDismiss()
-                      },
-                      Modifier.testTag(C.Tag.EditProfile.dismiss)) {
-                        Text(stringResource(R.string.edit_profile_cancel_button))
-                      }
-                }
+                Button(
+                    {
+                      Log.i("EditProfile_ClickBtn", "Cancel Clicked")
+                      onDismiss()
+                    },
+                    Modifier.testTag(C.Tag.EditProfile.dismiss)) {
+                      Text(stringResource(R.string.edit_profile_cancel_button))
+                    }
               }
             }
       }
     }
   }
-}
+}}
 
 /*@Preview(showBackground = true, widthDp = 540, heightDp = 1110)
 @Composable

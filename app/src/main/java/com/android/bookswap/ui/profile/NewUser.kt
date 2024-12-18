@@ -74,10 +74,11 @@ private val INFO_FONT_WEIGHT = FontWeight(400)
 private val ERROR_FONT_SIZE = 12.sp
 
 /**
- * NewUserScreen is the screen where the user can create a new account by filling in his personal
- * information
+ * NewUserScreen is the screen where the user can create a new account by filling in their personal
+ * information.
  *
- * @param navigationActions: NavigationActions
+ * @param navigationActions Navigation actions to handle navigation events.
+ * @param photoStorage Repository to handle photo storage operations.
  */
 @Composable
 fun NewUserScreen(
