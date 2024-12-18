@@ -67,14 +67,23 @@ import com.google.firebase.storage.FirebaseStorage
 import java.util.UUID
 
 class MainActivity : ComponentActivity() {
-
+  /**
+   * Called when the activity is starting. This is where most initialization should go.
+   *
+   * @param savedInstanceState If the activity is being re-initialized after previously being shut
+   *   down then this Bundle contains the data it most recently supplied in
+   *   onSaveInstanceState(Bundle).
+   */
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     // permissionHandler = PermissionHandler(this)
     // permissionHandler.askNotificationPermission()
     setContent { BookSwapApp() }
   }
-
+  /**
+   * Composable function for the main BookSwap application. Initializes Firebase Firestore, Firebase
+   * Storage, and other data sources. Sets up the geolocation and applies the app theme.
+   */
   @Composable
   fun BookSwapApp() {
     // Initialize a Firebase Firestore database instance
@@ -110,7 +119,18 @@ class MainActivity : ComponentActivity() {
           }
     }
   }
-
+  /**
+   * Composable function for the main BookSwap application.
+   *
+   * @param messageRepository The repository for handling messages.
+   * @param bookRepository The repository for handling books.
+   * @param userRepository The repository for handling users.
+   * @param startDestination The initial destination for navigation.
+   * @param photoStorage The repository for handling photo storage.
+   * @param messageStorage The storage for offline messages.
+   * @param geolocation The geolocation service.
+   * @param context The context of the application.
+   */
   @Composable
   fun BookSwapApp(
       messageRepository: MessageRepository,
@@ -137,6 +157,11 @@ class MainActivity : ComponentActivity() {
     // Book part
     val bookFilter = BookFilter()
 
+    val bookManagerVM =
+        BookManagerViewModel(geolocation, bookRepository, userRepository, bookFilter)
+
+    val contactViewModel = ContactViewModel(userVM, userRepository, messageRepository)
+
     val topAppBar =
         @Composable { s: String? ->
           TopAppBarComponent(
@@ -161,7 +186,6 @@ class MainActivity : ComponentActivity() {
         }
         navigation(startDestination = C.Screen.CHAT_LIST, route = C.Route.CHAT_LIST) {
           // Message part
-          val contactViewModel = ContactViewModel(userVM, userRepository, messageRepository)
           composable(C.Screen.CHAT_LIST) {
             ListChatScreen(
                 navigationActions,
@@ -195,7 +219,7 @@ class MainActivity : ComponentActivity() {
         navigation(startDestination = C.Screen.MAP, route = C.Route.MAP) {
           composable(C.Screen.MAP) {
             MapScreen(
-                BookManagerViewModel(geolocation, bookRepository, userRepository, bookFilter),
+                bookManagerViewModel = bookManagerVM,
                 navigationActions = navigationActions,
                 geolocation = geolocation,
                 topAppBar = { topAppBar(stringResource(R.string.map_screen_title)) },

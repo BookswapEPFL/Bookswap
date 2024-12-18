@@ -86,39 +86,8 @@ class BooksFirestoreSource(private val db: FirebaseFirestore) : BooksRepository 
         val document = task.result
         if (document != null && document.exists()) {
           try {
-            // Parse the fields and handle genres mapping separately
-            val genresList = document.get("genres") as? List<String> ?: emptyList()
-            val bookGenres =
-                genresList.mapNotNull { genre ->
-                  try {
-                    BookGenres.valueOf(genre) // Attempt to map each string to BookGenres
-                  } catch (e: IllegalArgumentException) {
-                    Log.e("BooksFirestoreRepository", "Unknown genre: $genre")
-                    null // Skip if genre is not valid in the BookGenres enum
-                  }
-                }
-            var archived = document.getBoolean("archived") ?: false
-            var exchange = document.getBoolean("exchange") ?: false
-
-            val userId = UUID.fromString(document.getString("userId"))
-            // Create the DataBook object
-            val dataBook =
-                DataBook(
-                    uuid = UUID.fromString(document.getString("uuid")),
-                    title = document.getString("title") ?: "",
-                    author = document.getString("author"),
-                    description = document.getString("description"),
-                    rating = document.getLong("rating")?.toInt(),
-                    photo = document.getString("photo"),
-                    language =
-                        document.getString("language")?.let { BookLanguages.valueOf(it) }
-                            ?: BookLanguages.ENGLISH, // Default or adjust based on requirements
-                    isbn = document.getString("isbn"),
-                    genres = bookGenres,
-                    userId = userId,
-                    archived = archived,
-                    exchange = exchange)
-            OnSucess(dataBook)
+            val book = requireNotNull(documentToBooks(document))
+            OnSucess(book)
           } catch (e: Exception) {
             Log.e("BooksFirestoreRepository", "Error parsing book document: ${e.message}", e)
             onFailure(e)
@@ -144,9 +113,7 @@ class BooksFirestoreSource(private val db: FirebaseFirestore) : BooksRepository 
    */
   override fun addBook(dataBook: DataBook, callback: (Result<Unit>) -> Unit) {
     // Check if essential fields are non-null before attempting to save
-    if (dataBook.title.isBlank() ||
-        dataBook.author.isNullOrBlank() ||
-        dataBook.isbn.isNullOrBlank()) {
+    if (dataBook.title.isBlank() || dataBook.author.isNullOrBlank()) {
       val exception = IllegalArgumentException("Missing required book fields.")
       Log.e("BooksFirestoreRepository", "Failed to add book: ${exception.message}")
       callback(Result.failure(exception))
@@ -202,23 +169,19 @@ class BooksFirestoreSource(private val db: FirebaseFirestore) : BooksRepository 
    */
   fun documentToBooks(document: DocumentSnapshot): DataBook? {
     return try {
-      val uuid = UUID.fromString(document.getString("uuid") ?: return null)
+      val uuid = DataConverter.parse_raw_UUID("${document.get("uuid")}") ?: return null
       val title = document.getString("title") ?: return null
       val author = document.getString("author")
       val description = document.getString("description")
       val rating = document.getLong("rating")?.toInt()
       val photo = document.getString("photo")
-      val language = BookLanguages.valueOf(document.getString("language") ?: return null)
+      val language = BookLanguages.get("${document.get("language")}")
       val isbn = document.getString("isbn")
       val genres =
-          (document.get("genres", List::class.java) as? List<String>)?.mapNotNull {
-            try {
-              BookGenres.valueOf(it)
-            } catch (e: IllegalArgumentException) {
-              null
-            }
-          } ?: emptyList()
-      val userId = UUID.fromString(document.getString("userId") ?: return null)
+          DataConverter.parse_raw_string_list("${document.get("genres")}")
+              .map { BookGenres.get(it) }
+              .distinct()
+      val userId = DataConverter.parse_raw_UUID("${document.get("userId")}") ?: return null
       val archived = document.getBoolean("archived") ?: false
       val exchange = document.getBoolean("exchange") ?: false
 

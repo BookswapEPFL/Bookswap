@@ -60,6 +60,20 @@ open class UserViewModel(
   /**
    * Update the user data with the given parameters. If no parameter is given, the data will not be
    * updated.
+   *
+   * @param greeting Greeting message of the user (default is the current greeting).
+   * @param firstName First name of the user (default is the current first name).
+   * @param lastName Last name of the user (default is the current last name).
+   * @param email Email address of the user (default is the current email).
+   * @param phone Phone number of the user (default is the current phone number).
+   * @param latitude Latitude coordinate of the user's location (default is the current latitude).
+   * @param longitude Longitude coordinate of the user's location (default is the current
+   *   longitude).
+   * @param picURL URL of the user's profile picture (default is the current profile picture URL).
+   * @param bookList List of book UUIDs associated with the user (default is the current book list).
+   * @param googleUid Google UID of the user (default is the current Google UID).
+   * @param contactList List of contact UUIDs associated with the user (default is the current
+   *   contact list).
    */
   fun updateUser(
       greeting: String = dataUser.greeting,
@@ -103,12 +117,17 @@ open class UserViewModel(
     }
   }
 
-  /** Get the user by the googleUid */
+  /**
+   * Get the user by the Google UID.
+   *
+   * @param googleUid Google UID of the user to fetch.
+   */
   fun getUserByGoogleUid(googleUid: String) {
     userRepository.getUser(googleUid) { result ->
       // If the user is found, update the dataUser and set isLoaded to true
       result.onSuccess {
         dataUser = it
+        uuid = dataUser.userUUID
         isLoaded = true
         _isStored.value = true
       }
@@ -129,7 +148,13 @@ open class UserViewModel(
     dataUser.googleUid = googleUid
     updateUser(dataUser)
   }
-
+  /**
+   * Updates the user's address based on the provided latitude and longitude.
+   *
+   * @param latitude Latitude coordinate of the user's location.
+   * @param longitude Longitude coordinate of the user's location.
+   * @param context Context used for geocoding.
+   */
   fun updateAddress(latitude: Double, longitude: Double, context: Context) {
     dataUser.latitude = latitude
     dataUser.longitude = longitude
@@ -145,7 +170,10 @@ open class UserViewModel(
             }
       }
     }
-
+    /**
+     * Launches a coroutine to update the user's address based on the provided latitude and
+     * longitude. Uses the Geocoder to perform geocoding on a background thread.
+     */
     viewModelScope.launch {
       val geocoder = Geocoder(context)
       val geocodeListener = Geocoder.GeocodeListener(handleAddresses)

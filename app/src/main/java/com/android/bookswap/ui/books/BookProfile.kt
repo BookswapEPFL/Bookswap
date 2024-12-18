@@ -61,6 +61,8 @@ const val HALF_WIDTH = 0.5f
 /**
  * Composable function to display the profile screen of a book.
  *
+ * @param bookId The UUID of the book to display.
+ * @param booksRepository The repository to fetch book data.
  * @param DataBook The data object containing book details.
  * @param navController The navigation actions for navigating between screens.
  * @param topAppBar A composable function to display the top app bar.
