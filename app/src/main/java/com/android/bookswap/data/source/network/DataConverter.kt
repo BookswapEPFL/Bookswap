@@ -61,21 +61,15 @@ object DataConverter {
    *   parsed.
    */
   fun parse_raw_UUID(string: String): UUID? {
+    if (string.isEmpty() || string.contentEquals("null", true)) return null
     return when (string.contains("=")) {
       true -> parse_bits_UUID(string)
       false -> parse_string_UUID(string)
     }
   }
 
-  fun parse_raw_UUID_list(string: String): List<UUID?> {
-    val temp_string = string.removeSurrounding("[", "]").removeSurrounding("{", "}")
-    val delimiter =
-        if (temp_string.contains("=")) {
-          "}, "
-        } else {
-          ", "
-        }
-    return temp_string.split(delimiter).map { parse_raw_UUID(it) }
+  fun parse_raw_UUID_list(string: String): List<UUID> {
+    return parse_raw_string_list(string).mapNotNull { parse_raw_UUID(it) }
   }
   /**
    * Parses a string representation of a list of UUIDs.
@@ -104,7 +98,19 @@ object DataConverter {
    * @throws Exception if the string cannot be parsed as a Long.
    */
   fun parse_raw_long_list(string: String): List<Long> {
-    return string.removeSurrounding("[", "]").split(", ").map { parse_raw_long(it) }.filterNotNull()
+    return parse_raw_string_list(string).map { parse_raw_long(it) }
+  }
+  /**
+   * Parses a string representation of a list of Strings.
+   *
+   * @param string The string to be parsed.
+   * @return A list of String
+   */
+  fun parse_raw_string_list(string: String): List<String> {
+    when (string.contains("=")) {
+      true -> return string.removeSurrounding("[", "]").removeSurrounding("{", "}").split("}, ")
+      false -> return string.removeSurrounding("[", "]").split(", ")
+    }
   }
   /**
    * Converts a UUID to its string representation.
@@ -115,13 +121,14 @@ object DataConverter {
   fun convert_UUID(uuid: UUID): String {
     return uuid.toString()
   }
-  /**
-   * Converts a list of UUIDs to their string representations.
-   *
-   * @param uuid_list The list of UUIDs to be converted.
-   * @return A list of string representations of the UUIDs.
-   */
-  fun convert_UUID_list(uuid_list: List<UUID?>): List<String> {
+
+  fun convert_UUID_list(uuid_list: List<UUID>): List<String> {
+    /**
+     * Converts a list of UUIDs to their string representations.
+     *
+     * @param uuid_list The list of UUIDs to be converted.
+     * @return A list of string representations of the UUIDs.
+     */
     return uuid_list.map { it.toString() }
   }
   /**
