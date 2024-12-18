@@ -238,10 +238,7 @@ fun MapScreen(
               }
 
               GoogleMap(
-                  onMapClick = { // mutableStateSelectedUser = NO_USER_SELECTED
-                      // showMarker = true // Hide the marker when map is clicked elsewhere
-                      // Log.d("MapScreen", "Map clicked, hiding marker")
-                      clickedLatLng ->
+                  onMapClick = { clickedLatLng ->
                     Log.e("MapScreen", "Map clicked")
 
                     // Check if the clicked location is near the user's location
@@ -283,8 +280,7 @@ fun MapScreen(
                       title = stringResource(R.string.map_screen_your_location),
                       visible = showMarker,
                       icon =
-                          BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE),
-                  )
+                          BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE))
                 }
                 filteredUsers.value
                     .filter {
