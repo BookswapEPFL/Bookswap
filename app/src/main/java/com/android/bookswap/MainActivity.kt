@@ -157,6 +157,11 @@ class MainActivity : ComponentActivity() {
     // Book part
     val bookFilter = BookFilter()
 
+    val bookManagerVM =
+        BookManagerViewModel(geolocation, bookRepository, userRepository, bookFilter)
+
+    val contactViewModel = ContactViewModel(userVM, userRepository, messageRepository)
+
     val topAppBar =
         @Composable { s: String? ->
           TopAppBarComponent(
@@ -181,7 +186,6 @@ class MainActivity : ComponentActivity() {
         }
         navigation(startDestination = C.Screen.CHAT_LIST, route = C.Route.CHAT_LIST) {
           // Message part
-          val contactViewModel = ContactViewModel(userVM, userRepository, messageRepository)
           composable(C.Screen.CHAT_LIST) {
             ListChatScreen(
                 navigationActions,
@@ -215,7 +219,7 @@ class MainActivity : ComponentActivity() {
         navigation(startDestination = C.Screen.MAP, route = C.Route.MAP) {
           composable(C.Screen.MAP) {
             MapScreen(
-                BookManagerViewModel(geolocation, bookRepository, userRepository, bookFilter),
+                bookManagerViewModel = bookManagerVM,
                 navigationActions = navigationActions,
                 geolocation = geolocation,
                 topAppBar = { topAppBar(stringResource(R.string.map_screen_title)) },
