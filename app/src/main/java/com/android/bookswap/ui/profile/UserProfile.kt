@@ -278,23 +278,21 @@ fun UserProfile(
               { showEditProfile = true },
               Modifier.testTag(C.Tag.UserProfile.edit).align(Alignment.CenterHorizontally)) {
                 Text(stringResource(R.string.user_profile_edit))
-                }
-            // Disconnect Button"
+              }
+          // Disconnect Button"
           Button(
               onClick = {
                 appConfig.userViewModel.disconnectUser()
                 navigationActions.navigateTo(C.Screen.AUTH)
               },
               modifier =
-              Modifier
-                  .align(Alignment.CenterHorizontally)
-                  .height(56.dp) // Use the specified height
-                  .defaultMinSize(minWidth = 56.dp*3) // Ensure consistent minimum width
-                  .padding(8.dp) // Add content padding
-                  .clip(CircleShape)
-                  .semantics { role = Role.Button }
-                  .testTag(C.Tag.UserProfile.disconnect)
-              ) {
+                  Modifier.align(Alignment.CenterHorizontally)
+                      .height(56.dp) // Use the specified height
+                      .defaultMinSize(minWidth = 56.dp * 3) // Ensure consistent minimum width
+                      .padding(8.dp) // Add content padding
+                      .clip(CircleShape)
+                      .semantics { role = Role.Button }
+                      .testTag(C.Tag.UserProfile.disconnect)) {
                 Text("Disconnect")
               }
           // Book List
