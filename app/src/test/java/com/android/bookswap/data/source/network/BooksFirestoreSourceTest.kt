@@ -163,17 +163,16 @@ class BooksFirestoreSourceTest {
             exchange = true)
 
     // Mocking the fields
-    every { mockDocumentSnapshot.getString("uuid") } returns testBook.uuid.toString()
+    every { mockDocumentSnapshot.get("uuid") } returns testBook.uuid.toString()
     every { mockDocumentSnapshot.getString("title") } returns testBook.title
     every { mockDocumentSnapshot.getString("author") } returns testBook.author
     every { mockDocumentSnapshot.getString("description") } returns testBook.description
     every { mockDocumentSnapshot.getLong("rating") } returns testBook.rating?.toLong()
     every { mockDocumentSnapshot.getString("photo") } returns testBook.photo
-    every { mockDocumentSnapshot.getString("language") } returns testBook.language.name
+    every { mockDocumentSnapshot.get("language") } returns testBook.language.name
     every { mockDocumentSnapshot.getString("isbn") } returns testBook.isbn
-    every { mockDocumentSnapshot.get("genres", List::class.java) } returns
-        testBook.genres.map { it.name }
-    every { mockDocumentSnapshot.getString("userId") } returns testBook.userId.toString()
+    every { mockDocumentSnapshot.get("genres") } returns testBook.genres.map { it.name }
+    every { mockDocumentSnapshot.get("userId") } returns testBook.userId.toString()
     every { mockDocumentSnapshot.getBoolean("archived") } returns testBook.archived
     every { mockDocumentSnapshot.getBoolean("exchange") } returns testBook.exchange
 
