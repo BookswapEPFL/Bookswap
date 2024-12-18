@@ -48,6 +48,12 @@ enum class BookLanguages(val languageName: String, val languageCode: String) {
       Enums.Languages.OTHER,
       Enums.LanguagesCode.OTHER); // All languages that are not yet implemented
 
+  /**
+   * Test whether the BookLanguages value is defined by the string given in parameter.
+   *
+   * @param string The string to test against, can be either a 2 letter code or a full language name
+   * @return True if the BookLanguages value is defined by the string, False otherwise
+   */
   fun isDefinedBy(string: String): Boolean {
     fun f(s: String) = s.trim().uppercase()
     val identifier = f(string)
@@ -60,6 +66,13 @@ enum class BookLanguages(val languageName: String, val languageCode: String) {
   }
 
   companion object {
+    /**
+     * Retrieves the Enum value corresponding to the given identifier.
+     *
+     * @param string The string used as identifier, can be either a 2 letter code or a full language
+     *   name
+     * @return The corresponding BookLanguages value or BookLanguages.OTHER if no value matches
+     */
     fun get(language: String): BookLanguages {
       return values().find { it.isDefinedBy(language) } ?: OTHER
     }
@@ -87,6 +100,12 @@ enum class BookGenres(val Genre: String) {
   GUIDE(Enums.Genres.GUIDE),
   OTHER(Enums.Genres.OTHER);
 
+  /**
+   * Test whether the BookGenres value is defined by the string given in parameter.
+   *
+   * @param string The string to test against.
+   * @return True if the BookGenres value is defined by the string, False otherwise
+   */
   fun isDefinedBy(string: String): Boolean {
     fun f(s: String) = s.trim().uppercase()
     val identifier = f(string)
@@ -98,6 +117,12 @@ enum class BookGenres(val Genre: String) {
   }
 
   companion object {
+    /**
+     * Retrieves the Enum value corresponding to the given identifier.
+     *
+     * @param string The string used as identifier.
+     * @return The corresponding BookGenres value or BookGenres.OTHER if no value matches
+     */
     fun get(genre: String): BookGenres {
       return values().find { it.isDefinedBy(genre) } ?: OTHER
     }

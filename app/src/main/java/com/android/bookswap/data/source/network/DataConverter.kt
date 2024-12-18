@@ -100,7 +100,12 @@ object DataConverter {
   fun parse_raw_long_list(string: String): List<Long> {
     return parse_raw_string_list(string).map { parse_raw_long(it) }
   }
-
+  /**
+   * Parses a string representation of a list of Strings.
+   *
+   * @param string The string to be parsed.
+   * @return A list of String
+   */
   fun parse_raw_string_list(string: String): List<String> {
     when (string.contains("=")) {
       true -> return string.removeSurrounding("[", "]").removeSurrounding("{", "}").split("}, ")
