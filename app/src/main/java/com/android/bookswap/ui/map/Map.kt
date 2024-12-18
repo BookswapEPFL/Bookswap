@@ -271,7 +271,6 @@ fun MapScreen(
                   uiSettings = mapUISettings,
                   properties = mapProperties,
               ) {
-
                 // Marker for user's current location
                 if (!latitude.value.isNaN() && !longitude.value.isNaN()) {
                   Log.e("MapScreen", "Marker displayed at: ${latitude.value}, ${longitude.value}")
