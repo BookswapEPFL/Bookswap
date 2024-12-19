@@ -39,6 +39,9 @@ class BookFromChatGPTTest {
         {
           thirdArg<(Result<String>) -> Unit>()(Result.success(testURL))
         }
+      every { photoFirebaseStorageRepository.deletePhotoFromStorageWithUrl(any(), any()) } answers {
+          secondArg<(Result<Unit>) -> Unit>()(Result.success(Unit))
+      }
 
     mockkConstructor(ChatGPTApiService::class)
     mockkConstructor(ImageToDataSource::class)
@@ -157,4 +160,42 @@ class BookFromChatGPTTest {
       callback.invoke(BookFromChatGPT.Companion.ErrorType.NONE, any())
     }
   }
+
+    @Test
+    fun `photo is deleted and not added to dataBook photo attribute`() {
+
+        // Mock the DataBook creation to ensure the `photo` attribute remains null or empty
+        val testURL = "AN_URL"
+        val testISBN = "9780435123437"
+        val expectedUuid = uuid // Use the predefined UUID
+        val dataBook: DataBook = mockk(relaxed = true) {
+            every { uuid } returns expectedUuid
+            every { copy(photo = any()) } throws IllegalStateException("Photo should not be added")
+        }
+
+        every { anyConstructed<GoogleBookDataSource>().getBookFromISBN(testISBN, any(), any()) } answers {
+            thirdArg<(Result<DataBook>) -> Unit>()(Result.success(dataBook))
+        }
+
+        val callback = mockk<(BookFromChatGPT.Companion.ErrorType, UUID?) -> Unit>(relaxed = true)
+        val bookFromChatGPT = BookFromChatGPT(context, photoFirebaseStorageRepository, booksRepository)
+
+        // Call the method
+        bookFromChatGPT.addBookFromImage(bitmap, uuid, callback)
+
+        // Verify that the photo is deleted
+        verify(exactly = 1, timeout = 500) {
+            photoFirebaseStorageRepository.deletePhotoFromStorageWithUrl(testURL, any())
+        }
+
+        // Verify the book is added with no photo attribute modification
+        verify(exactly = 1, timeout = 500) {
+            booksRepository.addBook(dataBook, any())
+        }
+
+        // Ensure callback is invoked with no error
+        verify(exactly = 1, timeout = 500) {
+            callback.invoke(BookFromChatGPT.Companion.ErrorType.NONE, any())
+        }
+    }
 }
