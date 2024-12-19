@@ -393,7 +393,7 @@ private fun CustomInfoWindow(
                             .background(ColorVariable.Green)
                             .testTag(C.Tag.Map.Marker.info_window_user_profile)) {
                       Text(
-                          text = "User profile",
+                          text = stringResource(R.string.map_screen_window_user),
                           color = ColorVariable.Accent,
                           fontSize = PRIMARY_TEXT_FONT_SP.sp,
                           modifier =
