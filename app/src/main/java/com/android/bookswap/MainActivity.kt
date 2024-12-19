@@ -239,6 +239,7 @@ class MainActivity : ComponentActivity() {
           composable(C.Screen.ADD_BOOK_MANUALLY) {
             AddToBookScreen(
                 AddToBookViewModel(bookRepository, userVM),
+                photoStorage,
                 topAppBar = { topAppBar("Add your Book") },
                 bottomAppBar = { bottomAppBar(this@navigation.route ?: "") })
           }
@@ -279,7 +280,9 @@ class MainActivity : ComponentActivity() {
                 backStackEntry.arguments?.getString("bookUUID")?.let { UUID.fromString(it) }
             EditBookScreen(
                 viewModel = EditBookViewModel(bookRepository, navigationActions, userVM),
-                navigationActions = NavigationActions(navController),
+                photoStorage,
+                topAppBar = { topAppBar("Edit your Book") },
+                bottomAppBar = { bottomAppBar(this@navigation.route ?: "") },
                 bookUUID = bookUUID!!)
           }
           composable(C.Screen.AUTH) { SignInScreen(navigationActions) }
@@ -293,6 +296,7 @@ class MainActivity : ComponentActivity() {
                 Log.e("Main Launch OthersUserProfile", "userId: $userId")
                 if (userId != null) {
                   OthersUserProfileScreen(
+                      context = context,
                       userId = userId,
                       booksRepository = bookRepository,
                       navigationActions = navigationActions,

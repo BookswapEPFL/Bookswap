@@ -165,6 +165,17 @@ object C {
       const val profileImageBox = "profile_image_box" + UI_T.CONTAINER
     }
 
+    object AddressFields {
+      const val newAddress = "new_address" + UI_T.TEXT
+      const val address = "address" + UI_T.TEXT_FIELD
+      const val city = "city" + UI_T.TEXT_FIELD
+      const val canton = "canton" + UI_T.TEXT_FIELD
+      const val postal = "postal" + UI_T.TEXT_FIELD
+      const val country = "country" + UI_T.TEXT_FIELD
+      const val cityError = "city_error" + UI_T.TEXT
+      const val countryError = "canton_error" + UI_T.TEXT
+    }
+
     object OtherUserProfile {
       const val fullname = "fullname"
       const val email = "email"
@@ -235,10 +246,11 @@ object C {
     // New Book Choice Screen specific tags (BookAdditionChoice.kt)
     object NewBookChoice {
       object btnWIcon {
-        val button = UI_T.BUTTON
-        val icon = UI_T.ICON
-        val png = UI_T.IMAGE
-        val arrow = "_arrow" + UI_T.ICON
+        const val button = UI_T.BUTTON
+        const val leftIcon = "left" + UI_T.ICON
+        const val leftPng = "left" + UI_T.IMAGE
+        const val rightIcon = "right" + UI_T.ICON
+        const val rightPng = "right" + UI_T.IMAGE
       }
     }
 
