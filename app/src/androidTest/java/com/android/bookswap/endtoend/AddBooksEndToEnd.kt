@@ -121,10 +121,6 @@ class AddBooksEndToEnd {
     composeTestRule
         .onNodeWithTag(C.Tag.BookEntryComp.description_field)
         .performTextInput("This is a test description for the book.")
-    composeTestRule
-        .onNodeWithTag(C.Tag.BookEntryComp.rating_star_empty + "_5", useUnmergedTree = true)
-        .performScrollTo()
-        .performClick()
     composeTestRule.onNodeWithTag(C.Tag.BookEntryComp.isbn_field).performTextInput("9780743273565")
 
     composeTestRule.onNodeWithTag(C.Tag.BookEntryComp.genre_field).performClick()
@@ -133,7 +129,13 @@ class AddBooksEndToEnd {
     composeTestRule.onNodeWithTag(C.Tag.BookEntryComp.language_field).performClick()
     composeTestRule.onNodeWithTag(C.Tag.BookEntryComp.language_menu + "_English").performClick()
 
-    composeTestRule.onNodeWithTag(C.Tag.NewBookManually.save).performScrollTo().performClick()
+    composeTestRule.onNodeWithTag(C.Tag.NewBookManually.save).performScrollTo()
+
+    composeTestRule
+        .onNodeWithTag(C.Tag.BookEntryComp.rating_star_empty + "_5", useUnmergedTree = true)
+        .performClick()
+
+    composeTestRule.onNodeWithTag(C.Tag.NewBookManually.save).performClick()
 
     verify {
       mockBookRepository.addBook(
