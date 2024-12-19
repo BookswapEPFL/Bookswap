@@ -1,6 +1,5 @@
 package com.android.bookswap.data.source.network
 
-import android.os.Looper
 import com.android.bookswap.data.BookGenres
 import com.android.bookswap.data.BookLanguages
 import com.android.bookswap.data.DataBook
@@ -20,7 +19,6 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
-import org.robolectric.Shadows.shadowOf
 
 @RunWith(RobolectricTestRunner::class)
 class BooksFirestoreSourceTest {
@@ -355,4 +353,3 @@ class BooksFirestoreSourceTest {
     assertNotNull(uuid)
   }
 }
-
