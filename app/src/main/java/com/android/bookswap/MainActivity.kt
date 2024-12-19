@@ -153,6 +153,7 @@ class MainActivity : ComponentActivity() {
 
     if (currentUser != null) {
       userVM.getUserByGoogleUid(currentUser.uid) // This will scrap the user from the database
+      Thread.sleep(500)
     }
     // Book part
     val bookFilter = BookFilter()
