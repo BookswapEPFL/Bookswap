@@ -165,6 +165,17 @@ object C {
       const val profileImageBox = "profile_image_box" + UI_T.CONTAINER
     }
 
+    object AddressFields {
+      const val newAddress = "new_address" + UI_T.TEXT
+      const val address = "address" + UI_T.TEXT_FIELD
+      const val city = "city" + UI_T.TEXT_FIELD
+      const val canton = "canton" + UI_T.TEXT_FIELD
+      const val postal = "postal" + UI_T.TEXT_FIELD
+      const val country = "country" + UI_T.TEXT_FIELD
+      const val cityError = "city_error" + UI_T.TEXT
+      const val countryError = "canton_error" + UI_T.TEXT
+    }
+
     object OtherUserProfile {
       const val fullname = "fullname"
       const val email = "email"
