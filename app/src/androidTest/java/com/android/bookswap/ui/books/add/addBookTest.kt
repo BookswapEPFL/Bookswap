@@ -11,6 +11,7 @@ import androidx.compose.ui.test.performTextInput
 import androidx.navigation.compose.rememberNavController
 import com.android.bookswap.data.repository.PhotoFirebaseStorageRepository
 import com.android.bookswap.model.add.AddToBookViewModel
+import com.android.bookswap.model.isNetworkAvailable
 import com.android.bookswap.resources.C
 import com.android.bookswap.ui.navigation.NavigationActions
 import io.mockk.every
@@ -43,7 +44,8 @@ class AddToBookTest {
 
       AddToBookScreen(mockViewModel, photoStorage)
     }
-
+    mockkStatic(::isNetworkAvailable)
+    every { isNetworkAvailable(any()) } returns true
     // Mock Toast messages for testing purposes
     mockkStatic(Toast::class)
     val toastMock = mockk<Toast>()

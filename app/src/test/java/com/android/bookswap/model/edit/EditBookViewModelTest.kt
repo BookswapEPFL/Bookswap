@@ -9,12 +9,14 @@ import com.android.bookswap.data.DataUser
 import com.android.bookswap.data.repository.BooksRepository
 import com.android.bookswap.data.repository.UsersRepository
 import com.android.bookswap.model.UserViewModel
+import com.android.bookswap.model.isNetworkAvailable
 import com.android.bookswap.ui.navigation.NavigationActions
 import io.mockk.*
 import java.util.*
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
+import org.mockito.kotlin.any
 
 class EditBookViewModelTest {
 
@@ -56,9 +58,11 @@ class EditBookViewModelTest {
           any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any())
     } just runs
 
+    mockkStatic(::isNetworkAvailable)
+    every { isNetworkAvailable(any()) } returns true
     booksRepository = mockk()
     navigation = mockk()
-    context = mockk()
+    context = mockk(relaxed = true)
     viewModel = EditBookViewModel(booksRepository, navigation, mockUserViewModel)
 
     every { mockUserViewModel.getUser() } returns user

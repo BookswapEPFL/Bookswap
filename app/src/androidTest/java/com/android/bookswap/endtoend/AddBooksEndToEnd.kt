@@ -16,11 +16,13 @@ import com.android.bookswap.data.repository.UsersRepository
 import com.android.bookswap.data.source.api.GoogleBookDataSource
 import com.android.bookswap.data.source.network.PhotoFirebaseStorageSource
 import com.android.bookswap.model.chat.OfflineMessageStorage
+import com.android.bookswap.model.isNetworkAvailable
 import com.android.bookswap.resources.C
 import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
 import io.mockk.mockkConstructor
+import io.mockk.mockkStatic
 import io.mockk.runs
 import io.mockk.verify
 import java.util.UUID
@@ -56,6 +58,8 @@ class AddBooksEndToEnd {
 
     val testUUID = UUID.randomUUID()
     every { mockBookRepository.getNewUUID() } returns testUUID
+    mockkStatic(::isNetworkAvailable)
+    every { isNetworkAvailable(any()) } returns true
 
     mockedBook =
         DataBook(
