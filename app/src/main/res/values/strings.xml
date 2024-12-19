@@ -78,6 +78,7 @@
     <string name="map_screen_title">Map</string>
     <string name="map_screen_please_connect_to_internet">Please connect to Internet to actualise</string>
     <string name="map_screen_your_location">Your Location</string>
+    <string name="map_screen_window_user">User Profile</string>
     <!-- Edit Profile Screen -->
     <string name="edit_profile_screen_title">Edit Profile</string>
     <string name="edit_profile_greeting">Greeting</string>
