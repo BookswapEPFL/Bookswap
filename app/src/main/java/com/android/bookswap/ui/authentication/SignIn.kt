@@ -184,6 +184,7 @@ fun SignInScreen(navigationActions: NavigationActions) {
  */
 @Composable
 fun GoogleSignInButton(onSignInClick: () -> Unit) {
+
   Button(
       onClick = onSignInClick,
       colors =

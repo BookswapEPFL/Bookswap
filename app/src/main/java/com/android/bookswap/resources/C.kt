@@ -155,6 +155,7 @@ object C {
 
     // User Profile Screen specific tags (UserProfile.kt)
     object UserProfile {
+      const val disconnect = "disconnect" + UI_T.BUTTON
       const val fullname = "fullname" + UI_T.TEXT
       const val email = "email" + UI_T.TEXT
       const val phone = "phoneNumber" + UI_T.TEXT

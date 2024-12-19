@@ -12,7 +12,9 @@ import androidx.lifecycle.viewModelScope
 import com.android.bookswap.data.DataUser
 import com.android.bookswap.data.repository.UsersRepository
 import com.android.bookswap.data.source.network.UserFirestoreSource
+import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.ktx.Firebase
 import java.util.UUID
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -183,6 +185,33 @@ open class UserViewModel(
           handleAddresses(geocoder.getFromLocation(latitude, longitude, 1))
         }
       }
+    }
+  }
+  /**
+   * Disconnect the current user by resetting the user data and UUID. This method sets the user data
+   * to a new DataUser instance with a new UUID, marks the user as not loaded, and updates the
+   * stored state to false.
+   */
+  fun disconnectUser() {
+    viewModelScope.launch {
+      // Update user if _isStored is false before disconnecting
+      if (_isStored.value == false) {
+        updateUser()
+      }
+
+      // Generate a single UUID for consistency
+      val newUUID = UUID.randomUUID()
+      dataUser = DataUser(newUUID)
+      uuid = newUUID
+
+      // Update flags
+      isLoaded = false
+      _isStored.value = false
+
+      // Sign out from Firebase
+      Firebase.auth.signOut()
+
+      Log.d("UserViewModel", "User disconnected and data reset.")
     }
   }
 }

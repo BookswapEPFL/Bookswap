@@ -3,6 +3,7 @@ package com.android.bookswap.ui.profile
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.assertAll
+import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.hasText
@@ -10,7 +11,6 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
-import androidx.navigation.compose.rememberNavController
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.android.bookswap.data.BookGenres
 import com.android.bookswap.data.BookLanguages
@@ -30,7 +30,10 @@ import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
 import io.github.kakaocup.compose.node.element.ComposeScreen
 import io.mockk.coEvery
 import io.mockk.every
+import io.mockk.just
 import io.mockk.mockk
+import io.mockk.runs
+import io.mockk.verify
 import java.util.UUID
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.junit.Before
@@ -98,30 +101,35 @@ class UserProfileScreenTest : TestCase() {
 
   @Before
   fun setup() {
-    val userVM: UserViewModel = mockk()
+    val userVM: UserViewModel = mockk(relaxed = true)
     every { userVM.getUser(any()) } returns standardUser
     every { userVM.uuid } returns standardUser.userUUID
     every { userVM.addressStr } returns MutableStateFlow("address")
 
+    // Mock disconnectUser to just run without throwing exceptions
+    every { userVM.disconnectUser() } just runs
+
+    // Relaxed mocks for dependencies
     photoStorage = mockk(relaxed = true)
-    mockBooksRepository = mockk()
-    mockNavigationActions = mockk()
-    photoStorage = mockk(relaxed = true)
+    mockBooksRepository = mockk(relaxed = true)
+    mockNavigationActions = mockk(relaxed = true)
     mockUserBookViewModel = mockk(relaxed = true)
+
+    // Mock navigation action
+    every { mockNavigationActions.navigateTo(C.Screen.AUTH) } just runs
 
     // Mock the book data fetching
     coEvery { mockUserBookViewModel.getBooks(standardUser.bookList) } returns testBooks
 
+    // Set the composable content for testing
     composeTestRule.setContent {
-      val navController = rememberNavController()
-      val navigationActions = NavigationActions(navController)
       CompositionLocalProvider(LocalAppConfig provides AppConfig(userViewModel = userVM)) {
         UserProfile(
             photoStorage = photoStorage,
             booksRepository = mockBooksRepository,
             userBookViewModel = mockUserBookViewModel,
-            navigationActions = mockNavigationActions,
-            { TopAppBarComponent(Modifier, navigationActions, "Messages") })
+            navigationActions = mockNavigationActions, // Use mocked navigation actions
+            topAppBar = { TopAppBarComponent(Modifier, mockNavigationActions, "Messages") })
       }
     }
   }
@@ -236,5 +244,23 @@ class UserProfileScreenTest : TestCase() {
     composeTestRule
         .onNodeWithTag(C.Tag.TopAppBar.profile_button, useUnmergedTree = true)
         .assertIsDisplayed()
+  }
+
+  @Test
+  fun testDisconnectButton() {
+    // Verify that the Disconnect button exists and is displayed
+    composeTestRule.onNodeWithTag(C.Tag.UserProfile.disconnect).assertExists()
+    composeTestRule.onNodeWithTag(C.Tag.UserProfile.disconnect).assertIsDisplayed()
+    composeTestRule.onNodeWithTag(C.Tag.UserProfile.disconnect).assertHasClickAction()
+
+    // Mock the disconnectUser function and navigation action
+    every { mockNavigationActions.navigateTo(C.Screen.AUTH) } just runs
+    coEvery { photoStorage.addPhotoToStorage(any(), any(), any()) } returns Unit
+
+    // Perform the click on the disconnect button
+    composeTestRule.onNodeWithTag(C.Tag.UserProfile.disconnect).performClick()
+
+    // Verify that the navigation action is triggered
+    verify(exactly = 1) { mockNavigationActions.navigateTo(C.Screen.AUTH) }
   }
 }
