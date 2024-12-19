@@ -35,7 +35,7 @@ class BookFromChatGPT(
             // Get isbn from result and removes the '-' characters
             val isbn = map["isbn"]?.replace("-", "")
             if (isbn == null || isbn == ImageToDataSource.UNDEFINED_ATTRIBUTE) {
-              photoStorageRepository.deletePhotoFromStorageWithUrl(photoUrl) {_ -> }
+              photoStorageRepository.deletePhotoFromStorageWithUrl(photoUrl) { _ -> }
               callback(ErrorType.CHATGPT_ANALYZER_ERROR, null)
               return@analyzeImage
             }
@@ -43,13 +43,13 @@ class BookFromChatGPT(
             // Request book from ISBN
             GoogleBookDataSource(context).getBookFromISBN(isbn, userUUID) { dataBookResult ->
               if (dataBookResult.isFailure) {
-                photoStorageRepository.deletePhotoFromStorageWithUrl(photoUrl) {_ -> }
+                photoStorageRepository.deletePhotoFromStorageWithUrl(photoUrl) { _ -> }
                 callback(ErrorType.ISBN_ERROR, null)
                 return@getBookFromISBN
               }
 
               // Add photo url to dataBook
-              val dataBook = dataBookResult.getOrThrow()//.copy(photo = urlResult.getOrThrow())
+              val dataBook = dataBookResult.getOrThrow() // .copy(photo = urlResult.getOrThrow())
 
               // Add book
               booksRepository.addBook(dataBook) { bookResult ->
