@@ -169,6 +169,7 @@ class MapScreenTest : TestCase() {
         composeTestRule.onAllNodesWithTag(C.Tag.Map.Marker.book_title).assertCountEquals(2)
         composeTestRule.onAllNodesWithTag(C.Tag.Map.Marker.book_author).assertCountEquals(2)
         composeTestRule.onAllNodesWithTag(C.Tag.Map.Marker.info_window_divider).assertCountEquals(1)
+        composeTestRule.onNodeWithTag(C.Tag.Map.Marker.info_window_user_profile).assertIsDisplayed()
 
         // components of Draggable Menu
         composeTestRule.onNodeWithTag(C.Tag.Map.bottom_drawer_container).assertIsDisplayed()
