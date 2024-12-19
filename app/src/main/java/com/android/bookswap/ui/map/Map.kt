@@ -239,7 +239,7 @@ fun MapScreen(
 
               GoogleMap(
                   onMapClick = { clickedLatLng ->
-                    Log.e("MapScreen", "Map clicked")
+                    Log.i("MapScreen", "Map clicked")
 
                     // Check if the clicked location is near the user's location
                     val userLocation = LatLng(latitude.value, longitude.value)
@@ -273,7 +273,7 @@ fun MapScreen(
               ) {
                 // Marker for user's current location
                 if (!latitude.value.isNaN() && !longitude.value.isNaN()) {
-                  Log.e("MapScreen", "Marker displayed at: ${latitude.value}, ${longitude.value}")
+                  Log.i("MapScreen", "Marker displayed at: ${latitude.value}, ${longitude.value}")
                   Marker(
                       state = markerState,
                       title = stringResource(R.string.map_screen_your_location),
