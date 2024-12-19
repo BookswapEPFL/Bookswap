@@ -223,38 +223,6 @@ class BooksFirestoreSource(private val db: FirebaseFirestore) : BooksRepository 
     }
   }
   /**
-   * If the Firestore operation fails, this method logs the exception and invokes the callback with
-   * the failure result.
-   *
-   * @param e The exception that occurred during the Firestore operation.
-   */
-  fun moveBookToArchive(book: DataBook, callback: (Result<Unit>) -> Unit) {
-    val bookMap =
-        mapOf(
-            "uuid" to book.uuid.toString(),
-            "title" to book.title,
-            "author" to book.author,
-            "description" to book.description,
-            "rating" to book.rating,
-            "photo" to book.photo,
-            "language" to book.language.toString(),
-            "isbn" to book.isbn,
-            "genres" to book.genres.map { it.toString() },
-            "userId" to book.userId.toString(),
-            "archived" to true,
-            "exchange" to book.exchange)
-
-    performFirestoreOperation(
-        db.collection(collectionBooks_Archived).document(book.uuid.toString()).set(bookMap)) {
-            result ->
-          if (result.isSuccess) {
-            deleteBook(book.uuid, callback) // Fixed reference here
-          } else {
-            callback(result)
-          }
-        }
-  }
-  /**
    * Retrieves a book from the archived books collection in Firestore.
    *
    * @param uuid The UUID of the book to be retrieved.
