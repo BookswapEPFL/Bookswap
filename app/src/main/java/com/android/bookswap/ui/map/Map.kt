@@ -26,12 +26,9 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
@@ -68,9 +65,9 @@ import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.*
 import com.google.maps.android.compose.GoogleMap
+import java.util.UUID
 import kotlin.math.roundToInt
 import kotlinx.coroutines.launch
-import java.util.UUID
 
 /** Constants * */
 const val INIT_ZOOM = 10F
@@ -300,12 +297,12 @@ fun MapScreen(
                             }
                             // Navigate to the user profile
                             /*navigationActions.navigateTo(
-                                screen = C.Screen.OTHERS_USER_PROFILE,
-                                UUID =
-                                    item.userUUID
-                                        .toString() // Assuming `item` has a unique UUID field
-                                // called `id`
-                                )*/
+                            screen = C.Screen.OTHERS_USER_PROFILE,
+                            UUID =
+                                item.userUUID
+                                    .toString() // Assuming `item` has a unique UUID field
+                            // called `id`
+                            )*/
                             false
                           })
                     }
@@ -358,7 +355,12 @@ const val SECONDARY_TEXT_FONT_SP = 16
  *   info window.
  */
 @Composable
-private fun CustomInfoWindow(modifier: Modifier = Modifier, userBooks: List<DataBook>, userUUID: UUID, navigationActions: NavigationActions) {
+private fun CustomInfoWindow(
+    modifier: Modifier = Modifier,
+    userBooks: List<DataBook>,
+    userUUID: UUID,
+    navigationActions: NavigationActions
+) {
   Card(
       modifier =
           modifier
@@ -381,25 +383,29 @@ private fun CustomInfoWindow(modifier: Modifier = Modifier, userBooks: List<Data
               0.dp, CARD_CORNER_RADIUS.dp, CARD_CORNER_RADIUS.dp, CARD_CORNER_RADIUS.dp)) {
         LazyColumn(
             modifier = Modifier.fillMaxWidth().testTag(C.Tag.Map.Marker.info_window_scrollable)) {
-                item {
-                    Column(modifier = Modifier.clickable {
-                        navigationActions.navigateTo(
-                            screen = C.Screen.OTHERS_USER_PROFILE,
-                            UUID = userUUID.toString()
-                        )
-                    }){
-                        Text(
-                            text = "User profile",
-                            color = ColorVariable.Accent,
-                            fontSize = PRIMARY_TEXT_FONT_SP.sp,
-                            modifier = Modifier.padding(horizontal = PADDING_HORIZONTAL_DP.dp, vertical = CARD_CORNER_RADIUS.dp))
-                        HorizontalDivider(
-                            modifier =
-                            Modifier.fillMaxWidth(),
-                            thickness = DIVIDER_THICKNESS_DP.dp,
-                            color = ColorVariable.Accent)
+              item {
+                Column(
+                    modifier =
+                        Modifier.clickable {
+                              navigationActions.navigateTo(
+                                  screen = C.Screen.OTHERS_USER_PROFILE, UUID = userUUID.toString())
+                            }
+                            .background(ColorVariable.Green)
+                            .testTag(C.Tag.Map.Marker.info_window_user_profile)) {
+                      Text(
+                          text = "User profile",
+                          color = ColorVariable.Accent,
+                          fontSize = PRIMARY_TEXT_FONT_SP.sp,
+                          modifier =
+                              Modifier.padding(
+                                  horizontal = PADDING_HORIZONTAL_DP.dp,
+                                  vertical = CARD_CORNER_RADIUS.dp))
+                      HorizontalDivider(
+                          modifier = Modifier.fillMaxWidth(),
+                          thickness = DIVIDER_THICKNESS_DP.dp,
+                          color = ColorVariable.Accent)
                     }
-                }
+              }
               itemsIndexed(userBooks) { index, book ->
                 Column(
                     modifier =
