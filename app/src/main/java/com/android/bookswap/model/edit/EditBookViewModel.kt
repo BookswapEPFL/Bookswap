@@ -4,11 +4,13 @@ import android.content.Context
 import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
+import com.android.bookswap.R
 import com.android.bookswap.data.BookGenres
 import com.android.bookswap.data.BookLanguages
 import com.android.bookswap.data.DataBook
 import com.android.bookswap.data.repository.BooksRepository
 import com.android.bookswap.model.UserViewModel
+import com.android.bookswap.model.isNetworkAvailable
 import com.android.bookswap.ui.navigation.NavigationActions
 import java.util.UUID
 
@@ -54,6 +56,11 @@ class EditBookViewModel(
       archived: Boolean,
       exchange: Boolean
   ) {
+    if (!isNetworkAvailable(context)) {
+      Toast.makeText(
+              context, context.getString(R.string.edit_book_toast_no_connection), Toast.LENGTH_LONG)
+          .show()
+    }
     val book =
         DataBook(
             uuid,
@@ -73,10 +80,14 @@ class EditBookViewModel(
         book,
         callback = {
           if (it.isSuccess) {
-            Toast.makeText(context, "Book updated.", Toast.LENGTH_LONG).show()
+
+            Toast.makeText(context, context.getString(R.string.edit_book_toast), Toast.LENGTH_LONG)
+                .show()
+
             navigation.goBack()
           } else {
-            Toast.makeText(context, "Failed to update book.", Toast.LENGTH_LONG).show()
+            Toast.makeText(context, context.getString(R.string.edit_book_toast), Toast.LENGTH_LONG)
+                .show()
           }
         })
   }
