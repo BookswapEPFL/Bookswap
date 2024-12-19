@@ -49,7 +49,7 @@ class BookFromChatGPT(
               }
 
               // Add photo url to dataBook
-              val dataBook = dataBookResult.getOrThrow() // .copy(photo = urlResult.getOrThrow())
+              val dataBook = dataBookResult.getOrThrow()
 
               // Add book
               booksRepository.addBook(dataBook) { bookResult ->
