@@ -161,6 +161,10 @@ class NewUserScreenTest {
     verify(exactly = 0) { navigationActions.navigateTo(C.Route.MAP) }
 
     composeTestRule
+        .onNodeWithTag(C.Tag.new_user_screen_container)
+        .performScrollToNode(hasTestTag(C.Tag.NewUser.email))
+
+    composeTestRule
         .onNodeWithTag(C.Tag.NewUser.email_error)
         .assertExists()
         .assertIsDisplayed()
