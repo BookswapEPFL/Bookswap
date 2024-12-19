@@ -140,7 +140,8 @@ class MainActivity : ComponentActivity() {
       photoStorage: PhotoFirebaseStorageRepository,
       messageStorage: OfflineMessageStorage,
       geolocation: IGeolocation = DefaultGeolocation(),
-      context: Context
+      context: Context,
+      userVM: UserViewModel = UserViewModel(UUID.randomUUID(), userRepository)
   ) {
     // navigation part
     val navController = rememberNavController()
@@ -149,7 +150,6 @@ class MainActivity : ComponentActivity() {
     // user part
     // Firebase.auth.signOut() // Uncomment this line to test the sign in screen
     val currentUser = Firebase.auth.currentUser
-    val userVM = UserViewModel(UUID.randomUUID(), userRepository)
 
     if (currentUser != null) {
       userVM.getUserByGoogleUid(currentUser.uid) // This will scrap the user from the database
