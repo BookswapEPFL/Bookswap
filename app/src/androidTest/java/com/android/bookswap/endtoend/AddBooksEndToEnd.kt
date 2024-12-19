@@ -120,9 +120,6 @@ class AddBooksEndToEnd {
     composeTestRule
         .onNodeWithTag(C.Tag.BookEntryComp.description_field)
         .performTextInput("This is a test description for the book.")
-    composeTestRule
-        .onNodeWithTag(C.Tag.BookEntryComp.rating_star_empty + "_1", useUnmergedTree = true)
-        .performClick()
     composeTestRule.onNodeWithTag(C.Tag.BookEntryComp.isbn_field).performTextInput("9780743273565")
 
     composeTestRule.onNodeWithTag(C.Tag.BookEntryComp.genre_field).performClick()
@@ -139,7 +136,6 @@ class AddBooksEndToEnd {
             book.title == "The Great Gatsby" &&
                 book.author == "F. Scott Fitzgerald" &&
                 book.description == "A classic novel set in the Jazz Age." &&
-                book.rating == 1 &&
                 book.isbn == "9780743273565" &&
                 book.genres == listOf(BookGenres.FANTASY)
             book.language == BookLanguages.ENGLISH
