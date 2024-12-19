@@ -2,6 +2,7 @@ package com.android.bookswap.model
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.util.Log
 import com.android.bookswap.R
 import com.android.bookswap.data.repository.BooksRepository
 import com.android.bookswap.data.repository.PhotoFirebaseStorageRepository
@@ -22,6 +23,8 @@ class BookFromChatGPT(
         callback(ErrorType.FIREBASE_STORAGE_ERROR, null)
         return@addPhotoToStorage
       }
+
+      Log.i("DeleteBook", "Sending photo to ChatGPT")
 
       // Send the url to ChatGPT
       val photoUrl = urlResult.getOrThrow()
@@ -46,9 +49,12 @@ class BookFromChatGPT(
               // Add photo url to dataBook
               val dataBook = dataBookResult.getOrThrow()//.copy(photo = urlResult.getOrThrow())
 
+              Log.i("DeleteBook", "Test if goes through this point")
+
               // Add book
               booksRepository.addBook(dataBook) { bookResult ->
                 if (bookResult.isFailure) {
+                  Log.i("DeleteBook", "Deleting photo from storage")
                   photoStorageRepository.deletePhotoFromStorageWithUrl(photoUrl) { deleteResult ->
                     if (deleteResult.isFailure) {
                       callback(ErrorType.FIREBASE_STORAGE_ERROR, null)
@@ -57,6 +63,7 @@ class BookFromChatGPT(
                     }
                   }
                 } else {
+                  Log.i("DeleteBook", "Deleting photo from storage")
                   photoStorageRepository.deletePhotoFromStorageWithUrl(photoUrl) { _ -> }
                   callback(ErrorType.NONE, dataBookResult.getOrThrow().uuid)
                 }
@@ -64,6 +71,7 @@ class BookFromChatGPT(
             }
           },
           onError = {
+            Log.i("DeleteBook", "Deleting photo from storage")
             photoStorageRepository.deletePhotoFromStorageWithUrl(photoUrl) { deleteResult ->
               if (deleteResult.isFailure) {
                 callback(ErrorType.FIREBASE_STORAGE_ERROR, null)
