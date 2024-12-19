@@ -11,9 +11,9 @@
     <string name="label_title">Title*</string>
     <string name="label_genres">Genres*</string>
     <string name="label_author">Author*</string>
-    <string name="label_description">Description*</string>
-    <string name="label_isbn">ISBN*</string>
-    <string name="label_photo">Pics*</string>
+    <string name="label_description">Description</string>
+    <string name="label_isbn">ISBN</string>
+    <string name="label_photo">Take a photo</string>
     <string name="label_language">Language*</string>
     <!-- Book Addition Choice Screen -->
     <string name="book_addition_choice_title">Add a Book</string>
