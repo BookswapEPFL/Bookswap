@@ -24,9 +24,10 @@ class BookFromChatGPT(
       }
 
       // Send the url to ChatGPT
+      val photoUrl = urlResult.getOrThrow()
       val imageToData = ImageToDataSource(ChatGPTApiService(context))
       imageToData.analyzeImage(
-          urlResult.getOrThrow(),
+          photoUrl,
           onSuccess = { map ->
             // Get isbn from result and removes the '-' characters
             val isbn = map["isbn"]?.replace("-", "")
@@ -43,19 +44,34 @@ class BookFromChatGPT(
               }
 
               // Add photo url to dataBook
-              val dataBook = dataBookResult.getOrThrow().copy(photo = urlResult.getOrThrow())
+              val dataBook = dataBookResult.getOrThrow()//.copy(photo = urlResult.getOrThrow())
 
               // Add book
               booksRepository.addBook(dataBook) { bookResult ->
                 if (bookResult.isFailure) {
-                  callback(ErrorType.BOOK_ADD_ERROR, null)
+                  photoStorageRepository.deletePhotoFromStorageWithUrl(photoUrl) { deleteResult ->
+                    if (deleteResult.isFailure) {
+                      callback(ErrorType.FIREBASE_STORAGE_ERROR, null)
+                    } else {
+                      callback(ErrorType.BOOK_ADD_ERROR, null)
+                    }
+                  }
                 } else {
+                  photoStorageRepository.deletePhotoFromStorageWithUrl(photoUrl) { _ -> }
                   callback(ErrorType.NONE, dataBookResult.getOrThrow().uuid)
                 }
               }
             }
           },
-          onError = { callback(ErrorType.CHATGPT_ANALYZER_ERROR, null) })
+          onError = {
+            photoStorageRepository.deletePhotoFromStorageWithUrl(photoUrl) { deleteResult ->
+              if (deleteResult.isFailure) {
+                callback(ErrorType.FIREBASE_STORAGE_ERROR, null)
+              } else {
+                callback(ErrorType.CHATGPT_ANALYZER_ERROR, null)
+              }
+            }
+          })
     }
   }
 
