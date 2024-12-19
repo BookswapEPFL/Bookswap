@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performTextInput
 import com.android.bookswap.MainActivity
 import com.android.bookswap.data.BookGenres
@@ -60,7 +61,7 @@ class AddBooksEndToEnd {
             "The Great Gatsby",
             "F. Scott Fitzgerald",
             "A classic novel set in the Jazz Age.",
-            1,
+            5,
             "https://example.com/greatgatsby.jpg",
             BookLanguages.ENGLISH,
             "9780743273565",
@@ -120,6 +121,10 @@ class AddBooksEndToEnd {
     composeTestRule
         .onNodeWithTag(C.Tag.BookEntryComp.description_field)
         .performTextInput("This is a test description for the book.")
+    composeTestRule
+        .onNodeWithTag(C.Tag.BookEntryComp.rating_star_empty + "_5", useUnmergedTree = true)
+        .performScrollTo()
+        .performClick()
     composeTestRule.onNodeWithTag(C.Tag.BookEntryComp.isbn_field).performTextInput("9780743273565")
 
     composeTestRule.onNodeWithTag(C.Tag.BookEntryComp.genre_field).performClick()
@@ -128,7 +133,7 @@ class AddBooksEndToEnd {
     composeTestRule.onNodeWithTag(C.Tag.BookEntryComp.language_field).performClick()
     composeTestRule.onNodeWithTag(C.Tag.BookEntryComp.language_menu + "_English").performClick()
 
-    composeTestRule.onNodeWithTag(C.Tag.NewBookManually.save).performClick()
+    composeTestRule.onNodeWithTag(C.Tag.NewBookManually.save).performScrollTo().performClick()
 
     verify {
       mockBookRepository.addBook(
@@ -136,6 +141,7 @@ class AddBooksEndToEnd {
             book.title == "The Great Gatsby" &&
                 book.author == "F. Scott Fitzgerald" &&
                 book.description == "A classic novel set in the Jazz Age." &&
+                book.rating == 5 &&
                 book.isbn == "9780743273565" &&
                 book.genres == listOf(BookGenres.FANTASY)
             book.language == BookLanguages.ENGLISH
