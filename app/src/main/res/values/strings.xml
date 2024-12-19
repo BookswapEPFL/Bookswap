@@ -147,7 +147,13 @@
 
     <!-- Add Book VM -->
     <string name="add_book_toast">Book added</string>
+    <string name="add_book_toast_no_connection">Book will be added when wifi is connected</string>
     <string name="add_book_toast_error">Failed to add book</string>
+
+    <!-- Edit Book VM -->
+    <string name="edit_book_toast">Book updated.</string>
+    <string name="edit_book_toast_no_connection">Book will be updated when wifi is connected</string>
+    <string name="edit_book_toast_error">Failed to update book.</string>
 
     <!-- Book Languages -->
     <string name="language_french">French</string>
