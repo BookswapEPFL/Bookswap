@@ -24,6 +24,7 @@ import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
 import java.util.UUID
+import kotlinx.coroutines.flow.MutableStateFlow
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -103,6 +104,9 @@ class OthersUserProfileTest : TestCase() {
 
     // Mock the book data fetching
     coEvery { mockUserBookViewModel.getBooks(testUser.bookList) } returns testBooks
+    coEvery { mockUserBookViewModel.getBooks(any()) } returns testBooks
+    every { mockOthersUserViewModel.addressStr } returns
+        MutableStateFlow("123 Main St, Springfield")
   }
 
   @Test
@@ -152,7 +156,7 @@ class OthersUserProfileTest : TestCase() {
     composeTestRule
         .onNodeWithTag(C.Tag.OtherUserProfile.address + C.Tag.LabeledText.text)
         .assertIsDisplayed()
-        .assertTextEquals("45.0, 50.0")
+        .assertTextEquals("123 Main St, Springfield")
 
     composeTestRule
         .onNodeWithTag(C.Tag.OtherUserProfile.chatButton)
