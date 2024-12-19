@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
-import androidx.compose.ui.test.performScrollTo
+import androidx.compose.ui.test.performScrollToIndex
 import androidx.compose.ui.test.performTextInput
 import com.android.bookswap.MainActivity
 import com.android.bookswap.data.BookGenres
@@ -39,6 +39,8 @@ class AddBooksEndToEnd {
   private lateinit var mockContext: Context
 
   private lateinit var mockedBook: DataBook
+
+  private val lastItem = 9
 
   @Before
   fun setUp() {
@@ -129,7 +131,8 @@ class AddBooksEndToEnd {
     composeTestRule.onNodeWithTag(C.Tag.BookEntryComp.language_field).performClick()
     composeTestRule.onNodeWithTag(C.Tag.BookEntryComp.language_menu + "_English").performClick()
 
-    composeTestRule.onNodeWithTag(C.Tag.NewBookManually.save).performScrollTo()
+    // scroll to the bottom of the page.
+    composeTestRule.onNodeWithTag(C.Tag.BookEntryComp.scrollable).performScrollToIndex(lastItem)
 
     composeTestRule
         .onNodeWithTag(C.Tag.BookEntryComp.rating_star_empty + "_5", useUnmergedTree = true)
