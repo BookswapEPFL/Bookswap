@@ -1,6 +1,8 @@
 package com.android.bookswap.ui.map
 
 import android.content.pm.PackageManager
+import android.location.Location
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -68,8 +70,10 @@ import com.google.maps.android.compose.GoogleMap
 import kotlin.math.roundToInt
 import kotlinx.coroutines.launch
 
+/** Constants * */
 const val INIT_ZOOM = 10F
 const val NO_USER_SELECTED = -1
+const val SHOW_MARKER_DISTANCE = 50
 
 val CameraPositionKey = SemanticsPropertyKey<CameraPositionState>("CameraPosition")
 var SemanticsPropertyReceiver.cameraPosition by CameraPositionKey
@@ -202,6 +206,9 @@ fun MapScreen(
     }
   }
 
+  // State to control the visibility of the marker
+  var showMarker by remember { mutableStateOf(false) }
+
   Scaffold(
       modifier = Modifier.testTag(C.Tag.map_screen_container),
       topBar = topAppBar,
@@ -210,8 +217,47 @@ fun MapScreen(
         Box(
             Modifier.padding(
                 top = pd.calculateTopPadding(), bottom = pd.calculateBottomPadding())) {
+
+              // Marker state for user's location
+              val markerState = remember {
+                MarkerState(position = LatLng(latitude.value, longitude.value))
+              }
+
+              // Update the marker's position when latitude or longitude changes
+              LaunchedEffect(latitude.value, longitude.value) {
+                markerState.position = LatLng(latitude.value, longitude.value)
+              }
+
+              // Show the InfoWindow when the marker becomes visible
+              LaunchedEffect(showMarker) {
+                if (showMarker) {
+                  markerState.showInfoWindow()
+                } else {
+                  markerState.hideInfoWindow()
+                }
+              }
+
               GoogleMap(
-                  onMapClick = { mutableStateSelectedUser = NO_USER_SELECTED },
+                  onMapClick = { clickedLatLng ->
+                    Log.i("MapScreen", "Map clicked")
+
+                    // Check if the clicked location is near the user's location
+                    val userLocation = LatLng(latitude.value, longitude.value)
+                    val distance = FloatArray(1)
+
+                    // Calculate the distance between the clicked point and the user's location
+                    Location.distanceBetween(
+                        clickedLatLng.latitude,
+                        clickedLatLng.longitude,
+                        userLocation.latitude,
+                        userLocation.longitude,
+                        distance)
+
+                    // Show marker if the distance is within 50 meters
+                    showMarker = distance[0] <= SHOW_MARKER_DISTANCE
+
+                    mutableStateSelectedUser = NO_USER_SELECTED
+                  },
                   onMapLoaded = {
                     cameraPositionState.position =
                         CameraPosition.fromLatLngZoom(
@@ -227,9 +273,11 @@ fun MapScreen(
               ) {
                 // Marker for user's current location
                 if (!latitude.value.isNaN() && !longitude.value.isNaN()) {
+                  Log.i("MapScreen", "Marker displayed at: ${latitude.value}, ${longitude.value}")
                   Marker(
-                      state = MarkerState(position = LatLng(latitude.value, longitude.value)),
+                      state = markerState,
                       title = stringResource(R.string.map_screen_your_location),
+                      visible = showMarker,
                       icon =
                           BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE))
                 }
