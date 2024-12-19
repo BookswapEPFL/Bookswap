@@ -12,7 +12,7 @@ import com.android.bookswap.data.BookLanguages
 import com.android.bookswap.data.DataBook
 import com.android.bookswap.data.repository.PhotoFirebaseStorageRepository
 import com.android.bookswap.model.edit.EditBookViewModel
-import com.android.bookswap.model.isNetworkAvailable
+import com.android.bookswap.model.isNetworkAvailableForBook
 import com.android.bookswap.resources.C
 import com.android.bookswap.ui.navigation.NavigationActions
 import io.mockk.MockKAnnotations
@@ -57,8 +57,8 @@ class EditBookScreenTest {
     every { photoStorage.addPhotoToStorage(any(), any(), any()) } just runs
     MockKAnnotations.init(this)
     every { mockViewModel.deleteBook(any(), any()) } just runs
-    mockkStatic(::isNetworkAvailable)
-    every { isNetworkAvailable(any()) } returns true
+    mockkStatic(::isNetworkAvailableForBook)
+    every { isNetworkAvailableForBook(any()) } returns true
     every {
       mockViewModel.updateDataBook(
           any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any())

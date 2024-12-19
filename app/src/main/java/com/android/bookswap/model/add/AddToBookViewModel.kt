@@ -10,7 +10,7 @@ import com.android.bookswap.data.BookLanguages
 import com.android.bookswap.data.DataBook
 import com.android.bookswap.data.repository.BooksRepository
 import com.android.bookswap.model.UserViewModel
-import com.android.bookswap.model.isNetworkAvailable
+import com.android.bookswap.model.isNetworkAvailableForBook
 import java.util.UUID
 
 /**
@@ -50,7 +50,7 @@ class AddToBookViewModel(
       archived: Boolean,
       exchange: Boolean
   ) {
-    if (!isNetworkAvailable(context)) {
+    if (!isNetworkAvailableForBook(context)) {
       Toast.makeText(
               context, context.getString(R.string.add_book_toast_no_connection), Toast.LENGTH_LONG)
           .show()

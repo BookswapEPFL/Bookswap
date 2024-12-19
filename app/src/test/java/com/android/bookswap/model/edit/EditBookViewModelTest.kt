@@ -9,7 +9,7 @@ import com.android.bookswap.data.DataUser
 import com.android.bookswap.data.repository.BooksRepository
 import com.android.bookswap.data.repository.UsersRepository
 import com.android.bookswap.model.UserViewModel
-import com.android.bookswap.model.isNetworkAvailable
+import com.android.bookswap.model.isNetworkAvailableForBook
 import com.android.bookswap.ui.navigation.NavigationActions
 import io.mockk.*
 import java.util.*
@@ -58,8 +58,8 @@ class EditBookViewModelTest {
           any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any())
     } just runs
 
-    mockkStatic(::isNetworkAvailable)
-    every { isNetworkAvailable(any()) } returns true
+    mockkStatic(::isNetworkAvailableForBook)
+    every { isNetworkAvailableForBook(any()) } returns true
     booksRepository = mockk()
     navigation = mockk()
     context = mockk(relaxed = true)
