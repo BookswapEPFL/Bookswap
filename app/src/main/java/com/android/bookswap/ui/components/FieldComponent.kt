@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
@@ -182,7 +181,7 @@ fun FieldComponent(
                                         focusedBorderThickness = 2.dp,
                                         unfocusedBorderThickness = 1.dp)
                                     .value,
-                                RoundedCornerShape(100))
+                                RoundedCornerShape(FIELD_MIN_HEIGHT / 2))
                             .background(
                                 backgroundColor(
                                         enabled = enabled,
@@ -197,7 +196,7 @@ fun FieldComponent(
                                             },
                                         colors = colors)
                                     .value,
-                                CircleShape)
+                                RoundedCornerShape(FIELD_MIN_HEIGHT / 2))
                             .padding(FIELD_PADDING)
                             .background(
                                 backgroundColor(
@@ -213,7 +212,7 @@ fun FieldComponent(
                                             },
                                         colors = colors)
                                     .value,
-                                CircleShape),
+                                RoundedCornerShape(FIELD_MIN_HEIGHT / 2)),
                     )
                   },
                   contentPadding = PaddingValues(FIELD_CONTENT_PADDING))
