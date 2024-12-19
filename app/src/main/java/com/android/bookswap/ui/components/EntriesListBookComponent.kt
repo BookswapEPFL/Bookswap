@@ -4,6 +4,7 @@ import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -264,17 +265,18 @@ fun EntriesListBookComponent(
         // Rating Input Field
         item {
           var currentRating by remember { mutableStateOf(rating.value.toIntOrNull() ?: 0) }
-
-          RatingStarsComponent(
-              currentRating = currentRating,
-              onRatingChanged = { newRating ->
-                currentRating = newRating
-                rating.value = newRating.toString()
-              },
-              modifier =
-                  Modifier.testTag(C.Tag.BookEntryComp.rating_field_stars)
-                      .fillMaxWidth()
-                      .padding(horizontal = HORIZONTAL_PADDING.dp))
+          Box(modifier = Modifier.fillMaxWidth().padding(horizontal = HORIZONTAL_PADDING.dp)) {
+            RatingStarsComponent(
+                currentRating = currentRating,
+                onRatingChanged = { newRating ->
+                  currentRating = newRating
+                  rating.value = newRating.toString()
+                },
+                modifier =
+                    Modifier.testTag(C.Tag.BookEntryComp.rating_field_stars)
+                        .padding(horizontal = HORIZONTAL_PADDING.dp)
+                        .align(Alignment.Center))
+          }
         }
 
         // Buttons
