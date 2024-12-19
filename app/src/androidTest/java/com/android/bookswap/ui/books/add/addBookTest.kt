@@ -1,7 +1,6 @@
 package com.android.bookswap.ui.books.add
 
 import android.widget.Toast
-import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -10,6 +9,7 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import androidx.navigation.compose.rememberNavController
+import com.android.bookswap.data.repository.PhotoFirebaseStorageRepository
 import com.android.bookswap.model.add.AddToBookViewModel
 import com.android.bookswap.resources.C
 import com.android.bookswap.ui.navigation.NavigationActions
@@ -25,10 +25,13 @@ import org.junit.Test
 class AddToBookTest {
   @get:Rule val composeTestRule = createComposeRule()
   private val mockViewModel: AddToBookViewModel = mockk()
+  private lateinit var photoStorage: PhotoFirebaseStorageRepository
 
   @Before
   fun init() {
     // Mock the ViewModel save method to run without side effects
+    photoStorage = mockk()
+    every { photoStorage.addPhotoToStorage(any(), any(), any()) } just runs
     every {
       mockViewModel.saveDataBook(
           any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any())
@@ -38,7 +41,7 @@ class AddToBookTest {
       val navController = rememberNavController()
       NavigationActions(navController)
 
-      AddToBookScreen(mockViewModel)
+      AddToBookScreen(mockViewModel, photoStorage)
     }
 
     // Mock Toast messages for testing purposes
@@ -57,10 +60,16 @@ class AddToBookTest {
   @Test
   fun testSaveButtonEnabledWhenRequiredFieldsAreFilled() {
     // Fill in the Title and ISBN fields
-    composeTestRule.onNodeWithTag(C.Tag.NewBookManually.title).performTextInput("My Book Title")
-    composeTestRule.onNodeWithTag(C.Tag.NewBookManually.isbn).performTextInput("978-3-16-148410-0")
-    composeTestRule.onNodeWithTag(C.Tag.NewBookManually.author).performTextInput("My Book Author")
-    composeTestRule.onNodeWithTag(C.Tag.NewBookManually.language).performClick()
+    composeTestRule.onNodeWithTag(C.Tag.BookEntryComp.title_field).performTextInput("My Book Title")
+    composeTestRule
+        .onNodeWithTag(C.Tag.BookEntryComp.isbn_field)
+        .performTextInput("978-3-16-148410-0")
+    composeTestRule
+        .onNodeWithTag(C.Tag.BookEntryComp.author_field)
+        .performTextInput("My Book Author")
+    composeTestRule.onNodeWithTag(C.Tag.BookEntryComp.genre_field).performClick()
+    composeTestRule.onNodeWithTag(C.Tag.BookEntryComp.genre_menu + "_Fantasy").performClick()
+    composeTestRule.onNodeWithTag(C.Tag.BookEntryComp.language_field).performClick()
     composeTestRule.onNodeWithText("French").performClick()
     // Check if the Save button is now enabled
     composeTestRule.onNodeWithTag(C.Tag.NewBookManually.save).performClick()
@@ -70,56 +79,9 @@ class AddToBookTest {
   @Test
   fun testSaveButtonDisabledWhenTitleIsEmpty() {
     // Fill in the ISBN field but leave the Title field empty
-    composeTestRule.onNodeWithTag(C.Tag.NewBookManually.isbn).performTextInput("1234567890")
+    composeTestRule.onNodeWithTag(C.Tag.BookEntryComp.isbn_field).performTextInput("1234567890")
 
     // Check if the Save button is still disabled
     composeTestRule.onNodeWithTag(C.Tag.NewBookManually.save).assertIsNotEnabled()
-  }
-
-  @Test
-  fun testDropdownMenuIsInitiallyClosed() {
-    // Verify that the dropdown menu is initially not expanded
-    composeTestRule.onNodeWithTag(C.Tag.NewBookManually.language).assertIsDisplayed()
-    composeTestRule.onNodeWithText("Language*").assertIsDisplayed()
-  }
-
-  @Test
-  fun testDropdownMenuOpensOnClick() {
-    // Simulate clicking the dropdown to expand it
-    composeTestRule.onNodeWithTag(C.Tag.NewBookManually.language).performClick()
-
-    // Verify that dropdown items are displayed:
-    composeTestRule.onNodeWithText("French").assertIsDisplayed()
-    composeTestRule.onNodeWithText("German").assertIsDisplayed()
-    composeTestRule.onNodeWithText("English").assertIsDisplayed()
-    composeTestRule.onNodeWithText("Spanish").assertIsDisplayed()
-    composeTestRule.onNodeWithText("Italian").assertIsDisplayed()
-    composeTestRule.onNodeWithText("Romansh").assertIsDisplayed()
-    composeTestRule.onNodeWithText("Other").assertIsDisplayed()
-  }
-
-  @Test
-  fun testDropdownMenuItemSelection() {
-    // Expand the dropdown menu:
-    composeTestRule.onNodeWithTag(C.Tag.NewBookManually.language).performClick()
-
-    // Click on a specific language ("English")
-    composeTestRule.onNodeWithText("English").performClick()
-
-    // Verify the language field updates with the selected language
-    composeTestRule.onNodeWithText("English").assertExists()
-  }
-
-  @Test
-  fun testDropdownMenuClosesAfterSelection() {
-    // Expand the dropdown menu
-    composeTestRule.onNodeWithTag(C.Tag.NewBookManually.language).performClick()
-
-    // Select a language to close the dropdown
-    composeTestRule.onNodeWithText("English").performClick()
-
-    // Ensure the dropdown items are no longer displayed (here we juste looks that Italian is not
-    // visible)
-    composeTestRule.onNodeWithText("Italian").assertDoesNotExist()
   }
 }
