@@ -24,7 +24,7 @@ class BookFromChatGPT(
         return@addPhotoToStorage
       }
 
-      Log.i("DeleteBook", "Sending photo to ChatGPT")
+      Log.i("BookFromChatGPT", "Sending photo to ChatGPT")
 
       // Send the url to ChatGPT
       val photoUrl = urlResult.getOrThrow()
@@ -49,12 +49,10 @@ class BookFromChatGPT(
               // Add photo url to dataBook
               val dataBook = dataBookResult.getOrThrow()//.copy(photo = urlResult.getOrThrow())
 
-              Log.i("DeleteBook", "Test if goes through this point")
-
               // Add book
               booksRepository.addBook(dataBook) { bookResult ->
                 if (bookResult.isFailure) {
-                  Log.i("DeleteBook", "Deleting photo from storage")
+                  Log.i("DeleteBookAfterGPT", "Deleting photo from storage")
                   photoStorageRepository.deletePhotoFromStorageWithUrl(photoUrl) { deleteResult ->
                     if (deleteResult.isFailure) {
                       callback(ErrorType.FIREBASE_STORAGE_ERROR, null)
@@ -63,7 +61,7 @@ class BookFromChatGPT(
                     }
                   }
                 } else {
-                  Log.i("DeleteBook", "Deleting photo from storage")
+                  Log.i("DeleteBookAfterGPT", "Deleting photo from storage")
                   photoStorageRepository.deletePhotoFromStorageWithUrl(photoUrl) { _ -> }
                   callback(ErrorType.NONE, dataBookResult.getOrThrow().uuid)
                 }
@@ -71,7 +69,7 @@ class BookFromChatGPT(
             }
           },
           onError = {
-            Log.i("DeleteBook", "Deleting photo from storage")
+            Log.i("DeleteBookAfterGPT", "Deleting photo from storage")
             photoStorageRepository.deletePhotoFromStorageWithUrl(photoUrl) { deleteResult ->
               if (deleteResult.isFailure) {
                 callback(ErrorType.FIREBASE_STORAGE_ERROR, null)
