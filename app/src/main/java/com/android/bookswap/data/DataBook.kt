@@ -46,7 +46,37 @@ enum class BookLanguages(val languageName: String, val languageCode: String) {
       Enums.LanguagesCode.ROMANSH), // Romansh, a language spoken in Switzerland
   OTHER(
       Enums.Languages.OTHER,
-      Enums.LanguagesCode.OTHER) // All languages that are not yet implemented
+      Enums.LanguagesCode.OTHER); // All languages that are not yet implemented
+
+  /**
+   * Test whether the BookLanguages value is defined by the string given in parameter.
+   *
+   * @param string The string to test against, can be either a 2 letter code or a full language name
+   * @return True if the BookLanguages value is defined by the string, False otherwise
+   */
+  fun isDefinedBy(string: String): Boolean {
+    fun f(s: String) = s.trim().uppercase()
+    val identifier = f(string)
+    return when (identifier.length) {
+      0,
+      1 -> false
+      2 -> f(languageCode).contentEquals(identifier)
+      else -> f(languageName).contentEquals(identifier)
+    }
+  }
+
+  companion object {
+    /**
+     * Retrieves the Enum value corresponding to the given identifier.
+     *
+     * @param string The string used as identifier, can be either a 2 letter code or a full language
+     *   name
+     * @return The corresponding BookLanguages value or BookLanguages.OTHER if no value matches
+     */
+    fun get(language: String): BookLanguages {
+      return values().find { it.isDefinedBy(language) } ?: OTHER
+    }
+  }
 }
 /** Genre of a book */
 enum class BookGenres(val Genre: String) {
@@ -68,5 +98,33 @@ enum class BookGenres(val Genre: String) {
   HEALTH(Enums.Genres.HEALTH),
   TRAVEL(Enums.Genres.TRAVEL),
   GUIDE(Enums.Genres.GUIDE),
-  OTHER(Enums.Genres.OTHER)
+  OTHER(Enums.Genres.OTHER);
+
+  /**
+   * Test whether the BookGenres value is defined by the string given in parameter.
+   *
+   * @param string The string to test against.
+   * @return True if the BookGenres value is defined by the string, False otherwise
+   */
+  fun isDefinedBy(string: String): Boolean {
+    fun f(s: String) = s.trim().uppercase()
+    val identifier = f(string)
+    return when (identifier.length) {
+      0,
+      1 -> false
+      else -> f(Genre).contentEquals(identifier)
+    }
+  }
+
+  companion object {
+    /**
+     * Retrieves the Enum value corresponding to the given identifier.
+     *
+     * @param string The string used as identifier.
+     * @return The corresponding BookGenres value or BookGenres.OTHER if no value matches
+     */
+    fun get(genre: String): BookGenres {
+      return values().find { it.isDefinedBy(genre) } ?: OTHER
+    }
+  }
 }
