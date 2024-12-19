@@ -32,7 +32,11 @@ class UserFirestoreSourceTest {
   private val mockQuery: Query = mockk()
   private lateinit var mockUsersRepository: UsersRepository
 
-  private val userFirestoreSource: UserFirestoreSource = UserFirestoreSource(mockFirestore)
+  private lateinit var userFirestoreSource: UserFirestoreSource
+  private lateinit var mockUserFirestoreSource: UserFirestoreSource
+
+  private val latitude = 37.4221
+  private val longitude = -122.0841
 
   private val testUser =
       DataUser(
@@ -51,14 +55,16 @@ class UserFirestoreSourceTest {
 
   @Before
   fun setUp() {
-
     mockUsersRepository = mockk()
-    userFirestoreSource
+    userFirestoreSource = UserFirestoreSource(mockFirestore)
+    mockUserFirestoreSource = mockk()
 
     every { mockFirestore.collection(any()) } returns mockCollectionReference
     every { mockCollectionReference.document() } returns mockDocumentReference
+    every { mockCollectionReference.document(any()) } returns mockDocumentReference
     every { mockCollectionReference.get() } returns Tasks.forResult(mockQuerySnapshot)
     every { mockCollectionReference.document(any()) } returns mockDocumentReference
+    every { mockDocumentReference.update(any<Map<String, Any?>>()) } returns Tasks.forResult(null)
 
     every { mockQuerySnapshot.documents } returns listOf(mockDocumentSnapshot)
 
@@ -244,5 +250,47 @@ class UserFirestoreSourceTest {
     assertTrue(result!!.isFailure)
     assertTrue(result!!.exceptionOrNull() == exception)
     verify { mockUsersRepository.removeContact(userUUID, contactUUID, any()) }
+  }
+
+  @Test
+  fun `updateLocation succeeds`() {
+    // Arrange: Mock the updateLocation method to return success
+    every { mockUserFirestoreSource.updateLocation(userUUID, latitude, longitude, any()) } answers
+        {
+          val callback = arg<(Result<Unit>) -> Unit>(3)
+          callback(Result.success(Unit))
+        }
+
+    // Act
+    var result: Result<Unit>? = null
+    mockUserFirestoreSource.updateLocation(userUUID, latitude, longitude) { result = it }
+
+    // Assert
+    assertTrue(result!!.isSuccess)
+
+    // Verify the method was called with the correct arguments
+    verify { mockUserFirestoreSource.updateLocation(userUUID, latitude, longitude, any()) }
+  }
+
+  @Test
+  fun `updateLocation fails`() {
+    // Arrange: Mock the updateLocation method to return failure
+    val exception = RuntimeException("Firestore update failed")
+    every { mockUserFirestoreSource.updateLocation(userUUID, latitude, longitude, any()) } answers
+        {
+          val callback = arg<(Result<Unit>) -> Unit>(3)
+          callback(Result.failure(exception))
+        }
+
+    // Act
+    var result: Result<Unit>? = null
+    mockUserFirestoreSource.updateLocation(userUUID, latitude, longitude) { result = it }
+
+    // Assert
+    assertTrue(result!!.isFailure)
+    assertTrue(result!!.exceptionOrNull() == exception)
+
+    // Verify the method was called with the correct arguments
+    verify { mockUserFirestoreSource.updateLocation(userUUID, latitude, longitude, any()) }
   }
 }

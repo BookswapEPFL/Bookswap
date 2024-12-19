@@ -1,5 +1,6 @@
 package com.android.bookswap.ui.profile
 
+import android.content.Context
 import androidx.compose.ui.test.assertAll
 import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertIsDisplayed
@@ -23,6 +24,7 @@ import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
 import java.util.UUID
+import kotlinx.coroutines.flow.MutableStateFlow
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -38,6 +40,7 @@ class OthersUserProfileTest : TestCase() {
   private lateinit var mockUserBookViewModel: UserBookViewModel
   private lateinit var mockBooksRepository: BooksRepository
   private lateinit var mockNavigationActions: NavigationActions
+  private lateinit var context: Context
 
   private val testUserId = UUID.randomUUID()
   private val testUser =
@@ -90,6 +93,7 @@ class OthersUserProfileTest : TestCase() {
     mockNavigationActions = mockk()
     mockOthersUserViewModel = mockk(relaxed = true)
     mockUserBookViewModel = mockk(relaxed = true)
+    context = mockk()
 
     // Mock the user data fetching
     every { mockOthersUserViewModel.getUserByUUID(testUserId, any()) } answers
@@ -100,12 +104,16 @@ class OthersUserProfileTest : TestCase() {
 
     // Mock the book data fetching
     coEvery { mockUserBookViewModel.getBooks(testUser.bookList) } returns testBooks
+    coEvery { mockUserBookViewModel.getBooks(any()) } returns testBooks
+    every { mockOthersUserViewModel.addressStr } returns
+        MutableStateFlow("123 Main St, Springfield")
   }
 
   @Test
   fun testUserDetailsDisplayed() {
     composeTestRule.setContent {
       OthersUserProfileScreen(
+          context = context,
           userId = testUserId,
           otherUserVM = mockOthersUserViewModel,
           booksRepository = mockBooksRepository,
@@ -148,7 +156,7 @@ class OthersUserProfileTest : TestCase() {
     composeTestRule
         .onNodeWithTag(C.Tag.OtherUserProfile.address + C.Tag.LabeledText.text)
         .assertIsDisplayed()
-        .assertTextEquals("45.0, 50.0")
+        .assertTextEquals("123 Main St, Springfield")
 
     composeTestRule
         .onNodeWithTag(C.Tag.OtherUserProfile.chatButton)
@@ -161,6 +169,7 @@ class OthersUserProfileTest : TestCase() {
   fun testBookListDisplayed() {
     composeTestRule.setContent {
       OthersUserProfileScreen(
+          context = context,
           userId = testUserId,
           otherUserVM = mockOthersUserViewModel,
           booksRepository = mockBooksRepository,
@@ -209,6 +218,7 @@ class OthersUserProfileTest : TestCase() {
 
     composeTestRule.setContent {
       OthersUserProfileScreen(
+          context = context,
           userId = imageTestUserId,
           otherUserVM = mockOthersUserViewModel,
           booksRepository = mockBooksRepository,
@@ -252,6 +262,7 @@ class OthersUserProfileTest : TestCase() {
 
     composeTestRule.setContent {
       OthersUserProfileScreen(
+          context = context,
           userId = imageTestUserId,
           otherUserVM = mockOthersUserViewModel,
           booksRepository = mockBooksRepository,

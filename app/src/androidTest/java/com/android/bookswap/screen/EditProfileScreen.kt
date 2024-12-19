@@ -17,4 +17,9 @@ class EditProfileScreen(semanticsProvider: SemanticsNodeInteractionsProvider) :
   val phoneNumberTbx: KNode = child { hasTestTag(C.Tag.EditProfile.phone) }
   val confirmBtn: KNode = child { hasTestTag(C.Tag.EditProfile.confirm) }
   val dismissBtn: KNode = child { hasTestTag(C.Tag.EditProfile.dismiss) }
+  val streetBox: KNode = child { hasTestTag(C.Tag.AddressFields.address) }
+  val cityBox: KNode = child { hasTestTag(C.Tag.AddressFields.city) }
+  val cantonBox: KNode = child { hasTestTag(C.Tag.AddressFields.canton) }
+  val postalBox: KNode = child { hasTestTag(C.Tag.AddressFields.postal) }
+  val countryBox: KNode = child { hasTestTag(C.Tag.AddressFields.country) }
 }

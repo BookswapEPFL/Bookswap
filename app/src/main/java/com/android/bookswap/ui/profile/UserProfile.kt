@@ -148,6 +148,7 @@ fun UserProfile(
 
   if (showEditProfile) {
     EditProfileDialog(
+        context = context,
         onDismiss = {
           showEditProfile = false
           needRecompose = true
