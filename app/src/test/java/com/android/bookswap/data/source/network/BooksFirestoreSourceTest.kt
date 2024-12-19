@@ -43,6 +43,8 @@ class BooksFirestoreSourceTest {
           archived = false,
           exchange = false)
 
+  private val bookSource = BooksFirestoreSource(mockFirestore)
+
   @Before
   fun setUp() {
     every { mockFirestore.collection(any()) }.returns(mockCollectionReference)
@@ -68,7 +70,6 @@ class BooksFirestoreSourceTest {
 
   @Test
   fun `book get returns correct result`() {
-    val bookSource = BooksFirestoreSource(mockFirestore)
     bookSource.getBook(
         callback = { result ->
           assertTrue(result.isSuccess)
@@ -98,7 +99,6 @@ class BooksFirestoreSourceTest {
 
   @Test
   fun `book set is success`() {
-    val bookSource = BooksFirestoreSource(mockFirestore)
 
     // Arrange
     every { mockDocumentReference.set(testBook) }.returns(Tasks.forResult(null))
@@ -113,7 +113,6 @@ class BooksFirestoreSourceTest {
 
   @Test
   fun `book update success`() {
-    val bookSource = BooksFirestoreSource(mockFirestore)
 
     // Arrange
     val testBook =
@@ -232,8 +231,8 @@ class BooksFirestoreSourceTest {
     // Act
     bookSource.getFromArchivedBooks(
         testBook.uuid,
-        { retrievedBook -> assertEquals(testBook.title, retrievedBook.title) },
-        { exception -> fail("Failed to retrieve book: ${exception.message}") })
+        { retrievedBook: DataBook -> assertEquals(testBook.title, retrievedBook.title) },
+        { exception: Exception -> fail("Failed to retrieve book: ${exception.message}") })
 
     // Assert
     verify { mockDocumentReference.get() }
