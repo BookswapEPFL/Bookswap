@@ -44,16 +44,6 @@
             </intent-filter>
         </activity>
 
-        <!-- Firebase Messaging Service -->
-        <service
-            android:name=".model.chat.MyFirebaseMessagingService"
-            android:exported="true"
-            android:permission="com.android.bookswap.permission.SEND_MESSAGES">
-            <intent-filter>
-                <action android:name="com.google.firebase.MESSAGING_EVENT" />
-            </intent-filter>
-        </service>
-
         <!-- Google Maps API -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
