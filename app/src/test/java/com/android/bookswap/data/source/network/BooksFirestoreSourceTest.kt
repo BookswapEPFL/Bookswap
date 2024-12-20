@@ -352,4 +352,172 @@ class BooksFirestoreSourceTest {
     val uuid = bookSource.getNewUUID()
     assertNotNull(uuid)
   }
+
+  @Test
+  fun `getBook retrieves book successfully`() {
+    // Arrange
+    val bookSource = BooksFirestoreSource(mockFirestore)
+    val uuid = UUID.randomUUID()
+    every { mockDocumentReference.get() } returns Tasks.forResult(mockDocumentSnapshot)
+    every { mockDocumentSnapshot.exists() } returns true
+    every { mockDocumentSnapshot.getString("uuid") } returns uuid.toString()
+    every { mockDocumentSnapshot.getString("title") } returns "Test Book"
+    every { mockDocumentSnapshot.getString("author") } returns "Test Author"
+    every { mockDocumentSnapshot.getString("description") } returns "Test Description"
+    every { mockDocumentSnapshot.getLong("rating") } returns 5L
+    every { mockDocumentSnapshot.getString("photo") } returns "http://example.com/photo.jpg"
+    every { mockDocumentSnapshot.getString("language") } returns BookLanguages.ENGLISH.name
+    every { mockDocumentSnapshot.getString("isbn") } returns "1234567890"
+    every { mockDocumentSnapshot.get("genres") } returns listOf("FICTION")
+    every { mockDocumentSnapshot.getString("userId") } returns UUID.randomUUID().toString()
+    every { mockDocumentSnapshot.getBoolean("archived") } returns false
+    every { mockDocumentSnapshot.getBoolean("exchange") } returns false
+
+    // Act
+    bookSource.getBook(
+        uuid,
+        { retrievedBook ->
+          // Assert
+          assertNotNull(retrievedBook)
+          assertEquals("Test Book", retrievedBook.title)
+        },
+        { exception -> fail("Expected success but got failure: ${exception.message}") })
+
+    // Verify
+    verify { mockDocumentReference.get() }
+  }
+
+  @Test
+  fun `getBook handles missing document`() {
+    // Arrange
+    val bookSource = BooksFirestoreSource(mockFirestore)
+    val uuid = UUID.randomUUID()
+    every { mockDocumentReference.get() } returns Tasks.forResult(mockDocumentSnapshot)
+    every { mockDocumentSnapshot.exists() } returns false
+
+    // Act
+    bookSource.getBook(
+        uuid,
+        { fail("Expected failure due to missing document") },
+        { exception ->
+          // Assert
+          assertTrue(exception is IllegalArgumentException)
+          assertEquals("Book not found", exception.message)
+        })
+
+    // Verify
+    verify { mockDocumentReference.get() }
+  }
+
+  @Test
+  fun `getBook handles Firestore failure`() {
+    // Arrange
+    val bookSource = BooksFirestoreSource(mockFirestore)
+    val uuid = UUID.randomUUID()
+    every { mockDocumentReference.get() } returns Tasks.forException(Exception("Firestore error"))
+
+    // Act
+    bookSource.getBook(
+        uuid,
+        { fail("Expected failure due to Firestore error") },
+        { exception ->
+          // Assert
+          assertTrue(exception is Exception)
+          assertEquals("Firestore error", exception.message)
+        })
+
+    // Verify
+    verify { mockDocumentReference.get() }
+  }
+
+  @Test
+  fun `addBook adds book successfully`() {
+    // Arrange
+    val bookSource = BooksFirestoreSource(mockFirestore)
+    val dataBook =
+        DataBook(
+            uuid = UUID.randomUUID(),
+            title = "Test Book",
+            author = "Test Author",
+            description = "Test Description",
+            rating = 5,
+            photo = "http://example.com/photo.jpg",
+            language = BookLanguages.ENGLISH,
+            isbn = "1234567890",
+            genres = listOf(BookGenres.FICTION),
+            userId = UUID.randomUUID(),
+            archived = false,
+            exchange = false)
+    every { mockDocumentReference.set(any<Map<String, Any>>()) } returns Tasks.forResult(null)
+
+    // Act
+    bookSource.addBook(dataBook) { result ->
+      // Assert
+      assertTrue(result.isSuccess)
+    }
+
+    // Verify
+    verify { mockDocumentReference.set(any<Map<String, Any>>()) }
+  }
+
+  @Test
+  fun `addBook fails when title is blank`() {
+    // Arrange
+    val bookSource = BooksFirestoreSource(mockFirestore)
+    val dataBook =
+        DataBook(
+            uuid = UUID.randomUUID(),
+            title = "",
+            author = "Test Author",
+            description = "Test Description",
+            rating = 5,
+            photo = "http://example.com/photo.jpg",
+            language = BookLanguages.ENGLISH,
+            isbn = "1234567890",
+            genres = listOf(BookGenres.FICTION),
+            userId = UUID.randomUUID(),
+            archived = false,
+            exchange = false)
+
+    // Act
+    bookSource.addBook(dataBook) { result ->
+      // Assert
+      assertTrue(result.isFailure)
+      assertTrue(result.exceptionOrNull() is IllegalArgumentException)
+      assertEquals("Missing required book fields.", result.exceptionOrNull()?.message)
+    }
+  }
+
+  @Test
+  fun `addBook fails when Firestore operation fails`() {
+    // Arrange
+    val bookSource = BooksFirestoreSource(mockFirestore)
+    val dataBook =
+        DataBook(
+            uuid = UUID.randomUUID(),
+            title = "Test Book",
+            author = "Test Author",
+            description = "Test Description",
+            rating = 5,
+            photo = "http://example.com/photo.jpg",
+            language = BookLanguages.ENGLISH,
+            isbn = "1234567890",
+            genres = listOf(BookGenres.FICTION),
+            userId = UUID.randomUUID(),
+            archived = false,
+            exchange = false)
+    every { mockDocumentReference.set(any<Map<String, Any>>()) } returns
+        Tasks.forException(Exception("Firestore error"))
+
+    // Act
+    bookSource.addBook(dataBook) { result ->
+      // Assert
+      assertTrue(result.isFailure)
+      assertTrue(result.exceptionOrNull() is Exception)
+      assertEquals("Firestore error", result.exceptionOrNull()?.message)
+    }
+
+    // Verify
+    verify { mockDocumentReference.set(any<Map<String, Any>>()) }
+  }
 }
