@@ -64,12 +64,12 @@ class NavigationBarEndToEnd {
       val messageRepository = MessageFirestoreSource(db)
       MainActivity()
           .BookSwapApp(
-              messageRepository,
-              mockBookRepository,
-              mockUserRepository,
-              C.Route.MAP,
-              mockPhotoStorage,
-              mockMessageStorage,
+              messageRepository = messageRepository,
+              bookRepository = mockBookRepository,
+              userRepository = mockUserRepository,
+              startDestination = C.Route.MAP,
+              photoStorage = mockPhotoStorage,
+              messageStorage = mockMessageStorage,
               context = mockContext,
               userVM = mockUserVM)
     }

@@ -123,13 +123,13 @@ class MainActivity : ComponentActivity() {
     isAppInForeground = false
   }
 
-    /**
-     * Called when the activity is starting. This is where most initialization should go.
-     *
-     * @param savedInstanceState If the activity is being re-initialized after previously being shut
-     *   down then this Bundle contains the data it most recently supplied in
-     *   onSaveInstanceState(Bundle).
-     */
+  /**
+   * Called when the activity is starting. This is where most initialization should go.
+   *
+   * @param savedInstanceState If the activity is being re-initialized after previously being shut
+   *   down then this Bundle contains the data it most recently supplied in
+   *   onSaveInstanceState(Bundle).
+   */
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setContent { BookSwapApp() }
@@ -199,7 +199,7 @@ class MainActivity : ComponentActivity() {
       geolocation: IGeolocation = DefaultGeolocation(),
       userRepository: UsersRepository,
       userVM: UserViewModel = UserViewModel(UUID.randomUUID(), userRepository),
-              context: Context
+      context: Context
   ) {
     // navigation part
     val navController = rememberNavController()
