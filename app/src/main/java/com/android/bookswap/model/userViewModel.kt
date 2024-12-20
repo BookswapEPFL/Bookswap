@@ -29,14 +29,14 @@ import kotlinx.coroutines.withContext
 open class UserViewModel(
     var uuid: UUID,
     repository: UsersRepository = UserFirestoreSource(FirebaseFirestore.getInstance()),
-    private var dataUser: DataUser = DataUser(uuid) // Allows easier testing
+    var dataUser: DataUser = DataUser(uuid) // Allows easier testing
 ) : ViewModel() {
   var listOfContacts = emptyList<DataUser>()
   private var isLoaded = false
   private val _isStored = MutableStateFlow<Boolean?>(null)
   val isStored: StateFlow<Boolean?> = _isStored
   private val userRepository: UsersRepository = repository
-  val addressStr = MutableStateFlow("")
+  open val addressStr = MutableStateFlow("")
 
   open fun getUser(force: Boolean = false): DataUser {
     if (!isLoaded || force) {
@@ -124,7 +124,7 @@ open class UserViewModel(
    *
    * @param newDataUser New user data
    */
-  fun updateUser(newDataUser: DataUser) {
+  open fun updateUser(newDataUser: DataUser) {
     this.dataUser = newDataUser
     this.uuid = newDataUser.userUUID
     isLoaded = true
@@ -138,7 +138,7 @@ open class UserViewModel(
    *
    * @param googleUid Google UID of the user to fetch.
    */
-  fun getUserByGoogleUid(googleUid: String) {
+  open fun getUserByGoogleUid(googleUid: String) {
     userRepository.getUser(googleUid) { result ->
       // If the user is found, update the dataUser and set isLoaded to true
       result.onSuccess {
@@ -160,7 +160,7 @@ open class UserViewModel(
    *
    * @param googleUid New googleUid
    */
-  fun updateGoogleUid(googleUid: String) {
+  open fun updateGoogleUid(googleUid: String) {
     dataUser.googleUid = googleUid
     updateUser(dataUser)
   }
@@ -171,7 +171,7 @@ open class UserViewModel(
    * @param longitude Longitude coordinate of the user's location.
    * @param context Context used for geocoding.
    */
-  fun updateAddress(latitude: Double, longitude: Double, context: Context) {
+  open fun updateAddress(latitude: Double, longitude: Double, context: Context) {
     dataUser.latitude = latitude
     dataUser.longitude = longitude
     val handleAddresses: (MutableList<Address>?) -> Unit = {
@@ -204,7 +204,7 @@ open class UserViewModel(
     }
   }
 
-  fun updateCoordinates(addressComponents: List<String>, context: Context, userUUID: UUID) {
+  open fun updateCoordinates(addressComponents: List<String>, context: Context, userUUID: UUID) {
     val fullAddress = addressComponents.joinToString(", ")
 
     val handleCoordinates: (MutableList<Address>?) -> Unit = {

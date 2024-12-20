@@ -160,8 +160,8 @@ fun UserProfile(
               lastName = it.lastName,
               email = it.email,
               phone = it.phoneNumber,
-              userData.latitude,
-              userData.longitude,
+              latitude = userData.latitude,
+              longitude = userData.longitude,
               picURL = userData.profilePictureUrl)
           showEditProfile = false
           needRecompose = true
@@ -341,22 +341,3 @@ fun LabeledTextUserProfile(testTag: String = "LabeledText", label: String, value
             }
       }
 }
-
-// @Preview(showBackground = true, widthDp = 540, heightDp = 1110)
-// @Composable
-// fun UserProfilePreview() {
-//  val userVM = UserViewModel("")
-//  userVM.updateUser(
-//    DataUser(
-//      "M.",
-//      "John",
-//      "Doe",
-//      "John.Doe@example.com",
-//      "+41223456789",
-//      0.0,
-//      0.0,
-//      "dummyPic.png",
-//      "dummyUUID0000")
-//  )
-//  UserProfile(userVM)
-// }
