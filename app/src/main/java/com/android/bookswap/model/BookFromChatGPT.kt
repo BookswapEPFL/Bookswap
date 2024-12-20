@@ -65,7 +65,7 @@ class BookFromChatGPT(
       FIREBASE_STORAGE_ERROR(R.string.book_gpt_error_firebase),
       CHATGPT_ANALYZER_ERROR(R.string.book_gpt_error_chatgpt),
       ISBN_ERROR(R.string.book_gpt_error_isbn),
-      BOOK_ADD_ERROR(R.string.app_name)
+      BOOK_ADD_ERROR(R.string.book_gpt_error_bookadd)
     }
   }
 }
