@@ -8,6 +8,7 @@ import com.android.bookswap.data.DataUser
 import com.android.bookswap.data.UserBooksWithLocation
 import com.android.bookswap.data.repository.BooksRepository
 import com.android.bookswap.data.repository.UsersRepository
+import java.util.UUID
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 
@@ -65,11 +66,11 @@ class BookManagerViewModel(
    * fixed interval defined by `REFRESH_TIME_DELAY`. It also initiates the computation of user
    * distances and combines the flows to filter books based on user preferences.
    */
-  fun startUpdatingBooks() {
+  fun startUpdatingBooks(currentUserUUID: UUID) {
     fetchBooksFromRepositoryJob =
         scope.launch {
           while (true) {
-            fetchBooksFromRepository()
+            fetchBooksFromRepository(currentUserUUID)
             delay(REFRESH_TIME_DELAY)
           }
         }
@@ -92,7 +93,7 @@ class BookManagerViewModel(
    * updates the `_allBooks` and `_allUsers` state flows with the retrieved data. If all retries
    * fail, it logs an error message.
    */
-  private suspend fun fetchBooksFromRepository() {
+  private suspend fun fetchBooksFromRepository(currentUserUUID: UUID) {
     var successBooks = false
     var successUsers = false
     var currentAttempt = 0
@@ -101,7 +102,7 @@ class BookManagerViewModel(
         launch {
           userRepository.getUsers { users ->
             if (users.isSuccess) {
-              _allUsers.value = users.getOrNull()!!
+              _allUsers.value = users.getOrNull()!!.filter { it.userUUID != currentUserUUID }
               successUsers = true
             } else {
               Log.e("BookManagerViewModel", "Failed to fetch users.")
