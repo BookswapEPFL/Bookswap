@@ -134,6 +134,7 @@ fun MapScreen(
   var isOnline = remember { isNetworkAvailable(context) }
   // Start location and books updates
   LaunchedEffect(Unit) {
+    appConfig.userViewModel.getContacts()
     if (isOnline) {
       bookManagerViewModel.startUpdatingBooks()
     } else {
