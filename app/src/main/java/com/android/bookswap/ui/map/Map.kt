@@ -136,7 +136,7 @@ fun MapScreen(
   LaunchedEffect(Unit) {
     appConfig.userViewModel.getContacts()
     if (isOnline) {
-      bookManagerViewModel.startUpdatingBooks()
+      bookManagerViewModel.startUpdatingBooks(userVM.getUser().userUUID)
     } else {
       Toast.makeText(
               context,

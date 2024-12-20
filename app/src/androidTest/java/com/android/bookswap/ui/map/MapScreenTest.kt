@@ -129,7 +129,7 @@ class MapScreenTest : TestCase() {
 
     every { mockBookManagerViewModel.filteredUsers } returns
         MutableStateFlow(userBooksWithLocationList)
-    every { mockBookManagerViewModel.startUpdatingBooks() } just runs
+    every { mockBookManagerViewModel.startUpdatingBooks(any()) } just runs
     every { mockBookManagerViewModel.stopUpdatingBooks() } just runs
 
     mockUserRepository = mockk()
