@@ -47,7 +47,7 @@ class PhotoRequester(
             callback(Result.success(ImageDecoder.decodeBitmap(source).asImageBitmap()))
           } else {
             fileUri = null
-            callback(Result.failure(Exception("Image could not be saved in phone.")))
+            callback(Result.failure(ExceptionType.IMAGE_NOT_SAVED.toException()))
           }
         }
     // Ask for permission before using the camera.
@@ -58,14 +58,14 @@ class PhotoRequester(
             fileUri = getTempUri()
             cameraLauncher.launch(fileUri)
           } else {
-            callback(Result.failure(Exception("Permission denied.")))
+            callback(Result.failure(ExceptionType.PERMISSION_DENIED.toException()))
           }
         }
   }
 
   /** Request a photo from the user, this will ends-up calling [callback] */
   fun requestPhoto() {
-    if (!initialized) throw Error("Always call Init() before using requestPhoto()")
+    if (!initialized) throw ExceptionType.INIT_NOT_CALLED.toException()
 
     permissionLauncher.launch(Manifest.permission.CAMERA)
   }
@@ -84,5 +84,15 @@ class PhotoRequester(
             tempFile)
 
     return uri
+  }
+
+  companion object {
+    enum class ExceptionType(private val exceptionMessage: String) {
+      INIT_NOT_CALLED("Always call #Init() before using #requestPhoto()."),
+      PERMISSION_DENIED("Camera permission denied."),
+      IMAGE_NOT_SAVED("Image could not be saved in phone.");
+
+      fun toException(): Exception = Exception(exceptionMessage)
+    }
   }
 }
