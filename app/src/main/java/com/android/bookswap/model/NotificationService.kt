@@ -8,10 +8,11 @@ import com.android.bookswap.R
 import kotlin.random.Random
 
 class NotificationService(private val context: Context) {
-    private val notificationManager=context.getSystemService(NotificationManager::class.java)
+  private val notificationManager = context.getSystemService(NotificationManager::class.java)
 
-    fun sendNotification(title: String, messageBody: String){
-        val notification= NotificationCompat.Builder(context, BookSwapApplication.NOTIFICATION_CHANNEL)
+  fun sendNotification(title: String, messageBody: String) {
+    val notification =
+        NotificationCompat.Builder(context, BookSwapApplication.NOTIFICATION_CHANNEL)
             .setContentTitle(title)
             .setContentText(messageBody)
             .setSmallIcon(R.drawable.logo5)
@@ -19,10 +20,6 @@ class NotificationService(private val context: Context) {
             .setAutoCancel(true)
             .build()
 
-        notificationManager.notify(
-            Random.nextInt(),
-            notification
-        )
-    }
-
+    notificationManager.notify(Random.nextInt(), notification)
+  }
 }

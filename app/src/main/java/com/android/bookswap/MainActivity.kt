@@ -68,66 +68,67 @@ import java.util.UUID
 
 class MainActivity : ComponentActivity() {
 
-    private var chatListener: ListenerRegistration? = null
-    private lateinit var userRepository: UsersRepository
-    private lateinit var userViewModel: UserViewModel
-    private lateinit var notificationService: NotificationService
+  private var chatListener: ListenerRegistration? = null
+  private lateinit var userRepository: UsersRepository
+  private lateinit var userViewModel: UserViewModel
+  private lateinit var notificationService: NotificationService
 
-    private fun listenForChatUpdates(currentUser: UUID) {
-        val db = FirebaseFirestore.getInstance()
+  private fun listenForChatUpdates(currentUser: UUID) {
+    val db = FirebaseFirestore.getInstance()
 
-        chatListener = db.collection("chats")
-            .addSnapshotListener { snapshot, e ->
-                if (e != null) {
-                    Log.e("Firestore", "Listen failed: $e")
-                    return@addSnapshotListener
+    chatListener =
+        db.collection("chats").addSnapshotListener { snapshot, e ->
+          if (e != null) {
+            Log.e("Firestore", "Listen failed: $e")
+            return@addSnapshotListener
+          }
+
+          if (snapshot != null && !isAppInForeground) {
+            for (change in snapshot.documentChanges) {
+              if (change.type == com.google.firebase.firestore.DocumentChange.Type.ADDED) {
+                val newMessage = change.document.toObject(DataMessage::class.java)
+
+                // Check if the current user is the receiver
+                if (newMessage.receiverUUID == currentUser) {
+                  val senderName = newMessage.senderUUID.toString()
+                  val messageContent = newMessage.text
+
+                  // Send a notification
+                  notificationService.sendNotification(
+                      "New Message", "From $senderName: $messageContent")
                 }
-
-                if (snapshot != null && !isAppInForeground) {
-                    for (change in snapshot.documentChanges) {
-                        if (change.type == com.google.firebase.firestore.DocumentChange.Type.ADDED) {
-                            val newMessage = change.document.toObject(DataMessage::class.java)
-
-                            // Check if the current user is the receiver
-                            if (newMessage.receiverUUID == currentUser) {
-                                val senderName = newMessage.senderUUID.toString()
-                                val messageContent = newMessage.text
-
-                                // Send a notification
-                                notificationService.sendNotification("New Message", "From $senderName: $messageContent")
-                            }
-                        }
-                    }
-                }
+              }
             }
-    }
+          }
+        }
+  }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        // Remove the listener to avoid memory leaks
-        chatListener?.remove()
-    }
+  override fun onDestroy() {
+    super.onDestroy()
+    // Remove the listener to avoid memory leaks
+    chatListener?.remove()
+  }
 
-    companion object {
-        var isAppInForeground = false
-    }
+  companion object {
+    var isAppInForeground = false
+  }
 
-    override fun onStart() {
-        super.onStart()
-        isAppInForeground = true
-    }
+  override fun onStart() {
+    super.onStart()
+    isAppInForeground = true
+  }
 
-    override fun onStop() {
-        super.onStop()
-        isAppInForeground = false
-    }
+  override fun onStop() {
+    super.onStop()
+    isAppInForeground = false
+  }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        userRepository = UserFirestoreSource(FirebaseFirestore.getInstance())
-        userViewModel = UserViewModel(UUID.randomUUID(), userRepository)
-        setContent { BookSwapApp() }
-        listenForChatUpdates(userViewModel.getUser().userUUID)
+  override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
+    userRepository = UserFirestoreSource(FirebaseFirestore.getInstance())
+    userViewModel = UserViewModel(UUID.randomUUID(), userRepository)
+    setContent { BookSwapApp() }
+    listenForChatUpdates(userViewModel.getUser().userUUID)
   }
 
   @Composable
@@ -138,7 +139,7 @@ class MainActivity : ComponentActivity() {
 
     val context = LocalContext.current
 
-      notificationService = NotificationService(context)
+    notificationService = NotificationService(context)
 
     // Create the data source objects
     val messageRepository = MessageFirestoreSource(db)
@@ -186,7 +187,8 @@ class MainActivity : ComponentActivity() {
     val currentUser = Firebase.auth.currentUser
 
     if (currentUser != null) {
-      userViewModel.getUserByGoogleUid(currentUser.uid) // This will scrap the user from the database
+      userViewModel.getUserByGoogleUid(
+          currentUser.uid) // This will scrap the user from the database
     }
     // Message part
     val contactViewModel = ContactViewModel(userViewModel, userRepository, messageRepository)
