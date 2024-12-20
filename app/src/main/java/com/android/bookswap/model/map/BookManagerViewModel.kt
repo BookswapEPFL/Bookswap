@@ -8,9 +8,9 @@ import com.android.bookswap.data.DataUser
 import com.android.bookswap.data.UserBooksWithLocation
 import com.android.bookswap.data.repository.BooksRepository
 import com.android.bookswap.data.repository.UsersRepository
+import java.util.UUID
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import java.util.UUID
 
 private const val REFRESH_TIME_DELAY = 5000L
 private const val RETRY_TIME_DELAY = 250L
