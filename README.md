@@ -8,7 +8,8 @@ Welcome to BookSwap. The application consists of an online version of the free b
 - **Interactive Map:** The map is the main part of the app, allowing you to discover nearby users and explore their book collections. By viewing their books, you can easily click on a user’s profile to initiate a conversation and potentially arrange a swap.
 - **Chat:** The chat feature is designed with simplicity and functionality in mind. It enables smooth communication between users prior to exchanging books. Additionally, you can share photos through the chat to provide a clearer view of the book’s condition or exchange other relevant information.
 - **Account page:** Your account page displays your personal book collection in an organized and visually appealing format, making it easy to review and correct any errors in book details. You can also update your personal information, such as your name or other profile details, at any time.
-- **Offline mode:** BookSwap ensures functionality even without an internet connection. You can add books offline, and they will automatically sync to the repository once connectivity is restored. Similarly, messages are stored to provide essential information to users, ensuring a nice experience regardless of connectivity status.  
+- **Offline mode:** BookSwap ensures functionality even without an internet connection. You can add books offline, and they will automatically sync to the repository once connectivity is restored. Similarly, messages are stored to provide essential information to users, ensuring a nice experience regardless of connectivity status.
+- **Notes:** Please avoid using dark mode as it is not supported and will lead to illegible text.
 
 ## Useful Links
 - The figma link of the project can be found  [here](https://www.figma.com/design/uyHS0PV5RBnmToK2JuTb4h/Untitled?node-id=0-1&m=dev&t=VdHNM8v7U5bhvsW7-1).
