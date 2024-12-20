@@ -31,6 +31,7 @@ open class UserViewModel(
     repository: UsersRepository = UserFirestoreSource(FirebaseFirestore.getInstance()),
     var dataUser: DataUser = DataUser(uuid) // Allows easier testing
 ) : ViewModel() {
+  var listOfContacts = emptyList<DataUser>()
   private var isLoaded = false
   private val _isStored = MutableStateFlow<Boolean?>(null)
   val isStored: StateFlow<Boolean?> = _isStored
@@ -54,6 +55,22 @@ open class UserViewModel(
         _isStored.value = true
       }
     }
+  }
+
+  /** Get the list of contacts for the user. */
+  fun getContacts() {
+    for (contact in dataUser.contactList) {
+      userRepository.getUser(contact) { result -> result.onSuccess { listOfContacts += it } }
+    }
+  }
+
+  /**
+   * Add a contact to the user's contact list.
+   *
+   * @param contactUUID UUID of the contact to add
+   */
+  fun addContact(contactUUID: UUID) {
+    userRepository.getUser(contactUUID) { result -> result.onSuccess { listOfContacts += it } }
   }
 
   /**

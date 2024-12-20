@@ -19,7 +19,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
-import com.android.bookswap.data.DataUser
 import com.android.bookswap.data.repository.BooksRepository
 import com.android.bookswap.data.repository.MessageRepository
 import com.android.bookswap.data.repository.PhotoFirebaseStorageRepository
@@ -155,6 +154,7 @@ class MainActivity : ComponentActivity() {
       userVM.getUserByGoogleUid(currentUser.uid) // This will scrap the user from the database
       Thread.sleep(500)
     }
+
     // Book part
     val bookFilter = BookFilter()
 
@@ -196,7 +196,8 @@ class MainActivity : ComponentActivity() {
           }
           composable("${C.Screen.CHAT}/{user2}") { backStackEntry ->
             val user2UUID = UUID.fromString(backStackEntry.arguments?.getString("user2"))
-            val user2: DataUser? = contactViewModel.getUserInMessageBoxMap(user2UUID)
+            userVM.addContact(user2UUID)
+            val user2 = userVM.listOfContacts.find { it.userUUID == user2UUID }
             if (user2 != null) {
               ChatScreen(
                   messageRepository,
@@ -207,13 +208,6 @@ class MainActivity : ComponentActivity() {
                   photoStorage,
                   messageStorage,
                   context)
-            } else {
-              BookAdditionChoiceScreen(
-                  navigationActions,
-                  topAppBar = { topAppBar(stringResource(R.string.book_addition_choice_title)) },
-                  bottomAppBar = { bottomAppBar(this@navigation.route ?: "") },
-                  photoFirebaseStorageRepository = photoStorage,
-                  booksRepository = bookRepository)
             }
           }
         }
