@@ -73,6 +73,7 @@ class MainActivity : ComponentActivity() {
   private var chatListener: ListenerRegistration? = null
   private lateinit var notificationService: NotificationService
 
+  /** Listen for chat update and send notification when a message is received */
   private fun listenForChatUpdates(userViewModel: UserViewModel) {
     val db = FirebaseFirestore.getInstance()
 

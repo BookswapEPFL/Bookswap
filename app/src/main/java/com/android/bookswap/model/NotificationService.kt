@@ -7,6 +7,11 @@ import com.android.bookswap.BookSwapApplication
 import com.android.bookswap.R
 import kotlin.random.Random
 
+/**
+ * Service to send notification to users
+ *
+ * @param context the activity context
+ */
 class NotificationService(private val context: Context) {
   private val notificationManager = context.getSystemService(NotificationManager::class.java)
 

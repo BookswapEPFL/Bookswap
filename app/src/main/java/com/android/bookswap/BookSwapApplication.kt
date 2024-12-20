@@ -4,6 +4,9 @@ import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
 
+/**
+ * Application state for the BookSwapApp Allows to register a few things like notification channels.
+ */
 class BookSwapApplication : Application() {
   override fun onCreate() {
     super.onCreate()
