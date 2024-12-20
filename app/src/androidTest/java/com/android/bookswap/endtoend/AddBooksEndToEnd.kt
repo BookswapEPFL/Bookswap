@@ -1,13 +1,13 @@
 package com.android.bookswap.endtoend
 
 import android.content.Context
-import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollToIndex
 import androidx.compose.ui.test.performTextInput
 import com.android.bookswap.MainActivity
+import com.android.bookswap.data.BookGenres
 import com.android.bookswap.data.BookLanguages
 import com.android.bookswap.data.DataBook
 import com.android.bookswap.data.repository.BooksRepository
@@ -16,6 +16,7 @@ import com.android.bookswap.data.repository.UsersRepository
 import com.android.bookswap.data.source.api.GoogleBookDataSource
 import com.android.bookswap.data.source.network.PhotoFirebaseStorageSource
 import com.android.bookswap.model.chat.OfflineMessageStorage
+import com.android.bookswap.model.isNetworkAvailableForBook
 import com.android.bookswap.resources.C
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.FirebaseFirestore
@@ -44,6 +45,8 @@ class AddBooksEndToEnd {
 
   private lateinit var mockedBook: DataBook
 
+  private val lastItem = 9
+
   @Before
   fun setUp() {
 
@@ -70,6 +73,8 @@ class AddBooksEndToEnd {
 
     val testUUID = UUID.randomUUID()
     every { mockBookRepository.getNewUUID() } returns testUUID
+    mockkStatic(::isNetworkAvailableForBook)
+    every { isNetworkAvailableForBook(any()) } returns true
 
     mockedBook =
         DataBook(
@@ -130,20 +135,27 @@ class AddBooksEndToEnd {
     composeTestRule.onNodeWithTag("Manually" + C.Tag.NewBookChoice.btnWIcon.button).performClick()
     composeTestRule.onNodeWithTag(C.Tag.new_book_manual_screen_container).assertExists()
 
-    composeTestRule.onNodeWithTag(C.Tag.NewBookManually.title).performTextInput("Test Book Title")
-    composeTestRule.onNodeWithTag(C.Tag.NewBookManually.author).performTextInput("Author Name")
     composeTestRule
-        .onNodeWithTag(C.Tag.NewBookManually.synopsis)
+        .onNodeWithTag(C.Tag.BookEntryComp.title_field)
+        .performTextInput("Test Book Title")
+    composeTestRule.onNodeWithTag(C.Tag.BookEntryComp.author_field).performTextInput("Author Name")
+    composeTestRule
+        .onNodeWithTag(C.Tag.BookEntryComp.description_field)
         .performTextInput("This is a test description for the book.")
-    composeTestRule.onNodeWithTag(C.Tag.NewBookManually.rating).performTextInput("5")
-    composeTestRule.onNodeWithTag(C.Tag.NewBookManually.isbn).performTextInput("9780743273565")
-    composeTestRule.onNodeWithTag(C.Tag.NewBookManually.photo).performTextInput("photo_url_test")
+    composeTestRule.onNodeWithTag(C.Tag.BookEntryComp.isbn_field).performTextInput("9780743273565")
 
-    composeTestRule.onNodeWithTag(C.Tag.NewBookManually.genres).performClick()
-    composeTestRule.onNode(hasText("Fiction")).performClick()
+    composeTestRule.onNodeWithTag(C.Tag.BookEntryComp.genre_field).performClick()
+    composeTestRule.onNodeWithTag(C.Tag.BookEntryComp.genre_menu + "_Fantasy").performClick()
 
-    composeTestRule.onNodeWithTag(C.Tag.NewBookManually.language).performClick()
-    composeTestRule.onNodeWithText("English").performClick()
+    composeTestRule.onNodeWithTag(C.Tag.BookEntryComp.language_field).performClick()
+    composeTestRule.onNodeWithTag(C.Tag.BookEntryComp.language_menu + "_English").performClick()
+
+    // scroll to the bottom of the page.
+    composeTestRule.onNodeWithTag(C.Tag.BookEntryComp.scrollable).performScrollToIndex(lastItem)
+
+    composeTestRule
+        .onNodeWithTag(C.Tag.BookEntryComp.rating_star_empty + "_5", useUnmergedTree = true)
+        .performClick()
 
     composeTestRule.onNodeWithTag(C.Tag.NewBookManually.save).performClick()
 
@@ -155,8 +167,8 @@ class AddBooksEndToEnd {
                 book.description == "A classic novel set in the Jazz Age." &&
                 book.rating == 5 &&
                 book.isbn == "9780743273565" &&
-                book.photo == "https://example.com/greatgatsby.jpg" &&
-                book.language == BookLanguages.ENGLISH
+                book.genres == listOf(BookGenres.FANTASY)
+            book.language == BookLanguages.ENGLISH
           },
           any())
     }

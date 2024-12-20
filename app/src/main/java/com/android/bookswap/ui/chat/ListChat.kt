@@ -30,12 +30,14 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import com.android.bookswap.R
 import com.android.bookswap.data.MessageBox
 import com.android.bookswap.model.LocalAppConfig
 import com.android.bookswap.model.chat.ContactViewModel
@@ -43,7 +45,14 @@ import com.android.bookswap.resources.C
 import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.theme.ColorVariable
 
-/** This is the main screen for the chat feature. It displays the list of messages */
+/**
+ * Displays the main screen for the chat feature, showing a list of messages.
+ *
+ * @param navigationActions Actions for navigating between screens.
+ * @param topAppBar A composable function for the top app bar.
+ * @param bottomAppBar A composable function for the bottom app bar.
+ * @param contactViewModel The ViewModel for managing contact data.
+ */
 @Composable
 fun ListChatScreen(
     navigationActions: NavigationActions,
@@ -68,7 +77,7 @@ fun ListChatScreen(
               if (messageBoxMap.isEmpty()) {
                 item {
                   Text(
-                      text = "No messages yet",
+                      text = stringResource(R.string.chat_list_no_messages),
                       modifier = Modifier.fillMaxWidth().padding(16.dp),
                       color = ColorVariable.Primary,
                       fontSize = 20.sp,
@@ -90,7 +99,12 @@ fun ListChatScreen(
       bottomBar = bottomAppBar)
 }
 
-/** This function is used to display the message box */
+/**
+ * Displays a message box with contact information and message preview.
+ *
+ * @param message The message box containing contact and message details.
+ * @param onClick The action to perform when the message box is clicked.
+ */
 @Composable
 fun MessageBoxDisplay(message: MessageBox, onClick: () -> Unit = {}) {
   Row(
@@ -139,7 +153,9 @@ fun MessageBoxDisplay(message: MessageBox, onClick: () -> Unit = {}) {
               }
 
           Text(
-              text = message.message?.takeUnless { it.isEmpty() } ?: "No messages yet",
+              text =
+                  message.message?.takeUnless { it.isEmpty() }
+                      ?: stringResource(R.string.chat_list_no_messages),
               fontSize = 14.sp,
               color = ColorVariable.AccentSecondary,
               maxLines = 1,

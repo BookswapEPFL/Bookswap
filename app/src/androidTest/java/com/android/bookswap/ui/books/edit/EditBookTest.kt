@@ -10,11 +10,17 @@ import androidx.compose.ui.test.performScrollToNode
 import com.android.bookswap.data.BookGenres
 import com.android.bookswap.data.BookLanguages
 import com.android.bookswap.data.DataBook
-import com.android.bookswap.data.repository.BooksRepository
+import com.android.bookswap.data.repository.PhotoFirebaseStorageRepository
+import com.android.bookswap.model.edit.EditBookViewModel
+import com.android.bookswap.model.isNetworkAvailableForBook
 import com.android.bookswap.resources.C
 import com.android.bookswap.ui.navigation.NavigationActions
+import io.mockk.MockKAnnotations
 import io.mockk.every
+import io.mockk.just
 import io.mockk.mockk
+import io.mockk.mockkStatic
+import io.mockk.runs
 import java.util.UUID
 import org.junit.Before
 import org.junit.Rule
@@ -22,11 +28,13 @@ import org.junit.Test
 
 class EditBookScreenTest {
 
-  private val booksRepository: BooksRepository = mockk()
+  private val mockViewModel: EditBookViewModel = mockk()
 
   private val navigationActions: NavigationActions = mockk()
 
   @get:Rule val composeTestRule = createComposeRule()
+
+  private lateinit var photoStorage: PhotoFirebaseStorageRepository
 
   private val sampleBook =
       DataBook(
@@ -40,60 +48,41 @@ class EditBookScreenTest {
           "123456789",
           listOf(BookGenres.FANTASY),
           UUID.randomUUID(),
-          false,
-          false)
+          archived = false,
+          exchange = true)
 
   @Before
   fun setUp() {
-    every { navigationActions.currentRoute() } returns "EDIT_BOOK"
-    every { booksRepository.getBook(any(), any(), any()) } answers
+    photoStorage = mockk()
+    every { photoStorage.addPhotoToStorage(any(), any(), any()) } just runs
+    MockKAnnotations.init(this)
+    every { mockViewModel.deleteBook(any(), any()) } just runs
+    mockkStatic(::isNetworkAvailableForBook)
+    every { isNetworkAvailableForBook(any()) } returns true
+    every {
+      mockViewModel.updateDataBook(
+          any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any())
+    } just runs
+    every { mockViewModel.getBook(any(), any(), any()) } answers
         {
           secondArg<(DataBook) -> Unit>()(sampleBook)
         }
+
+    every { navigationActions.currentRoute() } returns "EDIT_BOOK"
+    composeTestRule.setContent {
+      EditBookScreen(mockViewModel, photoStorage, bookUUID = sampleBook.uuid)
+    }
   }
 
   @Test
   fun displayEditScreenComponent() {
-    composeTestRule.setContent {
-      EditBookScreen(booksRepository, navigationActions, sampleBook.uuid)
-    }
-
-    composeTestRule.onNodeWithTag(C.Tag.edit_book_screen_container).assertIsDisplayed()
-  }
-
-  @Test
-  fun displayEditTitleComponent() {
-    composeTestRule.setContent {
-      EditBookScreen(booksRepository, navigationActions, sampleBook.uuid)
-    }
-
-    composeTestRule.onNodeWithTag(C.Tag.TopAppBar.screen_title).assertIsDisplayed()
-  }
-
-  @Test
-  fun displayEditTitleValueComponent() {
-    composeTestRule.setContent {
-      EditBookScreen(booksRepository, navigationActions, sampleBook.uuid)
-    }
-
-    composeTestRule.onNodeWithTag(C.Tag.TopAppBar.screen_title).assertTextEquals("Edit your Book")
-  }
-
-  @Test
-  fun displayEditButtonComponent() {
-    composeTestRule.setContent {
-      EditBookScreen(booksRepository, navigationActions, sampleBook.uuid)
-    }
-    composeTestRule.onNodeWithTag(C.Tag.TopAppBar.back_button).assertIsDisplayed()
+    composeTestRule.onNodeWithTag(C.Tag.BookEntryComp.scrollable).assertIsDisplayed()
   }
 
   @Test
   fun displayEditSaveValueComponent() {
-    composeTestRule.setContent {
-      EditBookScreen(booksRepository, navigationActions, sampleBook.uuid)
-    }
     composeTestRule
-        .onNodeWithTag(C.Tag.EditBook.scrollable)
+        .onNodeWithTag(C.Tag.BookEntryComp.scrollable)
         .performScrollToNode(hasTestTag(C.Tag.EditBook.save))
     composeTestRule.onNodeWithTag(C.Tag.EditBook.save).assertIsDisplayed()
     composeTestRule.onNodeWithTag(C.Tag.EditBook.save).assertTextEquals("Save")
@@ -101,79 +90,37 @@ class EditBookScreenTest {
 
   @Test
   fun displayEditDeleteValueComponent() {
-    composeTestRule.setContent {
-      EditBookScreen(booksRepository, navigationActions, sampleBook.uuid)
-    }
     composeTestRule
-        .onNodeWithTag(C.Tag.EditBook.scrollable)
+        .onNodeWithTag(C.Tag.BookEntryComp.scrollable)
         .performScrollToNode(hasTestTag(C.Tag.EditBook.delete))
     composeTestRule.onNodeWithTag(C.Tag.EditBook.delete).assertIsDisplayed()
     composeTestRule.onNodeWithTag(C.Tag.EditBook.delete).assertTextEquals("Delete")
   }
 
   @Test
-  fun displayEditBookTitleComponent() {
-    composeTestRule.setContent {
-      EditBookScreen(booksRepository, navigationActions, sampleBook.uuid)
-    }
-
-    composeTestRule.onNodeWithTag(C.Tag.EditBook.title).assertIsDisplayed()
-  }
-
-  @Test
-  fun displayEditBookAuthorComponent() {
-    composeTestRule.setContent {
-      EditBookScreen(booksRepository, navigationActions, sampleBook.uuid)
-    }
-    composeTestRule.onNodeWithTag(C.Tag.EditBook.author).assertIsDisplayed()
-  }
-
-  @Test
-  fun displayEditBookDescriptionComponent() {
-    composeTestRule.setContent {
-      EditBookScreen(booksRepository, navigationActions, sampleBook.uuid)
-    }
-    composeTestRule.onNodeWithTag(C.Tag.EditBook.synopsis).assertIsDisplayed()
-  }
-
-  @Test
-  fun displayEditBookRatingComponent() {
-    composeTestRule.setContent {
-      EditBookScreen(booksRepository, navigationActions, sampleBook.uuid)
-    }
-    composeTestRule.onNodeWithTag(C.Tag.EditBook.rating).assertIsDisplayed()
-  }
-
-  @Test
-  fun displayEditBookPhotoComponent() {
-    composeTestRule.setContent {
-      EditBookScreen(booksRepository, navigationActions, sampleBook.uuid)
-    }
-    composeTestRule.onNodeWithTag(C.Tag.EditBook.image).assertIsDisplayed()
-  }
-
-  @Test
-  fun displayEditBookLanguageComponent() {
-    composeTestRule.setContent {
-      EditBookScreen(booksRepository, navigationActions, sampleBook.uuid)
-    }
-    composeTestRule.onNodeWithTag(C.Tag.EditBook.language).assertIsDisplayed()
-  }
-
-  @Test
   fun inputsHaveInitialValue() {
-    composeTestRule.setContent {
-      EditBookScreen(booksRepository, navigationActions, sampleBook.uuid)
-    }
+    composeTestRule
+        .onNodeWithTag(C.Tag.BookEntryComp.title_field)
+        .assertTextContains(sampleBook.title)
 
-    composeTestRule.onNodeWithTag(C.Tag.EditBook.title).assertTextContains(sampleBook.title)
-    composeTestRule.onNodeWithTag(C.Tag.EditBook.author).assertTextContains(sampleBook.author ?: "")
     composeTestRule
-        .onNodeWithTag(C.Tag.EditBook.synopsis)
+        .onNodeWithTag(C.Tag.BookEntryComp.author_field)
+        .assertTextContains(sampleBook.author ?: "")
+
+    composeTestRule
+        .onNodeWithTag(C.Tag.BookEntryComp.description_field)
         .assertTextContains(sampleBook.description ?: "")
-    composeTestRule.onNodeWithTag(C.Tag.EditBook.image).assertTextContains(sampleBook.photo ?: "")
+
     composeTestRule
-        .onNodeWithTag(C.Tag.EditBook.language)
-        .assertTextContains(sampleBook.language.toString())
+        .onNodeWithTag(C.Tag.BookEntryComp.isbn_field)
+        .assertTextContains(sampleBook.isbn ?: "")
+
+    composeTestRule
+        .onNodeWithTag(C.Tag.BookEntryComp.language_field)
+        .assertTextContains(sampleBook.language.languageName)
+
+    composeTestRule
+        .onNodeWithTag(C.Tag.BookEntryComp.genre_field)
+        .assertTextContains(sampleBook.genres.joinToString { it.Genre })
   }
 }

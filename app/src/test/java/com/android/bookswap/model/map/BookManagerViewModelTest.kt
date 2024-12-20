@@ -143,7 +143,7 @@ class BookManagerViewModelTest {
                 _ ->
               0.0
             }
-    bookManagerViewModel.startUpdatingBooks()
+    bookManagerViewModel.startUpdatingBooks(UUID.randomUUID())
     bookManagerViewModel.filteredBooks.first { it != emptyList<DataBook>() }
     bookManagerViewModel.filteredUsers.first { it != emptyList<UserBooksWithLocation>() }
     assertEquals(books, bookManagerViewModel.filteredBooks.value)
@@ -156,7 +156,7 @@ class BookManagerViewModelTest {
     val bookManagerViewModel =
         BookManagerViewModel(
             mockGeolocation1, mockBookRepository, mockUsersRepository, mockBookFilter, sortingTest)
-    bookManagerViewModel.startUpdatingBooks()
+    bookManagerViewModel.startUpdatingBooks(UUID.randomUUID())
     bookManagerViewModel.filteredBooks.first { it != emptyList<DataBook>() }
     bookManagerViewModel.filteredUsers.first { it != emptyList<UserBooksWithLocation>() }
     assertEquals(listOf(book3), bookManagerViewModel.filteredBooks.value)
@@ -170,10 +170,10 @@ class BookManagerViewModelTest {
         BookManagerViewModel(
             mockGeolocation1, mockBookRepository, mockUsersRepository, mockBookFilter, sortingTest)
     every { mockBookFilter.filterBooks(any()) } answers { emptyList() }
-    bookManagerViewModel.startUpdatingBooks()
+    bookManagerViewModel.startUpdatingBooks(UUID.randomUUID())
     bookManagerViewModel.stopUpdatingBooks()
     every { mockBookFilter.filterBooks(any()) } answers { listOf(book3) }
-    bookManagerViewModel.startUpdatingBooks()
+    bookManagerViewModel.startUpdatingBooks(UUID.randomUUID())
     bookManagerViewModel.filteredBooks.first { it != emptyList<DataBook>() }
     bookManagerViewModel.filteredUsers.first { it != emptyList<UserBooksWithLocation>() }
     assertEquals(listOf(book3), bookManagerViewModel.filteredBooks.value)
@@ -190,7 +190,7 @@ class BookManagerViewModelTest {
             mockUsersRepository,
             mockBookFilterEmpty,
             sortingTest)
-    bookManagerViewModel.startUpdatingBooks()
+    bookManagerViewModel.startUpdatingBooks(UUID.randomUUID())
     bookManagerViewModel.filteredBooks.first { it != emptyList<DataBook>() }
     bookManagerViewModel.filteredUsers.first { it != emptyList<UserBooksWithLocation>() }
     assertEquals(listOf(book1, book2, book3), bookManagerViewModel.filteredBooks.value)

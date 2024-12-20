@@ -29,11 +29,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.android.bookswap.R
 import com.android.bookswap.data.BookGenres
 import com.android.bookswap.data.BookLanguages
 import com.android.bookswap.model.map.BookFilter
@@ -102,8 +104,8 @@ fun FilterMapScreen(navigationActions: NavigationActions, bookFilter: BookFilter
           }
           item {
             ButtonBlock(
-                buttonTexts = BookLanguages.values().map { it.languageCode },
-                selectedFiltersLanguages.map { it.languageCode }) { newSelection ->
+                buttonTexts = BookLanguages.values().map { it.languageName },
+                selectedFiltersLanguages.map { it.languageName }) { newSelection ->
                   bookFilter.setLanguages(
                       newSelection) // Actualize the selected languages as OnClick
             }
@@ -116,8 +118,12 @@ fun FilterMapScreen(navigationActions: NavigationActions, bookFilter: BookFilter
             Button(
                 onClick = {
                   bookFilter.setGenres(selectedFiltersGenres.map { it.Genre })
-                  bookFilter.setLanguages(selectedFiltersLanguages.map { it.languageCode })
-                  Toast.makeText(context, "Filters applied", Toast.LENGTH_SHORT).show()
+                  bookFilter.setLanguages(selectedFiltersLanguages.map { it.languageName })
+                  Toast.makeText(
+                          context,
+                          context.getString(R.string.filters_applied_message),
+                          Toast.LENGTH_SHORT)
+                      .show()
                   navigationActions.goBack()
                 },
                 colors = ButtonDefaults.buttonColors(ColorVariable.Primary),
@@ -126,7 +132,9 @@ fun FilterMapScreen(navigationActions: NavigationActions, bookFilter: BookFilter
                         .height(BUTTON_HEIGHT)
                         .testTag(C.Tag.MapFilter.apply)) {
                   Text(
-                      text = "Apply",
+                      text =
+                          stringResource(
+                              R.string.filter_apply_button_text), // Hard coded string that should
                       textAlign = TextAlign.Center,
                       style =
                           TextStyle(

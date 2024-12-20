@@ -36,6 +36,7 @@ import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -43,6 +44,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import com.android.bookswap.R
 import com.android.bookswap.data.repository.PhotoFirebaseStorageRepository
 import com.android.bookswap.model.InputVerification
 import com.android.bookswap.model.LocalAppConfig
@@ -53,6 +55,7 @@ import com.android.bookswap.ui.MAXLENGTHFIRSTNAME
 import com.android.bookswap.ui.MAXLENGTHGREETING
 import com.android.bookswap.ui.MAXLENGTHLASTNAME
 import com.android.bookswap.ui.MAXLENGTHPHONE
+import com.android.bookswap.ui.components.AddressFieldsComponent
 import com.android.bookswap.ui.navigation.NavigationActions
 import com.android.bookswap.ui.theme.ColorVariable
 import com.google.firebase.Firebase
@@ -71,10 +74,11 @@ private val INFO_FONT_WEIGHT = FontWeight(400)
 private val ERROR_FONT_SIZE = 12.sp
 
 /**
- * NewUserScreen is the screen where the user can create a new account by filling in his personal
- * information
+ * NewUserScreen is the screen where the user can create a new account by filling in their personal
+ * information.
  *
- * @param navigationActions: NavigationActions
+ * @param navigationActions Navigation actions to handle navigation events.
+ * @param photoStorage Repository to handle photo storage operations.
  */
 @Composable
 fun NewUserScreen(
@@ -95,6 +99,15 @@ fun NewUserScreen(
   val firstNameError = remember { mutableStateOf<String?>("First name required") }
   val lastNameError = remember { mutableStateOf<String?>("Last name required") }
 
+  val address = remember { mutableStateOf("") }
+  val city = remember { mutableStateOf("") }
+  val canton = remember { mutableStateOf("") }
+  val postal = remember { mutableStateOf("") }
+  val country = remember { mutableStateOf("") }
+
+  val cityError = remember { mutableStateOf<String?>("City required") }
+  val countryError = remember { mutableStateOf<String?>("Country required") }
+
   val appConfig = LocalAppConfig.current
   var firstAttempt = true
 
@@ -112,14 +125,21 @@ fun NewUserScreen(
                         onSuccess = { url -> profilPicture.value = url },
                         onFailure = { exception ->
                           Log.e("NewUserScreen", "Error uploading photo: $exception")
-                          Toast.makeText(context, "Error uploading photo", Toast.LENGTH_SHORT)
+                          Toast.makeText(
+                                  context,
+                                  context.getString(R.string.new_user_toast_error_upload),
+                                  Toast.LENGTH_SHORT)
                               .show()
                         })
                   })
             },
             onFailure = { exception ->
               Log.e("NewUserScreen", "Error taking photo: $exception")
-              Toast.makeText(context, "Error taking photo", Toast.LENGTH_SHORT).show()
+              Toast.makeText(
+                      context,
+                      context.getString(R.string.new_user_toast_error_taking),
+                      Toast.LENGTH_SHORT)
+                  .show()
             })
       }
   photoRequester.Init() // This is the initialization of the photo requester
@@ -131,7 +151,7 @@ fun NewUserScreen(
               .testTag(C.Tag.new_user_screen_container)) {
         item {
           Text(
-              "Welcome",
+              stringResource(R.string.new_user_welcome),
               modifier = Modifier.testTag(C.Tag.TopAppBar.screen_title).fillMaxWidth(),
               style =
                   TextStyle(
@@ -144,7 +164,7 @@ fun NewUserScreen(
         item {
           // The personal information text
           Text(
-              "Please fill in your personal information to start BookSwapping",
+              stringResource(R.string.new_user_indication_text),
               modifier = Modifier.testTag(C.Tag.NewUser.personal_info).fillMaxWidth(),
               style =
                   TextStyle(
@@ -192,8 +212,10 @@ fun NewUserScreen(
                           Modifier.testTag(C.Tag.NewUser.greeting)
                               .fillMaxWidth()
                               .padding(TEXT_PADDING),
-                          label = { Text("Greeting") },
-                          placeholder = { Text("Mr.", Modifier, Color.Gray) },
+                          label = { Text(stringResource(R.string.edit_profile_greeting)) },
+                          placeholder = {
+                            Text(stringResource(R.string.edit_profile_mr), Modifier, Color.Gray)
+                          },
                           keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                           singleLine = true)
 
@@ -203,8 +225,10 @@ fun NewUserScreen(
                           Modifier.testTag(C.Tag.NewUser.firstname)
                               .fillMaxWidth()
                               .padding(TEXT_PADDING),
-                          label = { Text("Firstname") },
-                          placeholder = { Text("John", Modifier, Color.Gray) },
+                          label = { Text(stringResource(R.string.edit_profile_firstname)) },
+                          placeholder = {
+                            Text(stringResource(R.string.edit_profile_john), Modifier, Color.Gray)
+                          },
                           keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                           singleLine = true,
                           isError =
@@ -223,8 +247,10 @@ fun NewUserScreen(
                           Modifier.testTag(C.Tag.NewUser.lastname)
                               .fillMaxWidth()
                               .padding(TEXT_PADDING),
-                          label = { Text("Lastname") },
-                          placeholder = { Text("Doe", Modifier, Color.Gray) },
+                          label = { Text(stringResource(R.string.edit_profile_lastname)) },
+                          placeholder = {
+                            Text(stringResource(R.string.edit_profile_Doe), Modifier, Color.Gray)
+                          },
                           keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                           singleLine = true,
                           isError = !verification.validateNonEmpty(lastName.value) && !firstAttempt)
@@ -242,8 +268,13 @@ fun NewUserScreen(
                           Modifier.testTag(C.Tag.NewUser.email)
                               .fillMaxWidth()
                               .padding(TEXT_PADDING),
-                          label = { Text("Email") },
-                          placeholder = { Text("John.Doe@example.com", Modifier, Color.Gray) },
+                          label = { Text(stringResource(R.string.edit_profile_email)) },
+                          placeholder = {
+                            Text(
+                                stringResource(R.string.edit_profile_email_example),
+                                Modifier,
+                                Color.Gray)
+                          },
                           keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                           singleLine = true,
                           isError = !verification.validateEmail(email.value) && !firstAttempt)
@@ -261,8 +292,13 @@ fun NewUserScreen(
                           Modifier.testTag(C.Tag.NewUser.phone)
                               .fillMaxWidth()
                               .padding(TEXT_PADDING),
-                          label = { Text("Phone") },
-                          placeholder = { Text("+4122345678", Modifier, Color.Gray) },
+                          label = { Text(stringResource(R.string.edit_profile_phone)) },
+                          placeholder = {
+                            Text(
+                                stringResource(R.string.edit_profile_phone_example),
+                                Modifier,
+                                Color.Gray)
+                          },
                           keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
                           singleLine = true,
                           isError = !verification.validatePhone(phone.value) && !firstAttempt)
@@ -276,6 +312,22 @@ fun NewUserScreen(
                     }
               }
         }
+        item {
+          AddressFieldsComponent(
+              firstAttempt = firstAttempt,
+              address = address.value,
+              onAddressChange = { address.value = it },
+              city = city.value,
+              onCityChange = { city.value = it },
+              cityError = cityError.value!!,
+              canton = canton.value,
+              onCantonChange = { canton.value = it },
+              postal = postal.value,
+              onPostalChange = { postal.value = it },
+              countryError = countryError.value!!,
+              country = country.value,
+              onCountryChange = { country.value = it })
+        }
 
         item {
           Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
@@ -284,7 +336,9 @@ fun NewUserScreen(
                   if (verification.validateEmail(email.value) &&
                       verification.validatePhone(phone.value) &&
                       verification.validateNonEmpty(firstName.value) &&
-                      verification.validateNonEmpty(lastName.value)) {
+                      verification.validateNonEmpty(lastName.value) &&
+                      verification.validateNonEmpty(city.value) &&
+                      verification.validateNonEmpty(country.value)) {
                     appConfig.userViewModel.updateUser(
                         greeting = greeting.value,
                         firstName = firstName.value,
@@ -293,10 +347,27 @@ fun NewUserScreen(
                         phone = phone.value,
                         picURL = profilPicture.value ?: "",
                         googleUid = Firebase.auth.currentUser?.uid ?: "")
+                    val addressComponents =
+                        if (address.value.isEmpty() ||
+                            canton.value.isEmpty() ||
+                            postal.value.isEmpty()) {
+                          listOf(city.value, country.value)
+                        } else {
+                          listOf(
+                              address.value, city.value, canton.value, postal.value, country.value)
+                        }
+                    appConfig.userViewModel.updateCoordinates(
+                        addressComponents = addressComponents,
+                        context = context,
+                        userUUID = appConfig.userViewModel.getUser().userUUID)
                     navigationActions.navigateTo(C.Route.MAP)
                   } else {
                     firstAttempt = false
-                    Toast.makeText(context, "Please correct the errors", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                            context,
+                            context.getString(R.string.new_user_toast_correct_error),
+                            Toast.LENGTH_SHORT)
+                        .show()
                   }
                 },
                 colors = ButtonDefaults.buttonColors(ColorVariable.Primary),
@@ -305,7 +376,7 @@ fun NewUserScreen(
                         .height(BUTTON_HEIGHT)
                         .testTag(C.Tag.NewUser.confirm)) {
                   Text(
-                      text = "Create",
+                      text = stringResource(R.string.new_user_create_button),
                       textAlign = TextAlign.Center,
                       style = TextStyle(color = ColorVariable.BackGround))
                 }

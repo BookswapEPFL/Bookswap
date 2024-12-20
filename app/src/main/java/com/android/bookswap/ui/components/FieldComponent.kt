@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
@@ -56,11 +55,13 @@ private val FIELD_CONTENT_PADDING = 16.dp
 /** Duration for the animation in milliseconds. */
 private val ANIMATION_DURATION = 150
 /**
- * A composable function that displays a field component with a label.
+ * A composable function that displays a field component with a label and a maximum length
+ * constraint.
  *
  * @param labelText The text to be displayed as the label.
  * @param value The current value of the field.
  * @param modifier The modifier to be applied to the field.
+ * @param maxLength The maximum length of the input text.
  * @param onValueChange A callback to be invoked when the value changes.
  */
 @Composable
@@ -180,7 +181,7 @@ fun FieldComponent(
                                         focusedBorderThickness = 2.dp,
                                         unfocusedBorderThickness = 1.dp)
                                     .value,
-                                RoundedCornerShape(100))
+                                RoundedCornerShape(FIELD_MIN_HEIGHT / 2))
                             .background(
                                 backgroundColor(
                                         enabled = enabled,
@@ -195,7 +196,7 @@ fun FieldComponent(
                                             },
                                         colors = colors)
                                     .value,
-                                CircleShape)
+                                RoundedCornerShape(FIELD_MIN_HEIGHT / 2))
                             .padding(FIELD_PADDING)
                             .background(
                                 backgroundColor(
@@ -211,7 +212,7 @@ fun FieldComponent(
                                             },
                                         colors = colors)
                                     .value,
-                                CircleShape),
+                                RoundedCornerShape(FIELD_MIN_HEIGHT / 2)),
                     )
                   },
                   contentPadding = PaddingValues(FIELD_CONTENT_PADDING))

@@ -7,7 +7,6 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.test.rule.GrantPermissionRule
 import com.android.bookswap.MainActivity
-import com.android.bookswap.data.DataUser
 import com.android.bookswap.data.repository.BooksRepository
 import com.android.bookswap.data.repository.UsersRepository
 import com.android.bookswap.data.source.network.MessageFirestoreSource
@@ -32,9 +31,7 @@ class NavigationBarEndToEnd {
   @get:Rule
   val grantPermissionRule: GrantPermissionRule =
       GrantPermissionRule.grant(
-          Manifest.permission.ACCESS_FINE_LOCATION,
-          Manifest.permission.ACCESS_COARSE_LOCATION,
-          Manifest.permission.ACCESS_BACKGROUND_LOCATION)
+          Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION)
 
   private lateinit var mockBookRepository: BooksRepository
   private lateinit var mockUserRepository: UsersRepository
@@ -42,18 +39,6 @@ class NavigationBarEndToEnd {
   private lateinit var mockMessageStorage: OfflineMessageStorage
   private lateinit var mockContext: Context
   private lateinit var mockUserVM: UserViewModel
-
-  private val standardUser =
-      DataUser(
-          UUID.randomUUID(),
-          "M.",
-          "John",
-          "Doe",
-          "John.Doe@example.com",
-          "+41223456789",
-          0.0,
-          0.0,
-          "dummyPic.png")
 
   @Before
   fun setUp() {
@@ -72,9 +57,6 @@ class NavigationBarEndToEnd {
     every { anyConstructed<ContactViewModel>().updateMessageBoxMap() } just runs
 
     mockUserVM = mockk(relaxed = true)
-    every { mockUserVM.getUser(any()) } returns standardUser
-    every { mockUserVM.uuid } returns standardUser.userUUID
-    every { mockUserVM.updateAddress(any<Double>(), any<Double>(), any<Context>()) } just runs
 
     composeTestRule.setContent {
       val db: FirebaseFirestore = mockk(relaxed = true)
@@ -82,13 +64,14 @@ class NavigationBarEndToEnd {
       val messageRepository = MessageFirestoreSource(db)
       MainActivity()
           .BookSwapApp(
-              messageRepository = messageRepository,
-              bookRepository = mockBookRepository,
-              userRepository = mockUserRepository,
-              startDestination = C.Route.MAP,
-              photoStorage = mockPhotoStorage,
-              messageStorage = mockMessageStorage,
-              context = mockContext)
+              messageRepository,
+              mockBookRepository,
+              mockUserRepository,
+              C.Route.MAP,
+              mockPhotoStorage,
+              mockMessageStorage,
+              context = mockContext,
+              userVM = mockUserVM)
     }
   }
 

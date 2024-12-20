@@ -79,4 +79,19 @@ interface UsersRepository {
    * @param callback Callback for success or failure.
    */
   fun removeContact(userUUID: UUID, contactUUID: UUID, callback: (Result<Unit>) -> Unit)
+
+  /**
+   * Function to update the location of a user in the repository.
+   *
+   * @param userUUID UUID of the user whose location is being updated.
+   * @param latitude The new latitude of the user.
+   * @param longitude The new longitude of the user.
+   * @param callback Callback for success or failure.
+   */
+  fun updateLocation(
+      userUUID: UUID,
+      latitude: Double,
+      longitude: Double,
+      callback: (Result<Unit>) -> Unit,
+  )
 }

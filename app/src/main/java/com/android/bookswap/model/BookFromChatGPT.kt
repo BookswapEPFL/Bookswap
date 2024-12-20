@@ -2,6 +2,7 @@ package com.android.bookswap.model
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.util.Log
 import com.android.bookswap.R
 import com.android.bookswap.data.repository.BooksRepository
 import com.android.bookswap.data.repository.PhotoFirebaseStorageRepository
@@ -23,14 +24,18 @@ class BookFromChatGPT(
         return@addPhotoToStorage
       }
 
+      Log.i("BookFromChatGPT", "Sending photo to ChatGPT")
+
       // Send the url to ChatGPT
+      val photoUrl = urlResult.getOrThrow()
       val imageToData = ImageToDataSource(ChatGPTApiService(context))
       imageToData.analyzeImage(
-          urlResult.getOrThrow(),
+          photoUrl,
           onSuccess = { map ->
             // Get isbn from result and removes the '-' characters
             val isbn = map["isbn"]?.replace("-", "")
             if (isbn == null || isbn == ImageToDataSource.UNDEFINED_ATTRIBUTE) {
+              photoStorageRepository.deletePhotoFromStorageWithUrl(photoUrl) { _ -> }
               callback(ErrorType.CHATGPT_ANALYZER_ERROR, null)
               return@analyzeImage
             }
@@ -38,24 +43,43 @@ class BookFromChatGPT(
             // Request book from ISBN
             GoogleBookDataSource(context).getBookFromISBN(isbn, userUUID) { dataBookResult ->
               if (dataBookResult.isFailure) {
+                photoStorageRepository.deletePhotoFromStorageWithUrl(photoUrl) { _ -> }
                 callback(ErrorType.ISBN_ERROR, null)
                 return@getBookFromISBN
               }
 
               // Add photo url to dataBook
-              val dataBook = dataBookResult.getOrThrow().copy(photo = urlResult.getOrThrow())
+              val dataBook = dataBookResult.getOrThrow()
 
               // Add book
               booksRepository.addBook(dataBook) { bookResult ->
                 if (bookResult.isFailure) {
-                  callback(ErrorType.BOOK_ADD_ERROR, null)
+                  Log.i("DeleteBookAfterGPT", "Deleting photo from storage")
+                  photoStorageRepository.deletePhotoFromStorageWithUrl(photoUrl) { deleteResult ->
+                    if (deleteResult.isFailure) {
+                      callback(ErrorType.FIREBASE_STORAGE_ERROR, null)
+                    } else {
+                      callback(ErrorType.BOOK_ADD_ERROR, null)
+                    }
+                  }
                 } else {
+                  Log.i("DeleteBookAfterGPT", "Deleting photo from storage")
+                  photoStorageRepository.deletePhotoFromStorageWithUrl(photoUrl) { _ -> }
                   callback(ErrorType.NONE, dataBookResult.getOrThrow().uuid)
                 }
               }
             }
           },
-          onError = { callback(ErrorType.CHATGPT_ANALYZER_ERROR, null) })
+          onError = {
+            Log.i("DeleteBookAfterGPT", "Deleting photo from storage")
+            photoStorageRepository.deletePhotoFromStorageWithUrl(photoUrl) { deleteResult ->
+              if (deleteResult.isFailure) {
+                callback(ErrorType.FIREBASE_STORAGE_ERROR, null)
+              } else {
+                callback(ErrorType.CHATGPT_ANALYZER_ERROR, null)
+              }
+            }
+          })
     }
   }
 

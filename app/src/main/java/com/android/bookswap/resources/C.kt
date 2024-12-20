@@ -107,6 +107,36 @@ object C {
       const val divider = BOOK + LIST + UI_T.DIVIDER
     }
 
+    object BookEntryComp {
+      // Parent container
+      const val entries_list_book_container = "entries_list_book" + UI_T.CONTAINER
+      const val scrollable = "scrollable" + UI_T.SCROLLABLE_CONTAINER
+      // Fields
+      const val title_field = "title" + UI_T.TEXT_FIELD
+      const val genre_field = "genres" + UI_T.DROPDOWN
+      const val author_field = "author" + UI_T.TEXT_FIELD
+      const val description_field = "description" + UI_T.TEXT_FIELD
+      const val rating_field = "rating" + UI_T.TEXT_FIELD
+      const val isbn_field = "isbn" + UI_T.TEXT_FIELD
+      const val photo_field = "photo" + UI_T.IMAGE_FIELD
+      const val language_field = "language" + UI_T.DROPDOWN
+
+      // Dropdown menus
+      const val genre_menu = "genre_menu" + UI_T.SCROLLABLE_CONTAINER
+      const val genre_menu_item = "genre_menu_item" + UI_T.CONTAINER
+      const val language_menu = "language_menu" + UI_T.SCROLLABLE_CONTAINER
+      const val language_menu_item = "language_menu_item" + UI_T.CONTAINER
+
+      // Buttons
+      const val action_buttons = "action_buttons" + UI_T.CONTAINER
+      const val confirm_button = A.CONFIRM + UI_T.BUTTON
+      const val cancel_button = A.CANCEL + UI_T.BUTTON
+
+      const val rating_field_stars = "rating_stars" + UI_T.CONTAINER
+      const val rating_star = "rating_star" + UI_T.ICON
+      const val rating_star_empty = "rating_star_empty" + UI_T.ICON
+    }
+
     // BookDisplayComponent specific tags (BookDisplayComponent.kt)
     object BookDisplayComp {
       const val book_display_container = BOOK + UI_T.CONTAINER
@@ -133,6 +163,17 @@ object C {
       const val profileImage = "profile" + UI_T.IMAGE
       const val take_photo = A.NEW + UI_T.IMAGE + UI_T.BUTTON
       const val profileImageBox = "profile_image_box" + UI_T.CONTAINER
+    }
+
+    object AddressFields {
+      const val newAddress = "new_address" + UI_T.TEXT
+      const val address = "address" + UI_T.TEXT_FIELD
+      const val city = "city" + UI_T.TEXT_FIELD
+      const val canton = "canton" + UI_T.TEXT_FIELD
+      const val postal = "postal" + UI_T.TEXT_FIELD
+      const val country = "country" + UI_T.TEXT_FIELD
+      const val cityError = "city_error" + UI_T.TEXT
+      const val countryError = "canton_error" + UI_T.TEXT
     }
 
     object OtherUserProfile {
@@ -205,10 +246,11 @@ object C {
     // New Book Choice Screen specific tags (BookAdditionChoice.kt)
     object NewBookChoice {
       object btnWIcon {
-        val button = UI_T.BUTTON
-        val icon = UI_T.ICON
-        val png = UI_T.IMAGE
-        val arrow = "_arrow" + UI_T.ICON
+        const val button = UI_T.BUTTON
+        const val leftIcon = "left" + UI_T.ICON
+        const val leftPng = "left" + UI_T.IMAGE
+        const val rightIcon = "right" + UI_T.ICON
+        const val rightPng = "right" + UI_T.IMAGE
       }
     }
 
@@ -257,6 +299,7 @@ object C {
       const val filter_button = "filter" + UI_T.BUTTON
       // Tags specific to components related to Google Maps Markers
       object Marker {
+        const val info_window_user_profile = "marker_info" + "_user_profile"
         const val info_window_container = "marker_info" + UI_T.CONTAINER
         const val info_window_scrollable = "marker_info" + UI_T.SCROLLABLE_CONTAINER
         const val info_window_divider = "marker_info" + UI_T.DIVIDER
@@ -324,5 +367,50 @@ object C {
     const val BOOK_PROFILE = S.BOOK_PROFILE + SCREEN
     const val EDIT_BOOK = S.EDIT_BOOK + SCREEN
     const val SETTINGS = S.SETTINGS + SCREEN
+  }
+}
+
+object Enums {
+
+  object Languages {
+    const val FRENCH = "French"
+    const val GERMAN = "German"
+    const val ENGLISH = "English"
+    const val SPANISH = "Spanish"
+    const val ITALIAN = "Italian"
+    const val ROMANSH = "Romansh"
+    const val OTHER = "Other"
+  }
+
+  object LanguagesCode {
+    const val FRENCH = "FR"
+    const val GERMAN = "DE"
+    const val ENGLISH = "EN"
+    const val SPANISH = "ES"
+    const val ITALIAN = "IT"
+    const val ROMANSH = "RM"
+    const val OTHER = "OTHER"
+  }
+
+  object Genres {
+    const val FICTION = "Fiction"
+    const val NONFICTION = "Non-Fiction"
+    const val FANTASY = "Fantasy"
+    const val SCIENCEFICTION = "Science-Fiction"
+    const val MYSTERY = "Mystery"
+    const val THRILLER = "Thriller"
+    const val ROMANCE = "Romance"
+    const val HORROR = "Horror"
+    const val HISTORICAL = "Historical"
+    const val WESTERN = "Western"
+    const val DYSTOPIAN = "Dystopian"
+    const val MEMOIR = "Memoir"
+    const val BIOGRAPHY = "Biography"
+    const val AUTOBIOGRAPHY = "Autobiography"
+    const val SELFHELP = "Self-Help"
+    const val HEALTH = "Health"
+    const val TRAVEL = "Travel"
+    const val GUIDE = "Guide"
+    const val OTHER = "Other"
   }
 }
