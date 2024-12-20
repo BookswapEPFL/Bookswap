@@ -11,6 +11,7 @@ import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.swipe
 import androidx.compose.ui.test.swipeUp
@@ -168,6 +169,7 @@ class MapScreenTest : TestCase() {
         composeTestRule.onAllNodesWithTag(C.Tag.Map.Marker.book_title).assertCountEquals(2)
         composeTestRule.onAllNodesWithTag(C.Tag.Map.Marker.book_author).assertCountEquals(2)
         composeTestRule.onAllNodesWithTag(C.Tag.Map.Marker.info_window_divider).assertCountEquals(1)
+        composeTestRule.onNodeWithTag(C.Tag.Map.Marker.info_window_user_profile).assertIsDisplayed()
 
         // components of Draggable Menu
         composeTestRule.onNodeWithTag(C.Tag.Map.bottom_drawer_container).assertIsDisplayed()
@@ -380,6 +382,27 @@ class MapScreenTest : TestCase() {
 
         assertEquals(geolocation.latitude.value, cameraPositionState?.position?.target?.latitude)
         assertEquals(geolocation.longitude.value, cameraPositionState?.position?.target?.longitude)
+      }
+    }
+  }
+
+  @Test
+  fun markerNotDisplayedWhenLaunch() {
+    run {
+      step("Accept Permissions") {
+        flakySafely {
+          device.permissions.clickOn(Permissions.Button.ALLOW_FOREGROUND)
+          device.hackPermissions.grant(
+              device.targetContext.packageName, android.Manifest.permission.ACCESS_COARSE_LOCATION)
+          device.hackPermissions.grant(
+              device.targetContext.packageName, android.Manifest.permission.ACCESS_FINE_LOCATION)
+        }
+      }
+      step("Compose screen") { composeMapScreen(0) }
+      step("") {
+
+        // Assert that the marker is visible and the InfoWindow is displayed
+        composeTestRule.onNodeWithText("Your Location").assertDoesNotExist()
       }
     }
   }

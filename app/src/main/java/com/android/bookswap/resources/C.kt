@@ -299,6 +299,7 @@ object C {
       const val filter_button = "filter" + UI_T.BUTTON
       // Tags specific to components related to Google Maps Markers
       object Marker {
+        const val info_window_user_profile = "marker_info" + "_user_profile"
         const val info_window_container = "marker_info" + UI_T.CONTAINER
         const val info_window_scrollable = "marker_info" + UI_T.SCROLLABLE_CONTAINER
         const val info_window_divider = "marker_info" + UI_T.DIVIDER

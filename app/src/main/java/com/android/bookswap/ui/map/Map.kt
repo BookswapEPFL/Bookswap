@@ -1,12 +1,15 @@
 package com.android.bookswap.ui.map
 
 import android.content.pm.PackageManager
+import android.location.Location
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -23,12 +26,9 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
@@ -65,11 +65,14 @@ import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.*
 import com.google.maps.android.compose.GoogleMap
+import java.util.UUID
 import kotlin.math.roundToInt
 import kotlinx.coroutines.launch
 
+/** Constants * */
 const val INIT_ZOOM = 10F
 const val NO_USER_SELECTED = -1
+const val SHOW_MARKER_DISTANCE = 50
 
 val CameraPositionKey = SemanticsPropertyKey<CameraPositionState>("CameraPosition")
 var SemanticsPropertyReceiver.cameraPosition by CameraPositionKey
@@ -202,6 +205,9 @@ fun MapScreen(
     }
   }
 
+  // State to control the visibility of the marker
+  var showMarker by remember { mutableStateOf(false) }
+
   Scaffold(
       modifier = Modifier.testTag(C.Tag.map_screen_container),
       topBar = topAppBar,
@@ -210,8 +216,47 @@ fun MapScreen(
         Box(
             Modifier.padding(
                 top = pd.calculateTopPadding(), bottom = pd.calculateBottomPadding())) {
+
+              // Marker state for user's location
+              val markerState = remember {
+                MarkerState(position = LatLng(latitude.value, longitude.value))
+              }
+
+              // Update the marker's position when latitude or longitude changes
+              LaunchedEffect(latitude.value, longitude.value) {
+                markerState.position = LatLng(latitude.value, longitude.value)
+              }
+
+              // Show the InfoWindow when the marker becomes visible
+              LaunchedEffect(showMarker) {
+                if (showMarker) {
+                  markerState.showInfoWindow()
+                } else {
+                  markerState.hideInfoWindow()
+                }
+              }
+
               GoogleMap(
-                  onMapClick = { mutableStateSelectedUser = NO_USER_SELECTED },
+                  onMapClick = { clickedLatLng ->
+                    Log.i("MapScreen", "Map clicked")
+
+                    // Check if the clicked location is near the user's location
+                    val userLocation = LatLng(latitude.value, longitude.value)
+                    val distance = FloatArray(1)
+
+                    // Calculate the distance between the clicked point and the user's location
+                    Location.distanceBetween(
+                        clickedLatLng.latitude,
+                        clickedLatLng.longitude,
+                        userLocation.latitude,
+                        userLocation.longitude,
+                        distance)
+
+                    // Show marker if the distance is within 50 meters
+                    showMarker = distance[0] <= SHOW_MARKER_DISTANCE
+
+                    mutableStateSelectedUser = NO_USER_SELECTED
+                  },
                   onMapLoaded = {
                     cameraPositionState.position =
                         CameraPosition.fromLatLngZoom(
@@ -227,9 +272,11 @@ fun MapScreen(
               ) {
                 // Marker for user's current location
                 if (!latitude.value.isNaN() && !longitude.value.isNaN()) {
+                  Log.i("MapScreen", "Marker displayed at: ${latitude.value}, ${longitude.value}")
                   Marker(
-                      state = MarkerState(position = LatLng(latitude.value, longitude.value)),
+                      state = markerState,
                       title = stringResource(R.string.map_screen_your_location),
+                      visible = showMarker,
                       icon =
                           BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE))
                 }
@@ -249,13 +296,13 @@ fun MapScreen(
                               computePositionOfMarker(cameraPositionState, markerState.position)
                             }
                             // Navigate to the user profile
-                            navigationActions.navigateTo(
-                                screen = C.Screen.OTHERS_USER_PROFILE,
-                                UUID =
-                                    item.userUUID
-                                        .toString() // Assuming `item` has a unique UUID field
-                                // called `id`
-                                )
+                            /*navigationActions.navigateTo(
+                            screen = C.Screen.OTHERS_USER_PROFILE,
+                            UUID =
+                                item.userUUID
+                                    .toString() // Assuming `item` has a unique UUID field
+                            // called `id`
+                            )*/
                             false
                           })
                     }
@@ -272,7 +319,9 @@ fun MapScreen(
                           Modifier.offset {
                             IntOffset(screenPos.x.roundToInt(), screenPos.y.roundToInt())
                           },
-                      userBooks = filteredUsers.value[mutableStateSelectedUser].books)
+                      userBooks = filteredUsers.value[mutableStateSelectedUser].books,
+                      filteredUsers.value[mutableStateSelectedUser].userUUID,
+                      navigationActions)
                 }
               }
               // Draggable Bottom List
@@ -306,7 +355,12 @@ const val SECONDARY_TEXT_FONT_SP = 16
  *   info window.
  */
 @Composable
-private fun CustomInfoWindow(modifier: Modifier = Modifier, userBooks: List<DataBook>) {
+private fun CustomInfoWindow(
+    modifier: Modifier = Modifier,
+    userBooks: List<DataBook>,
+    userUUID: UUID,
+    navigationActions: NavigationActions
+) {
   Card(
       modifier =
           modifier
@@ -327,9 +381,31 @@ private fun CustomInfoWindow(modifier: Modifier = Modifier, userBooks: List<Data
       shape =
           RoundedCornerShape(
               0.dp, CARD_CORNER_RADIUS.dp, CARD_CORNER_RADIUS.dp, CARD_CORNER_RADIUS.dp)) {
-        Spacer(modifier.height(CARD_CORNER_RADIUS.dp))
         LazyColumn(
             modifier = Modifier.fillMaxWidth().testTag(C.Tag.Map.Marker.info_window_scrollable)) {
+              item {
+                Column(
+                    modifier =
+                        Modifier.clickable {
+                              navigationActions.navigateTo(
+                                  screen = C.Screen.OTHERS_USER_PROFILE, UUID = userUUID.toString())
+                            }
+                            .background(ColorVariable.Green)
+                            .testTag(C.Tag.Map.Marker.info_window_user_profile)) {
+                      Text(
+                          text = stringResource(R.string.map_screen_window_user),
+                          color = ColorVariable.Accent,
+                          fontSize = PRIMARY_TEXT_FONT_SP.sp,
+                          modifier =
+                              Modifier.padding(
+                                  horizontal = PADDING_HORIZONTAL_DP.dp,
+                                  vertical = CARD_CORNER_RADIUS.dp))
+                      HorizontalDivider(
+                          modifier = Modifier.fillMaxWidth(),
+                          thickness = DIVIDER_THICKNESS_DP.dp,
+                          color = ColorVariable.Accent)
+                    }
+              }
               itemsIndexed(userBooks) { index, book ->
                 Column(
                     modifier =
@@ -362,19 +438,11 @@ private fun CustomInfoWindow(modifier: Modifier = Modifier, userBooks: List<Data
 }
 /** Constants used for dimensions and sizes in the draggable menu UI components. */
 const val HEIGHT_RETRACTED_DRAGGABLE_MENU_DP = 50
-const val MIN_BOX_BOOK_HEIGHT_DP = 90
-const val IMAGE_HEIGHT_DP = MIN_BOX_BOOK_HEIGHT_DP - PADDING_VERTICAL_DP * 2
 // 1.5:1 ratio + the padding
-const val IMAGE_WIDTH_DP = MIN_BOX_BOOK_HEIGHT_DP * 2 / 3 + PADDING_HORIZONTAL_DP * 2
 const val HANDLE_WIDTH_DP = 120
 const val HANDLE_HEIGHT_DP = 15
 const val HANDLE_CORNER_RADIUS_DP = 10
 const val SPACER_HEIGHT_DP = 20
-const val STAR_HEIGHT_DP = 30
-const val STAR_SIZE_DP = 26
-const val STAR_INNER_SIZE_DP = STAR_SIZE_DP / 2
-const val WIDTH_TITLE_BOX_DP = 150
-const val MAX_RATING = 5
 
 /**
  * Composable function to display a draggable menu containing all the nearest books available.
@@ -452,38 +520,4 @@ private fun DraggableMenu(listAllBooks: List<DataBook>, navigationActions: Navig
               })
         }
       }
-}
-
-/**
- * Composable function that displays a row of 5 stars, the n first are filled then the rest are
- * empty stars.
- *
- * @param rating A [Int] from 1 to 5, used to know how many filled star should be displayed
- */
-@Composable
-private fun DisplayStarReview(rating: Int) {
-  for (i in 1..rating) {
-    Icon(
-        imageVector = Icons.Filled.Star,
-        contentDescription = "Star Icon",
-        tint = Color.Black,
-        modifier = Modifier.size(STAR_SIZE_DP.dp).testTag("mapDraggableMenuBookBoxStar"))
-  }
-  for (i in rating + 1..MAX_RATING) {
-    // Hollow star
-    // Icons.Outlined.Star doesn't work, it displays the
-    // Icons.Filled.Star
-    Box(modifier = Modifier.width(STAR_SIZE_DP.dp).testTag("mapDraggableMenuBookBoxEmptyStar")) {
-      Icon(
-          imageVector = Icons.Filled.Star,
-          contentDescription = "Star Icon",
-          tint = Color.Black,
-          modifier = Modifier.size(STAR_SIZE_DP.dp))
-      Icon(
-          imageVector = Icons.Filled.Star,
-          contentDescription = "Star Icon",
-          tint = ColorVariable.BackGround,
-          modifier = Modifier.size(STAR_INNER_SIZE_DP.dp).align(Alignment.Center))
-    }
-  }
 }

@@ -9,6 +9,7 @@ import com.android.bookswap.data.DataUser
 import com.android.bookswap.data.repository.BooksRepository
 import com.android.bookswap.data.repository.UsersRepository
 import com.android.bookswap.model.UserViewModel
+import com.android.bookswap.model.isNetworkAvailableForBook
 import io.mockk.*
 import java.util.*
 import org.junit.After
@@ -48,6 +49,8 @@ class AddToBookViewModelTest {
 
     mockUserViewModel = spyk(UserViewModel(uuid, mockUserRepository, user))
     every { mockUserViewModel.getUser(any()) } returns user
+    mockkStatic(::isNetworkAvailableForBook)
+    every { isNetworkAvailableForBook(any()) } returns true
     every { mockUserViewModel.uuid } returns uuid
     every { mockUserViewModel.getUser() } returns user
     every {
