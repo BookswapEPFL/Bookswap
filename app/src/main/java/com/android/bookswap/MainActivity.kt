@@ -19,6 +19,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
+import com.android.bookswap.data.DataMessage
 import com.android.bookswap.data.repository.BooksRepository
 import com.android.bookswap.data.repository.MessageRepository
 import com.android.bookswap.data.repository.PhotoFirebaseStorageRepository
@@ -29,6 +30,7 @@ import com.android.bookswap.data.source.network.PhotoFirebaseStorageSource
 import com.android.bookswap.data.source.network.UserFirestoreSource
 import com.android.bookswap.model.AppConfig
 import com.android.bookswap.model.LocalAppConfig
+import com.android.bookswap.model.NotificationService
 import com.android.bookswap.model.UserViewModel
 import com.android.bookswap.model.add.AddToBookViewModel
 import com.android.bookswap.model.chat.ContactViewModel
@@ -62,10 +64,66 @@ import com.google.android.libraries.places.api.Places
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.storage.FirebaseStorage
 import java.util.UUID
 
 class MainActivity : ComponentActivity() {
+
+  private var chatListener: ListenerRegistration? = null
+  private lateinit var notificationService: NotificationService
+
+  /** Listen for chat update and send notification when a message is received */
+  private fun listenForChatUpdates(userViewModel: UserViewModel) {
+    val db = FirebaseFirestore.getInstance()
+
+    chatListener =
+        db.collection("chats").addSnapshotListener { snapshot, e ->
+          if (e != null) {
+            Log.e("Firestore", "Listen failed: $e")
+            return@addSnapshotListener
+          }
+
+          if (snapshot != null && !isAppInForeground) {
+            for (change in snapshot.documentChanges) {
+              if (change.type == com.google.firebase.firestore.DocumentChange.Type.ADDED) {
+                val newMessage = change.document.toObject(DataMessage::class.java)
+
+                // Check if the current user is the receiver
+                if (newMessage.receiverUUID == userViewModel.uuid) {
+                  val senderName = newMessage.senderUUID.toString()
+                  val messageContent = newMessage.text
+
+                  // Send a notification
+                  notificationService.sendNotification(
+                      "New Message", "From $senderName: $messageContent")
+                }
+              }
+            }
+          }
+        }
+  }
+
+  override fun onDestroy() {
+    super.onDestroy()
+    // Remove the listener to avoid memory leaks
+    chatListener?.remove()
+  }
+
+  companion object {
+    var isAppInForeground = false
+  }
+
+  override fun onStart() {
+    super.onStart()
+    isAppInForeground = true
+  }
+
+  override fun onStop() {
+    super.onStop()
+    isAppInForeground = false
+  }
+
   /**
    * Called when the activity is starting. This is where most initialization should go.
    *
@@ -75,8 +133,6 @@ class MainActivity : ComponentActivity() {
    */
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    // permissionHandler = PermissionHandler(this)
-    // permissionHandler.askNotificationPermission()
     setContent { BookSwapApp() }
   }
   /**
@@ -91,10 +147,12 @@ class MainActivity : ComponentActivity() {
 
     val context = LocalContext.current
 
+    notificationService = NotificationService(context)
+
     // Create the data source objects
     val messageRepository = MessageFirestoreSource(db)
     val bookRepository = BooksFirestoreSource(db)
-    val userDataSource = UserFirestoreSource(db)
+    val userRepository = UserFirestoreSource(db)
     val photoStorage = PhotoFirebaseStorageSource(storage)
     val messageStorage = OfflineMessageStorage(context)
 
@@ -102,7 +160,9 @@ class MainActivity : ComponentActivity() {
     val geolocation = Geolocation(this)
     val apiKey = BuildConfig.MAPS_API_KEY
     if (!Places.isInitialized()) Places.initialize(applicationContext, apiKey)
+
     BookSwapAppTheme {
+
       // A surface container using the 'background' color from the theme
       Surface(
           modifier = Modifier.fillMaxSize().semantics { testTag = C.Tag.main_screen_container },
@@ -110,7 +170,7 @@ class MainActivity : ComponentActivity() {
             BookSwapApp(
                 messageRepository = messageRepository,
                 bookRepository = bookRepository,
-                userRepository = userDataSource,
+                userRepository = userRepository,
                 photoStorage = photoStorage,
                 messageStorage = messageStorage,
                 geolocation = geolocation,
@@ -134,13 +194,13 @@ class MainActivity : ComponentActivity() {
   fun BookSwapApp(
       messageRepository: MessageRepository,
       bookRepository: BooksRepository,
-      userRepository: UsersRepository,
       startDestination: String = C.Route.AUTH,
       photoStorage: PhotoFirebaseStorageRepository,
       messageStorage: OfflineMessageStorage,
       geolocation: IGeolocation = DefaultGeolocation(),
-      context: Context,
-      userVM: UserViewModel = UserViewModel(UUID.randomUUID(), userRepository)
+      userRepository: UsersRepository,
+      userVM: UserViewModel = UserViewModel(UUID.randomUUID(), userRepository),
+      context: Context
   ) {
     // navigation part
     val navController = rememberNavController()
@@ -180,6 +240,8 @@ class MainActivity : ComponentActivity() {
 
     // CompositionLocalProvider provides LocalAppConfig to every child
     CompositionLocalProvider(LocalAppConfig provides AppConfig(userViewModel = userVM)) {
+      listenForChatUpdates(userVM)
+
       NavHost(navController = navController, startDestination = startDestination) {
         navigation(startDestination = C.Screen.AUTH, route = C.Route.AUTH) {
           composable(C.Screen.AUTH) { SignInScreen(navigationActions) }

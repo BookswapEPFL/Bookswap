@@ -28,6 +28,7 @@
         android:roundIcon="@drawable/logo5"
         android:supportsRtl="true"
         android:theme="@style/Theme.BookSwapApp"
+        android:name=".BookSwapApplication"
         tools:targetApi="31">
 
         <!-- Main activity for the launcher -->
@@ -42,16 +43,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <!-- Firebase Messaging Service -->
-        <service
-            android:name=".model.chat.MyFirebaseMessagingService"
-            android:exported="true"
-            android:permission="com.android.bookswap.permission.SEND_MESSAGES">
-            <intent-filter>
-                <action android:name="com.google.firebase.MESSAGING_EVENT" />
-            </intent-filter>
-        </service>
 
         <!-- Google Maps API -->
         <meta-data
