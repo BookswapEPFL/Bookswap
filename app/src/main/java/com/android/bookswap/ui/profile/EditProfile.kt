@@ -249,15 +249,3 @@ fun EditProfileDialog(context: Context, onDismiss: () -> Unit, onSave: (DataUser
     }
   }
 }
-
-/*@Preview(showBackground = true, widthDp = 540, heightDp = 1110)
-@Composable
-fun EditProfileDialoguePreview() {
-  val address = android.location.Address(java.util.Locale.getDefault())
-  address.countryCode = "CH"
-  address.locality = "Lausanne"
-  address.postalCode = "1000"
-  address.countryName = "Switzerland"
-  address.setAddressLine(0, "Rue de la Gare 1")
-  EditProfileDialog(onDismiss = { *//*TODO*//* }, onSave = { *//*TODO*//* }, dataUser = DataUser("Mr.", "John", "Doe", "John.Dow@example.com","+41223456789",address,"dummyPic.png","dummyUUID0000"))
-                                                                       }*/
