@@ -34,6 +34,7 @@ import com.android.bookswap.model.UserViewModel
 import com.android.bookswap.model.chat.ContactViewModel
 import com.android.bookswap.model.chat.MyFirebaseMessagingService
 import com.android.bookswap.model.chat.OfflineMessageStorage
+import com.android.bookswap.model.chat.PermissionHandler
 import com.android.bookswap.model.map.BookFilter
 import com.android.bookswap.model.map.BookManagerViewModel
 import com.android.bookswap.model.map.DefaultGeolocation
@@ -65,11 +66,12 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.storage.FirebaseStorage
 import java.util.UUID
-import com.android.bookswap.model.chat.PermissionHandler
 
 class MainActivity : ComponentActivity() {
 
     private var chatListener: ListenerRegistration? = null
+    private lateinit var userRepository: UsersRepository
+    private lateinit var userViewModel: UserViewModel
 
     private fun listenForChatUpdates(currentUser: UUID) {
         val db = FirebaseFirestore.getInstance()
@@ -100,11 +102,6 @@ class MainActivity : ComponentActivity() {
             }
     }
 
-    private fun sendNotification(title: String, messageBody: String) {
-        val notificationService = MyFirebaseMessagingService()
-        notificationService.sendNotification(title, messageBody)
-    }
-
     override fun onDestroy() {
         super.onDestroy()
         // Remove the listener to avoid memory leaks
@@ -127,12 +124,12 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val userRepository = UserFirestoreSource(FirebaseFirestore.getInstance())
-        val userVM = UserViewModel(UUID.randomUUID(), userRepository)
+        userRepository = UserFirestoreSource(FirebaseFirestore.getInstance())
+        userViewModel = UserViewModel(UUID.randomUUID(), userRepository)
         val permissionHandler = PermissionHandler(this)
         permissionHandler.askNotificationPermission()
         setContent { BookSwapApp() }
-        listenForChatUpdates(userVM.getUser().userUUID)
+        listenForChatUpdates(userViewModel.getUser().userUUID)
   }
 
   @Composable
@@ -146,7 +143,6 @@ class MainActivity : ComponentActivity() {
     // Create the data source objects
     val messageRepository = MessageFirestoreSource(db)
     val bookRepository = BooksFirestoreSource(db)
-    val userDataSource = UserFirestoreSource(db)
     val photoStorage = PhotoFirebaseStorageSource(storage)
     val messageStorage = OfflineMessageStorage(context)
 
@@ -162,7 +158,6 @@ class MainActivity : ComponentActivity() {
             BookSwapApp(
                 messageRepository = messageRepository,
                 bookRepository = bookRepository,
-                userRepository = userDataSource,
                 photoStorage = photoStorage,
                 messageStorage = messageStorage,
                 geolocation = geolocation,
@@ -175,7 +170,6 @@ class MainActivity : ComponentActivity() {
   fun BookSwapApp(
       messageRepository: MessageRepository,
       bookRepository: BooksRepository,
-      userRepository: UsersRepository,
       startDestination: String = C.Route.AUTH,
       photoStorage: PhotoFirebaseStorageRepository,
       messageStorage: OfflineMessageStorage,
@@ -189,13 +183,12 @@ class MainActivity : ComponentActivity() {
     // user part
     // Firebase.auth.signOut() // Uncomment this line to test the sign in screen
     val currentUser = Firebase.auth.currentUser
-    val userVM = UserViewModel(UUID.randomUUID(), userRepository)
 
     if (currentUser != null) {
-      userVM.getUserByGoogleUid(currentUser.uid) // This will scrap the user from the database
+      userViewModel.getUserByGoogleUid(currentUser.uid) // This will scrap the user from the database
     }
     // Message part
-    val contactViewModel = ContactViewModel(userVM, userRepository, messageRepository)
+    val contactViewModel = ContactViewModel(userViewModel, userRepository, messageRepository)
     // Book part
     val bookFilter = BookFilter()
     val bookManagerViewModel =
@@ -217,7 +210,7 @@ class MainActivity : ComponentActivity() {
         }
 
     // CompositionLocalProvider provides LocalAppConfig to every child
-    CompositionLocalProvider(LocalAppConfig provides AppConfig(userViewModel = userVM)) {
+    CompositionLocalProvider(LocalAppConfig provides AppConfig(userViewModel = userViewModel)) {
       NavHost(navController = navController, startDestination = startDestination) {
         navigation(startDestination = C.Screen.AUTH, route = C.Route.AUTH) {
           composable(C.Screen.AUTH) { SignInScreen(navigationActions) }
@@ -238,7 +231,7 @@ class MainActivity : ComponentActivity() {
               ChatScreen(
                   messageRepository,
                   userRepository,
-                  userVM.getUser(),
+                  userViewModel.getUser(),
                   user2,
                   navigationActions,
                   photoStorage,
