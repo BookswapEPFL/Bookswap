@@ -30,11 +30,10 @@ import com.android.bookswap.data.source.network.PhotoFirebaseStorageSource
 import com.android.bookswap.data.source.network.UserFirestoreSource
 import com.android.bookswap.model.AppConfig
 import com.android.bookswap.model.LocalAppConfig
+import com.android.bookswap.model.NotificationService
 import com.android.bookswap.model.UserViewModel
 import com.android.bookswap.model.chat.ContactViewModel
-import com.android.bookswap.model.chat.MyFirebaseMessagingService
 import com.android.bookswap.model.chat.OfflineMessageStorage
-import com.android.bookswap.model.chat.PermissionHandler
 import com.android.bookswap.model.map.BookFilter
 import com.android.bookswap.model.map.BookManagerViewModel
 import com.android.bookswap.model.map.DefaultGeolocation
@@ -72,6 +71,7 @@ class MainActivity : ComponentActivity() {
     private var chatListener: ListenerRegistration? = null
     private lateinit var userRepository: UsersRepository
     private lateinit var userViewModel: UserViewModel
+    private lateinit var notificationService: NotificationService
 
     private fun listenForChatUpdates(currentUser: UUID) {
         val db = FirebaseFirestore.getInstance()
@@ -94,7 +94,7 @@ class MainActivity : ComponentActivity() {
                                 val messageContent = newMessage.text
 
                                 // Send a notification
-                                sendNotification("New Message", "From $senderName: $messageContent")
+                                notificationService.sendNotification("New Message", "From $senderName: $messageContent")
                             }
                         }
                     }
@@ -126,8 +126,6 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         userRepository = UserFirestoreSource(FirebaseFirestore.getInstance())
         userViewModel = UserViewModel(UUID.randomUUID(), userRepository)
-        val permissionHandler = PermissionHandler(this)
-        permissionHandler.askNotificationPermission()
         setContent { BookSwapApp() }
         listenForChatUpdates(userViewModel.getUser().userUUID)
   }
@@ -140,6 +138,8 @@ class MainActivity : ComponentActivity() {
 
     val context = LocalContext.current
 
+      notificationService = NotificationService(context)
+
     // Create the data source objects
     val messageRepository = MessageFirestoreSource(db)
     val bookRepository = BooksFirestoreSource(db)
@@ -150,6 +150,7 @@ class MainActivity : ComponentActivity() {
     val geolocation = Geolocation(this)
     val apiKey = BuildConfig.MAPS_API_KEY
     if (!Places.isInitialized()) Places.initialize(applicationContext, apiKey)
+
     BookSwapAppTheme {
       // A surface container using the 'background' color from the theme
       Surface(
