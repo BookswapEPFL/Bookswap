@@ -49,6 +49,7 @@ open class UserViewModel(
     userRepository.getUser(uuid) { result ->
       result.onSuccess {
         dataUser = it
+        uuid = dataUser.userUUID
         isLoaded = true
         _isStored.value = true
       }
