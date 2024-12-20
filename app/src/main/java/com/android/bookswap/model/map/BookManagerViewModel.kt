@@ -114,7 +114,7 @@ class BookManagerViewModel(
         launch {
           booksRepository.getBook { books ->
             if (books.isSuccess) {
-              _allBooks.value = books.getOrThrow().filter { it.userId != currentUserUUID }
+              _allBooks.value = books.getOrThrow()
               successBooks = true
             } else {
               Log.e(
