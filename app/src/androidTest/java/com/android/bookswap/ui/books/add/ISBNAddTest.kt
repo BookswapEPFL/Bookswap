@@ -55,6 +55,7 @@ class ISBNAddTest : TestCase() {
     every { toastMock.show() } returns Unit
     every { Toast.makeText(any(), any<String>(), any()) } returns toastMock
     val userUUid = UUID.randomUUID()
+    mockkConstructor(DataUser::class)
 
     val dataUser =
         DataUser(
@@ -73,7 +74,7 @@ class ISBNAddTest : TestCase() {
 
     val mockUserRepository: UsersRepository = mockk()
 
-    mockUserVM = spyk(UserViewModel(userUUid, mockUserRepository, dataUser))
+    mockUserVM = spyk(UserViewModel(userUUid, mockUserRepository))
 
     every { mockUserVM.uuid } returns userUUid
     every { mockUserVM.getUser() } returns dataUser

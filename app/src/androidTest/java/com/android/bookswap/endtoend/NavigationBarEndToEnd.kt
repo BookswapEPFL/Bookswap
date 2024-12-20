@@ -41,7 +41,7 @@ class NavigationBarEndToEnd {
   private lateinit var mockPhotoStorage: PhotoFirebaseStorageSource
   private lateinit var mockMessageStorage: OfflineMessageStorage
   private lateinit var mockContext: Context
-  private lateinit var userVM: UserViewModel
+  private lateinit var mockUserVM: UserViewModel
 
   private val standardUser =
       DataUser(
@@ -71,10 +71,10 @@ class NavigationBarEndToEnd {
     mockkConstructor(ContactViewModel::class)
     every { anyConstructed<ContactViewModel>().updateMessageBoxMap() } just runs
 
-    userVM = mockk(relaxed = true)
-    every { userVM.getUser(any()) } returns standardUser
-    every { userVM.uuid } returns standardUser.userUUID
-    every { userVM.updateAddress(any<Double>(), any<Double>(), any<Context>()) } just runs
+    mockUserVM = mockk(relaxed = true)
+    every { mockUserVM.getUser(any()) } returns standardUser
+    every { mockUserVM.uuid } returns standardUser.userUUID
+    every { mockUserVM.updateAddress(any<Double>(), any<Double>(), any<Context>()) } just runs
 
     composeTestRule.setContent {
       val db: FirebaseFirestore = mockk(relaxed = true)
@@ -82,12 +82,12 @@ class NavigationBarEndToEnd {
       val messageRepository = MessageFirestoreSource(db)
       MainActivity()
           .BookSwapApp(
-              messageRepository,
-              mockBookRepository,
-              mockUserRepository,
-              C.Route.MAP,
-              mockPhotoStorage,
-              mockMessageStorage,
+              messageRepository = messageRepository,
+              bookRepository = mockBookRepository,
+              userRepository = mockUserRepository,
+              startDestination = C.Route.MAP,
+              photoStorage = mockPhotoStorage,
+              messageStorage = mockMessageStorage,
               context = mockContext)
     }
   }

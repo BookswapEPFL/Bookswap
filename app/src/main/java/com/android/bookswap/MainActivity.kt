@@ -69,11 +69,9 @@ import java.util.UUID
 class MainActivity : ComponentActivity() {
 
   private var chatListener: ListenerRegistration? = null
-  private lateinit var userRepository: UsersRepository
-  private lateinit var userViewModel: UserViewModel
   private lateinit var notificationService: NotificationService
 
-  private fun listenForChatUpdates(currentUser: UUID) {
+  private fun listenForChatUpdates(userViewModel: UserViewModel) {
     val db = FirebaseFirestore.getInstance()
 
     chatListener =
@@ -89,7 +87,7 @@ class MainActivity : ComponentActivity() {
                 val newMessage = change.document.toObject(DataMessage::class.java)
 
                 // Check if the current user is the receiver
-                if (newMessage.receiverUUID == currentUser) {
+                if (newMessage.receiverUUID == userViewModel.uuid) {
                   val senderName = newMessage.senderUUID.toString()
                   val messageContent = newMessage.text
 
@@ -125,10 +123,7 @@ class MainActivity : ComponentActivity() {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    userRepository = UserFirestoreSource(FirebaseFirestore.getInstance())
-    userViewModel = UserViewModel(UUID.randomUUID(), userRepository)
     setContent { BookSwapApp() }
-    listenForChatUpdates(userViewModel.getUser().userUUID)
   }
 
   @Composable
@@ -144,6 +139,7 @@ class MainActivity : ComponentActivity() {
     // Create the data source objects
     val messageRepository = MessageFirestoreSource(db)
     val bookRepository = BooksFirestoreSource(db)
+    val userRepository = UserFirestoreSource(db)
     val photoStorage = PhotoFirebaseStorageSource(storage)
     val messageStorage = OfflineMessageStorage(context)
 
@@ -153,6 +149,7 @@ class MainActivity : ComponentActivity() {
     if (!Places.isInitialized()) Places.initialize(applicationContext, apiKey)
 
     BookSwapAppTheme {
+
       // A surface container using the 'background' color from the theme
       Surface(
           modifier = Modifier.fillMaxSize().semantics { testTag = C.Tag.main_screen_container },
@@ -160,6 +157,7 @@ class MainActivity : ComponentActivity() {
             BookSwapApp(
                 messageRepository = messageRepository,
                 bookRepository = bookRepository,
+                userRepository = userRepository,
                 photoStorage = photoStorage,
                 messageStorage = messageStorage,
                 geolocation = geolocation,
@@ -176,6 +174,7 @@ class MainActivity : ComponentActivity() {
       photoStorage: PhotoFirebaseStorageRepository,
       messageStorage: OfflineMessageStorage,
       geolocation: IGeolocation = DefaultGeolocation(),
+      userRepository: UsersRepository,
       context: Context
   ) {
     // navigation part
@@ -185,7 +184,7 @@ class MainActivity : ComponentActivity() {
     // user part
     // Firebase.auth.signOut() // Uncomment this line to test the sign in screen
     val currentUser = Firebase.auth.currentUser
-
+    val userViewModel = UserViewModel(UUID.randomUUID(), userRepository)
     if (currentUser != null) {
       userViewModel.getUserByGoogleUid(
           currentUser.uid) // This will scrap the user from the database
@@ -214,6 +213,8 @@ class MainActivity : ComponentActivity() {
 
     // CompositionLocalProvider provides LocalAppConfig to every child
     CompositionLocalProvider(LocalAppConfig provides AppConfig(userViewModel = userViewModel)) {
+      listenForChatUpdates(userViewModel)
+
       NavHost(navController = navController, startDestination = startDestination) {
         navigation(startDestination = C.Screen.AUTH, route = C.Route.AUTH) {
           composable(C.Screen.AUTH) { SignInScreen(navigationActions) }

@@ -17,10 +17,14 @@ import com.android.bookswap.data.source.api.GoogleBookDataSource
 import com.android.bookswap.data.source.network.PhotoFirebaseStorageSource
 import com.android.bookswap.model.chat.OfflineMessageStorage
 import com.android.bookswap.resources.C
+import com.google.firebase.firestore.CollectionReference
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ListenerRegistration
 import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
 import io.mockk.mockkConstructor
+import io.mockk.mockkStatic
 import io.mockk.runs
 import io.mockk.verify
 import java.util.UUID
@@ -42,6 +46,18 @@ class AddBooksEndToEnd {
 
   @Before
   fun setUp() {
+
+    val listenerRegistration: ListenerRegistration = mockk()
+    every { listenerRegistration.remove() } just runs
+
+    val documentReference: CollectionReference = mockk()
+    every { documentReference.addSnapshotListener(any()) } returns listenerRegistration
+
+    val firebaseFirestore: FirebaseFirestore = mockk()
+    every { firebaseFirestore.collection(any()) } returns documentReference
+
+    mockkStatic(FirebaseFirestore::class)
+    every { FirebaseFirestore.getInstance() } returns firebaseFirestore
 
     mockMessageRepository = mockk()
     mockBookRepository = mockk()
@@ -84,12 +100,12 @@ class AddBooksEndToEnd {
     composeTestRule.setContent {
       MainActivity()
           .BookSwapApp(
-              mockMessageRepository,
-              mockBookRepository,
-              mockUserRepository,
-              C.Route.NEW_BOOK,
-              mockPhotoStorage,
-              mockMessageStorage,
+              messageRepository = mockMessageRepository,
+              bookRepository = mockBookRepository,
+              userRepository = mockUserRepository,
+              startDestination = C.Route.NEW_BOOK,
+              photoStorage = mockPhotoStorage,
+              messageStorage = mockMessageStorage,
               context = mockContext)
     }
   }
